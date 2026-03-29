@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Proveedores – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vino:#9E3B3B;--vino-hover:#862f2f;--vino-light:#fdeaea;
+  --crema:#fdf6f0;--crema-dark:#f0e0d6;
+  --text:#2c1810;--muted:#8a7570;
+  --sidebar-w:220px;--topbar-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:#f4ede9;color:var(--text);}
+h1,h2,h3,h4,h5{font-family:'Playfair Display',serif;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;border-right:1px solid var(--crema-dark);display:flex;flex-direction:column;z-index:200;box-shadow:2px 0 16px rgba(94,32,32,.07);overflow-y:auto;}
+.sidebar-brand{display:flex;align-items:center;gap:.7rem;padding:1.2rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);text-decoration:none;}
+.brand-icon{width:38px;height:38px;border-radius:10px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.65rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.63rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:1.1rem 1.3rem .4rem;}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.62rem 1.3rem;color:var(--muted);font-size:.82rem;font-weight:500;text-decoration:none;border-left:3px solid transparent;transition:all .18s ease;}
+.nav-link-side i{font-size:1rem;width:20px;text-align:center;}
+.nav-link-side:hover,.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);}
+.nav-link-side.active{font-weight:600;}
+.nav-link-side.logout{color:#c62828 !important;}
+.nav-link-side.logout:hover{background:#fdecea;color:#c62828 !important;border-left-color:#c62828;}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.8rem 0;}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;}
+.topbar-title{font-size:1rem;font-weight:600;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.75rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-icon-btn{width:36px;height:36px;border-radius:50%;background:var(--vino-light);border:1px solid var(--crema-dark);display:flex;align-items:center;justify-content:center;color:var(--vino);font-size:1.15rem;cursor:pointer;transition:all .18s;}
+.topbar-icon-btn:hover{background:var(--vino);color:#fff;}
+
+/* MAIN */
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.8rem;}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:1.5rem;}
+.page-header h4{font-size:1.35rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.8rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.75rem;margin-bottom:.4rem;}
+.breadcrumb-item a{color:var(--vino);text-decoration:none;}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:.8rem;margin-bottom:1.3rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:220px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;}
+.search-input{width:100%;padding:.5rem .9rem .5rem 2.2rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.82rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);transition:border .18s;}
+.search-input:focus{outline:none;border-color:var(--vino);}
+.btn-vino{background:var(--vino);color:#fff;border:none;border-radius:10px;padding:.52rem 1.2rem;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .18s;}
+.btn-vino:hover{background:var(--vino-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(94,32,32,.25);}
+
+/* TABLA */
+.table-card{background:#fff;border-radius:14px;border:1.5px solid var(--crema-dark);overflow:hidden;}
+.table-wrap{overflow-x:auto;}
+.table{margin:0;}
+.table thead tr{background:#9E3B3B !important;}
+.table th{font-size:.66rem;color:#fff !important;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border:none !important;padding:.7rem .8rem;white-space:nowrap;background:#9E3B3B !important;}
+.table tbody tr{transition:background .15s;}
+.table tbody tr:nth-child(even){background:#fdf3f0;}
+.table tbody tr:hover{background:var(--vino-light);}
+.table td{font-size:.78rem;vertical-align:middle;border-color:#f4ede9;padding:.6rem .8rem;white-space:nowrap;}
+
+.badge-est{font-size:.65rem;padding:.25rem .7rem;border-radius:50px;font-weight:600;}
+.est-activo{background:#e8f5e9;color:#2e7d32;}
+.est-inactivo{background:#f5f5f5;color:#757575;}
+
+.btn-accion{width:30px;height:30px;border-radius:8px;border:none;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:all .16s;}
+.btn-edit{background:var(--vino);color:#fff;}
+.btn-edit:hover{background:var(--vino-hover);}
+.btn-deact{background:var(--vino);color:#fff;}
+.btn-deact:hover{background:var(--vino-hover);}
+
+/* MODAL */
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.1rem;}
+.form-label{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:.3rem;}
+.form-control,.form-select{font-size:.82rem;border:1.5px solid var(--crema-dark);border-radius:9px;font-family:'Poppins',sans-serif;transition:border .18s;}
+.form-control:focus,.form-select:focus{border-color:var(--vino);box-shadow:0 0 0 3px rgba(94,32,32,.1);}
+.field-req{color:var(--vino);}
+.btn-modal-save{background:var(--vino);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;}
+.btn-modal-save:hover{background:var(--vino-hover);}
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem 1.2rem;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+
+/* MODAL CONFIRMACIÓN */
+.confirm-icon{width:60px;height:60px;border-radius:50%;background:#fff8e1;color:#e65100;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--muted);}
+.empty-state i{font-size:2.5rem;opacity:.35;display:block;margin-bottom:.8rem;}
+.empty-state p{font-size:.82rem;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <a class="sidebar-brand" href="#">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </a>
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-speedometer2"></i>Dashboard</a>
+  <div class="nav-section-label">Gestión</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-people-fill"></i>Usuarios</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+  <a href="#" class="nav-link-side active"><i class="bi bi-truck"></i>Proveedores</a>
+  <div class="nav-section-label">Almacén</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-box-seam-fill"></i>Inv. Materia Prima</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-cart-fill"></i>Compras MP</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-bag-fill"></i>Inv. Producto Term.</a>
+  <div class="nav-section-label">Producción</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-journal-richtext"></i>Recetas</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-gear-fill"></i>Producción</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-send-fill"></i>Solicitudes Prod.</a>
+  <div class="nav-section-label">Comercial</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-cash-coin"></i>Ventas</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+  <a href="#" class="nav-link-side"><i class="bi bi-bag-check-fill"></i>Pedidos Clientes</a>
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Gestión de Proveedores</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <div class="topbar-icon-btn" title="Mi cuenta"><i class="bi bi-person-fill"></i></div>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<main class="main-content">
+
+  <!-- Breadcrumb + título -->
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+    </nav>
+    <h4>Proveedores de materia prima</h4>
+    <p>Administra los proveedores registrados en el sistema</p>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre de proveedor…">
+    </div>
+    <button class="btn-vino" onclick="abrirModalAgregar()">
+      <i class="bi bi-plus-lg"></i> Agregar proveedor
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-card">
+    <div class="table-wrap">
+      <table class="table table-borderless mb-0" id="tablaProveedores">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre proveedor</th>
+            <th>Nombre contacto</th>
+            <th>Teléfono</th>
+            <th>Correo electrónico</th>
+            <th>Ciudad / Estado</th>
+            <th>Estado</th>
+            <th>Fecha registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyProveedores">
+          <!-- filas generadas por JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ MODAL AGREGAR / EDITAR ══ -->
+<div class="modal fade" id="modalProveedor" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalProveedorTitulo"><i class="bi bi-truck me-2"></i>Agregar proveedor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <!-- Nombre proveedor -->
+          <div class="col-md-6">
+            <label class="form-label">Nombre del proveedor <span class="field-req">*</span></label>
+            <input type="text" class="form-control" id="f_nombre_proveedor" placeholder="Ej. Harinera del Centro">
+          </div>
+          <!-- Nombre contacto -->
+          <div class="col-md-6">
+            <label class="form-label">Nombre de contacto <span class="field-req">*</span></label>
+            <input type="text" class="form-control" id="f_nombre_contacto" placeholder="Ej. Roberto Sánchez">
+          </div>
+          <!-- Teléfono -->
+          <div class="col-md-6">
+            <label class="form-label">Teléfono <span class="field-req">*</span></label>
+            <input type="text" class="form-control" id="f_telefono" placeholder="477 123 4567">
+          </div>
+          <!-- Correo -->
+          <div class="col-md-6">
+            <label class="form-label">Correo electrónico <span class="field-req">*</span></label>
+            <input type="email" class="form-control" id="f_correo" placeholder="contacto@proveedor.com">
+          </div>
+          <!-- Ciudad -->
+          <div class="col-md-6">
+            <label class="form-label">Ciudad <span class="field-req">*</span></label>
+            <input type="text" class="form-control" id="f_ciudad" placeholder="León">
+          </div>
+          <!-- Estado -->
+          <div class="col-md-6">
+            <label class="form-label">Estado <span class="field-req">*</span></label>
+            <input type="text" class="form-control" id="f_estado" placeholder="Guanajuato">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-save" onclick="guardarProveedor()"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR DESACTIVAR ══ -->
+<div class="modal fade" id="modalDesactivar" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <div class="confirm-icon"><i class="bi bi-truck"></i></div>
+      <h6 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.5rem;">¿Desactivar proveedor?</h6>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.2rem;">El proveedor <strong id="nombreDesactivar"></strong> pasará a estado <em>inactivo</em>. No se eliminará el registro.</p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-vino" onclick="confirmarDesactivar()"><i class="bi bi-check-lg me-1"></i>Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Fecha/hora topbar
+const now = new Date();
+document.getElementById('fecha-top').textContent = now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hora-top').textContent  = now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+
+// Datos de ejemplo
+let proveedores = [
+  {id:'PROV-001',nombre_proveedor:'Harinera del Centro',nombre_contacto:'Roberto Sánchez',telefono:'477 100 2001',correo:'rsanchez@harinera.com',ciudad:'León',estado:'Guanajuato',estado_proveedor:'activo',fecha_registro:'05/01/2026'},
+  {id:'PROV-002',nombre_proveedor:'Lácteos San Marcos',nombre_contacto:'Claudia Ríos',telefono:'477 200 3002',correo:'crios@lacteossm.com',ciudad:'Silao',estado:'Guanajuato',estado_proveedor:'activo',fecha_registro:'10/01/2026'},
+  {id:'PROV-003',nombre_proveedor:'Azucarera Guanajuato',nombre_contacto:'Miguel Herrera',telefono:'477 300 4003',correo:'mherrera@azucarera.mx',ciudad:'Irapuato',estado:'Guanajuato',estado_proveedor:'activo',fecha_registro:'15/01/2026'},
+  {id:'PROV-004',nombre_proveedor:'Distribuidora El Huevo',nombre_contacto:'Patricia Vega',telefono:'477 400 5004',correo:'pvega@elhuevo.com',ciudad:'León',estado:'Guanajuato',estado_proveedor:'inactivo',fecha_registro:'20/01/2026'},
+  {id:'PROV-005',nombre_proveedor:'Mantequillas del Bajío',nombre_contacto:'Jorge Medina',telefono:'477 500 6005',correo:'jmedina@mantequillas.mx',ciudad:'Salamanca',estado:'Guanajuato',estado_proveedor:'activo',fecha_registro:'01/02/2026'},
+];
+
+let idxEditar = null, idxDesactivar = null;
+const modalProveedor  = new bootstrap.Modal(document.getElementById('modalProveedor'));
+const modalDesactivar = new bootstrap.Modal(document.getElementById('modalDesactivar'));
+
+const estBadge = e => e === 'activo'
+  ? `<span class="badge-est est-activo"><i class="bi bi-circle-fill me-1" style="font-size:.45rem"></i>Activo</span>`
+  : `<span class="badge-est est-inactivo"><i class="bi bi-circle-fill me-1" style="font-size:.45rem"></i>Inactivo</span>`;
+
+function renderTabla(lista) {
+  const tbody = document.getElementById('tbodyProveedores');
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="bi bi-truck"></i><p>No se encontraron proveedores.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = lista.map((p, i) => `
+    <tr>
+      <td><span style="font-size:.7rem;color:var(--muted)">${p.id}</span></td>
+      <td><strong>${p.nombre_proveedor}</strong></td>
+      <td>${p.nombre_contacto}</td>
+      <td>${p.telefono}</td>
+      <td><a href="mailto:${p.correo}" style="color:var(--vino);text-decoration:none;font-size:.76rem">${p.correo}</a></td>
+      <td>${p.ciudad}, ${p.estado}</td>
+      <td>${estBadge(p.estado_proveedor)}</td>
+      <td>${p.fecha_registro}</td>
+      <td>
+        <div class="d-flex gap-1">
+          <button class="btn-accion btn-edit" title="Editar" onclick="abrirModalEditar(${i})"><i class="bi bi-pencil-fill"></i></button>
+          ${p.estado_proveedor === 'activo'
+            ? `<button class="btn-accion btn-deact" title="Desactivar" onclick="abrirModalDesactivar(${i})"><i class="bi bi-slash-circle-fill"></i></button>`
+            : `<button class="btn-accion" style="background:#f5f5f5;color:#bbb;cursor:not-allowed" disabled title="Ya inactivo"><i class="bi bi-slash-circle-fill"></i></button>`
+          }
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalAgregar() {
+  idxEditar = null;
+  document.getElementById('modalProveedorTitulo').innerHTML = '<i class="bi bi-truck me-2"></i>Agregar proveedor';
+  ['f_nombre_proveedor','f_nombre_contacto','f_telefono','f_correo','f_ciudad','f_estado'].forEach(id => document.getElementById(id).value = '');
+  modalProveedor.show();
+}
+
+function abrirModalEditar(i) {
+  idxEditar = i;
+  const p = proveedores[i];
+  document.getElementById('modalProveedorTitulo').innerHTML = '<i class="bi bi-pencil-fill me-2"></i>Modificar proveedor';
+  document.getElementById('f_nombre_proveedor').value = p.nombre_proveedor;
+  document.getElementById('f_nombre_contacto').value  = p.nombre_contacto;
+  document.getElementById('f_telefono').value          = p.telefono;
+  document.getElementById('f_correo').value            = p.correo;
+  document.getElementById('f_ciudad').value            = p.ciudad;
+  document.getElementById('f_estado').value            = p.estado;
+  modalProveedor.show();
+}
+
+function guardarProveedor() {
+  const nombre = document.getElementById('f_nombre_proveedor').value.trim();
+  const contacto = document.getElementById('f_nombre_contacto').value.trim();
+  const telefono = document.getElementById('f_telefono').value.trim();
+  const correo   = document.getElementById('f_correo').value.trim();
+  const ciudad   = document.getElementById('f_ciudad').value.trim();
+  const estado   = document.getElementById('f_estado').value.trim();
+
+  if (!nombre || !contacto || !telefono || !correo || !ciudad || !estado) {
+    alert('Por favor, completa todos los campos obligatorios.');
+    return;
+  }
+
+  const nextNum = String(proveedores.length + 1).padStart(3, '0');
+  const obj = {
+    id: idxEditar !== null ? proveedores[idxEditar].id : `PROV-${nextNum}`,
+    nombre_proveedor: nombre,
+    nombre_contacto: contacto,
+    telefono,
+    correo,
+    ciudad,
+    estado,
+    estado_proveedor: idxEditar !== null ? proveedores[idxEditar].estado_proveedor : 'activo',
+    fecha_registro: idxEditar !== null ? proveedores[idxEditar].fecha_registro : new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'}),
+  };
+
+  if (idxEditar !== null) proveedores[idxEditar] = obj;
+  else proveedores.push(obj);
+
+  renderTabla(proveedores);
+  modalProveedor.hide();
+}
+
+function abrirModalDesactivar(i) {
+  idxDesactivar = i;
+  document.getElementById('nombreDesactivar').textContent = proveedores[i].nombre_proveedor;
+  modalDesactivar.show();
+}
+
+function confirmarDesactivar() {
+  proveedores[idxDesactivar].estado_proveedor = 'inactivo';
+  renderTabla(proveedores);
+  modalDesactivar.hide();
+}
+
+// RDF0504 – Buscar por nombre_proveedor
+document.getElementById('searchInput').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  const filtro = proveedores.filter(p => p.nombre_proveedor.toLowerCase().includes(q));
+  renderTabla(filtro);
+});
+
+// Sidebar activo
+document.querySelectorAll('.nav-link-side:not(.logout)').forEach(el => {
+  el.addEventListener('click', function () {
+    document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+renderTabla(proveedores);
+</script>
+</body>
+</html>

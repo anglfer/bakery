@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrito & Pedidos – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vino:#9E3B3B; --vino-hover:#7a2c2c; --vino-light:#fdeaea; --vino-mid:#c96060;
+  --crema:#fdf6f0; --crema-dark:#eeddd5; --bg:#f4ede9;
+  --text:#2c1810; --muted:#9a7a72;
+  --oro:#c9933a; --oro-l:#fdf6ea;
+  --sidebar-w:240px; --topbar-h:62px;
+  --green:#2e7d52; --green-s:#e8f5ee;
+  --blue:#1a5fa0;  --blue-s:#e6f0fb;
+  --orange:#c05a1a;--orange-s:#fdebd8;
+  --purple:#6a3ba0;--purple-s:#f0eafa;
+  --red:#c0392b;   --red-s:#fce8e6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+
+/* ═══════════ SIDEBAR ═══════════ */
+.sidebar{
+  position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;
+  background:#fff;border-right:1px solid var(--crema-dark);
+  display:flex;flex-direction:column;z-index:200;
+  box-shadow:3px 0 18px rgba(94,32,32,.07);overflow-y:auto;overflow-x:hidden;
+}
+.sidebar-brand{display:flex;align-items:center;gap:.75rem;padding:1.15rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);}
+.brand-icon{width:38px;height:38px;border-radius:11px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(158,59,59,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.95rem 1.3rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:500;border-left:3px solid transparent;transition:all .17s;cursor:pointer;}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b!important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+
+/* ═══════════ TOPBAR ═══════════ */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-tag{font-size:.72rem;color:var(--muted);background:var(--crema);border:1px solid var(--crema-dark);border-radius:20px;padding:.25rem .8rem;display:flex;align-items:center;gap:.35rem;}
+.topbar-tag span{color:var(--vino);font-weight:600;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(158,59,59,.3);border:2px solid var(--crema-dark);cursor:pointer;}
+
+/* ═══════════ MAIN ═══════════ */
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.7rem 1.9rem;min-height:calc(100vh - var(--topbar-h));}
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* ═══════════ TABS DE VISTA ═══════════ */
+.view-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;background:#fff;border-radius:12px;padding:5px;border:1.5px solid var(--crema-dark);width:fit-content;}
+.view-tab{padding:.5rem 1.2rem;border:none;background:transparent;border-radius:9px;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .2s;}
+.view-tab:hover{color:var(--vino);background:var(--vino-light);}
+.view-tab.active{background:var(--vino);color:#fff;box-shadow:0 3px 12px rgba(158,59,59,.28);}
+.view-panel{display:none;}
+.view-panel.active{display:block;animation:fadeUp .3s ease;}
+
+/* ═══════════ CARD BOX ═══════════ */
+.card-box{background:#fff;border-radius:16px;border:1.5px solid var(--crema-dark);border-top:3px solid var(--vino);overflow:hidden;}
+.card-box-header{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.3rem;border-bottom:1px solid var(--crema-dark);}
+.cbh-title{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem;}
+.cbh-title i{color:var(--vino);}
+.cbh-count{font-size:.72rem;color:var(--muted);background:var(--crema-dark);padding:.18rem .65rem;border-radius:20px;}
+
+/* ═══════════ LAYOUT CARRITO ═══════════ */
+.cart-layout{display:grid;grid-template-columns:1fr 330px;gap:1.4rem;align-items:start;}
+@media(max-width:960px){.cart-layout{grid-template-columns:1fr;}}
+
+/* ═══════════ FILAS CARRITO ═══════════ */
+.cart-items{padding:.3rem 0;}
+.cart-row{display:grid;grid-template-columns:68px 1fr auto;gap:1rem;align-items:center;padding:.85rem 1.3rem;border-bottom:1px solid var(--crema-dark);transition:background .13s;animation:fadeUp .3s ease both;}
+.cart-row:last-child{border-bottom:none;}
+.cart-row:hover{background:var(--crema);}
+.cart-img{width:68px;height:68px;border-radius:12px;object-fit:cover;flex-shrink:0;}
+.cart-img-ph{width:68px;height:68px;border-radius:12px;background:var(--crema);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.6rem;opacity:.4;flex-shrink:0;}
+.cart-name{font-family:'Playfair Display',serif;font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.18rem;line-height:1.2;}
+.cart-cat{font-size:.65rem;color:var(--muted);margin-bottom:.35rem;}
+.cart-unit-price{font-size:.7rem;color:var(--muted);}
+.stock-warn{font-size:.65rem;color:var(--orange);display:flex;align-items:center;gap:.25rem;font-weight:600;margin-top:.25rem;}
+.qty-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;}
+.qty-control{display:flex;align-items:center;gap:.4rem;background:var(--crema);border-radius:50px;padding:.2rem .3rem;border:1.5px solid var(--crema-dark);}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:none;background:#fff;color:var(--vino);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;font-weight:700;transition:all .15s;box-shadow:0 1px 4px rgba(90,20,20,.1);}
+.qty-btn:hover{background:var(--vino);color:#fff;}
+.qty-btn:disabled{opacity:.3;cursor:not-allowed;}
+.qty-num{font-size:.82rem;font-weight:700;min-width:22px;text-align:center;color:var(--text);}
+.cart-subtotal{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--vino);white-space:nowrap;}
+.btn-remove{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:6px;transition:all .15s;display:flex;align-items:center;gap:.25rem;font-family:'Poppins',sans-serif;font-size:.68rem;}
+.btn-remove:hover{color:var(--red);background:var(--red-s);}
+
+/* ═══════════ CARRITO VACÍO ═══════════ */
+.empty-cart{padding:3.5rem 1.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.6rem;}
+.empty-cart-icon{width:72px;height:72px;border-radius:50%;background:var(--crema);border:2px solid var(--crema-dark);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--muted);opacity:.5;margin-bottom:.4rem;}
+.empty-cart h5{font-size:1.1rem;color:var(--text);}
+.empty-cart p{font-size:.78rem;color:var(--muted);}
+.btn-ir-catalogo{display:inline-flex;align-items:center;gap:.4rem;background:var(--vino);color:#fff;border:none;border-radius:50px;padding:.6rem 1.4rem;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;margin-top:.3rem;}
+.btn-ir-catalogo:hover{background:var(--vino-hover);}
+
+/* ═══════════ PANEL RESUMEN ═══════════ */
+.resumen-body{padding:1.1rem 1.3rem;}
+.resumen-row{display:flex;justify-content:space-between;align-items:center;font-size:.79rem;padding:.38rem 0;border-bottom:1px solid var(--crema-dark);color:var(--muted);}
+.resumen-row:last-of-type{border-bottom:none;}
+.resumen-row strong{color:var(--text);font-weight:600;}
+.resumen-total{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.3rem;background:var(--vino-light);border-top:1.5px solid var(--crema-dark);}
+.resumen-total-label{font-size:.85rem;font-weight:700;color:var(--text);}
+.resumen-total-monto{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--vino);}
+
+/* Fecha entrega */
+.entrega-box{margin:1rem 1.3rem 0;background:var(--oro-l);border:1.5px solid #f0d89a;border-left:4px solid var(--oro);border-radius:10px;padding:.75rem .9rem;font-size:.75rem;color:#7a5010;}
+.entrega-box label{display:block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oro);margin-bottom:.35rem;}
+.entrega-box input[type=date]{width:100%;border:1.5px solid #f0d89a;border-radius:8px;padding:.42rem .7rem;font-family:'Poppins',sans-serif;font-size:.78rem;color:var(--text);background:#fff;outline:none;}
+.entrega-box input[type=date]:focus{border-color:var(--oro);}
+
+/* Botones resumen */
+.btn-confirmar{display:flex;align-items:center;justify-content:center;gap:.5rem;width:calc(100% - 2.6rem);margin:1rem 1.3rem .6rem;padding:.78rem;border:none;border-radius:12px;background:var(--vino);color:#fff;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(158,59,59,.3);}
+.btn-confirmar:hover{background:var(--vino-hover);transform:translateY(-1px);}
+.btn-confirmar:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-vaciar{display:flex;align-items:center;justify-content:center;gap:.4rem;width:calc(100% - 2.6rem);margin:0 1.3rem .9rem;padding:.55rem;border:1.5px solid var(--crema-dark);border-radius:12px;background:#fff;color:var(--muted);font-family:'Poppins',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .18s;}
+.btn-vaciar:hover{border-color:var(--red);color:var(--red);background:var(--red-s);}
+
+/* ═══════════ TABLA PEDIDOS ═══════════ */
+.sb-table{width:100%;border-collapse:collapse;}
+.sb-table thead tr{background:var(--vino);}
+.sb-table th{font-size:.63rem;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.62rem .9rem;white-space:nowrap;border:none;}
+.sb-table tbody tr{transition:background .13s;}
+.sb-table tbody tr:nth-child(even){background:#fdf3f0;}
+.sb-table tbody tr:hover{background:var(--vino-light);}
+.sb-table td{font-size:.75rem;vertical-align:middle;border-bottom:1px solid var(--crema-dark);padding:.62rem .9rem;color:var(--text);}
+
+/* Badges estado */
+.badge-estado{font-size:.62rem;padding:.22rem .7rem;border-radius:50px;font-weight:700;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
+.st-pendiente {background:var(--orange-s);color:var(--orange);}
+.st-confirmado{background:var(--blue-s);  color:var(--blue);}
+.st-pagado    {background:var(--purple-s);color:var(--purple);}
+.st-entregado {background:var(--green-s); color:var(--green);}
+.st-cancelado {background:#f0f0f0;        color:#888;}
+
+/* Botones tabla */
+.btn-tbl{height:27px;border:none;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:.25rem;font-size:.65rem;font-weight:700;cursor:pointer;padding:0 .65rem;font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-tbl-view  {background:var(--blue-s); color:var(--blue);}
+.btn-tbl-view:hover{background:var(--blue);color:#fff;}
+.btn-tbl-cancel{background:var(--red-s);color:var(--red);}
+.btn-tbl-cancel:hover{background:var(--red);color:#fff;}
+
+/* Sin pedidos */
+.empty-pedidos{padding:3rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.5rem;}
+.empty-pedidos i{font-size:2.5rem;color:var(--muted);opacity:.4;}
+.empty-pedidos h5{font-size:1rem;color:var(--text);}
+.empty-pedidos p{font-size:.75rem;color:var(--muted);}
+
+/* ═══════════ MODALES ═══════════ */
+.modal-content{border-radius:18px!important;border:none;box-shadow:0 24px 60px rgba(90,20,20,.2);}
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:18px 18px 0 0!important;padding:1rem 1.4rem;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.modal-section{background:var(--crema);border-radius:10px;padding:.8rem 1rem;margin-bottom:.85rem;border-left:3px solid var(--vino);}
+.modal-section-title{font-size:.68rem;font-weight:700;color:var(--vino);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem;}
+.tbl-detalle{width:100%;border-collapse:collapse;font-size:.75rem;}
+.tbl-detalle th{background:var(--vino);color:#fff;padding:.42rem .75rem;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+.tbl-detalle td{padding:.48rem .75rem;border-bottom:1px solid var(--crema-dark);vertical-align:middle;}
+.tbl-detalle tfoot td{background:var(--crema);font-weight:700;color:var(--vino);}
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .18s;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+.btn-modal-ok{background:var(--vino);color:#fff;border:none;border-radius:9px;padding:.52rem 1.4rem;font-size:.8rem;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.35rem;}
+.btn-modal-ok:hover{background:var(--vino-hover);}
+.btn-modal-danger{background:var(--red);color:#fff;border:none;border-radius:9px;padding:.52rem 1.4rem;font-size:.8rem;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.35rem;}
+.btn-modal-danger:hover{background:#a32323;}
+
+/* Confirm icon */
+.confirm-icon{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto .9rem;}
+.ci-green{background:var(--green-s);color:var(--green);}
+.ci-red  {background:var(--red-s);  color:var(--red);}
+
+/* Success */
+.success-screen{display:none;text-align:center;padding:.5rem 0;animation:fadeUp .4s ease;}
+.success-screen.show{display:block;}
+.success-icon-big{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--green),#45a06a);display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;margin:0 auto 1rem;box-shadow:0 8px 24px rgba(46,125,82,.3);animation:pop .5s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-size:1.3rem;margin-bottom:.35rem;}
+.success-sub{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:1.1rem;}
+.btn-ok-final{display:inline-flex;align-items:center;gap:.4rem;background:var(--vino);color:#fff;border:none;border-radius:10px;padding:.62rem 1.5rem;font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:.18s;}
+.btn-ok-final:hover{background:var(--vino-hover);}
+
+/* Folio tag */
+.folio-tag{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vino);background:var(--vino-light);border-radius:8px;padding:.2rem .7rem;display:inline-block;margin-bottom:.6rem;}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:1.4rem;right:1.4rem;z-index:9999;display:flex;flex-direction:column;gap:.4rem;}
+.toast-pop{padding:.68rem 1.1rem;border-radius:10px;font-size:.78rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.42rem;box-shadow:0 4px 18px rgba(0,0,0,.14);animation:slideIn .3s ease;white-space:nowrap;}
+.toast-success{background:#27ae60;}
+.toast-warn{background:var(--orange);}
+.toast-error{background:var(--red);}
+.toast-info{background:var(--blue);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Portal de Clientes</span></div>
+  </div>
+  <div class="nav-section-label">Tienda</div>
+  <a href="#" class="nav-link-side"><i class="bi bi-grid-fill"></i>Catálogo</a>
+  <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Mi carrito</a>
+  <div class="nav-section-label">Mi cuenta</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this);switchView('pedidos')"><i class="bi bi-clipboard-check-fill"></i>Mis pedidos</a>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Historial</a>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Mi perfil</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="topbar-title" id="topbar-title">Mi Carrito de Compras</div>
+  <div class="topbar-right">
+    <div class="topbar-tag"><i class="bi bi-person-fill"></i>Laura Martínez · <span id="topbar-items">3 productos</span></div>
+    <div class="topbar-avatar">LM</div>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main class="main-content">
+
+  <!-- Header -->
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+        <li class="breadcrumb-item active" id="breadcrumb-active">Carrito</li>
+      </ol>
+    </nav>
+    <h4 id="page-title">Carrito & Pedidos</h4>
+    <p id="page-sub">RF17 · RF18 · Gestiona tu carrito y genera tu pedido</p>
+  </div>
+
+  <!-- Tabs de vista -->
+  <div class="view-tabs fu d2">
+    <button class="view-tab active" id="tab-carrito" onclick="switchView('carrito')">
+      <i class="bi bi-bag-fill"></i>Mi carrito <span id="tab-cart-badge" style="background:var(--vino-light);color:var(--vino);border-radius:20px;padding:.05rem .5rem;font-size:.65rem;font-weight:700;"></span>
+    </button>
+    <button class="view-tab" id="tab-pedidos" onclick="switchView('pedidos')">
+      <i class="bi bi-clipboard-check-fill"></i>Mis pedidos <span id="tab-ped-badge" style="background:var(--vino-light);color:var(--vino);border-radius:20px;padding:.05rem .5rem;font-size:.65rem;font-weight:700;"></span>
+    </button>
+  </div>
+
+  <!-- ══════════ VISTA CARRITO (RF17) ══════════ -->
+  <div class="view-panel active" id="panel-carrito">
+    <div class="cart-layout">
+
+      <!-- Lista productos -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <div class="cbh-title"><i class="bi bi-bag-fill"></i>Productos seleccionados</div>
+          <span class="cbh-count" id="items-count">0 artículos</span>
+        </div>
+        <div class="cart-items" id="cart-items-container"></div>
+      </div>
+
+      <!-- Resumen -->
+      <div>
+        <div class="card-box">
+          <div class="card-box-header">
+            <div class="cbh-title"><i class="bi bi-receipt"></i>Resumen del pedido</div>
+          </div>
+          <div class="resumen-body" id="resumen-body"></div>
+          <div class="resumen-total">
+            <div class="resumen-total-label">Total a pagar</div>
+            <div class="resumen-total-monto" id="resumen-total">$0.00</div>
+          </div>
+          <div class="entrega-box">
+            <label><i class="bi bi-calendar-event-fill me-1"></i>Fecha de entrega deseada</label>
+            <input type="date" id="fechaEntrega" min="">
+          </div>
+          <button class="btn-confirmar" id="btn-confirmar" onclick="abrirConfirmar()" disabled>
+            <i class="bi bi-clipboard-check-fill"></i>Generar pedido
+          </button>
+          <button class="btn-vaciar" id="btn-vaciar" onclick="vaciarCarrito()">
+            <i class="bi bi-trash3-fill"></i>Vaciar carrito
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ VISTA MIS PEDIDOS (RF18) ══════════ -->
+  <div class="view-panel" id="panel-pedidos">
+    <div class="card-box">
+      <div class="card-box-header">
+        <div class="cbh-title"><i class="bi bi-clipboard-check-fill"></i>Mis pedidos</div>
+        <span class="cbh-count" id="ped-count">0 pedidos</span>
+      </div>
+      <div style="overflow-x:auto;" id="tabla-pedidos-wrap"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ MODAL CONFIRMAR PEDIDO ══ -->
+<div class="modal fade" id="modalConfirmar" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4">
+      <div id="conf-body" class="text-center">
+        <div class="confirm-icon ci-green"><i class="bi bi-bag-check-fill"></i></div>
+        <h6 style="font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:.4rem;">¿Generar pedido?</h6>
+        <p style="font-size:.76rem;color:var(--muted);margin-bottom:1.1rem;" id="conf-texto"></p>
+        <div class="d-flex gap-2 justify-content-center">
+          <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn-modal-ok" onclick="ejecutarPedido()"><i class="bi bi-check-lg"></i>Confirmar</button>
+        </div>
+      </div>
+      <div class="success-screen" id="success-body">
+        <div class="success-icon-big"><i class="bi bi-check-lg"></i></div>
+        <h5 class="success-title">¡Pedido generado!</h5>
+        <p class="success-sub" id="success-folio-txt"></p>
+        <button class="btn-ok-final" onclick="irAPedidos()"><i class="bi bi-clipboard-check-fill"></i>Ver mis pedidos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL DETALLE PEDIDO ══ -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-clipboard-check-fill me-2"></i>Detalle del pedido — <span id="det-folio"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Información del pedido</div>
+          <div class="row g-2" id="det-info"></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-bag-fill"></i>Productos solicitados</div>
+          <div style="overflow-x:auto;">
+            <table class="tbl-detalle">
+              <thead><tr><th>#</th><th>Producto</th><th>Cantidad</th><th style="text-align:right;">Precio unit.</th><th style="text-align:right;">Subtotal</th></tr></thead>
+              <tbody id="det-tbody"></tbody>
+              <tfoot><tr><td colspan="4" style="text-align:right;font-size:.76rem;">Total:</td><td style="text-align:right;" id="det-total"></td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CANCELAR PEDIDO ══ -->
+<div class="modal fade" id="modalCancelar" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <div class="confirm-icon ci-red"><i class="bi bi-x-circle-fill"></i></div>
+      <h6 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.4rem;">¿Cancelar pedido?</h6>
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem;" id="canc-texto"></p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">No, mantener</button>
+        <button class="btn-modal-danger" onclick="ejecutarCancelacion()"><i class="bi bi-x-lg"></i>Sí, cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* ═══════════════════════════════════
+   INVENTARIO (simula producto + inventario_producto)
+═══════════════════════════════════ */
+const STOCK = {
+  1:{ nombre:'Pastel de Chocolate', precio:450, categoria:'Pasteles', disponible:8,
+      imagen:'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=120&q=80' },
+  5:{ nombre:'Donas Glaseadas (6 pz)', precio:90, categoria:'Pan dulce', disponible:12,
+      imagen:'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=120&q=80' },
+  6:{ nombre:'Pay de Manzana', precio:180, categoria:'Pays', disponible:6,
+      imagen:'https://images.unsplash.com/photo-1562007908-17c67e878c88?w=120&q=80' },
+  2:{ nombre:'Pastel Red Velvet', precio:480, categoria:'Pasteles', disponible:5,
+      imagen:'https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7?w=120&q=80' },
+  3:{ nombre:'Concha de Vainilla', precio:14, categoria:'Pan dulce', disponible:40,
+      imagen:'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=120&q=80' },
+};
+
+/* ═══════════════════════════════════
+   CARRITO — simula tabla `carrito`
+═══════════════════════════════════ */
+let carrito = [
+  { id_carrito:1, id_cliente:1, id_producto:1, cantidad:1 },
+  { id_carrito:2, id_cliente:1, id_producto:5, cantidad:2 },
+  { id_carrito:3, id_cliente:1, id_producto:6, cantidad:1 },
+];
+
+/* ═══════════════════════════════════
+   PEDIDOS — simula tabla `pedido` + `pedido_detalle`
+═══════════════════════════════════ */
+let pedidos = [
+  { id_pedido:101, folio:'PED-0101', fecha_pedido:'01/03/2026', fecha_entrega:'08/03/2026',
+    estado_pedido:'confirmado', total_pedido:640,
+    detalle:[
+      { id_producto:2, cantidad:1, precio_unitario:480, subtotal:480 },
+      { id_producto:3, cantidad:10, precio_unitario:14, subtotal:140 },
+    ]},
+  { id_pedido:102, folio:'PED-0102', fecha_pedido:'20/02/2026', fecha_entrega:'25/02/2026',
+    estado_pedido:'entregado', total_pedido:270,
+    detalle:[
+      { id_producto:6, cantidad:1, precio_unitario:180, subtotal:180 },
+      { id_producto:5, cantidad:1, precio_unitario:90,  subtotal:90  },
+    ]},
+];
+
+let pedidoACancelar = null;
+let folioGenerado   = '';
+
+const fmt$ = n => '$' + Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* ═══════════════════════════════════
+   HELPERS
+═══════════════════════════════════ */
+function subtotal(item){ return STOCK[item.id_producto].precio * item.cantidad; }
+function totalCarrito(){ return carrito.reduce((s,i) => s + subtotal(i), 0); }
+
+const EST = {
+  pendiente:  { cls:'st-pendiente',  ico:'bi-clock-fill',         label:'Pendiente'  },
+  confirmado: { cls:'st-confirmado', ico:'bi-check-circle-fill',   label:'Confirmado' },
+  pagado:     { cls:'st-pagado',     ico:'bi-credit-card-fill',    label:'Pagado'     },
+  entregado:  { cls:'st-entregado',  ico:'bi-box-seam-fill',       label:'Entregado'  },
+  cancelado:  { cls:'st-cancelado',  ico:'bi-x-circle-fill',       label:'Cancelado'  },
+};
+function badgeEstado(e){
+  const s = EST[e]||EST.pendiente;
+  return `<span class="badge-estado ${s.cls}"><i class="bi ${s.ico}"></i>${s.label}</span>`;
+}
+
+/* ═══════════════════════════════════
+   TABS
+═══════════════════════════════════ */
+function switchView(view){
+  ['carrito','pedidos'].forEach(v => {
+    document.getElementById('panel-'+v).classList.toggle('active', v===view);
+    document.getElementById('tab-'+v).classList.toggle('active',   v===view);
+  });
+  if(view==='pedidos') renderPedidos();
+  updateTabBadges();
+}
+
+function updateTabBadges(){
+  const totalItems = carrito.reduce((s,i)=>s+i.cantidad,0);
+  document.getElementById('tab-cart-badge').textContent = totalItems||'';
+  document.getElementById('tab-ped-badge').textContent  = pedidos.length||'';
+}
+
+/* ═══════════════════════════════════
+   RENDER CARRITO (RF17)
+═══════════════════════════════════ */
+function renderCarrito(){
+  const cont  = document.getElementById('cart-items-container');
+  const count = carrito.reduce((s,i)=>s+i.cantidad, 0);
+  document.getElementById('items-count').textContent = count+' artículo'+(count!==1?'s':'');
+  document.getElementById('topbar-items').textContent = count+' producto'+(count!==1?'s':'');
+
+  if(!carrito.length){
+    cont.innerHTML = `<div class="empty-cart">
+      <div class="empty-cart-icon"><i class="bi bi-bag"></i></div>
+      <h5>Tu carrito está vacío</h5>
+      <p>Agrega productos desde el catálogo para comenzar.</p>
+      <button class="btn-ir-catalogo"><i class="bi bi-grid-fill"></i>Ir al catálogo</button>
+    </div>`;
+    document.getElementById('btn-confirmar').disabled = true;
+    document.getElementById('btn-vaciar').style.display = 'none';
+    renderResumen(); updateTabBadges(); return;
+  }
+
+  document.getElementById('btn-confirmar').disabled = false;
+  document.getElementById('btn-vaciar').style.display = 'flex';
+
+  cont.innerHTML = carrito.map((item, idx) => {
+    const p = STOCK[item.id_producto];
+    const sub = subtotal(item);
+    const tope = item.cantidad >= p.disponible;
+    return `<div class="cart-row" style="animation-delay:${idx*.06}s">
+      ${p.imagen ? `<img class="cart-img" src="${p.imagen}" alt="${p.nombre}">` : `<div class="cart-img-ph"><i class="bi bi-cake2"></i></div>`}
+      <div>
+        <div class="cart-name">${p.nombre}</div>
+        <div class="cart-cat">${p.categoria}</div>
+        <div class="cart-unit-price">Precio unitario: <strong>${fmt$(p.precio)}</strong></div>
+        ${tope ? `<div class="stock-warn mt-1"><i class="bi bi-exclamation-triangle-fill"></i>Máximo disponible: ${p.disponible} uds.</div>` : ''}
+      </div>
+      <div class="qty-wrap">
+        <div class="cart-subtotal">${fmt$(sub)}</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="cambiarQty(${item.id_producto},-1)" ${item.cantidad<=1?'disabled':''}><i class="bi bi-dash"></i></button>
+          <span class="qty-num">${item.cantidad}</span>
+          <button class="qty-btn" onclick="cambiarQty(${item.id_producto},1)" ${item.cantidad>=p.disponible?'disabled':''}><i class="bi bi-plus"></i></button>
+        </div>
+        <button class="btn-remove" onclick="eliminarProducto(${item.id_producto})"><i class="bi bi-trash3-fill"></i>Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderResumen(); updateTabBadges();
+}
+
+function renderResumen(){
+  const body  = document.getElementById('resumen-body');
+  const total = totalCarrito();
+  if(!carrito.length){
+    body.innerHTML = `<div style="font-size:.78rem;color:var(--muted);text-align:center;padding:.5rem 0;">Sin productos en el carrito</div>`;
+    document.getElementById('resumen-total').textContent = '$0.00';
+    return;
+  }
+  body.innerHTML = carrito.map(item => {
+    const p = STOCK[item.id_producto];
+    return `<div class="resumen-row"><span>${p.nombre} <span style="color:var(--muted);">×${item.cantidad}</span></span><strong>${fmt$(subtotal(item))}</strong></div>`;
+  }).join('');
+  document.getElementById('resumen-total').textContent = fmt$(total);
+}
+
+/* ═══════════════════════════════════
+   ACCIONES CARRITO
+═══════════════════════════════════ */
+function cambiarQty(id, delta){
+  const item = carrito.find(c=>c.id_producto===id);
+  if(!item) return;
+  const p = STOCK[id];
+  const nueva = item.cantidad + delta;
+  if(nueva < 1){ eliminarProducto(id); return; }
+  if(nueva > p.disponible){ toast(`Solo hay ${p.disponible} uds. disponibles de "${p.nombre}".`,'warn'); return; }
+  item.cantidad = nueva;
+  renderCarrito();
+}
+function eliminarProducto(id){
+  const p = STOCK[id];
+  carrito = carrito.filter(c=>c.id_producto!==id);
+  renderCarrito();
+  toast(`"${p.nombre}" eliminado del carrito.`,'warn');
+}
+function vaciarCarrito(){
+  if(!carrito.length) return;
+  carrito = [];
+  renderCarrito();
+  toast('Carrito vaciado.','warn');
+}
+
+/* ═══════════════════════════════════
+   GENERAR PEDIDO (RF18)
+═══════════════════════════════════ */
+function abrirConfirmar(){
+  const fecha = document.getElementById('fechaEntrega').value;
+  if(!fecha){ toast('Selecciona una fecha de entrega.','warn'); document.getElementById('fechaEntrega').focus(); return; }
+  const total = totalCarrito();
+  const items = carrito.reduce((s,i)=>s+i.cantidad,0);
+  document.getElementById('conf-texto').innerHTML =
+    `<strong>${items} producto${items!==1?'s':''}</strong> · Total: <strong>${fmt$(total)}</strong><br>
+     Entrega: <strong>${new Date(fecha+'T12:00').toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}</strong>`;
+  document.getElementById('conf-body').style.display = 'block';
+  document.getElementById('success-body').classList.remove('show');
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmar')).show();
+}
+
+function ejecutarPedido(){
+  const fecha = document.getElementById('fechaEntrega').value;
+  const total = totalCarrito();
+  const nuevoId = pedidos.length ? Math.max(...pedidos.map(p=>p.id_pedido))+1 : 200;
+  folioGenerado = 'PED-0' + String(nuevoId).padStart(3,'0');
+
+  // Simula INSERT INTO pedido + pedido_detalle
+  pedidos.unshift({
+    id_pedido: nuevoId,
+    folio: folioGenerado,
+    fecha_pedido: new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    fecha_entrega: new Date(fecha+'T12:00').toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    estado_pedido: 'pendiente',
+    total_pedido: total,
+    detalle: carrito.map(item => ({
+      id_producto: item.id_producto,
+      cantidad: item.cantidad,
+      precio_unitario: STOCK[item.id_producto].precio,
+      subtotal: subtotal(item),
+    })),
+  });
+
+  document.getElementById('success-folio-txt').innerHTML =
+    `Tu pedido <strong>${folioGenerado}</strong> fue registrado.<br>Quedará en estado <em>Pendiente</em> hasta que el personal lo gestione.`;
+
+  // Simula DELETE FROM carrito
+  carrito = [];
+  renderCarrito();
+
+  document.getElementById('conf-body').style.display = 'none';
+  document.getElementById('success-body').classList.add('show');
+  updateTabBadges();
+}
+
+function irAPedidos(){
+  bootstrap.Modal.getInstance(document.getElementById('modalConfirmar')).hide();
+  switchView('pedidos');
+  document.getElementById('tab-pedidos').classList.add('active');
+  document.getElementById('tab-carrito').classList.remove('active');
+}
+
+/* ═══════════════════════════════════
+   RENDER TABLA PEDIDOS (RF18)
+═══════════════════════════════════ */
+function renderPedidos(){
+  const wrap = document.getElementById('tabla-pedidos-wrap');
+  document.getElementById('ped-count').textContent = pedidos.length+' pedido'+(pedidos.length!==1?'s':'');
+
+  if(!pedidos.length){
+    wrap.innerHTML = `<div class="empty-pedidos">
+      <i class="bi bi-clipboard"></i>
+      <h5>Sin pedidos aún</h5>
+      <p>Cuando generes tu primer pedido aparecerá aquí.</p>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table class="sb-table">
+    <thead><tr>
+      <th>Folio</th><th>Fecha pedido</th><th>Fecha entrega</th>
+      <th>Productos</th><th>Total</th><th>Estado</th>
+      <th style="text-align:center;">Acciones</th>
+    </tr></thead>
+    <tbody>${pedidos.map(p=>`
+      <tr>
+        <td><strong style="color:var(--vino);">${p.folio}</strong></td>
+        <td style="color:var(--muted);">${p.fecha_pedido}</td>
+        <td style="color:var(--muted);">${p.fecha_entrega}</td>
+        <td><span style="background:var(--crema-dark);color:var(--muted);border-radius:5px;padding:.1rem .5rem;font-size:.7rem;font-weight:700;">${p.detalle.length} prod.</span></td>
+        <td><strong>${fmt$(p.total_pedido)}</strong></td>
+        <td>${badgeEstado(p.estado_pedido)}</td>
+        <td>
+          <div style="display:flex;gap:.35rem;justify-content:center;">
+            <button class="btn-tbl btn-tbl-view" onclick="verDetalle(${p.id_pedido})"><i class="bi bi-eye-fill"></i> Ver</button>
+            ${p.estado_pedido==='pendiente'
+              ? `<button class="btn-tbl btn-tbl-cancel" onclick="abrirCancelar(${p.id_pedido})"><i class="bi bi-x-circle-fill"></i> Cancelar</button>`
+              : ''}
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+/* ═══════════════════════════════════
+   DETALLE PEDIDO
+═══════════════════════════════════ */
+function verDetalle(id){
+  const p = pedidos.find(x=>x.id_pedido===id);
+  document.getElementById('det-folio').textContent = p.folio;
+  document.getElementById('det-info').innerHTML = `
+    <div class="col-sm-3"><div style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.12rem;">Fecha pedido</div><div style="font-size:.8rem;">${p.fecha_pedido}</div></div>
+    <div class="col-sm-3"><div style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.12rem;">Fecha entrega</div><div style="font-size:.8rem;color:var(--vino);font-weight:600;">${p.fecha_entrega}</div></div>
+    <div class="col-sm-3"><div style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.12rem;">Estado</div><div>${badgeEstado(p.estado_pedido)}</div></div>
+    <div class="col-sm-3"><div style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.12rem;">Total</div><div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--vino);">${fmt$(p.total_pedido)}</div></div>`;
+  document.getElementById('det-tbody').innerHTML = p.detalle.map((d,i)=>`
+    <tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td><strong>${STOCK[d.id_producto]?.nombre||'Producto #'+d.id_producto}</strong></td>
+      <td style="text-align:center;">${d.cantidad}</td>
+      <td style="text-align:right;">${fmt$(d.precio_unitario)}</td>
+      <td style="text-align:right;font-weight:600;">${fmt$(d.subtotal)}</td>
+    </tr>`).join('');
+  document.getElementById('det-total').textContent = fmt$(p.total_pedido);
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalle')).show();
+}
+
+/* ═══════════════════════════════════
+   CANCELAR PEDIDO (RF18 — solo pendiente)
+═══════════════════════════════════ */
+function abrirCancelar(id){
+  pedidoACancelar = id;
+  const p = pedidos.find(x=>x.id_pedido===id);
+  document.getElementById('canc-texto').innerHTML =
+    `El pedido <strong>${p.folio}</strong> pasará a estado <strong>Cancelado</strong>. Esta acción no se puede deshacer.`;
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelar')).show();
+}
+function ejecutarCancelacion(){
+  const p = pedidos.find(x=>x.id_pedido===pedidoACancelar);
+  p.estado_pedido = 'cancelado';
+  bootstrap.Modal.getInstance(document.getElementById('modalCancelar')).hide();
+  renderPedidos();
+  toast(`Pedido ${p.folio} cancelado.`,'warn');
+}
+
+/* ═══════════════════════════════════
+   FECHA MÍNIMA
+═══════════════════════════════════ */
+const tmr = new Date(); tmr.setDate(tmr.getDate()+1);
+document.getElementById('fechaEntrega').min = tmr.toISOString().split('T')[0];
+
+/* ═══════════════════════════════════
+   TOAST
+═══════════════════════════════════ */
+function toast(msg, tipo='success'){
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-pop toast-'+tipo;
+  const ic = tipo==='success'?'bi-check-circle-fill':tipo==='warn'?'bi-exclamation-circle-fill':'bi-x-circle-fill';
+  t.innerHTML = `<i class="bi ${ic}"></i>${msg}`;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3600);
+}
+
+/* ═══════════════════════════════════
+   SIDEBAR ACTIVE
+═══════════════════════════════════ */
+function setActive(el){
+  document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── INIT ── */
+renderCarrito();
+updateTabBadges();
+</script>
+</body>
+</html>

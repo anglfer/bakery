@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Materia Prima – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vino:       #9E3B3B;
+  --vino-hover: #7a2c2c;
+  --vino-light: #fdeaea;
+  --vino-mid:   #c96060;
+  --crema:      #fdf6f0;
+  --crema-dark: #eeddd5;
+  --bg:         #f4ede9;
+  --text:       #2c1810;
+  --muted:      #9a7a72;
+  --sidebar-w:  240px;
+  --topbar-h:   62px;
+  --green:      #2e7d52;
+  --green-s:    #e8f5ee;
+  --blue:       #1a5fa0;
+  --blue-s:     #e6f0fb;
+  --orange:     #c05a1a;
+  --orange-s:   #fdebd8;
+  --red:        #c0392b;
+  --red-s:      #fce8e6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--vino-mid);}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;top:0;left:0;
+  width:var(--sidebar-w);height:100vh;
+  background:#fff;border-right:1px solid var(--crema-dark);
+  display:flex;flex-direction:column;
+  z-index:200;box-shadow:3px 0 18px rgba(94,32,32,.07);
+  overflow-y:auto;overflow-x:hidden;
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:.75rem;
+  padding:1.15rem 1.3rem 1rem;
+  border-bottom:1px solid var(--crema-dark);
+}
+.brand-icon{
+  width:38px;height:38px;border-radius:11px;
+  background:var(--vino);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+  box-shadow:0 3px 10px rgba(158,59,59,.35);
+}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{
+  font-size:.6rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:.95rem 1.3rem .35rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.58rem 1.3rem;
+  color:var(--muted);font-size:.8rem;font-weight:500;
+  border-left:3px solid transparent;
+  transition:all .17s ease;cursor:pointer;
+}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.nav-group-toggle{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.58rem 1.3rem;
+  color:var(--muted);font-size:.8rem;font-weight:600;
+  border-left:3px solid transparent;
+  transition:all .17s ease;cursor:pointer;user-select:none;
+}
+.nav-group-toggle i.icon-main{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-group-toggle .gtlabel{flex:1;}
+.nav-group-toggle .chevron{font-size:.7rem;transition:transform .22s ease;margin-left:auto;}
+.nav-group-toggle:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-group-toggle.open{color:var(--vino);}
+.nav-group-toggle.open .chevron{transform:rotate(90deg);}
+.nav-submenu{overflow:hidden;max-height:0;transition:max-height .28s cubic-bezier(.4,0,.2,1);background:#fdf8f6;border-left:3px solid var(--crema-dark);}
+.nav-submenu.open{max-height:400px;}
+.nav-submenu .nav-link-side{padding:.5rem 1.3rem .5rem 2.5rem;font-size:.77rem;border-left:none;}
+.nav-submenu .nav-link-side::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--crema-dark);flex-shrink:0;transition:background .15s;}
+.nav-submenu .nav-link-side:hover::before,
+.nav-submenu .nav-link-side.active::before{background:var(--vino);}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b !important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:var(--sidebar-w);right:0;
+  height:var(--topbar-h);background:#fff;
+  border-bottom:1px solid var(--crema-dark);
+  display:flex;align-items:center;padding:0 1.8rem;gap:1rem;
+  z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);
+}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.73rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--vino),var(--vino-mid));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:.8rem;
+  box-shadow:0 2px 8px rgba(158,59,59,.3);
+  border:2px solid var(--crema-dark);cursor:pointer;
+}
+
+/* ── MAIN ── */
+.main-content{
+  margin-top:var(--topbar-h);
+  margin-left:var(--sidebar-w);
+  padding:1.7rem 1.9rem;
+  min-height:calc(100vh - var(--topbar-h));
+}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem;}
+.kpi-mini{
+  background:#fff;border:1.5px solid var(--crema-dark);
+  border-top:3px solid var(--vino);border-radius:13px;
+  padding:1rem 1.15rem;
+  transition:all .2s ease;
+}
+.kpi-mini:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(94,32,32,.1);}
+.kpi-mini.k-alert{border-top-color:var(--red);}
+.kpi-mini.k-ok   {border-top-color:var(--green);}
+.kpi-mini.k-warn {border-top-color:var(--orange);}
+.km-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;font-weight:600;}
+.km-val{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--text);line-height:1;}
+.km-sub{font-size:.67rem;color:var(--muted);margin-top:.25rem;display:flex;align-items:center;gap:3px;}
+.km-sub.red   {color:var(--red);   font-weight:600;}
+.km-sub.green {color:var(--green); font-weight:600;}
+.km-sub.orange{color:var(--orange);font-weight:600;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:220px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.search-input{
+  width:100%;padding:.52rem .9rem .52rem 2.2rem;
+  border:1.5px solid var(--crema-dark);border-radius:10px;
+  font-size:.8rem;font-family:'Poppins',sans-serif;
+  background:#fff;color:var(--text);transition:border .17s;
+}
+.search-input:focus{outline:none;border-color:var(--vino);}
+
+.filter-select{
+  padding:.52rem .9rem;border:1.5px solid var(--crema-dark);
+  border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;
+  background:#fff;color:var(--text);cursor:pointer;transition:border .17s;
+  min-width:140px;
+}
+.filter-select:focus{outline:none;border-color:var(--vino);}
+
+.btn-vino{
+  background:var(--vino);color:#fff;border:none;border-radius:10px;
+  padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;
+  font-family:'Poppins',sans-serif;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;transition:all .18s;white-space:nowrap;
+}
+.btn-vino:hover{background:var(--vino-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(158,59,59,.25);}
+.btn-outline{
+  background:#fff;color:var(--vino);border:1.5px solid var(--vino);
+  border-radius:10px;padding:.5rem 1rem;font-size:.8rem;font-weight:600;
+  font-family:'Poppins',sans-serif;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;transition:all .18s;white-space:nowrap;
+}
+.btn-outline:hover{background:var(--vino-light);}
+
+/* ── TABLA PRINCIPAL ── */
+.card-table{
+  background:#fff;border-radius:14px;
+  border:1.5px solid var(--crema-dark);
+  border-top:3px solid var(--vino);
+  overflow:hidden;
+}
+.card-table-header{
+  padding:.9rem 1.3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--crema-dark);
+}
+.card-table-header .ct-title{
+  font-family:'Playfair Display',serif;
+  font-size:.95rem;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:.5rem;
+}
+.card-table-header .ct-title i{color:var(--vino);}
+.ct-count{font-size:.72rem;color:var(--muted);background:var(--crema-dark);padding:.18rem .65rem;border-radius:20px;}
+
+.sb-table{width:100%;border-collapse:collapse;}
+.sb-table thead tr{background:var(--vino);}
+.sb-table th{
+  font-size:.63rem;color:#fff;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;
+  padding:.62rem .9rem;white-space:nowrap;border:none;
+}
+.sb-table th:first-child{border-radius:0;}
+.sb-table tbody tr{transition:background .13s;}
+.sb-table tbody tr:nth-child(even){background:#fdf3f0;}
+.sb-table tbody tr:hover{background:var(--vino-light);}
+.sb-table td{
+  font-size:.75rem;vertical-align:middle;
+  border-bottom:1px solid #f4ede9;
+  padding:.58rem .9rem;color:var(--text);
+}
+
+/* Badges de estado */
+.badge-activo  {background:var(--green-s);color:var(--green);font-size:.62rem;padding:.2rem .65rem;border-radius:50px;font-weight:700;}
+.badge-inactivo{background:#f0f0f0;color:#888;font-size:.62rem;padding:.2rem .65rem;border-radius:50px;font-weight:700;}
+.badge-ok      {background:var(--green-s);color:var(--green);font-size:.62rem;padding:.2rem .65rem;border-radius:50px;font-weight:700;}
+.badge-warn    {background:var(--orange-s);color:var(--orange);font-size:.62rem;padding:.2rem .65rem;border-radius:50px;font-weight:700;}
+.badge-critico {background:var(--red-s);color:var(--red);font-size:.62rem;padding:.2rem .65rem;border-radius:50px;font-weight:700;display:flex;align-items:center;gap:3px;}
+.badge-critico i,.badge-warn i{font-size:.6rem;}
+
+/* Barra de stock */
+.stock-bar-wrap{display:flex;align-items:center;gap:.5rem;}
+.stock-bar-track{flex:1;height:6px;background:var(--crema-dark);border-radius:3px;overflow:hidden;min-width:60px;}
+.stock-bar-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.fill-ok    {background:var(--green);}
+.fill-warn  {background:var(--orange);}
+.fill-crit  {background:var(--red);}
+.stock-val  {font-size:.72rem;font-weight:700;white-space:nowrap;}
+.sv-ok  {color:var(--green);}
+.sv-warn{color:var(--orange);}
+.sv-crit{color:var(--red);}
+
+/* Acciones tabla */
+.btn-tbl{
+  height:27px;border:none;border-radius:7px;
+  display:inline-flex;align-items:center;justify-content:center;gap:.25rem;
+  font-size:.65rem;font-weight:700;cursor:pointer;padding:0 .65rem;
+  font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;
+}
+.btn-tbl-edit {background:#e8eaf6;color:#3949ab;}
+.btn-tbl-edit:hover{background:#3949ab;color:#fff;}
+.btn-tbl-move {background:var(--green-s);color:var(--green);}
+.btn-tbl-move:hover{background:var(--green);color:#fff;}
+.btn-tbl-hist {background:var(--blue-s);color:var(--blue);}
+.btn-tbl-hist:hover{background:var(--blue);color:#fff;}
+.btn-tbl-deact{background:var(--orange-s);color:var(--orange);}
+.btn-tbl-deact:hover{background:var(--orange);color:#fff;}
+
+/* Paginación */
+.pagination-wrap{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.2rem;border-top:1px solid var(--crema-dark);
+  font-size:.73rem;color:var(--muted);
+}
+.page-btns{display:flex;gap:.35rem;}
+.page-btn{
+  width:30px;height:30px;border-radius:8px;border:1.5px solid var(--crema-dark);
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;cursor:pointer;color:var(--muted);transition:all .15s;
+}
+.page-btn:hover{border-color:var(--vino);color:var(--vino);}
+.page-btn.active{background:var(--vino);color:#fff;border-color:var(--vino);}
+
+/* ── PANEL ALERTAS ── */
+.alert-banner{
+  background:var(--red-s);border:1.5px solid #f0b0a8;
+  border-left:4px solid var(--red);
+  border-radius:11px;padding:.75rem 1rem;
+  margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:.75rem;
+  font-size:.78rem;color:var(--red);
+}
+.alert-banner i{font-size:1.1rem;flex-shrink:0;}
+.alert-banner strong{font-weight:700;}
+
+/* ── MODAL BASE ── */
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;box-shadow:0 20px 60px rgba(94,32,32,.2);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.form-label{font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.28rem;}
+.form-label .req{color:var(--vino);}
+.form-control,.form-select{
+  font-size:.8rem;border:1.5px solid var(--crema-dark);
+  border-radius:9px;font-family:'Poppins',sans-serif;
+  transition:border .17s;
+}
+.form-control:focus,.form-select:focus{border-color:var(--vino);box-shadow:0 0 0 3px rgba(158,59,59,.09);}
+.form-hint{font-size:.66rem;color:var(--muted);margin-top:.2rem;}
+.form-hint.computed{color:var(--vino);font-weight:600;}
+
+/* Preview conversión */
+.conv-preview{
+  background:var(--crema);border:1.5px solid var(--crema-dark);
+  border-radius:10px;padding:.75rem 1rem;margin-top:.5rem;
+  font-size:.76rem;color:var(--text);
+  display:flex;align-items:center;gap:.5rem;
+}
+.conv-preview i{color:var(--vino);}
+.conv-preview strong{color:var(--vino);}
+
+/* Sección dentro del modal */
+.modal-section{
+  background:var(--crema);border-radius:10px;
+  padding:.8rem 1rem;margin-bottom:.9rem;
+  border-left:3px solid var(--vino);
+}
+.modal-section-title{
+  font-size:.7rem;font-weight:700;color:var(--vino);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;
+  display:flex;align-items:center;gap:.35rem;
+}
+
+/* Botones modal */
+.btn-modal-save{
+  background:var(--vino);color:#fff;border:none;border-radius:9px;
+  padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;
+  font-family:'Poppins',sans-serif;transition:all .18s;
+  display:flex;align-items:center;gap:.35rem;
+}
+.btn-modal-save:hover{background:var(--vino-hover);}
+.btn-modal-cancel{
+  background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);
+  border-radius:9px;padding:.55rem 1.2rem;font-size:.8rem;font-weight:600;
+  font-family:'Poppins',sans-serif;transition:all .18s;
+}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+
+/* ── HISTORIAL MOVIMIENTOS ── */
+.mov-item{
+  display:flex;align-items:flex-start;gap:.75rem;
+  padding:.7rem 0;border-bottom:1px solid var(--crema-dark);
+}
+.mov-item:last-child{border:none;}
+.mov-icon{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;flex-shrink:0;
+}
+.mi-entrada {background:var(--green-s);color:var(--green);}
+.mi-salida  {background:var(--red-s);  color:var(--red);}
+.mi-ajuste  {background:var(--blue-s); color:var(--blue);}
+.mov-body{flex:1;}
+.mov-tipo{font-size:.73rem;font-weight:700;color:var(--text);}
+.mov-ref {font-size:.67rem;color:var(--muted);}
+.mov-meta{font-size:.65rem;color:var(--muted);margin-top:.15rem;}
+.mov-cant{font-size:.8rem;font-weight:700;white-space:nowrap;}
+.mc-entrada{color:var(--green);}
+.mc-salida {color:var(--red);}
+.mc-ajuste {color:var(--blue);}
+
+/* AJUSTE MODAL */
+.ajuste-tipo-btn{
+  flex:1;padding:.55rem;border-radius:9px;border:1.5px solid var(--crema-dark);
+  background:#fff;font-size:.75rem;font-weight:600;font-family:'Poppins',sans-serif;
+  cursor:pointer;transition:all .17s;display:flex;flex-direction:column;align-items:center;gap:.25rem;
+  color:var(--muted);
+}
+.ajuste-tipo-btn i{font-size:1.1rem;}
+.ajuste-tipo-btn.selected-entrada{border-color:var(--green);background:var(--green-s);color:var(--green);}
+.ajuste-tipo-btn.selected-salida {border-color:var(--red);  background:var(--red-s);  color:var(--red);}
+.ajuste-tipo-btn.selected-ajuste {border-color:var(--blue); background:var(--blue-s); color:var(--blue);}
+
+/* CONFIRM MODAL */
+.confirm-icon{
+  width:58px;height:58px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin:0 auto 1rem;
+}
+.ci-warn{background:var(--orange-s);color:var(--orange);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}.d4{animation-delay:.18s}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.main-content{margin-left:0;padding:1rem}.sidebar{transform:translateX(-100%)}.topbar{left:0}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </div>
+
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-speedometer2"></i>Dashboard</a>
+
+  <div class="nav-section-label">Gestión</div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-people-fill icon-main"></i><span class="gtlabel">Personal</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Empleados</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-truck"></i>Proveedores</a>
+  </div>
+
+  <div class="nav-group-toggle open" onclick="toggleMenu(this)">
+    <i class="bi bi-box-seam-fill icon-main"></i><span class="gtlabel">Almacén</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu open">
+    <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-archive-fill"></i>Materia Prima</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cart-fill"></i>Compras</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Producto Terminado</a>
+  </div>
+
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-gear-fill icon-main"></i><span class="gtlabel">Producción</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-journal-richtext"></i>Recetas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cpu-fill"></i>Órdenes</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-send-fill"></i>Solicitudes</a>
+  </div>
+
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-cash-coin icon-main"></i><span class="gtlabel">Comercial</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-receipt"></i>Ventas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-arrow-down-circle-fill"></i>Salidas Efectivo</a>
+  </div>
+
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<header class="topbar">
+  <div class="topbar-title">Inventario de Materia Prima</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <div class="topbar-avatar">JR</div>
+  </div>
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main-content">
+
+  <!-- Breadcrumb + header -->
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Materia Prima</li>
+      </ol>
+    </nav>
+    <h4>Inventario de Materia Prima</h4>
+  </div>
+
+  <!-- Banner alerta crítica -->
+  <div class="alert-banner fu d1" id="alertBanner">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div>
+      <strong>2 materias primas bajo stock mínimo:</strong>
+      Harina de Trigo (2 kg / mín. 10 kg) · Mantequilla s/sal (800 g / mín. 2 kg)
+      <span style="margin-left:.5rem;font-size:.72rem;opacity:.8;">— Solicita una compra o ajusta el inventario.</span>
+    </div>
+    <button onclick="document.getElementById('alertBanner').style.display='none'"
+      style="margin-left:auto;background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip fu d2">
+    <div class="kpi-mini k-alert">
+      <div class="km-label">Stock crítico</div>
+      <div class="km-val" style="color:var(--red)">2</div>
+      <div class="km-sub red"><i class="bi bi-exclamation-triangle-fill"></i>Requieren reabasto</div>
+    </div>
+    <div class="kpi-mini k-warn">
+      <div class="km-label">Stock bajo</div>
+      <div class="km-val" style="color:var(--orange)">3</div>
+      <div class="km-sub orange"><i class="bi bi-dash-circle-fill"></i>Por debajo del 50%</div>
+    </div>
+    <div class="kpi-mini k-ok">
+      <div class="km-label">Stock suficiente</div>
+      <div class="km-val" style="color:var(--green)">9</div>
+      <div class="km-sub green"><i class="bi bi-check-circle-fill"></i>Niveles óptimos</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar fu d3">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar materia prima…">
+    </div>
+    <select class="filter-select" id="filtroEstado" onchange="filtrar()">
+      <option value="todos">Todos los estados</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+    <select class="filter-select" id="filtroStock" onchange="filtrar()">
+      <option value="todos">Todo el stock</option>
+      <option value="critico">Stock crítico</option>
+      <option value="bajo">Stock bajo</option>
+      <option value="ok">Stock OK</option>
+    </select>
+    <button class="btn-outline" onclick="abrirHistorialGeneral()">
+      <i class="bi bi-clock-history"></i>Movimientos
+    </button>
+    <button class="btn-vino" onclick="abrirModalAgregar()">
+      <i class="bi bi-plus-lg"></i>Nueva materia prima
+    </button>
+  </div>
+
+  <!-- Tabla principal -->
+  <div class="card-table fu d4">
+    <div class="card-table-header">
+      <div class="ct-title">
+        <i class="bi bi-archive-fill"></i>Materias Primas
+      </div>
+      <span class="ct-count" id="contadorTabla">14 registros</span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="sb-table" id="tablaMP">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Unidad base</th>
+            <th>Unidad compra</th>
+            <th>Factor conv.</th>
+            <th>Merma %</th>
+            <th>Existencia actual</th>
+            <th>Stock mínimo</th>
+            <th>Estado stock</th>
+            <th>Estado</th>
+            <th style="text-align:center;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyMP"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrap">
+      <span id="pag-info">Mostrando 1–10 de 14</span>
+      <div class="page-btns">
+        <div class="page-btn"><i class="bi bi-chevron-left"></i></div>
+        <div class="page-btn active">1</div>
+        <div class="page-btn">2</div>
+        <div class="page-btn"><i class="bi bi-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════
+     MODAL AGREGAR / EDITAR
+══════════════════════════════════ -->
+<div class="modal fade" id="modalMP" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMPTitulo"><i class="bi bi-plus-circle-fill me-2"></i>Nueva Materia Prima</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <!-- Sección 1: Datos generales -->
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Datos generales</div>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Nombre <span class="req">*</span></label>
+              <input type="text" class="form-control" id="f_nombre" placeholder="Ej. Harina de trigo">
+              <div class="form-hint">Nombre único. No se permiten duplicados.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 2: Unidades y conversión -->
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-arrow-left-right"></i>Unidades y conversión automática</div>
+          <div class="row g-3 mb-2">
+            <div class="col-md-4">
+              <label class="form-label">Unidad base <span class="req">*</span></label>
+              <select class="form-select" id="f_unidad_base" onchange="actualizarPreview()">
+                <option value="">Seleccionar…</option>
+                <option value="g">Gramo (g)</option>
+                <option value="kg">Kilogramo (kg)</option>
+                <option value="ml">Mililitro (ml)</option>
+                <option value="l">Litro (l)</option>
+                <option value="pza">Pieza (pza)</option>
+              </select>
+              <div class="form-hint">Unidad en que se <strong>controla</strong> el inventario.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Unidad de compra <span class="req">*</span></label>
+              <select class="form-select" id="f_unidad_compra" onchange="actualizarPreview()">
+                <option value="">Seleccionar…</option>
+                <option value="bto">Bulto (bto)</option>
+                <option value="cos">Costal (cos)</option>
+                <option value="kg">Kilogramo (kg)</option>
+                <option value="l">Litro (l)</option>
+                <option value="pza">Pieza (pza)</option>
+                <option value="cda">Cucharada (cda)</option>
+              </select>
+              <div class="form-hint">Unidad en que normalmente se <strong>adquiere</strong>.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Factor de conversión <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_factor" min="0" step="0.0001" placeholder="Ej. 50000" oninput="actualizarPreview()">
+              <div class="form-hint">Cuántas <em>unidades base</em> por <em>unidad de compra</em>.</div>
+            </div>
+          </div>
+
+          <!-- Preview conversión -->
+          <div class="conv-preview" id="convPreview" style="display:none;">
+            <i class="bi bi-calculator-fill"></i>
+            <span>Al registrar <strong>1 <span id="prev_compra">—</span></strong>, el sistema sumará
+              <strong><span id="prev_factor">—</span> <span id="prev_base">—</span></strong>
+              al inventario. &nbsp;<em style="color:var(--muted);font-size:.72rem;">cantidad_base = cantidad_comprada × factor_conversion</em>
+            </span>
+          </div>
+        </div>
+
+        <!-- Sección 3: Merma y stock -->
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-percent"></i>Merma y stock mínimo</div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">% Merma</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="f_merma" min="0" max="100" step="0.01" placeholder="0.00">
+                <span class="input-group-text" style="font-size:.8rem;background:var(--crema);border-color:var(--crema-dark);">%</span>
+              </div>
+              <div class="form-hint">Por desperdicio, manejo o proceso. Default: 0.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Stock mínimo</label>
+              <input type="number" class="form-control" id="f_stock_min" min="0" step="0.01" placeholder="0.00">
+              <div class="form-hint">Cantidad mínima para disparar la alerta visual.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cantidad inicial</label>
+              <input type="number" class="form-control" id="f_cant_inicial" min="0" step="0.01" placeholder="0.00">
+              <div class="form-hint">Existencia de apertura en unidad base.</div>
+            </div>
+          </div>
+
+          <!-- Preview merma -->
+          <div class="conv-preview" id="mermaPreview" style="margin-top:.75rem;background:var(--orange-s);border-color:#f0b898;">
+            <i class="bi bi-info-circle-fill" style="color:var(--orange)"></i>
+            <span style="color:var(--orange)">
+              Fórmula de producción:
+              <strong>cantidad_real = cantidad_receta × (1 + merma / 100)</strong>
+              — El sistema aplica esta merma automáticamente al iniciar una orden de producción.
+            </span>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-save" onclick="guardarMP()"><i class="bi bi-check-lg"></i>Guardar materia prima</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL AJUSTE DE INVENTARIO
+══════════════════════════════════ -->
+<div class="modal fade" id="modalAjuste" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-arrow-left-right me-2"></i>Ajuste de Inventario — <span id="ajusteNombre"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <div class="mb-3">
+          <label class="form-label">Tipo de movimiento <span class="req">*</span></label>
+          <div class="d-flex gap-2">
+            <button class="ajuste-tipo-btn" id="btn-entrada" onclick="selTipo('ENTRADA')">
+              <i class="bi bi-box-arrow-in-down"></i>ENTRADA
+            </button>
+            <button class="ajuste-tipo-btn" id="btn-salida" onclick="selTipo('SALIDA')">
+              <i class="bi bi-box-arrow-up"></i>SALIDA
+            </button>
+            <button class="ajuste-tipo-btn" id="btn-ajuste" onclick="selTipo('AJUSTE')">
+              <i class="bi bi-pencil-square"></i>AJUSTE
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">Cantidad <span class="req">*</span> <span id="ajusteUnidad" style="color:var(--vino);font-size:.7rem;font-weight:700;"></span></label>
+            <input type="number" class="form-control" id="aj_cantidad" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Existencia actual</label>
+            <input type="text" class="form-control" id="aj_actual" disabled style="background:var(--crema);color:var(--muted);">
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">Referencia / Motivo <span class="req">*</span></label>
+          <input type="text" class="form-control" id="aj_referencia" placeholder="Ej. Ajuste por conteo físico · Compra extra · Merma detectada">
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">Notas adicionales</label>
+          <textarea class="form-control" id="aj_notas" rows="2" placeholder="Observaciones del movimiento…"></textarea>
+        </div>
+
+        <!-- Preview nuevo saldo -->
+        <div class="conv-preview mt-3" id="ajustePreview" style="display:none;">
+          <i class="bi bi-calculator-fill"></i>
+          <span>Nuevo saldo estimado: <strong id="ajusteNuevoSaldo" style="color:var(--vino)">—</strong></span>
+        </div>
+
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-save" onclick="guardarAjuste()"><i class="bi bi-check-lg"></i>Registrar movimiento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL HISTORIAL MOVIMIENTOS
+══════════════════════════════════ -->
+<div class="modal fade" id="modalHistorial" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>Historial de Movimientos — <span id="histNombre"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="historialBody"></div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL CONFIRMAR DESACTIVAR
+══════════════════════════════════ -->
+<div class="modal fade" id="modalDesactivar" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <div class="confirm-icon ci-warn"><i class="bi bi-archive-fill"></i></div>
+      <h6 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.5rem;">¿Desactivar materia prima?</h6>
+      <p style="font-size:.76rem;color:var(--muted);margin-bottom:1.2rem;">
+        <strong id="deactNombre"></strong> pasará a estado <em>inactivo</em>.
+        El registro y su historial de movimientos se conservan.
+      </p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-vino" onclick="confirmarDesactivar()"><i class="bi bi-check-lg me-1"></i>Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Fecha / hora ── */
+const now = new Date();
+const dias  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+document.getElementById('fecha-top').textContent = now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hora-top').textContent  = now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+
+/* ── DATA ── */
+const UNIDADES = {g:'g',kg:'kg',ml:'ml',l:'l',pza:'pza',bto:'bto',cos:'cos',cda:'cda'};
+
+let materias = [
+  {id:'MP-001',nombre:'Harina de Trigo',     unidad_base:'g',  unidad_compra:'cos', factor:25000, merma:2,   activo:true,  cant_actual:2000,   stock_min:10000, created_at:'01/01/2026'},
+  {id:'MP-002',nombre:'Mantequilla s/sal',   unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:1.5, activo:true,  cant_actual:800,    stock_min:2000,  created_at:'01/01/2026'},
+  {id:'MP-003',nombre:'Azúcar Refinada',     unidad_base:'g',  unidad_compra:'cos', factor:25000, merma:0.5, activo:true,  cant_actual:18000,  stock_min:5000,  created_at:'01/01/2026'},
+  {id:'MP-004',nombre:'Leche Entera',        unidad_base:'ml', unidad_compra:'l',   factor:1000,  merma:0,   activo:true,  cant_actual:4500,   stock_min:2000,  created_at:'01/01/2026'},
+  {id:'MP-005',nombre:'Huevo Fresco',        unidad_base:'pza',unidad_compra:'pza', factor:1,     merma:3,   activo:true,  cant_actual:48,     stock_min:24,    created_at:'01/01/2026'},
+  {id:'MP-006',nombre:'Cacao en Polvo',      unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:1,   activo:true,  cant_actual:3200,   stock_min:1000,  created_at:'01/01/2026'},
+  {id:'MP-007',nombre:'Vainilla Extracto',   unidad_base:'ml', unidad_compra:'l',   factor:1000,  merma:0,   activo:true,  cant_actual:600,    stock_min:200,   created_at:'01/01/2026'},
+  {id:'MP-008',nombre:'Polvo de Hornear',    unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:0,   activo:true,  cant_actual:900,    stock_min:300,   created_at:'01/01/2026'},
+  {id:'MP-009',nombre:'Sal de Mesa',         unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:0,   activo:true,  cant_actual:2100,   stock_min:500,   created_at:'01/01/2026'},
+  {id:'MP-010',nombre:'Crema para Batir',    unidad_base:'ml', unidad_compra:'l',   factor:1000,  merma:2,   activo:true,  cant_actual:2800,   stock_min:1000,  created_at:'01/01/2026'},
+  {id:'MP-011',nombre:'Colorante Rojo',      unidad_base:'ml', unidad_compra:'l',   factor:1000,  merma:0,   activo:true,  cant_actual:320,    stock_min:100,   created_at:'02/01/2026'},
+  {id:'MP-012',nombre:'Fresas Frescas',      unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:15,  activo:true,  cant_actual:1200,   stock_min:800,   created_at:'02/01/2026'},
+  {id:'MP-013',nombre:'Chocolate Oscuro',    unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:1,   activo:false, cant_actual:0,      stock_min:500,   created_at:'03/01/2026'},
+  {id:'MP-014',nombre:'Nuez Pecana',         unidad_base:'g',  unidad_compra:'kg',  factor:1000,  merma:5,   activo:true,  cant_actual:750,    stock_min:400,   created_at:'05/01/2026'},
+];
+
+let movimientos = [
+  {id_mp:'MP-001', tipo:'ENTRADA', cantidad:25000, ref_tipo:'COMPRA',          ref_id:'C-042', notas:'Proveedor Harinera del Norte', fecha:'03/03/2026 08:15', usuario:'jlopez'},
+  {id_mp:'MP-001', tipo:'SALIDA',  cantidad:8000,  ref_tipo:'ORDEN_PRODUCCION',ref_id:'OP-018',notas:'Producción Pan Blanco ×50',    fecha:'03/03/2026 10:30', usuario:'mgarcia'},
+  {id_mp:'MP-001', tipo:'SALIDA',  cantidad:15000, ref_tipo:'ORDEN_PRODUCCION',ref_id:'OP-019',notas:'Producción Cuernos ×100',      fecha:'03/03/2026 14:00', usuario:'mgarcia'},
+  {id_mp:'MP-002', tipo:'ENTRADA', cantidad:2000,  ref_tipo:'COMPRA',          ref_id:'C-041', notas:'Compra urgente Lácteos SA',    fecha:'02/03/2026 09:00', usuario:'jlopez'},
+  {id_mp:'MP-002', tipo:'SALIDA',  cantidad:1200,  ref_tipo:'ORDEN_PRODUCCION',ref_id:'OP-017',notas:'Croissants ×30',               fecha:'02/03/2026 11:00', usuario:'mgarcia'},
+  {id_mp:'MP-003', tipo:'ENTRADA', cantidad:25000, ref_tipo:'COMPRA',          ref_id:'C-040', notas:'Azúcar Mayorista Central',     fecha:'28/02/2026 08:00', usuario:'jlopez'},
+  {id_mp:'MP-003', tipo:'AJUSTE',  cantidad:-500,  ref_tipo:'AJUSTE_MANUAL',   ref_id:'AJ-003',notas:'Corrección conteo físico',     fecha:'01/03/2026 16:00', usuario:'jrodriguez'},
+];
+
+let idxEditar = null, idxDesactivar = null, idxAjuste = null, tipoAjuste = null;
+let datosFiltrados = [...materias];
+
+const bsMP         = new bootstrap.Modal(document.getElementById('modalMP'));
+const bsAjuste     = new bootstrap.Modal(document.getElementById('modalAjuste'));
+const bsHistorial  = new bootstrap.Modal(document.getElementById('modalHistorial'));
+const bsDesactivar = new bootstrap.Modal(document.getElementById('modalDesactivar'));
+
+/* ── Helpers ── */
+function stockStatus(mp) {
+  if (!mp.activo) return 'inactivo';
+  const pct = mp.cant_actual / mp.stock_min;
+  if (mp.cant_actual < mp.stock_min) return 'critico';
+  if (pct < 1.5) return 'bajo';
+  return 'ok';
+}
+function fmtNum(n, u) {
+  return `${Number(n).toLocaleString('es-MX', {maximumFractionDigits:2})} ${u}`;
+}
+function pctBar(mp) {
+  if (mp.stock_min === 0) return 100;
+  return Math.min(100, Math.round((mp.cant_actual / mp.stock_min) * 100));
+}
+
+/* ── Render tabla ── */
+function renderTabla(lista) {
+  const tbody = document.getElementById('tbodyMP');
+  document.getElementById('contadorTabla').textContent = `${lista.length} registros`;
+
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted);font-size:.8rem;">
+      <i class="bi bi-search" style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>Sin resultados para esta búsqueda.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = lista.map(mp => {
+    const idx = materias.indexOf(mp);
+    const st  = stockStatus(mp);
+    const pct = pctBar(mp);
+    const fillCls = st === 'critico' ? 'fill-crit' : st === 'bajo' ? 'fill-warn' : 'fill-ok';
+    const valCls  = st === 'critico' ? 'sv-crit'  : st === 'bajo'  ? 'sv-warn'  : 'sv-ok';
+
+    const badgeStock = st === 'critico'
+      ? `<span class="badge-critico"><i class="bi bi-exclamation-triangle-fill"></i>Crítico</span>`
+      : st === 'bajo'
+        ? `<span class="badge-warn"><i class="bi bi-dash-circle-fill"></i>Bajo</span>`
+        : st === 'inactivo'
+          ? `<span class="badge-inactivo">Inactivo</span>`
+          : `<span class="badge-ok">OK</span>`;
+
+    return `<tr>
+      <td><strong style="font-size:.78rem;">${mp.nombre}</strong></td>
+      <td><span style="font-size:.72rem;background:var(--blue-s);color:var(--blue);padding:.15rem .55rem;border-radius:5px;font-weight:700;">${mp.unidad_base}</span></td>
+      <td><span style="font-size:.72rem;background:var(--crema-dark);color:var(--muted);padding:.15rem .55rem;border-radius:5px;font-weight:700;">${mp.unidad_compra}</span></td>
+      <td style="font-size:.74rem;font-weight:600;">× ${mp.factor.toLocaleString('es-MX')}</td>
+      <td style="font-size:.74rem;text-align:center;">
+        <span style="color:${mp.merma>5?'var(--orange)':mp.merma>0?'var(--text)':'var(--muted)'}; font-weight:600;">${mp.merma}%</span>
+      </td>
+      <td>
+        <div class="stock-bar-wrap">
+          <div class="stock-bar-track"><div class="stock-bar-fill ${fillCls}" style="width:${pct}%"></div></div>
+          <span class="stock-val ${valCls}">${fmtNum(mp.cant_actual, mp.unidad_base)}</span>
+        </div>
+      </td>
+      <td style="font-size:.73rem;color:var(--muted);">${fmtNum(mp.stock_min, mp.unidad_base)}</td>
+      <td>${badgeStock}</td>
+      <td>${mp.activo ? '<span class="badge-activo">Activo</span>' : '<span class="badge-inactivo">Inactivo</span>'}</td>
+      <td>
+        <div style="display:flex;gap:.35rem;justify-content:center;flex-wrap:wrap;">
+          <button class="btn-tbl btn-tbl-edit" onclick="abrirEditar(${idx})" title="Editar"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn-tbl btn-tbl-move" onclick="abrirAjuste(${idx})" title="Ajuste inventario" ${!mp.activo?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="bi bi-arrow-left-right"></i></button>
+          <button class="btn-tbl btn-tbl-hist" onclick="verHistorial(${idx})" title="Historial"><i class="bi bi-clock-history"></i></button>
+          ${mp.activo
+            ? `<button class="btn-tbl btn-tbl-deact" onclick="abrirDesactivar(${idx})" title="Desactivar"><i class="bi bi-archive-fill"></i></button>`
+            : `<button class="btn-tbl" style="background:#f5f5f5;color:#bbb;cursor:not-allowed;" disabled title="Ya inactivo"><i class="bi bi-archive-fill"></i></button>`
+          }
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Filtrar ── */
+function filtrar() {
+  const q     = document.getElementById('searchInput').value.toLowerCase();
+  const est   = document.getElementById('filtroEstado').value;
+  const stock = document.getElementById('filtroStock').value;
+
+  datosFiltrados = materias.filter(mp => {
+    const matchQ = mp.nombre.toLowerCase().includes(q) || mp.id.toLowerCase().includes(q);
+    const matchE = est   === 'todos' ? true : est === 'activo' ? mp.activo : !mp.activo;
+    const st     = stockStatus(mp);
+    const matchS = stock === 'todos' ? true
+      : stock === 'critico' ? st === 'critico'
+      : stock === 'bajo'    ? st === 'bajo'
+      : st === 'ok';
+    return matchQ && matchE && matchS;
+  });
+  renderTabla(datosFiltrados);
+}
+
+document.getElementById('searchInput').addEventListener('input', filtrar);
+
+/* ── Modal agregar ── */
+function abrirModalAgregar() {
+  idxEditar = null;
+  document.getElementById('modalMPTitulo').innerHTML = '<i class="bi bi-plus-circle-fill me-2"></i>Nueva Materia Prima';
+  document.getElementById('f_nombre').value   = '';
+  document.getElementById('f_nombre').disabled = false;
+  document.getElementById('f_unidad_base').value   = '';
+  document.getElementById('f_unidad_compra').value = '';
+  document.getElementById('f_factor').value    = '';
+  document.getElementById('f_merma').value     = '0';
+  document.getElementById('f_stock_min').value = '';
+  document.getElementById('f_cant_inicial').value = '0';
+  document.getElementById('convPreview').style.display = 'none';
+  bsMP.show();
+}
+
+/* ── Modal editar ── */
+function abrirEditar(i) {
+  idxEditar = i;
+  const mp = materias[i];
+  document.getElementById('modalMPTitulo').innerHTML = '<i class="bi bi-pencil-fill me-2"></i>Editar Materia Prima';
+  document.getElementById('f_nombre').value    = mp.nombre;
+  document.getElementById('f_nombre').disabled = false;
+  document.getElementById('f_unidad_base').value   = mp.unidad_base;
+  document.getElementById('f_unidad_compra').value = mp.unidad_compra;
+  document.getElementById('f_factor').value    = mp.factor;
+  document.getElementById('f_merma').value     = mp.merma;
+  document.getElementById('f_stock_min').value = mp.stock_min;
+  document.getElementById('f_cant_inicial').value = mp.cant_actual;
+  actualizarPreview();
+  bsMP.show();
+}
+
+/* ── Preview conversión ── */
+function actualizarPreview() {
+  const base    = document.getElementById('f_unidad_base').value;
+  const compra  = document.getElementById('f_unidad_compra').value;
+  const factor  = parseFloat(document.getElementById('f_factor').value);
+  const preview = document.getElementById('convPreview');
+  if (base && compra && factor > 0) {
+    document.getElementById('prev_compra').textContent = compra;
+    document.getElementById('prev_factor').textContent = factor.toLocaleString('es-MX');
+    document.getElementById('prev_base').textContent   = base;
+    preview.style.display = 'flex';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+/* ── Guardar MP ── */
+function guardarMP() {
+  const nombre   = document.getElementById('f_nombre').value.trim();
+  const ub       = document.getElementById('f_unidad_base').value;
+  const uc       = document.getElementById('f_unidad_compra').value;
+  const factor   = parseFloat(document.getElementById('f_factor').value) || 0;
+  const merma    = parseFloat(document.getElementById('f_merma').value)  || 0;
+  const stkMin   = parseFloat(document.getElementById('f_stock_min').value) || 0;
+  const cantIni  = parseFloat(document.getElementById('f_cant_inicial').value) || 0;
+
+  if (!nombre || !ub || !uc || factor <= 0) {
+    alert('Nombre, unidades y factor de conversión son obligatorios.');
+    return;
+  }
+
+  if (idxEditar !== null) {
+    Object.assign(materias[idxEditar], {nombre,unidad_base:ub,unidad_compra:uc,factor,merma,stock_min:stkMin,cant_actual:cantIni});
+  } else {
+    const newId = 'MP-' + String(materias.length + 1).padStart(3,'0');
+    materias.push({
+      id:newId,nombre,unidad_base:ub,unidad_compra:uc,
+      factor,merma,activo:true,cant_actual:cantIni,
+      stock_min:stkMin,
+      created_at:now.toLocaleDateString('es-MX')
+    });
+  }
+  filtrar();
+  bsMP.hide();
+}
+
+/* ── Ajuste inventario ── */
+function abrirAjuste(i) {
+  idxAjuste  = i;
+  tipoAjuste = null;
+  const mp   = materias[i];
+  document.getElementById('ajusteNombre').textContent  = mp.nombre;
+  document.getElementById('ajusteUnidad').textContent  = `(${mp.unidad_base})`;
+  document.getElementById('aj_cantidad').value   = '';
+  document.getElementById('aj_actual').value     = fmtNum(mp.cant_actual, mp.unidad_base);
+  document.getElementById('aj_referencia').value = '';
+  document.getElementById('aj_notas').value      = '';
+  document.getElementById('ajustePreview').style.display = 'none';
+  ['btn-entrada','btn-salida','btn-ajuste'].forEach(id =>
+    document.getElementById(id).className = 'ajuste-tipo-btn');
+  bsAjuste.show();
+}
+
+function selTipo(t) {
+  tipoAjuste = t;
+  const map = {ENTRADA:'entrada',SALIDA:'salida',AJUSTE:'ajuste'};
+  ['btn-entrada','btn-salida','btn-ajuste'].forEach(id =>
+    document.getElementById(id).className = 'ajuste-tipo-btn');
+  document.getElementById('btn-'+t.toLowerCase()).className = `ajuste-tipo-btn selected-${map[t]}`;
+  calcNuevoSaldo();
+}
+
+document.getElementById('aj_cantidad').addEventListener('input', calcNuevoSaldo);
+function calcNuevoSaldo() {
+  if (!tipoAjuste || !idxAjuste === null) return;
+  const mp   = materias[idxAjuste];
+  const cant = parseFloat(document.getElementById('aj_cantidad').value) || 0;
+  let nuevo  = mp.cant_actual;
+  if (tipoAjuste === 'ENTRADA') nuevo = mp.cant_actual + cant;
+  else if (tipoAjuste === 'SALIDA') nuevo = mp.cant_actual - cant;
+  else nuevo = cant;
+  const pr = document.getElementById('ajustePreview');
+  document.getElementById('ajusteNuevoSaldo').textContent = fmtNum(Math.max(0,nuevo), mp.unidad_base);
+  pr.style.display = 'flex';
+}
+
+function guardarAjuste() {
+  if (!tipoAjuste) { alert('Selecciona un tipo de movimiento.'); return; }
+  const cant = parseFloat(document.getElementById('aj_cantidad').value);
+  const ref  = document.getElementById('aj_referencia').value.trim();
+  if (!cant || cant <= 0) { alert('Ingresa una cantidad válida.'); return; }
+  if (!ref) { alert('La referencia/motivo es obligatorio.'); return; }
+
+  const mp = materias[idxAjuste];
+  if (tipoAjuste === 'ENTRADA') mp.cant_actual += cant;
+  else if (tipoAjuste === 'SALIDA') mp.cant_actual = Math.max(0, mp.cant_actual - cant);
+  else mp.cant_actual = cant;
+
+  movimientos.unshift({
+    id_mp:mp.id, tipo:tipoAjuste,
+    cantidad: tipoAjuste === 'SALIDA' ? -cant : cant,
+    ref_tipo: tipoAjuste === 'AJUSTE' ? 'AJUSTE_MANUAL' : tipoAjuste === 'ENTRADA' ? 'COMPRA' : 'ORDEN_PRODUCCION',
+    ref_id: ref,
+    notas: document.getElementById('aj_notas').value,
+    fecha: new Date().toLocaleString('es-MX'),
+    usuario:'jrodriguez'
+  });
+
+  filtrar();
+  bsAjuste.hide();
+}
+
+/* ── Historial ── */
+function verHistorial(i) {
+  const mp   = materias[i];
+  document.getElementById('histNombre').textContent = mp.nombre;
+  const movs = movimientos.filter(m => m.id_mp === mp.id);
+  const body = document.getElementById('historialBody');
+
+  if (!movs.length) {
+    body.innerHTML = `<p style="color:var(--muted);font-size:.8rem;text-align:center;padding:1.5rem 0;">Sin movimientos registrados.</p>`;
+  } else {
+    body.innerHTML = movs.map(m => {
+      const cls = m.tipo === 'ENTRADA' ? 'mi-entrada' : m.tipo === 'SALIDA' ? 'mi-salida' : 'mi-ajuste';
+      const ic  = m.tipo === 'ENTRADA' ? 'bi-box-arrow-in-down' : m.tipo === 'SALIDA' ? 'bi-box-arrow-up' : 'bi-pencil-square';
+      const cc  = m.tipo === 'ENTRADA' ? 'mc-entrada' : m.tipo === 'SALIDA' ? 'mc-salida' : 'mc-ajuste';
+      const signo = m.tipo === 'ENTRADA' ? '+' : m.tipo === 'SALIDA' ? '−' : '→';
+      return `<div class="mov-item">
+        <div class="mov-icon ${cls}"><i class="bi ${ic}"></i></div>
+        <div class="mov-body">
+          <div class="mov-tipo">${m.tipo}</div>
+          <div class="mov-ref"><strong>${m.ref_tipo}</strong> · Ref: ${m.ref_id}</div>
+          ${m.notas?`<div class="mov-meta"><i class="bi bi-chat-left-text me-1"></i>${m.notas}</div>`:''}
+          <div class="mov-meta"><i class="bi bi-calendar3 me-1"></i>${m.fecha} &nbsp;·&nbsp; <i class="bi bi-person me-1"></i>${m.usuario}</div>
+        </div>
+        <div class="mov-cant ${cc}">${signo} ${Math.abs(m.cantidad).toLocaleString('es-MX')} ${mp.unidad_base}</div>
+      </div>`;
+    }).join('');
+  }
+  bsHistorial.show();
+}
+
+function abrirHistorialGeneral() {
+  document.getElementById('histNombre').textContent = 'Todos los movimientos';
+  const body = document.getElementById('historialBody');
+  const movs = [...movimientos];
+  body.innerHTML = movs.map(m => {
+    const mp  = materias.find(x => x.id === m.id_mp) || {};
+    const cls = m.tipo === 'ENTRADA' ? 'mi-entrada' : m.tipo === 'SALIDA' ? 'mi-salida' : 'mi-ajuste';
+    const ic  = m.tipo === 'ENTRADA' ? 'bi-box-arrow-in-down' : m.tipo === 'SALIDA' ? 'bi-box-arrow-up' : 'bi-pencil-square';
+    const cc  = m.tipo === 'ENTRADA' ? 'mc-entrada' : m.tipo === 'SALIDA' ? 'mc-salida' : 'mc-ajuste';
+    const signo = m.tipo === 'ENTRADA' ? '+' : m.tipo === 'SALIDA' ? '−' : '→';
+    return `<div class="mov-item">
+      <div class="mov-icon ${cls}"><i class="bi ${ic}"></i></div>
+      <div class="mov-body">
+        <div class="mov-tipo">${m.tipo} — <span style="color:var(--vino)">${mp.nombre||m.id_mp}</span></div>
+        <div class="mov-ref"><strong>${m.ref_tipo}</strong> · Ref: ${m.ref_id}</div>
+        ${m.notas?`<div class="mov-meta"><i class="bi bi-chat-left-text me-1"></i>${m.notas}</div>`:''}
+        <div class="mov-meta"><i class="bi bi-calendar3 me-1"></i>${m.fecha} &nbsp;·&nbsp; <i class="bi bi-person me-1"></i>${m.usuario}</div>
+      </div>
+      <div class="mov-cant ${cc}">${signo} ${Math.abs(m.cantidad).toLocaleString('es-MX')} ${mp.unidad_base||''}</div>
+    </div>`;
+  }).join('');
+  bsHistorial.show();
+}
+
+/* ── Desactivar ── */
+function abrirDesactivar(i) {
+  idxDesactivar = i;
+  document.getElementById('deactNombre').textContent = materias[i].nombre;
+  bsDesactivar.show();
+}
+function confirmarDesactivar() {
+  materias[idxDesactivar].activo = false;
+  filtrar();
+  bsDesactivar.hide();
+}
+
+/* ── Sidebar ── */
+function setActive(el) {
+  document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleMenu(toggle) {
+  const sub    = toggle.nextElementSibling;
+  const isOpen = sub.classList.contains('open');
+  document.querySelectorAll('.nav-submenu.open').forEach(m => {
+    m.classList.remove('open');
+    m.previousElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { sub.classList.add('open'); toggle.classList.add('open'); }
+}
+
+/* ── Init ── */
+renderTabla(materias);
+</script>
+</body>
+</html>

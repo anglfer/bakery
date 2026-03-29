@@ -1,0 +1,352 @@
+{% extends "Inicio/layout.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+
+{# INICIO HERO #}
+<section class="hero-section" id="inicio" aria-labelledby="hero-titulo">
+    <div class="hero-overlay">
+        <div class="container h-100">
+            <div class="row h-100 align-items-center">
+
+                <div class="col-lg-6 hero-texto">
+                    <h1 class="hero-titulo" id="hero-titulo">
+                        ¡Pasteles que <span class="text-highlight">enamoran</span> en cada bocado!
+                    </h1>
+                    <p class="hero-subtitulo">
+                        Elaborados artesanalmente con ingredientes frescos y mucho amor.
+                        Para cada celebración, tenemos el pastel perfecto.
+                    </p>
+                </div>
+
+                <div class="col-lg-6 d-none d-lg-flex justify-content-center" aria-hidden="true">
+                    <div class="hero-cake-container">
+                        <div class="hero-cake-main">
+                            <img src="{{ url_for('static', filename='img/Inicio/hero-principal.png') }}"
+                                 alt="" class="hero-cake-img">
+                        </div>
+                        <div class="hero-cake-small top">
+                            <img src="{{ url_for('static', filename='img/Inicio/hero-mini1.png') }}"
+                                 alt="" class="hero-cake-img-sm">
+                        </div>
+                        <div class="hero-cake-small bottom">
+                            <img src="{{ url_for('static', filename='img/Inicio/hero-principal.png') }}"
+                                 alt="" class="hero-cake-img-sm">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{# MENU #}
+<section class="destacados-section py-5 bg-crema menu-section-wrapper"
+         id="menu" aria-labelledby="menu-titulo">
+    <div class="container">
+
+        <div class="text-center mb-2">
+            <span class="text-pastel fw-semibold small text-uppercase letter-spacing-2">
+                <i class="bi bi-star-fill me-1" aria-hidden="true"></i>Lo mejor de la casa
+            </span>
+            <h2 class="section-titulo mt-2 mb-1" id="menu-titulo">Nuestros Favoritos</h2>
+            <p class="section-sub">Los más pedidos por nuestros clientes</p>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center gap-2 mb-4" aria-hidden="true">
+            <div style="height:2px; width:40px; background:var(--pastel-light); border-radius:2px;"></div>
+            <i class="bi bi-cake2 text-pastel"></i>
+            <div style="height:2px; width:40px; background:var(--pastel-light); border-radius:2px;"></div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+
+            {# Tarjeta 1 - Chocolate #}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm pastel-card">
+                    <div class="pastel-img-wrap">
+                        <img src="{{ url_for('static', filename='img/Inicio/choco.jpg') }}"
+                             class="card-img-top pastel-img" alt="Pastel de Chocolate"
+                             onerror="this.src='https://placehold.co/300x250/f8e8e0/8b3a3a?text=%F0%9F%8E%82'">
+                    </div>
+                    <div class="card-body px-3 pb-3">
+                        <h6 class="card-title fw-bold mb-1">Pastel de Chocolate</h6>
+                        <p class="card-text text-muted small mb-2">Húmedo y cremoso</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="precio fw-bold">$450.00</span>
+                            <div class="estrellas" aria-label="5 de 5 estrellas">
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-pastel w-100 mt-2" type="button">
+                            <i class="bi bi-cart-plus me-1"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta 2 - Red Velvet #}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm pastel-card">
+                    <div class="pastel-img-wrap">
+                        <img src="{{ url_for('static', filename='img/Inicio/redvelvet.jpg') }}"
+                             class="card-img-top pastel-img" alt="Pastel Red Velvet"
+                             onerror="this.src='https://placehold.co/300x250/f8e8e0/8b3a3a?text=%F0%9F%8E%82'">
+                    </div>
+                    <div class="card-body px-3 pb-3">
+                        <h6 class="card-title fw-bold mb-1">Pastel Red Velvet</h6>
+                        <p class="card-text text-muted small mb-2">Terciopelo rojo clásico</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="precio fw-bold">$480.00</span>
+                            <div class="estrellas" aria-label="5 de 5 estrellas">
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-pastel w-100 mt-2" type="button">
+                            <i class="bi bi-cart-plus me-1"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta 3 - Frutos #}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm pastel-card">
+                    <div class="pastel-img-wrap">
+                        <img src="{{ url_for('static', filename='img/Inicio/frutos.jpg') }}"
+                             class="card-img-top pastel-img" alt="Pastel de Frutos"
+                             onerror="this.src='https://placehold.co/300x250/f8e8e0/8b3a3a?text=%F0%9F%8E%82'">
+                    </div>
+                    <div class="card-body px-3 pb-3">
+                        <h6 class="card-title fw-bold mb-1">Pastel de Frutos</h6>
+                        <p class="card-text text-muted small mb-2">Fruta fresca natural</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="precio fw-bold">$510.00</span>
+                            <div class="estrellas" aria-label="4 de 5 estrellas">
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star text-warning small" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-pastel w-100 mt-2" type="button">
+                            <i class="bi bi-cart-plus me-1"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta 4 - Tres Leches #}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm pastel-card">
+                    <div class="pastel-img-wrap">
+                        <img src="{{ url_for('static', filename='img/Inicio/tresleches.jpg') }}"
+                             class="card-img-top pastel-img" alt="Pastel Tres Leches"
+                             onerror="this.src='https://placehold.co/300x250/f8e8e0/8b3a3a?text=%F0%9F%8E%82'">
+                    </div>
+                    <div class="card-body px-3 pb-3">
+                        <h6 class="card-title fw-bold mb-1">Pastel Tres Leches</h6>
+                        <p class="card-text text-muted small mb-2">Suave y esponjoso</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="precio fw-bold">$390.00</span>
+                            <div class="estrellas" aria-label="5 de 5 estrellas">
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-pastel w-100 mt-2" type="button">
+                            <i class="bi bi-cart-plus me-1"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{# ── SECCIÓN NOSOTROS ── #}
+<section class="nosotros-section" id="nosotros" aria-labelledby="nosotros-titulo">
+
+    <div class="nosotros-header py-5">
+        <div class="container text-center">
+            <h2 class="nosotros-titulo mt-3 mb-2" id="nosotros-titulo">Conoce Nuestra Historia</h2>
+            <p class="nosotros-sub mx-auto">
+                Cinco jóvenes, una pasión y muchos pasteles de por medio.
+            </p>
+        </div>
+    </div>
+
+    <div class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+
+                <div class="col-lg-6">
+                    <div class="nosotros-img-wrap">
+                        <img src="{{ url_for('static', filename='img/Inicio/Sucursal.jpg') }}"
+                             alt="Interior de nuestra sucursal SoftBakery en León, Gto."
+                             class="img-fluid rounded-4 shadow"
+                             style="max-width:460px; width:100%;">
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <span class="text-pastel fw-semibold small text-uppercase letter-spacing-2">
+                        Una historia de sabor
+                    </span>
+                    <h3 class="section-titulo mt-2 mb-3">Pasión en cada bocado</h3>
+                    <p class="text-muted mb-3">
+                        SoftBakery nació como un proyecto escolar creado por cinco jóvenes
+                        que compartían una misma pasión: contar historias a través de los pasteles.
+                        Lo que comenzó en la cocina de nuestra fundadora se convirtió poco a poco
+                        en un pequeño gran negocio y, con dedicación y creatividad, en la pastelería
+                        artesanal más querida de la ciudad.
+                    </p>
+                    <p class="text-muted mb-4">
+                        Hoy, después de 1 año, seguimos fieles a nuestros valores:
+                        ingredientes frescos, elaboración artesanal y el toque personal que hace
+                        cada creación única e irrepetible.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {# ── Valores ── #}
+    <div class="py-5 bg-crema">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="text-pastel fw-semibold small text-uppercase letter-spacing-2">Lo que nos define</span>
+                <h3 class="section-titulo mt-2">Nuestros Valores</h3>
+                <p class="section-sub">Lo que nos hace diferentes</p>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-5" aria-hidden="true">
+                <div style="height:2px; width:40px; background:var(--pastel-light); border-radius:2px;"></div>
+                <i class="bi bi-cake2 text-pastel"></i>
+                <div style="height:2px; width:40px; background:var(--pastel-light); border-radius:2px;"></div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="valor-card text-center p-4">
+                        <div class="valor-icon mb-3" aria-hidden="true"><i class="bi bi-heart-fill"></i></div>
+                        <h5 class="fw-bold mb-2">Pasión</h5>
+                        <p class="text-muted small mb-0">Cada pastel es elaborado con amor y dedicación genuina.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="valor-card text-center p-4">
+                        <div class="valor-icon mb-3" aria-hidden="true"><i class="bi bi-patch-check"></i></div>
+                        <h5 class="fw-bold mb-2">Calidad</h5>
+                        <p class="text-muted small mb-0">Solo usamos ingredientes frescos y de primera calidad.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="valor-card text-center p-4">
+                        <div class="valor-icon mb-3" aria-hidden="true"><i class="bi bi-people-fill"></i></div>
+                        <h5 class="fw-bold mb-2">Comunidad</h5>
+                        <p class="text-muted small mb-0">Apoyamos a productores locales y al comercio justo.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="valor-card text-center p-4">
+                        <div class="valor-icon mb-3" aria-hidden="true"><i class="bi bi-lightbulb"></i></div>
+                        <h5 class="fw-bold mb-2">Creatividad</h5>
+                        <p class="text-muted small mb-0">Diseños únicos adaptados a cada ocasión especial.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Nuestra Promesa ── #}
+    <div class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+
+                <div class="col-lg-5">
+                    <span class="text-pastel fw-semibold small text-uppercase letter-spacing-2">Lo que prometemos</span>
+                    <h3 class="section-titulo mt-2 mb-3">Nuestra Promesa</h3>
+                    <p class="text-muted mb-4">
+                        Cada pastel sale de nuestras manos con ingredientes cuidadosamente
+                        seleccionados, horneado fresco y decorado con dedicación. Sin secretos,
+                        solo sabor auténtico.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <i class="bi bi-clock-history stat-icon" aria-hidden="true"></i>
+                                <div>
+                                    <div class="stat-titulo">Entrega puntual</div>
+                                    <div class="stat-desc">Llevamos tu pedido a tiempo</div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <i class="bi bi-bag-heart stat-icon" aria-hidden="true"></i>
+                                <div>
+                                    <div class="stat-titulo">Ingredientes naturales</div>
+                                    <div class="stat-desc">Sin conservadores artificiales</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <i class="bi bi-fire stat-icon" aria-hidden="true"></i>
+                                <div>
+                                    <div class="stat-titulo">Horneado fresco</div>
+                                    <div class="stat-desc">Todos los días</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="galeria-grid" aria-label="Galería de productos y sucursal">
+                        <div class="galeria-item galeria-grande">
+                            <img src="{{ url_for('static', filename='img/Inicio/Sucursal2.jpg') }}"
+                                 alt="Vista de la pastelería SoftBakery">
+                        </div>
+                        <div class="galeria-item">
+                            <img src="{{ url_for('static', filename='img/Inicio/Pastel1.jpg') }}"
+                                 alt="Pastel artesanal">
+                        </div>
+                        <div class="galeria-item">
+                            <img src="{{ url_for('static', filename='img/Inicio/Pastel2.png') }}"
+                                 alt="Pastel de temporada 3">
+                        </div>
+                        <div class="galeria-item">
+                            <img src="{{ url_for('static', filename='img/Inicio/Pastel3.png') }}"
+                                 alt="Pastel de temporada 4">
+                        </div>
+                        <div class="galeria-item">
+                            <img src="{{ url_for('static', filename='img/Inicio/Pastel4.png') }}"
+                                 alt="Pastel de temporada 5">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

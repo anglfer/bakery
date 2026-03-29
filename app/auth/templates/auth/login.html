@@ -1,0 +1,102 @@
+{% extends "base_template.html" %} {% block title %}Login - SoftBakery{% endblock %} {% block
+content %}
+<div class="login-wrapper">
+	<div class="login-container">
+		<div class="text-center mb-4">
+			<i class="bi bi-cake2-fill logo-icon"></i>
+			<h2 class="login-title mt-2">SoftBakery</h2>
+		</div>
+
+		<form method="POST" novalidate>
+			{{ form.hidden_tag() }}
+
+			<div class="mb-3">
+				<label class="form-label fw-semibold">Usuario</label>
+				<div class="input-group">
+					<span class="input-group-text">
+						<i class="bi bi-person-fill"></i>
+					</span>
+					{{ form.username(class_='form-control', placeholder='Ingrese su usuario') }}
+				</div>
+				{% if form.username.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.username.errors %}{{ error }}{% endfor %}
+				</div>
+				{% endif %}
+			</div>
+
+			<div class="mb-2">
+				<label class="form-label fw-semibold">Contraseña</label>
+				<div class="input-group">
+					<span class="input-group-text">
+						<i class="bi bi-lock-fill"></i>
+					</span>
+					{{ form.password(class_='form-control', id='password', placeholder='Ingrese su
+					contraseña') }}
+					<span
+						class="input-group-text p-0"
+						style="
+							background: #fff;
+							border-radius: 0 50px 50px 0;
+							border: 1px solid #eee;
+							border-left: none;
+						">
+						<button
+							type="button"
+							class="btn border-0 toggle-password h-100 px-3 d-flex align-items-center"
+							id="togglePassword"
+							style="color: #aaa">
+							<i class="bi bi-eye-slash"></i>
+						</button>
+					</span>
+				</div>
+				{% if form.password.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.password.errors %}{{ error }}{% endfor %}
+				</div>
+				{% endif %}
+
+				<!-- Según Reglas de Negocio v2.pdf, se debe indicar la política de contraseñas -->
+				<div class="mt-2" style="font-size: 0.7rem; color: #777">
+					<i class="bi bi-exclamation-circle"></i>
+					Debe contener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter
+					especial.
+				</div>
+			</div>
+
+			<!-- Espacio para CAPTCHA requerido en las reglas de negocio (opcional en UI visual si no hay backend activo) -->
+			{% if show_captcha %}
+			<div class="mb-3">
+				<div class="d-flex justify-content-center">
+					<!-- Se quitó el campo recaptcha temporalmente para no bloquear el login. -->
+				</div>
+			</div>
+			{% endif %}
+
+			<div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+				<a href="#" class="link">¿Olvidaste tu contraseña?</a>
+			</div>
+
+			{{ form.submit(class_='btn btn-login w-100', value='Iniciar sesión') }}
+
+			<div class="text-center mt-3" style="font-size: 0.9rem">
+				¿Eres nuevo cliente?
+				<a href="{{ url_for('auth.registro_cliente') }}" class="link fw-semibold">Crear cuenta</a>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+	const toggle = document.getElementById('togglePassword');
+	if (toggle) {
+		toggle.addEventListener('click', function () {
+			const password = document.getElementById('password');
+			const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+			password.setAttribute('type', type);
+			this.innerHTML =
+				type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+		});
+	}
+</script>
+{% endblock %}

@@ -1,0 +1,3483 @@
+[
+    {
+        "label": "FlaskForm",
+        "importPath": "flask_wtf",
+        "description": "flask_wtf",
+        "isExtraImport": true,
+        "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "FlaskForm",
+        "importPath": "flask_wtf",
+        "description": "flask_wtf",
+        "isExtraImport": true,
+        "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "FlaskForm",
+        "importPath": "flask_wtf",
+        "description": "flask_wtf",
+        "isExtraImport": true,
+        "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "FlaskForm",
+        "importPath": "flask_wtf",
+        "description": "flask_wtf",
+        "isExtraImport": true,
+        "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "FlaskForm",
+        "importPath": "flask_wtf",
+        "description": "flask_wtf",
+        "isExtraImport": true,
+        "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "StringField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "StringField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "IntegerField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "IntegerField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SelectField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "DecimalField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SelectField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "StringField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Length",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Length",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Regexp",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "NumberRange",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "NumberRange",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "NumberRange",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Proveedor",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rol",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Modulo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Proveedor",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rol",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_today",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "BitacoraAcceso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rol",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Carrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCarrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Carrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCarrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Modulo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Carrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Compra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCarrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCompra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetallePedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrima",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MovimientoInventarioMP",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PagoPedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TicketVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrima",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MovimientoInventarioMP",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "CorteDiario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Compra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "CorteDiario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrima",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Proveedor",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_today",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "BitacoraAcceso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Carrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Compra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "CorteDiario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCarrito",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCompra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrima",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Modulo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MovimientoInventarioMP",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Proveedor",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rol",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "UnidadMedida",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_today",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "annotations",
+        "importPath": "__future__",
+        "description": "__future__",
+        "isExtraImport": true,
+        "detail": "__future__",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "InvalidOperation",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "InvalidOperation",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "url_for",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "current_app",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "session",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "url_for",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "url_for",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "abort",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "url_for",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "current_app",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "render_template",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "url_for",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "current_app",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "logout_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "current_user",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "LoginManager",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "UserMixin",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "admin_bp",
+        "importPath": "app.admin",
+        "description": "app.admin",
+        "isExtraImport": true,
+        "detail": "app.admin",
+        "documentation": {}
+    },
+    {
+        "label": "is_password_insecure",
+        "importPath": "app.common.passwords",
+        "description": "app.common.passwords",
+        "isExtraImport": true,
+        "detail": "app.common.passwords",
+        "documentation": {}
+    },
+    {
+        "label": "is_password_insecure",
+        "importPath": "app.common.passwords",
+        "description": "app.common.passwords",
+        "isExtraImport": true,
+        "detail": "app.common.passwords",
+        "documentation": {}
+    },
+    {
+        "label": "require_permission",
+        "importPath": "app.common.security",
+        "description": "app.common.security",
+        "isExtraImport": true,
+        "detail": "app.common.security",
+        "documentation": {}
+    },
+    {
+        "label": "require_permission",
+        "importPath": "app.common.security",
+        "description": "app.common.security",
+        "isExtraImport": true,
+        "detail": "app.common.security",
+        "documentation": {}
+    },
+    {
+        "label": "require_permission",
+        "importPath": "app.common.security",
+        "description": "app.common.security",
+        "isExtraImport": true,
+        "detail": "app.common.security",
+        "documentation": {}
+    },
+    {
+        "label": "require_permission",
+        "importPath": "app.common.security",
+        "description": "app.common.security",
+        "isExtraImport": true,
+        "detail": "app.common.security",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "bcrypt",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "login_manager",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "smtplib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "smtplib",
+        "description": "smtplib",
+        "detail": "smtplib",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "EmailMessage",
+        "importPath": "email.message",
+        "description": "email.message",
+        "isExtraImport": true,
+        "detail": "email.message",
+        "documentation": {}
+    },
+    {
+        "label": "auth_bp",
+        "importPath": "app.auth",
+        "description": "app.auth",
+        "isExtraImport": true,
+        "detail": "app.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LoginForm",
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "isExtraImport": true,
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RegisterClientForm",
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "isExtraImport": true,
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "Verify2FAForm",
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "isExtraImport": true,
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "catalog_bp",
+        "importPath": "app.catalog",
+        "description": "app.catalog",
+        "isExtraImport": true,
+        "detail": "app.catalog",
+        "documentation": {}
+    },
+    {
+        "label": "agregar_producto_a_carrito",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "crear_pedido_desde_carrito",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "crear_orden_produccion",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "iniciar_orden_produccion",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "actualizar_estado_pedido",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "calcular_costo_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "generar_venta_desde_pedido",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "pagar_compra",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "registrar_compra",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "wraps",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "production_bp",
+        "importPath": "app.production",
+        "description": "app.production",
+        "isExtraImport": true,
+        "detail": "app.production",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "secure_filename",
+        "importPath": "werkzeug.utils",
+        "description": "werkzeug.utils",
+        "isExtraImport": true,
+        "detail": "werkzeug.utils",
+        "documentation": {}
+    },
+    {
+        "label": "sales_bp",
+        "importPath": "app.sales",
+        "description": "app.sales",
+        "isExtraImport": true,
+        "detail": "app.sales",
+        "documentation": {}
+    },
+    {
+        "label": "Bcrypt",
+        "importPath": "flask_bcrypt",
+        "description": "flask_bcrypt",
+        "isExtraImport": true,
+        "detail": "flask_bcrypt",
+        "documentation": {}
+    },
+    {
+        "label": "Migrate",
+        "importPath": "flask_migrate",
+        "description": "flask_migrate",
+        "isExtraImport": true,
+        "detail": "flask_migrate",
+        "documentation": {}
+    },
+    {
+        "label": "SQLAlchemy",
+        "importPath": "flask_sqlalchemy",
+        "description": "flask_sqlalchemy",
+        "isExtraImport": true,
+        "detail": "flask_sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "sqlalchemy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "CheckConstraint",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "UniqueConstraint",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DevelopmentConfig",
+        "importPath": "config.development",
+        "description": "config.development",
+        "isExtraImport": true,
+        "detail": "config.development",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "context",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "mysql",
+        "importPath": "sqlalchemy.dialects",
+        "description": "sqlalchemy.dialects",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.dialects",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "fileConfig",
+        "importPath": "logging.config",
+        "description": "logging.config",
+        "isExtraImport": true,
+        "detail": "logging.config",
+        "documentation": {}
+    },
+    {
+        "label": "create_app",
+        "importPath": "app",
+        "description": "app",
+        "isExtraImport": true,
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "create_app",
+        "importPath": "app",
+        "description": "app",
+        "isExtraImport": true,
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "PyPDF2",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "PyPDF2",
+        "description": "PyPDF2",
+        "detail": "PyPDF2",
+        "documentation": {}
+    },
+    {
+        "label": "ProveedorForm",
+        "kind": 6,
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "peekOfCode": "class ProveedorForm(FlaskForm):\n    nombre_empresa = StringField(\"Nombre empresa\", validators=[DataRequired(), Length(max=120)])\n    submit = SubmitField(\"Guardar\")",
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "__all__",
+        "kind": 5,
+        "importPath": "app.admin.models",
+        "description": "app.admin.models",
+        "peekOfCode": "__all__ = [\"Rol\", \"Permiso\", \"Persona\", \"Usuario\", \"Proveedor\"]",
+        "detail": "app.admin.models",
+        "documentation": {}
+    },
+    {
+        "label": "dashboard",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def dashboard():\n    if not current_user.rol or current_user.rol.nombre != \"Administrador\":\n        flash(\"No tienes acceso al dashboard administrativo.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    fecha = utc_today()\n    ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n    total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n    numero_ventas = len(ventas_hoy)\n    producto_mas_vendido = None\n    if ventas_hoy:",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "usuarios",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def usuarios():\n    if request.method == \"POST\":\n        if not _can_create_user():\n            flash(\"No tienes permiso para crear usuarios.\", \"danger\")\n            return redirect(url_for(USERS_ENDPOINT))\n        username = request.form.get(\"username\", \"\").strip()\n        password = request.form.get(\"password\", \"\")\n        id_rol = _parse_int(request.form.get(\"id_rol\", \"0\"))\n        nombre = request.form.get(\"nombre\", \"\").strip()\n        apellidos = request.form.get(\"apellidos\", \"\").strip()",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "editar_usuario",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def editar_usuario(id_usuario: int):\n    user = Usuario.query.get_or_404(id_usuario)\n    if user.id_usuario == current_user.id_usuario:\n        flash(\"No puedes editarte a ti mismo desde este formulario.\", \"warning\")\n        return redirect(url_for(USERS_ENDPOINT))\n    user.id_rol = _parse_int(request.form.get(\"id_rol\", str(user.id_rol)), user.id_rol)\n    user.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    user.persona.nombre = request.form.get(\"nombre\", user.persona.nombre).strip()\n    user.persona.apellidos = request.form.get(\n        \"apellidos\", user.persona.apellidos",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "desactivar_usuario",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def desactivar_usuario(id_usuario: int):\n    user = Usuario.query.get_or_404(id_usuario)\n    if user.id_usuario == current_user.id_usuario:\n        flash(\"No puedes desactivar tu propio usuario.\", \"warning\")\n        return redirect(url_for(USERS_ENDPOINT))\n    user.activo = False\n    db.session.commit()\n    flash(\"Usuario desactivado.\", \"success\")\n    return redirect(url_for(USERS_ENDPOINT))\n@admin_bp.route(\"/roles\", methods=[\"GET\", \"POST\"])",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "roles",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def roles():\n    if request.method == \"POST\":\n        nombre = request.form.get(\"nombre\", \"\").strip()\n        descripcion = request.form.get(\"descripcion\", \"\").strip()\n        if not nombre or not descripcion:\n            flash(\"Nombre y descripcion son obligatorios.\", \"warning\")\n            return redirect(url_for(ROLES_ENDPOINT))\n        if Rol.query.filter_by(nombre=nombre).first():\n            flash(\"El rol ya existe.\", \"danger\")\n            return redirect(url_for(ROLES_ENDPOINT))",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "editar_rol",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def editar_rol(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    role.descripcion = request.form.get(\"descripcion\", role.descripcion).strip()\n    if role.nombre not in BASE_ROLES:\n        role.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    db.session.commit()\n    flash(\"Rol actualizado.\", \"success\")\n    return redirect(url_for(ROLES_ENDPOINT))\n@admin_bp.post(\"/roles/<int:id_rol>/desactivar\")\n@login_required",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "desactivar_rol",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def desactivar_rol(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    if role.nombre in BASE_ROLES:\n        flash(\"No puedes desactivar roles base.\", \"warning\")\n        return redirect(url_for(ROLES_ENDPOINT))\n    role.activo = False\n    db.session.commit()\n    flash(\"Rol desactivado.\", \"success\")\n    return redirect(url_for(ROLES_ENDPOINT))\n@admin_bp.post(\"/roles/<int:id_rol>/activar\")",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "activar_rol",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def activar_rol(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    if role.nombre in BASE_ROLES:\n        flash(\"No puedes modificar roles base.\", \"warning\")\n        return redirect(url_for(ROLES_ENDPOINT))\n    role.activo = True\n    db.session.commit()\n    flash(\"Rol activado.\", \"success\")\n    return redirect(url_for(ROLES_ENDPOINT))\n@admin_bp.post(\"/roles/<int:id_rol>/permisos\")",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "rol_permisos",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def rol_permisos(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    data = request.get_json(silent=True) or {}\n    permisos_nuevos = data.get(\"permisos\", [])\n    Permiso.query.filter_by(id_rol=role.id_rol).delete()\n    for item in permisos_nuevos:\n        id_modulo = _parse_int(str(item.get(\"id_modulo\", \"0\")), 0)\n        if id_modulo <= 0:\n            continue\n        modulo = Modulo.query.get(id_modulo)",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "proveedores",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def proveedores():\n    if request.method == \"POST\":\n        nombre = request.form.get(\"nombre_empresa\", \"\").strip()\n        telefono = request.form.get(\"telefono\", \"\").strip()\n        correo = request.form.get(\"correo\", \"\").strip().lower()\n        direccion = request.form.get(\"direccion\", \"\").strip()\n        if not all([nombre, telefono, correo, direccion]):\n            flash(\"Completa todos los campos del proveedor.\", \"warning\")\n            return redirect(url_for(SUPPLIERS_ENDPOINT))\n        if \"@\" not in correo or \".\" not in correo:",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "editar_proveedor",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def editar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    proveedor.nombre_empresa = request.form.get(\n        \"nombre_empresa\", proveedor.nombre_empresa\n    ).strip()\n    proveedor.telefono = request.form.get(\"telefono\", proveedor.telefono).strip()\n    proveedor.correo = request.form.get(\"correo\", proveedor.correo).strip().lower()\n    proveedor.direccion = request.form.get(\"direccion\", proveedor.direccion).strip()\n    proveedor.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    db.session.commit()",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "desactivar_proveedor",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def desactivar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    proveedor.activo = False\n    db.session.commit()\n    flash(\"Proveedor desactivado.\", \"success\")\n    return redirect(url_for(SUPPLIERS_ENDPOINT))",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_ROLES",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "BASE_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "USERS_ENDPOINT",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "USERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "ROLES_ENDPOINT",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "ROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "SUPPLIERS_ENDPOINT",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "SUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:\n    permission = (",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "LoginForm",
+        "kind": 6,
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\"Codigo\", validators=[DataRequired(), Length(min=6, max=6)])\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):",
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "Verify2FAForm",
+        "kind": 6,
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\"Codigo\", validators=[DataRequired(), Length(min=6, max=6)])\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\"Nombre\", validators=[DataRequired(), Length(max=100)])\n    apellidos = StringField(\"Apellidos\", validators=[DataRequired(), Length(max=120)])\n    telefono = StringField(\"Telefono\", validators=[DataRequired(), Length(max=30)])\n    correo = StringField(\"Correo\", validators=[DataRequired(), Length(max=120)])\n    direccion = StringField(\"Direccion\", validators=[DataRequired(), Length(max=255)])\n    ciudad = StringField(\"Ciudad\", validators=[DataRequired(), Length(max=120)])",
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RegisterClientForm",
+        "kind": 6,
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "peekOfCode": "class RegisterClientForm(FlaskForm):\n    nombre = StringField(\"Nombre\", validators=[DataRequired(), Length(max=100)])\n    apellidos = StringField(\"Apellidos\", validators=[DataRequired(), Length(max=120)])\n    telefono = StringField(\"Telefono\", validators=[DataRequired(), Length(max=30)])\n    correo = StringField(\"Correo\", validators=[DataRequired(), Length(max=120)])\n    direccion = StringField(\"Direccion\", validators=[DataRequired(), Length(max=255)])\n    ciudad = StringField(\"Ciudad\", validators=[DataRequired(), Length(max=120)])\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )",
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "PASSWORD_RULE",
+        "kind": 5,
+        "importPath": "app.auth.forms",
+        "description": "app.auth.forms",
+        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=\"Minimo 8 caracteres con mayuscula, minuscula, numero y caracter especial.\",\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")",
+        "detail": "app.auth.forms",
+        "documentation": {}
+    },
+    {
+        "label": "login",
+        "kind": 2,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "def login():\n    if current_user.is_authenticated:\n        return redirect(url_for(\"catalog.home\"))\n    form = LoginForm()\n    if form.validate_on_submit():\n        usuario = Usuario.query.filter_by(\n            username=form.username.data.strip(), activo=True\n        ).first()\n        if not usuario:\n            flash(\"Credenciales invalidas\", \"danger\")",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "verify_2fa",
+        "kind": 2,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "def verify_2fa():\n    user_id = session.get(\"pending_2fa_user\")\n    if not user_id:\n        return redirect(url_for(LOGIN_ENDPOINT))\n    usuario = Usuario.query.get(user_id)\n    if not usuario:\n        session.pop(\"pending_2fa_user\", None)\n        return redirect(url_for(LOGIN_ENDPOINT))\n    form = Verify2FAForm()\n    if form.validate_on_submit():",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "registro_cliente",
+        "kind": 2,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "def registro_cliente():\n    form = RegisterClientForm()\n    if form.validate_on_submit():\n        existe_user = Usuario.query.filter_by(\n            username=form.username.data.strip()\n        ).first()\n        if existe_user:\n            flash(\"El nombre de usuario ya existe\", \"danger\")\n            return render_template(REGISTER_TEMPLATE, form=form)\n        existe_mail = Persona.query.filter_by(",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "logout",
+        "kind": 2,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "def logout():\n    logout_user()\n    flash(\"Sesion finalizada\", \"info\")\n    return redirect(url_for(\"catalog.home\"))",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "LOGIN_TEMPLATE",
+        "kind": 5,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "LOGIN_TEMPLATE = \"auth/login.html\"\nREGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "REGISTER_TEMPLATE",
+        "kind": 5,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "REGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":\n        return \"production.ordenes\"",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "LOGIN_ENDPOINT",
+        "kind": 5,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "LOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":\n        return \"production.ordenes\"\n    return \"catalog.home\"",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "CarritoForm",
+        "kind": 6,
+        "importPath": "app.catalog.forms",
+        "description": "app.catalog.forms",
+        "peekOfCode": "class CarritoForm(FlaskForm):\n    cantidad = IntegerField(\n        \"Cantidad\", validators=[DataRequired(), NumberRange(min=1, max=5)]\n    )\n    submit = SubmitField(\"Agregar\")",
+        "detail": "app.catalog.forms",
+        "documentation": {}
+    },
+    {
+        "label": "__all__",
+        "kind": 5,
+        "importPath": "app.catalog.models",
+        "description": "app.catalog.models",
+        "peekOfCode": "__all__ = [\"Producto\", \"Carrito\", \"DetalleCarrito\", \"Venta\"]",
+        "detail": "app.catalog.models",
+        "documentation": {}
+    },
+    {
+        "label": "home",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def home():\n    destacados = (\n        Producto.query.filter(Producto.activo == True, Producto.cantidad_disponible > 0)\n        .order_by(Producto.cantidad_disponible.desc(), Producto.id_producto.asc())\n        .limit(6)\n        .all()\n    )\n    return render_template(\"catalog/index.html\", destacados=destacados)\n@catalog_bp.route(\"/catalogo\")\ndef catalogo():",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "catalogo",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def catalogo():\n    productos = (\n        Producto.query.filter(Producto.activo == True, Producto.cantidad_disponible > 0)\n        .order_by(Producto.nombre.asc())\n        .all()\n    )\n    return render_template(\"catalog/catalogo_productos.html\", productos=productos)\n@catalog_bp.post(\"/carrito/agregar\")\n@login_required\n@require_permission(\"Carrito\", \"crear\")",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "carrito_agregar",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def carrito_agregar():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden usar el carrito web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    try:\n        id_producto = int(request.form.get(\"id_producto\", \"0\") or 0)\n        cantidad = int(request.form.get(\"cantidad\", \"1\") or 1)\n    except ValueError:\n        flash(\"Datos invalidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "carrito",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def carrito():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden usar el carrito web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"\").strip().lower()\n        try:\n            id_detalle = int(request.form.get(\"id_detalle\", \"0\") or 0)\n        except ValueError:\n            id_detalle = 0",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "checkout",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def checkout():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden generar pedidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    fecha_entrega_raw = (request.form.get(\"fecha_entrega\") or \"\").strip()\n    tipo_pago_pedido = (request.form.get(\"tipo_pago_pedido\") or \"CONTRA_ENTREGA\").strip().upper()\n    tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n    referencia = (request.form.get(\"referencia_pago\") or \"\").strip() or None\n    try:\n        fecha_entrega = date.fromisoformat(fecha_entrega_raw)",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "mis_pedidos",
+        "kind": 2,
+        "importPath": "app.catalog.routes",
+        "description": "app.catalog.routes",
+        "peekOfCode": "def mis_pedidos():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden consultar pedidos web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    pedidos = (\n        Pedido.query.filter_by(id_usuario_cliente=current_user.id_usuario)\n        .order_by(Pedido.id_pedido.desc())\n        .all()\n    )\n    return render_template(\"catalog/mis_pedidos.html\", pedidos=pedidos)",
+        "detail": "app.catalog.routes",
+        "documentation": {}
+    },
+    {
+        "label": "is_password_insecure",
+        "kind": 2,
+        "importPath": "app.common.passwords",
+        "description": "app.common.passwords",
+        "peekOfCode": "def is_password_insecure(password: str) -> bool:\n    pwd = (password or \"\").strip()\n    if not pwd:\n        return True\n    lowered = pwd.lower()\n    if lowered in _COMMON_PASSWORDS:\n        return True\n    # Block very repetitive passwords like \"aaaaaaaa\", \"11111111\"\n    if re.fullmatch(r\"(.)\\1{7,}\", pwd):\n        return True",
+        "detail": "app.common.passwords",
+        "documentation": {}
+    },
+    {
+        "label": "_COMMON_PASSWORDS",
+        "kind": 5,
+        "importPath": "app.common.passwords",
+        "description": "app.common.passwords",
+        "peekOfCode": "_COMMON_PASSWORDS = {\n    \"password\",\n    \"password1\",\n    \"password123\",\n    \"12345678\",\n    \"123456789\",\n    \"qwerty123\",\n    \"admin123\",\n    \"admin@123\",\n    \"ventas@123\",",
+        "detail": "app.common.passwords",
+        "documentation": {}
+    },
+    {
+        "label": "require_permission",
+        "kind": 2,
+        "importPath": "app.common.security",
+        "description": "app.common.security",
+        "peekOfCode": "def require_permission(modulo_nombre: str, accion: str):\n    action_map = {\n        \"leer\": \"lectura\",\n        \"crear\": \"escritura\",\n        \"editar\": \"actualizacion\",\n        \"desactivar\": \"eliminacion\",\n    }\n    if accion not in action_map:\n        raise ValueError(\"Accion de permiso no valida\")\n    field_name = action_map[accion]",
+        "detail": "app.common.security",
+        "documentation": {}
+    },
+    {
+        "label": "registrar_compra",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:\n    total = Decimal(\"0\")\n    for item in detalles:\n        materia = MateriaPrima.query.get(item[\"id_materia_prima\"])\n        if not materia:\n            raise ValueError(\"Materia prima no encontrada\")\n        cantidad_comprada = Decimal(str(item[\"cantidad_comprada\"]))\n        precio_unitario = Decimal(str(item[\"precio_unitario\"]))\n        subtotal = cantidad_comprada * precio_unitario\n        cantidad_base = cantidad_comprada * Decimal(str(materia.factor_conversion))",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "agregar_producto_a_carrito",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def agregar_producto_a_carrito(\n    id_usuario: int, id_producto: int, cantidad: int\n) -> None:\n    if cantidad < 1 or cantidad > 5:\n        raise ValueError(\"La cantidad por producto en carrito debe estar entre 1 y 5\")\n    carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()\n    if not carrito:\n        carrito = Carrito(id_usuario_cliente=id_usuario)\n        db.session.add(carrito)\n        db.session.flush()",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "crear_venta_desde_carrito",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def crear_venta_desde_carrito(id_usuario: int, pagado_en_linea: bool) -> Venta:\n    carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()\n    if not carrito or not carrito.detalles:\n        raise ValueError(\"No hay productos en el carrito\")\n    venta = Venta(\n        id_usuario_cliente=id_usuario,\n        estado=\"EN_PROCESO_PRODUCCION\",\n        pagado_en_linea=pagado_en_linea,\n        fecha=utc_now(),\n    )",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "crear_pedido_desde_carrito",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def crear_pedido_desde_carrito(\n    *,\n    id_usuario: int,\n    fecha_entrega,\n    tipo_pago_pedido: str,\n    tipo_pago: str,\n    referencia_pago: str | None,\n) -> Pedido:\n    carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()\n    if not carrito or not carrito.detalles:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "generar_venta_desde_pedido",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def generar_venta_desde_pedido(\n    *,\n    id_pedido: int,\n    id_usuario_emite: int,\n    requiere_ticket: bool,\n) -> Venta:\n    pedido = Pedido.query.get(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")\n    if pedido.estado_pedido == \"CANCELADO\":",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "actualizar_estado_pedido",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def actualizar_estado_pedido(\n    *,\n    id_pedido: int,\n    nuevo_estado: str,\n    referencia_pago: str | None = None,\n) -> Pedido:\n    pedido = Pedido.query.get(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")\n    nuevo_estado = (nuevo_estado or \"\").strip().upper()",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "calcular_costo_unitario_producto",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def calcular_costo_unitario_producto(*, id_producto: int) -> Decimal:\n    producto = Producto.query.get(id_producto)\n    if not producto or not producto.activo:\n        raise ValueError(\"Producto no disponible\")\n    if not producto.id_receta:\n        raise ValueError(\"Producto sin receta activa\")\n    receta = Receta.query.get(producto.id_receta)\n    if not receta or not receta.activa:\n        raise ValueError(\"Producto sin receta activa\")\n    if receta.rendimiento_base <= 0:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "calcular_costo_producto",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def calcular_costo_producto(*, id_producto: int, cantidad: int) -> Decimal:\n    if cantidad <= 0:\n        return Decimal(\"0\")\n    return calcular_costo_unitario_producto(id_producto=id_producto) * Decimal(\n        str(cantidad)\n    )\ndef crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    solicitud = SolicitudProduccion.query.get(id_solicitud)",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "crear_orden_produccion",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    solicitud = SolicitudProduccion.query.get(id_solicitud)\n    if not solicitud:\n        raise ValueError(\"Solicitud no encontrada\")\n    if solicitud.estado != \"APROBADA\":\n        raise ValueError(\"Solo solicitudes aprobadas pueden generar orden\")\n    receta = Receta.query.get(id_receta)\n    if not receta or not receta.activa:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "iniciar_orden_produccion",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProduccion:\n    orden = OrdenProduccion.query.get(id_orden)\n    if not orden:\n        raise ValueError(\"Orden no encontrada\")\n    if orden.estado != \"PENDIENTE\":\n        raise ValueError(\"Solo se pueden iniciar ordenes pendientes\")\n    receta = Receta.query.get(orden.id_receta)\n    if not receta or not receta.activa:\n        raise ValueError(\"Receta activa no encontrada\")\n    if receta.rendimiento_base <= 0:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "pagar_compra",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def pagar_compra(id_compra: int, id_usuario: int) -> None:\n    compra = Compra.query.get(id_compra)\n    if not compra:\n        raise ValueError(\"Compra no encontrada\")\n    compra.estado_pago = \"PAGADO\"\n    salida = SalidaEfectivo(\n        concepto=f\"Pago compra {compra.id_compra}\",\n        monto=compra.total,\n        tipo=\"COMPRA_MATERIA_PRIMA\",\n        id_usuario=id_usuario,",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccionForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired()])\n    cantidad = IntegerField(\"Cantidad\", validators=[DataRequired(), NumberRange(min=1)])\n    submit = SubmitField(\"Enviar solicitud\")",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "__all__",
+        "kind": 5,
+        "importPath": "app.production.models",
+        "description": "app.production.models",
+        "peekOfCode": "__all__ = [\"Receta\", \"DetalleReceta\", \"SolicitudProduccion\", \"OrdenProduccion\"]",
+        "detail": "app.production.models",
+        "documentation": {}
+    },
+    {
+        "label": "inventario_mp",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def inventario_mp():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"ajuste\":\n            id_materia = _int(request.form.get(\"id_materia\", \"0\"))\n            cantidad = _decimal(request.form.get(\"cantidad\", \"0\"))\n            tipo = request.form.get(\"tipo\", \"AJUSTE\").strip().upper()\n            materia = MateriaPrima.query.get(id_materia)\n            if not materia:\n                flash(\"Materia prima no encontrada.\", \"danger\")",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "recetas",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def recetas():\n    if request.method == \"POST\":\n        nombre = (request.form.get(\"nombre\") or \"\").strip()\n        rendimiento = _decimal(request.form.get(\"rendimiento\", \"0\"))\n        unidad_produccion = (request.form.get(\"unidad_produccion\") or \"pieza\").strip()\n        categoria = (request.form.get(\"categoria\") or \"\").strip() or None\n        descripcion = (request.form.get(\"descripcion\") or \"\").strip() or None\n        ids_materia = request.form.getlist(\"id_materia_prima[]\")\n        cantidades = request.form.getlist(\"cantidad_receta[]\")\n        if not nombre or rendimiento <= 0:",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "toggle_receta",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def toggle_receta(id_receta: int):\n    receta = Receta.query.get_or_404(id_receta)\n    if not receta.activa:\n        Receta.query.filter(\n            db.func.lower(Receta.nombre) == receta.nombre.lower(),\n            Receta.activa.is_(True),\n        ).update({\"activa\": False}, synchronize_session=False)\n    receta.activa = not receta.activa\n    db.session.commit()\n    flash(\"Estado de receta actualizado.\", \"success\")",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "ordenes",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def ordenes():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\":\n            id_solicitud = _int(request.form.get(\"id_solicitud\", \"0\"))\n            id_receta = _int(request.form.get(\"id_receta\", \"0\"))\n            cantidad = _int(request.form.get(\"cantidad\", \"0\"))\n            if id_solicitud <= 0 or id_receta <= 0 or cantidad <= 0:\n                flash(\"Datos invalidos para crear la orden.\", \"warning\")\n                return redirect(url_for(\"production.ordenes\"))",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "solicitudes",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def solicitudes():\n    if request.method == \"POST\":\n        id_solicitud = _int(request.form.get(\"id_solicitud\", \"0\"))\n        estado = request.form.get(\"estado\", \"PENDIENTE\").strip().upper()\n        solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)\n        if solicitud.estado != \"PENDIENTE\":\n            flash(\"Solo se pueden resolver solicitudes pendientes.\", \"warning\")\n            return redirect(url_for(\"production.solicitudes\"))\n        if estado not in {\"APROBADA\", \"RECHAZADA\"}:\n            flash(\"Estado de resolucion invalido.\", \"danger\")",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivoForm",
+        "kind": 6,
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "peekOfCode": "class SalidaEfectivoForm(FlaskForm):\n    concepto = StringField(\"Concepto\", validators=[DataRequired()])\n    monto = DecimalField(\"Monto\", validators=[DataRequired(), NumberRange(min=0.01)])\n    tipo = SelectField(\"Tipo\", choices=[(\"GASTO_OPERATIVO\", \"Gasto operativo\"), (\"COMPRA_MATERIA_PRIMA\", \"Compra materia prima\")])\n    submit = SubmitField(\"Registrar salida\")",
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "__all__",
+        "kind": 5,
+        "importPath": "app.sales.models",
+        "description": "app.sales.models",
+        "peekOfCode": "__all__ = [\"Venta\", \"DetalleVenta\", \"CorteDiario\", \"SalidaEfectivo\"]",
+        "detail": "app.sales.models",
+        "documentation": {}
+    },
+    {
+        "label": "producto_terminado",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def producto_terminado():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        # Handle image upload\n        image_file = request.files.get(\"imagen_archivo\")\n        image_path = _handle_image_upload(image_file)\n        if action == \"crear\":\n            nombre = request.form.get(\"nombre\", \"\").strip()\n            descripcion = (\n                request.form.get(\"descripcion\", \"\").strip() or \"Sin descripcion\"",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "solicitudes",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def solicitudes():\n    if request.method == \"POST\":\n        id_producto = _int(request.form.get(\"id_producto\", \"0\"))\n        cantidad = _int(request.form.get(\"cantidad\", \"0\"))\n        observaciones = request.form.get(\"observaciones\", \"\").strip() or None\n        producto = Producto.query.get(id_producto)\n        if not producto or not producto.activo or cantidad <= 0:\n            flash(\"Producto o cantidad invalida para solicitud.\", \"warning\")\n            return redirect(url_for(\"sales.solicitudes\"))\n        db.session.add(",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "pedidos_clientes",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def pedidos_clientes():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"actualizar\").strip().lower()\n        id_pedido = _int(request.form.get(\"id_pedido\", \"0\"))\n        if action == \"entregar\":\n            requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n            try:\n                generar_venta_desde_pedido(\n                    id_pedido=id_pedido,\n                    id_usuario_emite=current_user.id_usuario,",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "ventas",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def ventas():\n    if request.method == \"POST\":\n        id_producto = _int(request.form.get(\"id_producto\", \"0\"))\n        cantidad = _int(request.form.get(\"cantidad\", \"1\"), 1)\n        tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n        requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n        producto = Producto.query.get(id_producto)\n        if not producto or not producto.activo:\n            flash(\"Producto no disponible para venta.\", \"danger\")\n            return redirect(url_for(\"sales.ventas\"))",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "compras_mp",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def compras_mp():\n    if request.method == \"POST\":\n        id_proveedor = _int(request.form.get(\"id_proveedor\", \"0\"))\n        id_materia = _int(request.form.get(\"id_materia\", \"0\"))\n        cantidad_comprada = _dec(request.form.get(\"cantidad_comprada\", \"0\"))\n        precio_unitario = _dec(request.form.get(\"precio_unitario\", \"0\"))\n        proveedor = Proveedor.query.get(id_proveedor)\n        materia = MateriaPrima.query.get(id_materia)\n        if not proveedor or not proveedor.activo:\n            flash(\"Proveedor invalido o inactivo.\", \"danger\")",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "pagar_compra_route",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def pagar_compra_route(id_compra: int):\n    try:\n        pagar_compra(id_compra=id_compra, id_usuario=current_user.id_usuario)\n        flash(\"Compra marcada como pagada.\", \"success\")\n    except ValueError as exc:\n        flash(str(exc), \"danger\")\n    return redirect(url_for(\"sales.compras_mp\"))\n@sales_bp.route(\"/salidas\", methods=[\"GET\", \"POST\"])\n@login_required\n@require_permission(\"Costos y Utilidad\", \"leer\")",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "salidas",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def salidas():\n    if request.method == \"POST\":\n        concepto = request.form.get(\"concepto\", \"\").strip()\n        monto = _dec(request.form.get(\"monto\", \"0\"))\n        tipo = request.form.get(\"tipo\", \"OTRO\").strip().upper() or \"OTRO\"\n        if not concepto or monto <= 0:\n            flash(\"Concepto y monto valido son obligatorios.\", \"warning\")\n            return redirect(url_for(\"sales.salidas\"))\n        db.session.add(\n            SalidaEfectivo(",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "cortes",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def cortes():\n    if request.method == \"POST\":\n        fecha = utc_today()\n        ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n        total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n        numero_ventas = len(ventas_hoy)\n        costo_produccion = Decimal(\"0\")\n        for v in ventas_hoy:\n            for d in v.detalles:\n                try:",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "db = SQLAlchemy()\nlogin_manager = LoginManager()\nmigrate = Migrate()\nbcrypt = Bcrypt()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "login_manager",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "login_manager = LoginManager()\nmigrate = Migrate()\nbcrypt = Bcrypt()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "migrate",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "migrate = Migrate()\nbcrypt = Bcrypt()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "bcrypt",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "bcrypt = Bcrypt()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "TimestampMixin",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"\n    id_rol = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(50), unique=True, nullable=False)\n    descripcion = db.Column(db.String(255), nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)\n    es_base = db.Column(db.Boolean, default=False, nullable=False)\n    usuarios = db.relationship(\"Usuario\", back_populates=\"rol\", lazy=\"dynamic\")",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Rol",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"\n    id_rol = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(50), unique=True, nullable=False)\n    descripcion = db.Column(db.String(255), nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)\n    es_base = db.Column(db.Boolean, default=False, nullable=False)\n    usuarios = db.relationship(\"Usuario\", back_populates=\"rol\", lazy=\"dynamic\")\n    permisos = db.relationship(\"Permiso\", back_populates=\"rol\", lazy=\"dynamic\")\nclass Modulo(db.Model):",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Modulo",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Modulo(db.Model):\n    __tablename__ = \"modulo\"\n    id_modulo = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(80), unique=True, nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)\nclass Permiso(db.Model):\n    __tablename__ = \"permiso\"\n    __table_args__ = (\n        UniqueConstraint(\"id_rol\", \"id_modulo\", name=\"uq_permiso_rol_modulo\"),\n    )",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Permiso(db.Model):\n    __tablename__ = \"permiso\"\n    __table_args__ = (\n        UniqueConstraint(\"id_rol\", \"id_modulo\", name=\"uq_permiso_rol_modulo\"),\n    )\n    id_permiso = db.Column(db.Integer, primary_key=True)\n    id_rol = db.Column(db.Integer, db.ForeignKey(\"rol.id_rol\"), nullable=False)\n    id_modulo = db.Column(db.Integer, db.ForeignKey(\"modulo.id_modulo\"), nullable=False)\n    lectura = db.Column(db.Boolean, default=False, nullable=False)\n    escritura = db.Column(db.Boolean, default=False, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Persona(TimestampMixin, db.Model):\n    __tablename__ = \"persona\"\n    id_persona = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(100), nullable=False)\n    apellidos = db.Column(db.String(120), nullable=False)\n    telefono = db.Column(db.String(30), nullable=False)\n    correo = db.Column(db.String(120), unique=True, nullable=False)\n    direccion = db.Column(db.String(255), nullable=False)\n    ciudad = db.Column(db.String(120), nullable=False)\n    usuario = db.relationship(\"Usuario\", back_populates=\"persona\", uselist=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Usuario(UserMixin, TimestampMixin, db.Model):\n    __tablename__ = \"usuario\"\n    id_usuario = db.Column(db.Integer, primary_key=True)\n    id_persona = db.Column(\n        db.Integer, db.ForeignKey(\"persona.id_persona\"), unique=True, nullable=False\n    )\n    id_rol = db.Column(db.Integer, db.ForeignKey(\"rol.id_rol\"), nullable=False)\n    username = db.Column(db.String(60), unique=True, nullable=False)\n    password_hash = db.Column(db.String(255), nullable=False)\n    intentos_fallidos = db.Column(db.Integer, default=0, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "BitacoraAcceso",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class BitacoraAcceso(db.Model):\n    __tablename__ = \"bitacora_acceso\"\n    id_bitacora = db.Column(db.Integer, primary_key=True)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    exitoso = db.Column(db.Boolean, nullable=False)\n    error_mensaje = db.Column(db.String(255), nullable=True)\n    usuario = db.relationship(\"Usuario\", back_populates=\"bitacora\")\nclass Proveedor(TimestampMixin, db.Model):\n    __tablename__ = \"proveedor\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Proveedor",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Proveedor(TimestampMixin, db.Model):\n    __tablename__ = \"proveedor\"\n    id_proveedor = db.Column(db.Integer, primary_key=True)\n    nombre_empresa = db.Column(db.String(120), unique=True, nullable=False)\n    telefono = db.Column(db.String(30), nullable=False)\n    correo = db.Column(db.String(120), unique=True, nullable=False)\n    direccion = db.Column(db.String(255), nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)\n    fecha_alta = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass UnidadMedida(db.Model):",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "UnidadMedida",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class UnidadMedida(db.Model):\n    __tablename__ = \"unidad_medida\"\n    id_unidad = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(80), unique=True, nullable=False)\n    abreviatura = db.Column(db.String(20), unique=True, nullable=False)\nclass MateriaPrima(TimestampMixin, db.Model):\n    __tablename__ = \"materia_prima\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad_disponible >= 0\", name=\"ck_mp_cantidad_no_negativa\"),\n    )",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrima",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class MateriaPrima(TimestampMixin, db.Model):\n    __tablename__ = \"materia_prima\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad_disponible >= 0\", name=\"ck_mp_cantidad_no_negativa\"),\n    )\n    id_materia = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(120), unique=True, nullable=False)\n    id_unidad_base = db.Column(db.Integer, db.ForeignKey(FK_UNIDAD), nullable=False)\n    id_unidad_compra = db.Column(db.Integer, db.ForeignKey(FK_UNIDAD), nullable=False)\n    factor_conversion = db.Column(db.Numeric(12, 4), nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MovimientoInventarioMP",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class MovimientoInventarioMP(db.Model):\n    __tablename__ = \"movimiento_inventario_mp\"\n    id_movimiento = db.Column(db.Integer, primary_key=True)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)\n    tipo = db.Column(db.String(20), nullable=False)\n    cantidad = db.Column(db.Numeric(12, 4), nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    referencia_id = db.Column(db.String(50), nullable=True)\n    materia_prima = db.relationship(\"MateriaPrima\")",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Compra",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Compra(TimestampMixin, db.Model):\n    __tablename__ = \"compra\"\n    id_compra = db.Column(db.Integer, primary_key=True)\n    id_proveedor = db.Column(\n        db.Integer, db.ForeignKey(\"proveedor.id_proveedor\"), nullable=False\n    )\n    id_usuario_comprador = db.Column(\n        db.Integer, db.ForeignKey(FK_USUARIO), nullable=False\n    )\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCompra",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetalleCompra(db.Model):\n    __tablename__ = \"detalle_compra\"\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_compra = db.Column(db.Integer, db.ForeignKey(\"compra.id_compra\"), nullable=False)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)\n    cantidad_comprada = db.Column(db.Numeric(12, 4), nullable=False)\n    id_unidad_compra = db.Column(db.Integer, db.ForeignKey(FK_UNIDAD), nullable=False)\n    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)\n    subtotal = db.Column(db.Numeric(12, 2), nullable=False)\n    cantidad_base = db.Column(db.Numeric(12, 4), nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Producto",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Producto(TimestampMixin, db.Model):\n    __tablename__ = \"producto\"\n    id_producto = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(120), unique=True, nullable=False)\n    descripcion = db.Column(db.String(255), nullable=False)\n    precio_venta = db.Column(db.Numeric(12, 2), nullable=False)\n    unidad_venta = db.Column(db.String(20), default=\"Pieza\", nullable=False)\n    cantidad_disponible = db.Column(db.Integer, default=0, nullable=False)\n    stock_minimo = db.Column(db.Integer, default=0, nullable=False)\n    id_receta = db.Column(db.Integer, db.ForeignKey(\"receta.id_receta\"), nullable=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Receta",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Receta(TimestampMixin, db.Model):\n    __tablename__ = \"receta\"\n    __table_args__ = (\n        UniqueConstraint(\"nombre\", \"version\", name=\"uq_receta_nombre_version\"),\n    )\n    id_receta = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(120), nullable=False)\n    descripcion = db.Column(db.String(255), nullable=True)\n    unidad_produccion = db.Column(db.String(50), default=\"pieza\", nullable=False)\n    categoria = db.Column(db.String(50), nullable=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetalleReceta(db.Model):\n    __tablename__ = \"detalle_receta\"\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_receta = db.Column(db.Integer, db.ForeignKey(\"receta.id_receta\"), nullable=False)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)\n    cantidad_base = db.Column(db.Numeric(12, 4), nullable=False)\n    receta = db.relationship(\"Receta\", back_populates=\"detalles\")\n    materia_prima = db.relationship(\"MateriaPrima\")\nclass SolicitudProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"solicitud_produccion\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudProduccion",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class SolicitudProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"solicitud_produccion\"\n    id_solicitud = db.Column(db.Integer, primary_key=True)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad = db.Column(db.Integer, nullable=False)\n    estado = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)\n    fecha_solicitud = db.Column(db.DateTime, default=utc_now, nullable=False)\n    id_usuario_solicita = db.Column(\n        db.Integer, db.ForeignKey(FK_USUARIO), nullable=False\n    )",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccion",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class OrdenProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"orden_produccion\"\n    id_orden = db.Column(db.Integer, primary_key=True)\n    id_solicitud = db.Column(\n        db.Integer, db.ForeignKey(\"solicitud_produccion.id_solicitud\"), nullable=False\n    )\n    id_receta = db.Column(db.Integer, db.ForeignKey(\"receta.id_receta\"), nullable=False)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad_producir = db.Column(db.Integer, nullable=False)\n    estado = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Carrito",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Carrito(TimestampMixin, db.Model):\n    __tablename__ = \"carrito\"\n    id_carrito = db.Column(db.Integer, primary_key=True)\n    id_usuario_cliente = db.Column(\n        db.Integer, db.ForeignKey(FK_USUARIO), nullable=False\n    )\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\n    usuario_cliente = db.relationship(\"Usuario\")\n    detalles = db.relationship(\n        \"DetalleCarrito\", back_populates=\"carrito\", cascade=CASCADE_DELETE_ORPHAN",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleCarrito",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetalleCarrito(db.Model):\n    __tablename__ = \"detalle_carrito\"\n    __table_args__ = (\n        CheckConstraint(\n            \"cantidad >= 1 AND cantidad <= 5\", name=\"ck_carrito_cantidad_1_5\"\n        ),\n    )\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_carrito = db.Column(\n        db.Integer, db.ForeignKey(\"carrito.id_carrito\"), nullable=False",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Pedido",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Pedido(TimestampMixin, db.Model):\n    __tablename__ = \"pedido\"\n    id_pedido = db.Column(db.Integer, primary_key=True)\n    id_usuario_cliente = db.Column(\n        db.Integer, db.ForeignKey(FK_USUARIO), nullable=False\n    )\n    fecha_pedido = db.Column(db.DateTime, default=utc_now, nullable=False)\n    fecha_entrega = db.Column(db.Date, nullable=False)\n    total = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    estado_pedido = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetallePedido",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetallePedido(db.Model):\n    __tablename__ = \"detalle_pedido\"\n    __table_args__ = (\n        CheckConstraint(\n            \"cantidad >= 1 AND cantidad <= 5\", name=\"ck_pedido_cantidad_1_5\"\n        ),\n    )\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_pedido = db.Column(db.Integer, db.ForeignKey(\"pedido.id_pedido\"), nullable=False)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PagoPedido",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class PagoPedido(db.Model):\n    __tablename__ = \"pago_pedido\"\n    id_pago = db.Column(db.Integer, primary_key=True)\n    id_pedido = db.Column(\n        db.Integer, db.ForeignKey(\"pedido.id_pedido\"), unique=True, nullable=False\n    )\n    estado_pago = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)\n    tipo_pago = db.Column(db.String(20), nullable=False)  # EFECTIVO / TARJETA\n    referencia = db.Column(db.String(120), nullable=True)\n    fecha_pago = db.Column(db.DateTime, nullable=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Venta",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class Venta(TimestampMixin, db.Model):\n    __tablename__ = \"venta\"\n    id_venta = db.Column(db.Integer, primary_key=True)\n    id_pedido = db.Column(db.Integer, db.ForeignKey(\"pedido.id_pedido\"), nullable=True)\n    id_usuario_cliente = db.Column(\n        db.Integer, db.ForeignKey(FK_USUARIO), nullable=False\n    )\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    total = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    estado = db.Column(db.String(40), default=\"EN_PROCESO_PRODUCCION\", nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TicketVenta",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class TicketVenta(db.Model):\n    __tablename__ = \"ticket_venta\"\n    id_ticket = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(\n        db.Integer, db.ForeignKey(\"venta.id_venta\"), unique=True, nullable=False\n    )\n    folio = db.Column(db.String(30), unique=True, nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    venta = db.relationship(\"Venta\")\nclass DetalleVenta(db.Model):",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetalleVenta(db.Model):\n    __tablename__ = \"detalle_venta\"\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(db.Integer, db.ForeignKey(\"venta.id_venta\"), nullable=False)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad = db.Column(db.Integer, nullable=False)\n    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)\n    subtotal = db.Column(db.Numeric(12, 2), nullable=False)\n    venta = db.relationship(\"Venta\", back_populates=\"detalles\")\n    producto = db.relationship(\"Producto\")",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivo",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class SalidaEfectivo(TimestampMixin, db.Model):\n    __tablename__ = \"salida_efectivo\"\n    id_salida = db.Column(db.Integer, primary_key=True)\n    concepto = db.Column(db.String(150), nullable=False)\n    monto = db.Column(db.Numeric(12, 2), nullable=False)\n    tipo = db.Column(db.String(50), nullable=False)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    referencia = db.Column(db.String(80), nullable=True)\nclass CorteDiario(TimestampMixin, db.Model):\n    __tablename__ = \"corte_diario\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "CorteDiario",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class CorteDiario(TimestampMixin, db.Model):\n    __tablename__ = \"corte_diario\"\n    id_corte = db.Column(db.Integer, primary_key=True)\n    fecha = db.Column(db.Date, default=utc_today, nullable=False)\n    total_ventas = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    numero_ventas = db.Column(db.Integer, default=0, nullable=False)\n    utilidad_diaria = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    salida_efectivo_proveedores = db.Column(\n        db.Numeric(12, 2), default=0, nullable=False\n    )",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
+        "kind": 2,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "def utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"\n    id_rol = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(50), unique=True, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_today",
+        "kind": 2,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "def utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"\n    id_rol = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(50), unique=True, nullable=False)\n    descripcion = db.Column(db.String(255), nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "load_user",
+        "kind": 2,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "def load_user(user_id: str) -> Usuario | None:\n    return Usuario.query.get(int(user_id))\nclass BitacoraAcceso(db.Model):\n    __tablename__ = \"bitacora_acceso\"\n    id_bitacora = db.Column(db.Integer, primary_key=True)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    exitoso = db.Column(db.Boolean, nullable=False)\n    error_mensaje = db.Column(db.String(255), nullable=True)\n    usuario = db.relationship(\"Usuario\", back_populates=\"bitacora\")",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "seed_base_catalog_data",
+        "kind": 2,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "def seed_base_catalog_data() -> None:\n    roles_base = (\n        (\"Administrador\", \"Acceso total al sistema.\"),\n        (\"Ventas\", \"Gestiona ventas y solicitudes de produccion.\"),\n        (\"Produccion\", \"Gestiona ordenes y recetas.\"),\n        (\"Cliente\", \"Compra y consulta pedidos web.\"),\n    )\n    for nombre, descripcion in roles_base:\n        role = Rol.query.filter_by(nombre=nombre).first()\n        if not role:",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ESTADOS_PAGO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "ESTADOS_PAGO = (\"PENDIENTE\", \"PAGADO\")\nTIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TIPOS_MOVIMIENTO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "TIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ESTADOS_SOLICITUD",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "ESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ESTADOS_ORDEN",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "ESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ESTADOS_VENTA",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "ESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ESTADOS_PEDIDO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "ESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TIPOS_PAGO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "TIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TIPOS_PAGO_PEDIDO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "TIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "FK_USUARIO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "FK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "FK_UNIDAD",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "FK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "FK_MATERIA",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "FK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "FK_PRODUCTO",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "FK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "CASCADE_DELETE_ORPHAN",
+        "kind": 5,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "CASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:\n    return datetime.now(UTC).replace(tzinfo=None)\ndef utc_today() -> date:\n    return utc_now().date()\nclass TimestampMixin:\n    fecha_creacion = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass Rol(TimestampMixin, db.Model):\n    __tablename__ = \"rol\"\n    id_rol = db.Column(db.Integer, primary_key=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "seed_full_data",
+        "kind": 2,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)\n    _seed_customer_flow(users)\n    _seed_access_logs(users)",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "ROLE_ADMIN",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "ROLE_ADMIN = \"Administrador\"\nROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "ROLE_SALES",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "ROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "ROLE_PRODUCTION",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "ROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "ROLE_CLIENT",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "ROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "MP_HARINA",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "MP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "MP_AZUCAR",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "MP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "MP_MANTEQUILLA",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "MP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "MP_HUEVO",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "MP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)\n    _seed_customer_flow(users)",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "DevelopmentConfig",
+        "kind": 6,
+        "importPath": "config.development",
+        "description": "config.development",
+        "peekOfCode": "class DevelopmentConfig:\n    DEBUG = True\n    TESTING = False\n    SECRET_KEY = os.getenv(\"SECRET_KEY\", \"dev-softbakery-key\")\n    SQLALCHEMY_DATABASE_URI = os.getenv(\n        \"DATABASE_URL\",\n        \"mysql+pymysql://root:root@localhost/softbakery2?charset=utf8mb4\",\n    )\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    SESSION_COOKIE_HTTPONLY = True",
+        "detail": "config.development",
+        "documentation": {}
+    },
+    {
+        "label": "LocalConfig",
+        "kind": 6,
+        "importPath": "config.local",
+        "description": "config.local",
+        "peekOfCode": "class LocalConfig(DevelopmentConfig):\n    DEBUG = True\n    SQLALCHEMY_DATABASE_URI = \"mysql+pymysql://root:root@localhost/softbakery2?charset=utf8mb4\"",
+        "detail": "config.local",
+        "documentation": {}
+    },
+    {
+        "label": "ProductionConfig",
+        "kind": 6,
+        "importPath": "config.production",
+        "description": "config.production",
+        "peekOfCode": "class ProductionConfig:\n    DEBUG = False\n    TESTING = False\n    SECRET_KEY = os.getenv(\"SECRET_KEY\")\n    SQLALCHEMY_DATABASE_URI = os.getenv(\"DATABASE_URL\")\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    SESSION_COOKIE_HTTPONLY = True\n    SESSION_COOKIE_SECURE = True\n    PERMANENT_SESSION_LIFETIME = timedelta(minutes=10)\n    SESSION_REFRESH_EACH_REQUEST = True",
+        "detail": "config.production",
+        "documentation": {}
+    },
+    {
+        "label": "TestingConfig",
+        "kind": 6,
+        "importPath": "config.testing",
+        "description": "config.testing",
+        "peekOfCode": "class TestingConfig:\n    DEBUG = False\n    TESTING = True\n    SECRET_KEY = os.getenv(\"SECRET_KEY\", \"test-softbakery-key\")\n    SQLALCHEMY_DATABASE_URI = os.getenv(\"TEST_DATABASE_URL\", \"sqlite:///softbakery_test.db\")\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    WTF_CSRF_ENABLED = False",
+        "detail": "config.testing",
+        "documentation": {}
+    },
+    {
+        "label": "get_config_path",
+        "kind": 2,
+        "importPath": "instance.config",
+        "description": "instance.config",
+        "peekOfCode": "def get_config_path() -> str:\n    env_name = os.getenv(\"FLASK_ENV\", \"development\")\n    return ENV_CONFIG_MAP.get(env_name, ENV_CONFIG_MAP[\"development\"])",
+        "detail": "instance.config",
+        "documentation": {}
+    },
+    {
+        "label": "ENV_CONFIG_MAP",
+        "kind": 5,
+        "importPath": "instance.config",
+        "description": "instance.config",
+        "peekOfCode": "ENV_CONFIG_MAP = {\n    \"development\": \"config.development.DevelopmentConfig\",\n    \"local\": \"config.local.LocalConfig\",\n    \"testing\": \"config.testing.TestingConfig\",\n    \"production\": \"config.production.ProductionConfig\",\n}\ndef get_config_path() -> str:\n    env_name = os.getenv(\"FLASK_ENV\", \"development\")\n    return ENV_CONFIG_MAP.get(env_name, ENV_CONFIG_MAP[\"development\"])",
+        "detail": "instance.config",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",\n            [\"id_receta\"],\n            [\"id_receta\"],\n        )\n    with op.batch_alter_table(\"receta\", schema=None) as batch_op:",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "def downgrade():\n    op.drop_constraint(\"uq_receta_nombre_version\", \"receta\", type_=\"unique\")\n    with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n        batch_op.alter_column(\n            \"rendimiento_base\",\n            existing_type=sa.Numeric(precision=12, scale=4),\n            type_=sa.Integer(),\n            existing_nullable=False,\n        )\n        batch_op.drop_column(\"categoria\")",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "revision = \"9f1a2b3c4d5e\"\ndown_revision = \"d8c99c83efae\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "down_revision = \"d8c99c83efae\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",\n            [\"id_receta\"],",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",\n            [\"id_receta\"],\n            [\"id_receta\"],",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",\n            [\"id_receta\"],\n            [\"id_receta\"],\n        )",
+        "detail": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "def upgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('costo_unitario', sa.Numeric(precision=12, scale=4), nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('unidad_venta', sa.String(length=20), nullable=False))\n        batch_op.add_column(sa.Column('fecha_actualizacion', sa.DateTime(), nullable=True))\n    with op.batch_alter_table('venta', schema=None) as batch_op:\n        batch_op.drop_column('pagado_en_linea')\n    # ### end Alembic commands ###",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "def downgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('venta', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('pagado_en_linea', mysql.TINYINT(display_width=1), autoincrement=False, nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.drop_column('fecha_actualizacion')\n        batch_op.drop_column('unidad_venta')\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.drop_column('costo_unitario')\n    # ### end Alembic commands ###",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "revision = 'd8c99c83efae'\ndown_revision = None\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('costo_unitario', sa.Numeric(precision=12, scale=4), nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('unidad_venta', sa.String(length=20), nullable=False))",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "down_revision = None\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('costo_unitario', sa.Numeric(precision=12, scale=4), nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('unidad_venta', sa.String(length=20), nullable=False))\n        batch_op.add_column(sa.Column('fecha_actualizacion', sa.DateTime(), nullable=True))",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('costo_unitario', sa.Numeric(precision=12, scale=4), nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('unidad_venta', sa.String(length=20), nullable=False))\n        batch_op.add_column(sa.Column('fecha_actualizacion', sa.DateTime(), nullable=True))\n    with op.batch_alter_table('venta', schema=None) as batch_op:",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "description": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    # ### commands auto generated by Alembic - please adjust! ###\n    with op.batch_alter_table('materia_prima', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('costo_unitario', sa.Numeric(precision=12, scale=4), nullable=False))\n    with op.batch_alter_table('producto', schema=None) as batch_op:\n        batch_op.add_column(sa.Column('unidad_venta', sa.String(length=20), nullable=False))\n        batch_op.add_column(sa.Column('fecha_actualizacion', sa.DateTime(), nullable=True))\n    with op.batch_alter_table('venta', schema=None) as batch_op:\n        batch_op.drop_column('pagado_en_linea')",
+        "detail": "migrations.versions.d8c99c83efae_add_unidad_venta_and_fecha_",
+        "documentation": {}
+    },
+    {
+        "label": "get_engine",
+        "kind": 2,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "def get_engine():\n    try:\n        # this works with Flask-SQLAlchemy<3 and Alchemical\n        return current_app.extensions['migrate'].db.get_engine()\n    except (TypeError, AttributeError):\n        # this works with Flask-SQLAlchemy>=3\n        return current_app.extensions['migrate'].db.engine\ndef get_engine_url():\n    try:\n        return get_engine().url.render_as_string(hide_password=False).replace(",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "get_engine_url",
+        "kind": 2,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "def get_engine_url():\n    try:\n        return get_engine().url.render_as_string(hide_password=False).replace(\n            '%', '%%')\n    except AttributeError:\n        return str(get_engine().url).replace('%', '%%')\n# add your model's MetaData object here\n# for 'autogenerate' support\n# from myapp import mymodel\n# target_metadata = mymodel.Base.metadata",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "get_metadata",
+        "kind": 2,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "def get_metadata():\n    if hasattr(target_db, 'metadatas'):\n        return target_db.metadatas[None]\n    return target_db.metadata\ndef run_migrations_offline():\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "run_migrations_offline",
+        "kind": 2,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "def run_migrations_offline():\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.\n    Calls to context.execute() here emit the given string to the\n    script output.\n    \"\"\"\n    url = config.get_main_option(\"sqlalchemy.url\")",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "run_migrations_online",
+        "kind": 2,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "def run_migrations_online():\n    \"\"\"Run migrations in 'online' mode.\n    In this scenario we need to create an Engine\n    and associate a connection with the context.\n    \"\"\"\n    # this callback is used to prevent an auto-migration from being generated\n    # when there are no changes to the schema\n    # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html\n    def process_revision_directives(context, revision, directives):\n        if getattr(config.cmd_opts, 'autogenerate', False):",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "config",
+        "kind": 5,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "config = context.config\n# Interpret the config file for Python logging.\n# This line sets up loggers basically.\nfileConfig(config.config_file_name)\nlogger = logging.getLogger('alembic.env')\ndef get_engine():\n    try:\n        # this works with Flask-SQLAlchemy<3 and Alchemical\n        return current_app.extensions['migrate'].db.get_engine()\n    except (TypeError, AttributeError):",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "logger = logging.getLogger('alembic.env')\ndef get_engine():\n    try:\n        # this works with Flask-SQLAlchemy<3 and Alchemical\n        return current_app.extensions['migrate'].db.get_engine()\n    except (TypeError, AttributeError):\n        # this works with Flask-SQLAlchemy>=3\n        return current_app.extensions['migrate'].db.engine\ndef get_engine_url():\n    try:",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "target_db",
+        "kind": 5,
+        "importPath": "migrations.env",
+        "description": "migrations.env",
+        "peekOfCode": "target_db = current_app.extensions['migrate'].db\n# other values from the config, defined by the needs of env.py,\n# can be acquired:\n# my_important_option = config.get_main_option(\"my_important_option\")\n# ... etc.\ndef get_metadata():\n    if hasattr(target_db, 'metadatas'):\n        return target_db.metadatas[None]\n    return target_db.metadata\ndef run_migrations_offline():",
+        "detail": "migrations.env",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "entrypoint",
+        "description": "entrypoint",
+        "peekOfCode": "app = create_app()\nif __name__ == \"__main__\":\n    app.run(debug=True)",
+        "detail": "entrypoint",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "run",
+        "description": "run",
+        "peekOfCode": "app = create_app()\nif __name__ == \"__main__\":\n    app.run(debug=True)",
+        "detail": "run",
+        "documentation": {}
+    }
+]

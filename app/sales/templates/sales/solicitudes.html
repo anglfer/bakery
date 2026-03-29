@@ -1,0 +1,52 @@
+{% extends "base_template.html" %} {% block title %}Solicitudes de Produccion{% endblock %} {% block
+content %}
+<section class="section">
+	<h2 class="mb-3">Solicitudes de produccion (Ventas)</h2>
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Nueva solicitud</h3>
+		<form method="post" class="grid-form">
+			<select name="id_producto" required>
+				<option value="">Producto</option>
+				{% for p in productos %}
+				<option value="{{ p.id_producto }}">{{ p.nombre }}</option>
+				{% endfor %}
+			</select>
+			<input type="number" min="1" name="cantidad" placeholder="Cantidad" required />
+			<input type="text" name="observaciones" placeholder="Observaciones" />
+			<button type="submit">Solicitar</button>
+		</form>
+	</div>
+
+	<div class="card p-3">
+		<h3 class="mb-2">Historial de solicitudes</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Producto</th>
+						<th>Cantidad</th>
+						<th>Estado</th>
+						<th>Solicita</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in solicitudes %}
+					<tr>
+						<td>{{ s.id_solicitud }}</td>
+						<td>{{ s.producto.nombre }}</td>
+						<td>{{ s.cantidad }}</td>
+						<td>{{ s.estado }}</td>
+						<td>{{ s.id_usuario_solicita }}</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="5">No hay solicitudes registradas.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

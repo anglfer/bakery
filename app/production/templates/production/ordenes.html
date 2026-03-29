@@ -1,0 +1,90 @@
+{% extends "base_template.html" %}
+{% block title %}Ordenes{% endblock %}
+{% block content %}
+<section class="section">
+	<h2 class="mb-3">Ordenes de produccion</h2>
+
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Crear orden</h3>
+		<form method="post" class="grid-form">
+		<input type="hidden" name="action" value="crear" />
+		<select name="id_solicitud" required>
+			<option value="">Solicitud aprobada</option>
+			{% for s in solicitudes %}
+			<option value="{{ s.id_solicitud }}">#{{ s.id_solicitud }} - {{ s.producto.nombre }} ({{ s.cantidad }})</option>
+			{% endfor %}
+		</select>
+		<select name="id_receta" required>
+			<option value="">Receta activa</option>
+			{% for r in recetas %}
+			<option value="{{ r.id_receta }}">#{{ r.id_receta }} - {{ r.nombre }} v{{ r.version }}</option>
+			{% endfor %}
+		</select>
+		<input type="number" min="1" name="cantidad" placeholder="Cantidad a producir" required />
+		<button type="submit">Crear orden</button>
+		</form>
+	</div>
+
+ 	<div class="card p-3">
+		<h3 class="mb-2">Historial de ordenes</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Producto</th>
+						<th>Cantidad</th>
+						<th>Estado</th>
+						<th>Costo</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for o in ordenes %}
+					<tr>
+						<td>{{ o.id_orden }}</td>
+						<td>{{ o.producto.nombre }}</td>
+						<td>{{ o.cantidad_producir }}</td>
+						<td>{{ o.estado }}</td>
+						<td>${{ '%.2f'|format(o.costo_total) }}</td>
+						<td>
+							<form method="post" class="d-flex flex-wrap gap-2">
+								<input type="hidden" name="id_orden" value="{{ o.id_orden }}" />
+								<button
+									type="submit"
+									name="action"
+									value="iniciar"
+									class="btn btn-sm"
+									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
+									Iniciar
+								</button>
+								<button
+									type="submit"
+									name="action"
+									value="finalizar"
+									class="btn btn-sm"
+									{{ 'disabled' if o.estado != 'EN_PROCESO' else '' }}>
+									Finalizar
+								</button>
+								<button
+									type="submit"
+									name="action"
+									value="cancelar"
+									class="btn btn-sm btn-outline-dark"
+									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
+									Cancelar
+								</button>
+							</form>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="6">No hay ordenes registradas.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

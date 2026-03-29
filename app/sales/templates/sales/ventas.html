@@ -1,0 +1,69 @@
+{% extends "base_template.html" %} {% block title %}Ventas{% endblock %} {% block content %}
+<section class="section">
+	<h2 class="mb-3">Modulo de ventas</h2>
+
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Registrar venta</h3>
+		<form method="post" class="grid-form">
+			<select name="id_producto" required>
+				<option value="">Producto</option>
+				{% for p in productos %}
+				<option value="{{ p.id_producto }}">{{ p.nombre }} ({{ p.cantidad_disponible }})</option>
+				{% endfor %}
+			</select>
+			<input type="number" name="cantidad" min="1" value="1" required />
+			<select name="tipo_pago" required>
+				<option value="EFECTIVO">Efectivo</option>
+				<option value="TARJETA">Tarjeta</option>
+			</select>
+			<label class="form-check d-flex align-items-center gap-2">
+				<input class="form-check-input" type="checkbox" name="requiere_ticket" />
+				<span class="small text-secondary">Ticket (si el cliente lo solicita)</span>
+			</label>
+			<button type="submit">Registrar venta</button>
+		</form>
+	</div>
+
+	<div class="card p-3">
+		<h3 class="mb-2">Historial de ventas</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Fecha</th>
+						<th>Total</th>
+						<th>Estado</th>
+						<th>Tipo pago</th>
+						<th>Ticket</th>
+						<th>Detalle</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for v in ventas %}
+					<tr>
+						<td>{{ v.id_venta }}</td>
+						<td>{{ v.fecha.strftime('%Y-%m-%d') }}</td>
+						<td>${{ '%.2f'|format(v.total) }}</td>
+						<td>{{ v.estado }}</td>
+						<td>{{ v.tipo_pago }}</td>
+						<td>{{ 'Si' if v.requiere_ticket else 'No' }}</td>
+						<td>
+							{% for d in v.detalles %}
+							<div>{{ d.producto.nombre }} x {{ d.cantidad }}</div>
+							{% else %}
+							<div>Sin detalle</div>
+							{% endfor %}
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="7">No hay ventas registradas.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

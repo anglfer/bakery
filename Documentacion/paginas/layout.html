@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}SoftBakery{% endblock %} — Pastelería Artesanal</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-5.0.2-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-icons-1.13.1/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='Inicio/estilos.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-principal fixed-top"
+     role="navigation" aria-label="Navegación principal">
+    <div class="container">
+
+        <a class="navbar-brand brand-logo" href="{{ url_for('index') }}">
+            <i class="bi bi-cake2 me-2" aria-hidden="true"></i>SoftBakery
+        </a>
+
+        <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navMenu"
+                aria-controls="navMenu" aria-expanded="false"
+                aria-label="Abrir menú de navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+
+            <ul class="navbar-nav mx-auto gap-1" role="menubar">
+                <li class="nav-item" role="none">
+                    <a class="nav-link nav-pill {% if request.endpoint == 'index' %}active{% endif %}"
+                       href="{{ url_for('index') }}#inicio" role="menuitem">
+                        <i class="bi bi-house me-1" aria-hidden="true"></i>Inicio
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a class="nav-link nav-pill" href="{{ url_for('index') }}#menu" role="menuitem">
+                        <i class="bi bi-journal-richtext me-1" aria-hidden="true"></i>Menú
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a class="nav-link nav-pill" href="{{ url_for('index') }}#nosotros" role="menuitem">
+                        <i class="bi bi-people me-1" aria-hidden="true"></i>Nosotros
+                    </a>
+                </li>
+            </ul>
+
+          <a href="{{ url_for('login_empleado') }}" class="btn btn-usuario" title="Iniciar sesión como empleado">
+    <i class="bi bi-person-circle fs-5" aria-hidden="true"></i>
+    <span class="ms-1 d-none d-lg-inline">Mi cuenta</span>
+</a>
+
+        </div>
+    </div>
+</nav>
+
+<main class="main-content" id="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer-principal mt-5" role="contentinfo">
+    <div class="footer-top py-5">
+        <div class="container">
+            <div class="row g-4">
+
+                <div class="col-lg-4">
+                    <h5 class="brand-logo mb-3">
+                        <i class="bi bi-cake2 me-2" aria-hidden="true"></i>SOFTBAKERY
+                    </h5>
+                    <p class="text-muted small">
+                        Tu pastelería de confianza. Elaboramos cada pastel con amor,
+                        ingredientes frescos y dedicación para hacer tus momentos especiales
+                        inolvidables.
+                    </p>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3 text-pastel">Explora</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="{{ url_for('index') }}#inicio"   class="footer-link">Inicio</a></li>
+                        <li><a href="{{ url_for('index') }}#menu"     class="footer-link">Menú</a></li>
+                        <li><a href="{{ url_for('index') }}#nosotros" class="footer-link">Nosotros</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3 text-pastel">Acceso</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="footer-link">Mi cuenta</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4">
+                    <h6 class="fw-bold mb-3 text-pastel">Contáctanos</h6>
+                    <address class="mb-3" style="font-style:normal;">
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-geo-alt me-2" aria-hidden="true"></i>Av. Pradera, León, Gto.
+                        </p>
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-telephone me-2" aria-hidden="true"></i>(477) 123-4568
+                        </p>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-envelope me-2" aria-hidden="true"></i>softBakery@soft.mx
+                        </p>
+                    </address>
+
+                    <h6 class="fw-bold mb-2 text-pastel">Síguenos</h6>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-btn" title="Facebook"  aria-label="Visitar Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-btn" title="Instagram" aria-label="Visitar Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-btn" title="TikTok"    aria-label="Visitar TikTok"><i class="bi bi-tiktok"></i></a>
+                        <a href="#" class="social-btn" title="WhatsApp"  aria-label="Contactar por WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom py-3 text-center">
+        <small class="text-muted">
+            © 2026 SoftBakery — Pastelería Artesanal. Todos los derechos reservados.
+        </small>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='Inicio/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

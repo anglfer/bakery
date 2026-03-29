@@ -1,0 +1,114 @@
+{% extends "base_template.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<section class="section">
+	<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+		<h2 class="mb-0">Gestion de usuarios</h2>
+		<form method="get" class="d-flex gap-2">
+			<input
+				type="text"
+				name="q"
+				value="{{ q or '' }}"
+				placeholder="Buscar por nombre o usuario" />
+			<button type="submit" class="btn btn-sm">Buscar</button>
+		</form>
+	</div>
+
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Alta de empleado</h3>
+		<form method="post" class="grid-form">
+			<input type="text" name="username" placeholder="Usuario" required />
+			<input type="password" name="password" placeholder="Contrasena" required />
+			<input type="text" name="nombre" placeholder="Nombre" required />
+			<input type="text" name="apellidos" placeholder="Apellidos" required />
+			<input type="text" name="telefono" placeholder="Telefono" required />
+			<input type="email" name="correo" placeholder="Correo" required />
+			<input type="text" name="ciudad" placeholder="Ciudad" required />
+			<input type="text" name="direccion" placeholder="Direccion" required />
+			<select name="id_rol" required>
+				<option value="">Rol</option>
+				{% for rol in roles %}
+				<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+				{% endfor %}
+			</select>
+			<button type="submit">Crear usuario</button>
+		</form>
+	</div>
+
+	<div class="card p-3">
+		<h3 class="mb-2">Usuarios registrados</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Usuario</th>
+						<th>Nombre</th>
+						<th>Rol</th>
+						<th>Activo</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for u in usuarios %}
+					<tr>
+						<td>{{ u.id_usuario }}</td>
+						<td>{{ u.username }}</td>
+						<td>{{ u.persona.nombre }} {{ u.persona.apellidos }}</td>
+						<td>{{ u.rol.nombre if u.rol else '-' }}</td>
+						<td>{{ 'Si' if u.activo else 'No' }}</td>
+						<td>
+							<form
+								method="post"
+								action="{{ url_for('admin.editar_usuario', id_usuario=u.id_usuario) }}"
+								class="d-grid gap-2" style="min-width: 260px">
+								<input type="text" name="nombre" value="{{ u.persona.nombre }}" required />
+								<input type="text" name="apellidos" value="{{ u.persona.apellidos }}" required />
+								<input type="text" name="telefono" value="{{ u.persona.telefono }}" required />
+								<input type="text" name="ciudad" value="{{ u.persona.ciudad }}" required />
+								<input type="text" name="direccion" value="{{ u.persona.direccion }}" required />
+								<select name="id_rol">
+									{% for rol in roles %}
+									<option value="{{ rol.id_rol }}" {{ 'selected' if rol.id_rol == u.id_rol else '' }}>
+										{{ rol.nombre }}
+									</option>
+									{% endfor %}
+								</select>
+								<div class="form-check">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										name="activo"
+										{{ 'checked' if u.activo else '' }} />
+									<span class="small text-secondary">Activo</span>
+								</div>
+								<button type="submit" class="btn btn-sm">Guardar cambios</button>
+							</form>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="6" class="text-end">
+							<form
+								method="post"
+								action="{{ url_for('admin.desactivar_usuario', id_usuario=u.id_usuario) }}"
+								class="d-inline">
+								<button
+									type="submit"
+									class="btn btn-sm btn-outline-dark"
+									{{ 'disabled' if not u.activo else '' }}>
+									Desactivar
+								</button>
+							</form>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="6">No hay usuarios para mostrar.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

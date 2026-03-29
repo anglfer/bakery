@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Costo y Utilidad – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vino:       #9E3B3B;
+  --vino-hover: #7a2c2c;
+  --vino-light: #fdeaea;
+  --vino-mid:   #c96060;
+  --crema:      #fdf6f0;
+  --crema-dark: #eeddd5;
+  --bg:         #f4ede9;
+  --text:       #2c1810;
+  --muted:      #9a7a72;
+  --sidebar-w:  240px;
+  --topbar-h:   62px;
+  --green:      #2e7d52;
+  --green-s:    #e8f5ee;
+  --blue:       #1a5fa0;
+  --blue-s:     #e6f0fb;
+  --orange:     #c05a1a;
+  --orange-s:   #fdebd8;
+  --red:        #c0392b;
+  --red-s:      #fce8e6;
+  --gold:       #b8860b;
+  --gold-s:     #fdf3d0;
+  --purple:     #6d3fa0;
+  --purple-s:   #f0e8fb;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--vino-mid);}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;border-right:1px solid var(--crema-dark);display:flex;flex-direction:column;z-index:200;box-shadow:3px 0 18px rgba(94,32,32,.07);overflow-y:auto;overflow-x:hidden;}
+.sidebar-brand{display:flex;align-items:center;gap:.75rem;padding:1.15rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);}
+.brand-icon{width:38px;height:38px;border-radius:11px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(158,59,59,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.95rem 1.3rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:500;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.nav-group-toggle{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:600;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;user-select:none;}
+.nav-group-toggle i.icon-main{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-group-toggle .gtlabel{flex:1;}
+.nav-group-toggle .chevron{font-size:.7rem;transition:transform .22s ease;margin-left:auto;}
+.nav-group-toggle:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-group-toggle.open{color:var(--vino);}
+.nav-group-toggle.open .chevron{transform:rotate(90deg);}
+.nav-submenu{overflow:hidden;max-height:0;transition:max-height .28s cubic-bezier(.4,0,.2,1);background:#fdf8f6;border-left:3px solid var(--crema-dark);}
+.nav-submenu.open{max-height:400px;}
+.nav-submenu .nav-link-side{padding:.5rem 1.3rem .5rem 2.5rem;font-size:.77rem;border-left:none;}
+.nav-submenu .nav-link-side::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--crema-dark);flex-shrink:0;transition:background .15s;}
+.nav-submenu .nav-link-side:hover::before,.nav-submenu .nav-link-side.active::before{background:var(--vino);}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b !important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.73rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(158,59,59,.3);border:2px solid var(--crema-dark);cursor:pointer;}
+
+/* MAIN */
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.7rem 1.9rem;min-height:calc(100vh - var(--topbar-h));}
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* TARJETAS RANKING */
+.ranking-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem;}
+.rank-card{background:#fff;border-radius:13px;border:1.5px solid var(--crema-dark);padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;transition:all .18s;}
+.rank-card:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(94,32,32,.09);}
+.rank-pos{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--crema-dark);flex-shrink:0;min-width:28px;line-height:1;}
+.rank-pos.p1{color:var(--gold);}
+.rank-pos.p2{color:var(--muted);}
+.rank-pos.p3{color:var(--orange);}
+.rank-info{flex:1;min-width:0;}
+.rank-nombre{font-size:.8rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rank-det{font-size:.67rem;color:var(--muted);margin-top:.1rem;}
+.rank-pct{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--green);flex-shrink:0;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.search-input{width:100%;padding:.52rem .9rem .52rem 2.2rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);transition:border .17s;}
+.search-input:focus{outline:none;border-color:var(--vino);}
+.filter-select{padding:.52rem .9rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);cursor:pointer;min-width:160px;}
+.filter-select:focus{outline:none;border-color:var(--vino);}
+
+/* TABLA PRINCIPAL */
+.table-wrap{background:#fff;border-radius:14px;border:1.5px solid var(--crema-dark);overflow:hidden;margin-bottom:1.4rem;}
+.cost-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.cost-table thead tr{background:var(--vino);}
+.cost-table th{color:#fff;font-weight:700;font-size:.63rem;text-transform:uppercase;letter-spacing:.06em;padding:.65rem .9rem;border:none;white-space:nowrap;}
+.cost-table th.sortable{cursor:pointer;user-select:none;}
+.cost-table th.sortable:hover{background:var(--vino-hover);}
+.cost-table th .sort-icon{margin-left:.3rem;opacity:.5;font-size:.6rem;}
+.cost-table th.sorted .sort-icon{opacity:1;}
+.cost-table tbody tr{border-bottom:1px solid var(--crema-dark);transition:background .15s;}
+.cost-table tbody tr:hover{background:var(--vino-light);}
+.cost-table tbody tr:last-child{border:none;}
+.cost-table td{padding:.65rem .9rem;vertical-align:middle;}
+
+/* Producto sin emoji */
+.prod-name{font-weight:700;font-size:.8rem;color:var(--text);}
+.prod-ver{font-size:.63rem;color:var(--muted);}
+
+/* Margen bar */
+.margen-wrap{display:flex;align-items:center;gap:.5rem;}
+.margen-bar{flex:1;height:8px;border-radius:4px;background:var(--crema-dark);overflow:hidden;min-width:60px;}
+.mb-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.mb-alto  {background:linear-gradient(90deg,var(--green),#4caf80);}
+.mb-medio {background:linear-gradient(90deg,var(--gold),#e0a800);}
+.mb-bajo  {background:linear-gradient(90deg,var(--orange),#e07a30);}
+.mb-negativo{background:linear-gradient(90deg,var(--red),#e05a50);}
+.margen-pct{font-size:.72rem;font-weight:700;min-width:38px;text-align:right;}
+.pct-alto   {color:var(--green);}
+.pct-medio  {color:var(--gold);}
+.pct-bajo   {color:var(--orange);}
+.pct-negativo{color:var(--red);}
+
+/* Rating badge margen */
+.badge-margen{font-size:.6rem;font-weight:700;padding:.18rem .55rem;border-radius:50px;white-space:nowrap;display:inline-flex;align-items:center;gap:.2rem;}
+.bm-alto    {background:var(--green-s);color:var(--green);}
+.bm-medio   {background:var(--gold-s); color:var(--gold);}
+.bm-bajo    {background:var(--orange-s);color:var(--orange);}
+.bm-negativo{background:var(--red-s);  color:var(--red);}
+
+/* Btn tabla */
+.btn-tbl{height:26px;border:none;border-radius:7px;display:inline-flex;align-items:center;gap:.2rem;font-size:.62rem;font-weight:700;cursor:pointer;padding:0 .6rem;font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;}
+.bt-det{background:var(--blue-s);color:var(--blue);}
+.bt-det:hover{background:var(--blue);color:#fff;}
+
+/* MODALES */
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;box-shadow:0 20px 60px rgba(94,32,32,.2);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.form-label{font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.28rem;}
+.form-control,.form-select{font-size:.8rem;border:1.5px solid var(--crema-dark);border-radius:9px;font-family:'Poppins',sans-serif;transition:border .17s;}
+.form-control:focus,.form-select:focus{border-color:var(--vino);box-shadow:0 0 0 3px rgba(158,59,59,.09);}
+.modal-section{background:var(--crema);border-radius:10px;padding:.85rem 1rem;margin-bottom:.9rem;border-left:3px solid var(--vino);}
+.modal-section-title{font-size:.7rem;font-weight:700;color:var(--vino);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem;}
+.info-box{background:var(--blue-s);border:1.5px solid #b8d4f0;border-radius:10px;padding:.7rem 1rem;font-size:.75rem;color:var(--blue);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.info-box i{flex-shrink:0;margin-top:.1rem;}
+
+/* Desglose ingredientes modal */
+.det-table{width:100%;border-collapse:collapse;font-size:.73rem;}
+.det-table thead tr{background:var(--vino);}
+.det-table th{color:#fff;font-weight:700;font-size:.61rem;text-transform:uppercase;letter-spacing:.05em;padding:.5rem .75rem;border:none;}
+.det-table tbody tr:nth-child(even){background:#fdf3f0;}
+.det-table tbody tr:hover{background:var(--vino-light);}
+.det-table td{padding:.48rem .75rem;border-bottom:1px solid #f4ede9;vertical-align:middle;}
+
+/* Resumen financiero modal */
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px dashed var(--crema-dark);font-size:.78rem;}
+.fin-row:last-child{border:none;font-weight:800;font-size:.88rem;padding-top:.6rem;margin-top:.2rem;}
+.fin-label{color:var(--muted);}
+.fin-val{font-weight:700;}
+
+/* Fórmulas display */
+.formula-box{background:#fff;border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem .9rem;font-size:.72rem;color:var(--text);font-family:monospace;margin:.4rem 0;}
+.formula-box span{color:var(--vino);font-weight:700;}
+
+/* Botones footer */
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}.d4{animation-delay:.18s}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.85rem;}
+.empty-state i{font-size:2rem;display:block;margin-bottom:.5rem;}
+
+@media(max-width:1100px){.ranking-strip{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.main-content{margin-left:0;padding:1rem}.sidebar{transform:translateX(-100%)}.topbar{left:0}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </div>
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-speedometer2"></i>Dashboard</a>
+  <div class="nav-section-label">Gestión</div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-people-fill icon-main"></i><span class="gtlabel">Personal</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Empleados</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-truck"></i>Proveedores</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-box-seam-fill icon-main"></i><span class="gtlabel">Almacén</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-archive-fill"></i>Materia Prima</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cart-fill"></i>Compras</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Producto Terminado</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-gear-fill icon-main"></i><span class="gtlabel">Producción</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-journal-richtext"></i>Recetas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cpu-fill"></i>Órdenes</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-send-fill"></i>Solicitudes</a>
+  </div>
+  <div class="nav-group-toggle open" onclick="toggleMenu(this)">
+    <i class="bi bi-cash-coin icon-main"></i><span class="gtlabel">Comercial</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu open">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-receipt"></i>Ventas</a>
+    <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-arrow-down-circle-fill"></i>Salidas Efectivo</a>
+  </div>
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Comercial — Costos y Utilidad</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <div class="topbar-avatar">JR</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="#">Comercial</a></li>
+        <li class="breadcrumb-item active">Costos y Utilidad</li>
+      </ol>
+    </nav>
+    <h4>Costo y Utilidad de Producto</h4>
+  </div>
+
+
+
+  <!-- Toolbar -->
+  <div class="toolbar fu d3">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar producto…">
+    </div>
+    <select class="filter-select" id="filtroMargen" onchange="filtrar()">
+      <option value="todos">Todos los márgenes</option>
+      <option value="alto">Alto (≥ 50%)</option>
+      <option value="medio">Medio (30–49%)</option>
+      <option value="bajo">Bajo (&lt; 30%)</option>
+    </select>
+    <select class="filter-select" id="filtroOrden" onchange="filtrar()">
+      <option value="margen_desc">Ordenar: mayor margen</option>
+      <option value="margen_asc">Ordenar: menor margen</option>
+      <option value="utilidad_desc">Ordenar: mayor utilidad $</option>
+      <option value="costo_asc">Ordenar: menor costo</option>
+    </select>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap fu d4">
+    <div style="overflow-x:auto;">
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Receta</th>
+            <th>Rendimiento</th>
+            <th class="sortable" onclick="sortBy('costo')">Costo producción <i class="bi bi-chevron-expand sort-icon"></i></th>
+            <th>Costo unitario</th>
+            <th class="sortable" onclick="sortBy('precio')">Precio venta <i class="bi bi-chevron-expand sort-icon"></i></th>
+            <th class="sortable" onclick="sortBy('utilidad')">Utilidad unit. <i class="bi bi-chevron-expand sort-icon"></i></th>
+            <th class="sortable" onclick="sortBy('margen')">Margen % <i class="bi bi-chevron-expand sort-icon"></i></th>
+            <th>Rating</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="costoBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Nota fórmulas -->
+  <div class="info-box fu d4" style="margin-top:.5rem;">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+      <strong>Fórmulas aplicadas:</strong>
+      <div class="formula-box" style="margin-top:.3rem;">
+        <span>costo_ingrediente</span> = cantidad_requerida × costo_unitario × (1 + porcentaje_merma / 100)
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span>utilidad</span> = precio_venta − costo_total_producción
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span>margen%</span> = (utilidad / precio_venta) × 100
+      </div>
+      Los costos unitarios provienen de <code>costo_historico_materia_prima</code> con vigencia más reciente.
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════ MODAL DESGLOSE ══════════ -->
+<div class="modal fade" id="modalDesglose" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-calculator me-2"></i>Desglose de costo — <span id="desNombre"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <!-- Resumen financiero -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div class="modal-section" style="margin-bottom:0;">
+            <div class="modal-section-title"><i class="bi bi-receipt-cutoff"></i>Resumen financiero</div>
+            <div id="desResumen"></div>
+          </div>
+          <div class="modal-section" style="margin-bottom:0;">
+            <div class="modal-section-title"><i class="bi bi-pie-chart-fill"></i>Distribución de costos</div>
+            <div id="desPie" style="display:flex;flex-direction:column;gap:.3rem;"></div>
+          </div>
+        </div>
+
+        <!-- Tabla ingredientes -->
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-list-check"></i>Desglose por ingrediente</div>
+          <div style="overflow-x:auto;">
+            <table class="det-table">
+              <thead><tr>
+                <th>#</th><th>Materia Prima</th><th>Unidad</th>
+                <th>Cant. receta</th><th>Merma %</th>
+                <th>Costo unit. ($/ub)</th>
+                <th>Cant. real</th>
+                <th>Costo ingrediente</th>
+                <th>% del total</th>
+              </tr></thead>
+              <tbody id="desTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Fecha / hora ── */
+const now = new Date();
+document.getElementById('fecha-top').textContent = now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hora-top').textContent  = now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+
+/* ── DATOS MAESTROS ── */
+const MATERIAS = [
+  {id:'MP-001',nombre:'Harina de Trigo',    ub:'g',   merma:2,  costo:0.005},
+  {id:'MP-002',nombre:'Mantequilla s/sal',  ub:'g',   merma:1,  costo:0.025},
+  {id:'MP-003',nombre:'Azúcar Refinada',    ub:'g',   merma:0,  costo:0.008},
+  {id:'MP-004',nombre:'Leche Entera',       ub:'ml',  merma:3,  costo:0.012},
+  {id:'MP-005',nombre:'Huevo Fresco',       ub:'pza', merma:5,  costo:3.5  },
+  {id:'MP-006',nombre:'Cacao en Polvo',     ub:'g',   merma:1,  costo:0.045},
+  {id:'MP-007',nombre:'Vainilla Extracto',  ub:'ml',  merma:0,  costo:0.18 },
+  {id:'MP-008',nombre:'Polvo de Hornear',   ub:'g',   merma:0,  costo:0.022},
+  {id:'MP-009',nombre:'Sal de Mesa',        ub:'g',   merma:0,  costo:0.003},
+  {id:'MP-010',nombre:'Crema para Batir',   ub:'ml',  merma:2,  costo:0.028},
+  {id:'MP-012',nombre:'Fresas Frescas',     ub:'g',   merma:8,  costo:0.032},
+  {id:'MP-014',nombre:'Nuez Pecana',        ub:'g',   merma:3,  costo:0.12 },
+];
+
+const RECETAS_DATA = [
+  {id:'RC-001',id_prod:'P-001',version:2,rendimiento:12,ingredientes:[
+    {id_mp:'MP-001',cant:230},{id_mp:'MP-006',cant:90},{id_mp:'MP-003',cant:190},
+    {id_mp:'MP-005',cant:4}, {id_mp:'MP-002',cant:100},{id_mp:'MP-010',cant:150}]},
+  {id:'RC-002',id_prod:'P-002',version:1,rendimiento:8,ingredientes:[
+    {id_mp:'MP-001',cant:180},{id_mp:'MP-002',cant:90},{id_mp:'MP-003',cant:120},
+    {id_mp:'MP-012',cant:300},{id_mp:'MP-005',cant:2},{id_mp:'MP-010',cant:200}]},
+  {id:'RC-003',id_prod:'P-003',version:1,rendimiento:24,ingredientes:[
+    {id_mp:'MP-001',cant:400},{id_mp:'MP-002',cant:250},{id_mp:'MP-004',cant:80},
+    {id_mp:'MP-005',cant:2}, {id_mp:'MP-009',cant:5}]},
+  {id:'RC-004',id_prod:'P-004',version:1,rendimiento:12,ingredientes:[
+    {id_mp:'MP-001',cant:200},{id_mp:'MP-003',cant:150},{id_mp:'MP-002',cant:80},
+    {id_mp:'MP-005',cant:2}, {id_mp:'MP-004',cant:120},{id_mp:'MP-007',cant:8},{id_mp:'MP-008',cant:6}]},
+  {id:'RC-005',id_prod:'P-005',version:1,rendimiento:30,ingredientes:[
+    {id_mp:'MP-001',cant:300},{id_mp:'MP-003',cant:160},{id_mp:'MP-002',cant:150},
+    {id_mp:'MP-014',cant:100},{id_mp:'MP-005',cant:1}]},
+  {id:'RC-006',id_prod:'P-006',version:1,rendimiento:16,ingredientes:[
+    {id_mp:'MP-001',cant:120},{id_mp:'MP-006',cant:60},{id_mp:'MP-003',cant:180},
+    {id_mp:'MP-002',cant:100},{id_mp:'MP-005',cant:3},{id_mp:'MP-007',cant:5}]},
+  {id:'RC-007',id_prod:'P-008',version:1,rendimiento:8,ingredientes:[
+    {id_mp:'MP-001',cant:160},{id_mp:'MP-002',cant:80},{id_mp:'MP-003',cant:100},
+    {id_mp:'MP-005',cant:3}, {id_mp:'MP-010',cant:100}]},
+];
+
+const PRODUCTOS = {
+  'P-001':{nombre:'Pastel de Chocolate', precio:380},
+  'P-002':{nombre:'Pay de Fresa',        precio:220},
+  'P-003':{nombre:'Cuernos de Mantequilla', precio:28},
+  'P-004':{nombre:'Muffin de Vainilla',  precio:35},
+  'P-005':{nombre:'Galleta de Nuez',     precio:18},
+  'P-006':{nombre:'Brownie de Chocolate', precio:42},
+  'P-008':{nombre:'Tarta de Limón',      precio:195},
+};
+
+function getMp(id){ return MATERIAS.find(m=>m.id===id)||null; }
+
+/* ── Calcular costos ── */
+function calcularCostoReceta(rec){
+  let total=0;
+  const desglose=rec.ingredientes.map(ing=>{
+    const mp=getMp(ing.id_mp);
+    if(!mp) return null;
+    const cantReal = ing.cant * (1 + mp.merma/100);
+    const costoIng = cantReal * mp.costo;
+    total+=costoIng;
+    return {mp, cantOrig:ing.cant, cantReal, costoIng};
+  }).filter(Boolean);
+  return {total, desglose};
+}
+
+/* ── Construir dataset ── */
+let dataset = RECETAS_DATA.map(rec=>{
+  const prod = PRODUCTOS[rec.id_prod];
+  if(!prod) return null;
+  const {total:costoTotal, desglose} = calcularCostoReceta(rec);
+  const costoUnit = costoTotal / rec.rendimiento;
+  const utilUnit  = prod.precio - costoUnit;
+  const margen    = (utilUnit / prod.precio) * 100;
+  return {rec, prod, id_prod:rec.id_prod, costoTotal, costoUnit, utilUnit, margen, desglose};
+}).filter(Boolean);
+
+let sortCol='margen', sortDir=-1;
+
+/* ── Helpers ── */
+function margenClass(m){
+  if(m>=50) return 'alto';
+  if(m>=30) return 'medio';
+  if(m>0)   return 'bajo';
+  return 'negativo';
+}
+function margenLabel(m){
+  const map={alto:'Alta rentabilidad',medio:'Rentabilidad media',bajo:'Rentabilidad baja',negativo:'Sin rentabilidad'};
+  return map[margenClass(m)];
+}
+function fmt(n){return n.toFixed(2);}
+
+function renderRanking(){
+  const sorted = dataset.slice().sort((a,b)=>b.margen-a.margen).slice(0,3);
+  const posClass=['p1','p2','p3'];
+  document.getElementById('rankingStrip').innerHTML=sorted.map((d,i)=>`
+    <div class="rank-card">
+      <div class="rank-pos ${posClass[i]}">#${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-nombre">${d.prod.nombre}</div>
+        <div class="rank-det">Costo unit: $${fmt(d.costoUnit)} · Precio: $${d.prod.precio}</div>
+      </div>
+      <div class="rank-pct">${fmt(d.margen)}%</div>
+    </div>`).join('');
+}
+
+/* ── Render tabla ── */
+function renderTabla(lista){
+  const body=document.getElementById('costoBody');
+  if(!lista.length){
+    body.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="bi bi-calculator"></i>Sin productos para este filtro.</div></td></tr>`;
+    return;
+  }
+  body.innerHTML=lista.map((d,i)=>{
+    const mc=margenClass(d.margen);
+    return `<tr>
+      <td>
+        <div class="prod-name">${d.prod.nombre}</div>
+        <div class="prod-ver">${d.id_prod}</div>
+      </td>
+      <td><span style="font-size:.67rem;background:var(--gold-s);color:var(--gold);padding:.12rem .45rem;border-radius:5px;font-weight:700;">v${d.rec.version}</span></td>
+      <td><strong>${d.rec.rendimiento}</strong> <span style="font-size:.65rem;color:var(--muted);">pzas/lote</span></td>
+      <td><strong>$${fmt(d.costoTotal)}</strong> <span style="font-size:.65rem;color:var(--muted);">/lote</span></td>
+      <td style="color:var(--orange);font-weight:700;">$${fmt(d.costoUnit)}</td>
+      <td style="color:var(--vino);font-weight:700;">$${d.prod.precio.toFixed(2)}</td>
+      <td style="color:var(--green);font-weight:700;">$${fmt(d.utilUnit)}</td>
+      <td>
+        <div class="margen-wrap">
+          <div class="margen-bar"><div class="mb-fill mb-${mc}" style="width:${Math.max(0,Math.min(100,d.margen))}%"></div></div>
+          <span class="margen-pct pct-${mc}">${fmt(d.margen)}%</span>
+        </div>
+      </td>
+      <td><span class="badge-margen bm-${mc}"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i>${margenLabel(d.margen)}</span></td>
+      <td>
+        <button class="btn-tbl bt-det" onclick="verDesglose(${i})"><i class="bi bi-calculator"></i> Desglose</button>
+      </td>
+    </tr>`;
+  }).join('');
+  window._lastFiltered = lista;
+}
+
+/* ── Filtrar / ordenar ── */
+function filtrar(){
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const mg  = document.getElementById('filtroMargen').value;
+  const ord = document.getElementById('filtroOrden').value;
+
+  let res = dataset.filter(d=>{
+    const matchQ = d.prod.nombre.toLowerCase().includes(q)||d.id_prod.toLowerCase().includes(q);
+    const mc=margenClass(d.margen);
+    const matchM = mg==='todos'?true:mg===mc;
+    return matchQ && matchM;
+  });
+
+  const ordMap={
+    margen_desc:(a,b)=>b.margen-a.margen,
+    margen_asc: (a,b)=>a.margen-b.margen,
+    utilidad_desc:(a,b)=>b.utilUnit-a.utilUnit,
+    costo_asc:(a,b)=>a.costoUnit-b.costoUnit,
+  };
+  if(ordMap[ord]) res.sort(ordMap[ord]);
+  renderTabla(res);
+}
+document.getElementById('searchInput').addEventListener('input',filtrar);
+
+function sortBy(col){
+  if(sortCol===col) sortDir*=-1; else {sortCol=col;sortDir=-1;}
+  filtrar();
+}
+
+/* ── Modal desglose ── */
+function verDesglose(i){
+  const d = (window._lastFiltered||dataset)[i];
+  document.getElementById('desNombre').textContent=d.prod.nombre;
+
+  const mc=margenClass(d.margen);
+  document.getElementById('desResumen').innerHTML=`
+    <div class="fin-row"><span class="fin-label">Rendimiento base</span><span class="fin-val">${d.rec.rendimiento} pzas/lote</span></div>
+    <div class="fin-row"><span class="fin-label">Costo total (lote)</span><span class="fin-val">$${fmt(d.costoTotal)}</span></div>
+    <div class="fin-row"><span class="fin-label">Costo unitario</span><span class="fin-val" style="color:var(--orange);">$${fmt(d.costoUnit)}</span></div>
+    <div class="fin-row"><span class="fin-label">Precio de venta</span><span class="fin-val" style="color:var(--vino);">$${d.prod.precio.toFixed(2)}</span></div>
+    <div class="fin-row"><span class="fin-label">Utilidad unitaria</span><span class="fin-val" style="color:var(--green);">$${fmt(d.utilUnit)}</span></div>
+    <div class="fin-row"><span class="fin-label">Margen de utilidad</span><span class="fin-val pct-${mc}">${fmt(d.margen)}%</span></div>`;
+
+  const pieHtml = d.desglose.sort((a,b)=>b.costoIng-a.costoIng).map(ing=>{
+    const pct=(ing.costoIng/d.costoTotal*100).toFixed(1);
+    return `<div style="margin-bottom:.45rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.18rem;">
+        <span style="font-size:.72rem;font-weight:700;color:var(--text);background:var(--blue-s);padding:.1rem .5rem;border-radius:4px;">${ing.mp.nombre}</span>
+        <span style="font-size:.72rem;font-weight:700;color:var(--text);">$${fmt(ing.costoIng)} (${pct}%)</span>
+      </div>
+      <div style="height:8px;border-radius:4px;background:var(--crema-dark);overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--vino),var(--vino-mid));border-radius:4px;transition:width .5s ease;"></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('desPie').innerHTML=pieHtml;
+
+  document.getElementById('desTbody').innerHTML=d.desglose.map((ing,i)=>{
+    const pct=(ing.costoIng/d.costoTotal*100).toFixed(1);
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${ing.mp.nombre}</strong></td>
+      <td><span style="background:var(--blue-s);color:var(--blue);padding:.1rem .4rem;border-radius:5px;font-weight:700;font-size:.65rem;">${ing.mp.ub}</span></td>
+      <td>${ing.cantOrig} ${ing.mp.ub}</td>
+      <td>${ing.mp.merma}%</td>
+      <td style="color:var(--muted);">$${ing.mp.costo.toFixed(4)}</td>
+      <td><strong>${ing.cantReal.toFixed(3)} ${ing.mp.ub}</strong></td>
+      <td style="color:var(--orange);font-weight:700;">$${fmt(ing.costoIng)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.4rem;">
+          <div style="height:6px;width:${Math.max(4,parseFloat(pct))}px;background:var(--vino-mid);border-radius:3px;max-width:50px;"></div>
+          <span style="font-size:.68rem;font-weight:700;color:var(--muted);">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  new bootstrap.Modal(document.getElementById('modalDesglose')).show();
+}
+
+/* ── Sidebar ── */
+function setActive(el){document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x=>x.classList.remove('active'));el.classList.add('active');}
+function toggleMenu(toggle){
+  const sub=toggle.nextElementSibling,isOpen=sub.classList.contains('open');
+  document.querySelectorAll('.nav-submenu.open').forEach(m=>{m.classList.remove('open');m.previousElementSibling.classList.remove('open');});
+  if(!isOpen){sub.classList.add('open');toggle.classList.add('open');}
+}
+
+/* ── Init ── */
+filtrar();
+</script>
+</body>
+</html>

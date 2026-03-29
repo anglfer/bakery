@@ -1,0 +1,49 @@
+{% extends "base_template.html" %}
+{% block title %}Solicitudes{% endblock %}
+{% block content %}
+<section class="section">
+	<h2 class="mb-3">Solicitudes de produccion</h2>
+	<div class="card p-3">
+		<div class="table-responsive">
+			<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Producto</th>
+				<th>Cantidad</th>
+				<th>Estado</th>
+				<th>Fecha</th>
+				<th>Resolver</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for s in solicitudes %}
+			<tr>
+				<td>{{ s.id_solicitud }}</td>
+				<td>{{ s.producto.nombre }}</td>
+				<td>{{ s.cantidad }}</td>
+				<td>{{ s.estado }}</td>
+				<td>{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
+				<td>
+					<form method="post">
+						<input type="hidden" name="id_solicitud" value="{{ s.id_solicitud }}" />
+						<select name="estado" {{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
+							<option value="APROBADA">Aprobar</option>
+							<option value="RECHAZADA">Rechazar</option>
+						</select>
+						<input type="text" name="observaciones" placeholder="Observaciones" />
+						<button type="submit" class="btn btn-sm" {{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>Guardar</button>
+					</form>
+				</td>
+			</tr>
+			{% else %}
+			<tr>
+				<td colspan="6">No hay solicitudes registradas.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

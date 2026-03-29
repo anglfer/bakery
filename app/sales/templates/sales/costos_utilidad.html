@@ -1,0 +1,72 @@
+{% extends "base_template.html" %} {% block title %}Cortes{% endblock %} {% block content %}
+<section class="section">
+	<h2 class="mb-3">Costos y utilidad</h2>
+	<div class="card p-3 mb-3">
+		<form method="post">
+			<button type="submit">Generar corte del dia</button>
+		</form>
+	</div>
+
+	{% if costos %}
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Costo y utilidad por producto</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>Producto</th>
+						<th>Precio venta</th>
+						<th>Costo unitario</th>
+						<th>Utilidad unitaria</th>
+						<th>% utilidad</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in costos %}
+					<tr>
+						<td>{{ row.producto.nombre }}</td>
+						<td>${{ '%.2f'|format(row.producto.precio_venta) }}</td>
+						<td>${{ '%.2f'|format(row.costo_unitario) }}</td>
+						<td>${{ '%.2f'|format(row.utilidad_unitaria) }}</td>
+						<td>{{ '%.2f'|format(row.porcentaje_utilidad) }}%</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="card p-3">
+		<h3 class="mb-2">Historial de cortes</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>Fecha</th>
+						<th>Total ventas</th>
+						<th>Numero ventas</th>
+						<th>Total salidas</th>
+						<th>Utilidad</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for c in cortes %}
+					<tr>
+						<td>{{ c.fecha.strftime('%Y-%m-%d') }}</td>
+						<td>${{ '%.2f'|format(c.total_ventas) }}</td>
+						<td>{{ c.numero_ventas }}</td>
+						<td>${{ '%.2f'|format(c.salida_efectivo_proveedores) }}</td>
+						<td>${{ '%.2f'|format(c.utilidad_diaria) }}</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="5">No hay cortes generados.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

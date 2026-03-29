@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Órdenes de Producción – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vino:       #9E3B3B;
+  --vino-hover: #7a2c2c;
+  --vino-light: #fdeaea;
+  --vino-mid:   #c96060;
+  --crema:      #fdf6f0;
+  --crema-dark: #eeddd5;
+  --bg:         #f4ede9;
+  --text:       #2c1810;
+  --muted:      #9a7a72;
+  --sidebar-w:  240px;
+  --topbar-h:   62px;
+  --green:      #2e7d52;
+  --green-s:    #e8f5ee;
+  --blue:       #1a5fa0;
+  --blue-s:     #e6f0fb;
+  --orange:     #c05a1a;
+  --orange-s:   #fdebd8;
+  --red:        #c0392b;
+  --red-s:      #fce8e6;
+  --gold:       #b8860b;
+  --gold-s:     #fdf3d0;
+  --purple:     #6d3fa0;
+  --purple-s:   #f0e8fb;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--vino-mid);}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;border-right:1px solid var(--crema-dark);display:flex;flex-direction:column;z-index:200;box-shadow:3px 0 18px rgba(94,32,32,.07);overflow-y:auto;overflow-x:hidden;}
+.sidebar-brand{display:flex;align-items:center;gap:.75rem;padding:1.15rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);}
+.brand-icon{width:38px;height:38px;border-radius:11px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(158,59,59,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.95rem 1.3rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:500;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.nav-group-toggle{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:600;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;user-select:none;}
+.nav-group-toggle i.icon-main{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-group-toggle .gtlabel{flex:1;}
+.nav-group-toggle .chevron{font-size:.7rem;transition:transform .22s ease;margin-left:auto;}
+.nav-group-toggle:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-group-toggle.open{color:var(--vino);}
+.nav-group-toggle.open .chevron{transform:rotate(90deg);}
+.nav-submenu{overflow:hidden;max-height:0;transition:max-height .28s cubic-bezier(.4,0,.2,1);background:#fdf8f6;border-left:3px solid var(--crema-dark);}
+.nav-submenu.open{max-height:400px;}
+.nav-submenu .nav-link-side{padding:.5rem 1.3rem .5rem 2.5rem;font-size:.77rem;border-left:none;}
+.nav-submenu .nav-link-side::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--crema-dark);flex-shrink:0;transition:background .15s;}
+.nav-submenu .nav-link-side:hover::before,.nav-submenu .nav-link-side.active::before{background:var(--vino);}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b !important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.73rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(158,59,59,.3);border:2px solid var(--crema-dark);cursor:pointer;}
+
+/* ── MAIN ── */
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.7rem 1.9rem;min-height:calc(100vh - var(--topbar-h));}
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* ── KPIs ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem;}
+.kpi-mini{background:#fff;border:1.5px solid var(--crema-dark);border-top:3px solid var(--vino);border-radius:13px;padding:1rem 1.15rem;transition:all .2s ease;}
+.kpi-mini:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(94,32,32,.1);}
+.kpi-mini.k-green  {border-top-color:var(--green);}
+.kpi-mini.k-blue   {border-top-color:var(--blue);}
+.kpi-mini.k-orange {border-top-color:var(--orange);}
+.km-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;font-weight:600;}
+.km-val{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--text);line-height:1;}
+.km-sub{font-size:.67rem;color:var(--muted);margin-top:.25rem;display:flex;align-items:center;gap:3px;}
+.km-sub.green  {color:var(--green);font-weight:600;}
+.km-sub.blue   {color:var(--blue);font-weight:600;}
+.km-sub.orange {color:var(--orange);font-weight:600;}
+.km-sub.vino   {color:var(--vino);font-weight:600;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.search-input{width:100%;padding:.52rem .9rem .52rem 2.2rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);transition:border .17s;}
+.search-input:focus{outline:none;border-color:var(--vino);}
+.filter-select{padding:.52rem .9rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);cursor:pointer;min-width:140px;}
+.filter-select:focus{outline:none;border-color:var(--vino);}
+.btn-vino{background:var(--vino);color:#fff;border:none;border-radius:10px;padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .18s;white-space:nowrap;}
+.btn-vino:hover{background:var(--vino-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(158,59,59,.25);}
+
+/* ── TABLA DE ÓRDENES ── */
+.table-wrap{background:#fff;border-radius:14px;border:1.5px solid var(--crema-dark);overflow:hidden;}
+.ord-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.ord-table thead tr{background:var(--vino);}
+.ord-table th{color:#fff;font-weight:700;font-size:.63rem;text-transform:uppercase;letter-spacing:.06em;padding:.65rem .9rem;border:none;white-space:nowrap;}
+.ord-table tbody tr{border-bottom:1px solid var(--crema-dark);transition:background .15s;}
+.ord-table tbody tr:hover{background:var(--vino-light);}
+.ord-table tbody tr:last-child{border:none;}
+.ord-table td{padding:.62rem .9rem;vertical-align:middle;}
+
+/* Estado badges */
+.badge-estado{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;padding:.22rem .65rem;border-radius:50px;white-space:nowrap;}
+.be-pendiente {background:var(--gold-s);   color:var(--gold);}
+.be-proceso   {background:var(--blue-s);   color:var(--blue);}
+.be-finalizado{background:var(--green-s);  color:var(--green);}
+.be-cancelado {background:#f0f0f0;         color:#888;}
+
+/* Botones tabla */
+.btn-tbl{height:26px;border:none;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:.2rem;font-size:.62rem;font-weight:700;cursor:pointer;padding:0 .6rem;font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-ver   {background:var(--blue-s); color:var(--blue);}
+.btn-ver:hover{background:var(--blue);color:#fff;}
+.btn-iniciar{background:var(--green-s);color:var(--green);}
+.btn-iniciar:hover{background:var(--green);color:#fff;}
+.btn-finalizar{background:var(--purple-s);color:var(--purple);}
+.btn-finalizar:hover{background:var(--purple);color:#fff;}
+.btn-cancelar{background:var(--red-s);color:var(--red);}
+.btn-cancelar:hover{background:var(--red);color:#fff;}
+
+/* Producto chip */
+.prod-chip{display:flex;align-items:center;gap:.5rem;}
+.prod-icon{width:30px;height:30px;border-radius:8px;background:var(--vino-light);color:var(--vino);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.prod-name{font-weight:600;color:var(--text);font-size:.78rem;}
+.prod-rec{font-size:.65rem;color:var(--muted);}
+
+/* Costo chip */
+.costo-chip{font-size:.73rem;font-weight:700;color:var(--green);}
+
+/* ── MODALES BASE ── */
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;box-shadow:0 20px 60px rgba(94,32,32,.2);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.form-label{font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.28rem;}
+.req{color:var(--vino);}
+.form-control,.form-select{font-size:.8rem;border:1.5px solid var(--crema-dark);border-radius:9px;font-family:'Poppins',sans-serif;transition:border .17s;}
+.form-control:focus,.form-select:focus{border-color:var(--vino);box-shadow:0 0 0 3px rgba(158,59,59,.09);}
+.form-hint{font-size:.66rem;color:var(--muted);margin-top:.2rem;}
+
+.modal-section{background:var(--crema);border-radius:10px;padding:.85rem 1rem;margin-bottom:.9rem;border-left:3px solid var(--vino);}
+.modal-section-title{font-size:.7rem;font-weight:700;color:var(--vino);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem;}
+
+.info-box{background:var(--blue-s);border:1.5px solid #b8d4f0;border-radius:10px;padding:.7rem 1rem;font-size:.75rem;color:var(--blue);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.info-box i{flex-shrink:0;margin-top:.1rem;}
+.warn-box{background:var(--orange-s);border:1.5px solid #f0b898;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--orange);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.warn-box i{flex-shrink:0;}
+.success-box{background:var(--green-s);border:1.5px solid #a8d5bb;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--green);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.success-box i{flex-shrink:0;}
+.error-box{background:var(--red-s);border:1.5px solid #f0b8b5;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--red);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.error-box i{flex-shrink:0;}
+
+/* Stock chips */
+.stock-chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;}
+.sc-ok  {background:var(--green-s);color:var(--green);}
+.sc-warn{background:var(--orange-s);color:var(--orange);}
+.sc-bad {background:var(--red-s);color:var(--red);}
+
+/* Detalle ingredientes en modal */
+.det-table{width:100%;border-collapse:collapse;font-size:.74rem;}
+.det-table thead tr{background:var(--vino);}
+.det-table th{color:#fff;font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:.5rem .75rem;border:none;}
+.det-table tbody tr:nth-child(even){background:#fdf3f0;}
+.det-table tbody tr:hover{background:var(--vino-light);}
+.det-table td{padding:.5rem .75rem;border-bottom:1px solid #f4ede9;vertical-align:middle;}
+
+/* Botones footer modal */
+.btn-modal-save{background:var(--vino);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-save:hover{background:var(--vino-hover);}
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+.btn-modal-green{background:var(--green);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-green:hover{background:#236040;}
+.btn-modal-purple{background:var(--purple);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-purple:hover{background:#532e80;}
+.btn-modal-red{background:var(--red);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-red:hover{background:#992d22;}
+
+/* Confirm modal */
+.confirm-icon{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem;}
+.ci-warn  {background:var(--orange-s);color:var(--orange);}
+.ci-green {background:var(--green-s); color:var(--green);}
+.ci-purple{background:var(--purple-s);color:var(--purple);}
+.ci-red   {background:var(--red-s);   color:var(--red);}
+
+/* Costo preview */
+.costo-preview{background:var(--crema);border-radius:10px;padding:.75rem 1rem;border:1.5px solid var(--crema-dark);margin-top:.5rem;}
+.cp-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid var(--crema-dark);font-size:.74rem;}
+.cp-row:last-child{border:none;font-weight:700;color:var(--vino);font-size:.8rem;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}.d4{animation-delay:.18s}
+
+/* Vacío */
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.85rem;}
+.empty-state i{font-size:2rem;display:block;margin-bottom:.5rem;}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.main-content{margin-left:0;padding:1rem}.sidebar{transform:translateX(-100%)}.topbar{left:0}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </div>
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-speedometer2"></i>Dashboard</a>
+  <div class="nav-section-label">Gestión</div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-people-fill icon-main"></i><span class="gtlabel">Personal</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Empleados</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-truck"></i>Proveedores</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-box-seam-fill icon-main"></i><span class="gtlabel">Almacén</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-archive-fill"></i>Materia Prima</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cart-fill"></i>Compras</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Producto Terminado</a>
+  </div>
+  <div class="nav-group-toggle open" onclick="toggleMenu(this)">
+    <i class="bi bi-gear-fill icon-main"></i><span class="gtlabel">Producción</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu open">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-journal-richtext"></i>Recetas</a>
+    <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-cpu-fill"></i>Órdenes</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-send-fill"></i>Solicitudes</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-cash-coin icon-main"></i><span class="gtlabel">Comercial</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-receipt"></i>Ventas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-arrow-down-circle-fill"></i>Salidas Efectivo</a>
+  </div>
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<header class="topbar">
+  <div class="topbar-title">Módulo de Producción — Órdenes</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <div class="topbar-avatar">JR</div>
+  </div>
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main-content">
+
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Órdenes</li>
+      </ol>
+    </nav>
+    <h4>Órdenes de Producción</h4>
+  </div>
+
+
+
+  <!-- Toolbar -->
+  <div class="toolbar fu d3">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por producto, orden…">
+    </div>
+    <select class="filter-select" id="filtroEstado" onchange="filtrar()">
+      <option value="todos">Todos los estados</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="EN_PROCESO">En proceso</option>
+      <option value="FINALIZADO">Finalizado</option>
+      <option value="CANCELADO">Cancelado</option>
+    </select>
+    <button class="btn-vino" onclick="abrirNuevaOrden()">
+      <i class="bi bi-plus-lg"></i>Nueva orden
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap fu d4">
+    <div style="overflow-x:auto;">
+      <table class="ord-table">
+        <thead>
+          <tr>
+            <th>ID Orden</th>
+            <th>Producto</th>
+            <th>Cant. a producir</th>
+            <th>Costo estimado</th>
+            <th>Estado</th>
+            <th>Fecha inicio</th>
+            <th>Fecha fin</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="ordenesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════════
+     MODAL NUEVA ORDEN
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalOrden" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cpu me-2"></i>Nueva Orden de Producción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Datos de la orden</div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Producto <span class="req">*</span></label>
+              <select class="form-select" id="f_producto" onchange="onProductoChange()">
+                <option value="">Seleccionar producto…</option>
+                <option value="P-001">Pastel de Chocolate</option>
+                <option value="P-002">Pay de Fresa</option>
+                <option value="P-003">Cuernos de Mantequilla</option>
+                <option value="P-004">Muffin de Vainilla</option>
+                <option value="P-005">Galleta de Nuez</option>
+                <option value="P-006">Brownie de Chocolate</option>
+                <option value="P-007">Pan de Canela</option>
+                <option value="P-008">Tarta de Limón</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Receta activa <span class="req">*</span></label>
+              <select class="form-select" id="f_receta" onchange="onRecetaChange()">
+                <option value="">Selecciona primero un producto…</option>
+              </select>
+              <div class="form-hint" id="recetaHint">Sólo se muestran versiones activas.</div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Cantidad a producir <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_cantidad" min="1" step="1" placeholder="Ej. 24" oninput="calcularCosto()">
+              <div class="form-hint" id="rendHint"></div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Observaciones</label>
+              <input type="text" class="form-control" id="f_obs" placeholder="Opcional…">
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>Al <strong>iniciar</strong> la orden, el sistema descontará automáticamente la materia prima del inventario aplicando la merma definida en cada insumo. Al <strong>finalizar</strong>, se ingresará el producto terminado al inventario disponible para venta.</span>
+        </div>
+
+        <!-- Explosión de materiales preview -->
+        <div id="explosionWrap" style="display:none;">
+          <div class="modal-section">
+            <div class="modal-section-title"><i class="bi bi-list-check"></i>Explosión de materiales — consumo estimado</div>
+            <div style="overflow-x:auto;">
+              <table class="det-table">
+                <thead><tr>
+                  <th>#</th><th>Materia Prima</th><th>Unidad</th>
+                  <th>Cant. receta</th><th>Cant. necesaria</th><th>Merma (%)</th>
+                  <th>Cant. real a descontar</th><th>Stock actual</th><th>Disponibilidad</th>
+                </tr></thead>
+                <tbody id="explosionBody"></tbody>
+              </table>
+            </div>
+            <div id="costoPreviewWrap" style="margin-top:.75rem;"></div>
+          </div>
+          <div id="stockAlertBox"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-vino" style="border-radius:9px;" onclick="verificarExplosion()">
+          <i class="bi bi-boxes"></i>Verificar materiales
+        </button>
+        <button class="btn-modal-save" onclick="guardarOrden()">
+          <i class="bi bi-check-lg"></i>Crear orden
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL VER ORDEN
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalVer" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-eye-fill me-2"></i><span id="verTitulo"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="modal-section mb-3">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Información general</div>
+          <div class="row g-2" id="verCabecera"></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-list-check"></i>Ingredientes consumidos / a consumir</div>
+          <div style="overflow-x:auto;">
+            <table class="det-table">
+              <thead><tr>
+                <th>#</th><th>Materia Prima</th><th>Unidad</th>
+                <th>Cant. receta</th><th>Cant. real (con merma)</th>
+                <th>Stock actual</th><th>Disp.</th>
+              </tr></thead>
+              <tbody id="verTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="verEstadoBox" style="margin-top:.75rem;"></div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL CONFIRMAR ACCIÓN
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalConfirm" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <div class="confirm-icon" id="confirmIcon"><i class="bi bi-question-lg"></i></div>
+      <h6 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.5rem;" id="confirmTitulo"></h6>
+      <p style="font-size:.76rem;color:var(--muted);margin-bottom:1.2rem;" id="confirmMsg"></p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button id="confirmBtn" onclick="ejecutarAccion()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Fecha / hora ── */
+const now = new Date();
+document.getElementById('fecha-top').textContent = now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hora-top').textContent  = now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+
+/* ── DATOS MAESTROS ── */
+const PRODUCTOS = {
+  'P-001':'Pastel de Chocolate','P-002':'Pay de Fresa',
+  'P-003':'Cuernos de Mantequilla','P-004':'Muffin de Vainilla',
+  'P-005':'Galleta de Nuez','P-006':'Brownie de Chocolate',
+  'P-007':'Pan de Canela','P-008':'Tarta de Limón'
+};
+
+const MATERIAS = [
+  {id:'MP-001',nombre:'Harina de Trigo',   ub:'g',   stock:2000, merma:2, costo:0.005},
+  {id:'MP-002',nombre:'Mantequilla s/sal', ub:'g',   stock:800,  merma:1, costo:0.025},
+  {id:'MP-003',nombre:'Azúcar Refinada',   ub:'g',   stock:18000,merma:0, costo:0.008},
+  {id:'MP-004',nombre:'Leche Entera',      ub:'ml',  stock:4500, merma:3, costo:0.012},
+  {id:'MP-005',nombre:'Huevo Fresco',      ub:'pza', stock:48,   merma:5, costo:3.5  },
+  {id:'MP-006',nombre:'Cacao en Polvo',    ub:'g',   stock:3200, merma:1, costo:0.045},
+  {id:'MP-007',nombre:'Vainilla Extracto', ub:'ml',  stock:600,  merma:0, costo:0.18 },
+  {id:'MP-008',nombre:'Polvo de Hornear',  ub:'g',   stock:900,  merma:0, costo:0.022},
+  {id:'MP-009',nombre:'Sal de Mesa',       ub:'g',   stock:2100, merma:0, costo:0.003},
+  {id:'MP-010',nombre:'Crema para Batir',  ub:'ml',  stock:2800, merma:2, costo:0.028},
+  {id:'MP-012',nombre:'Fresas Frescas',    ub:'g',   stock:1200, merma:8, costo:0.032},
+  {id:'MP-014',nombre:'Nuez Pecana',       ub:'g',   stock:750,  merma:3, costo:0.12 },
+];
+
+const RECETAS = [
+  {id:'RC-001',id_producto:'P-001',version:2,rendimiento:12,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:230},{id_mp:'MP-006',cant:90},{id_mp:'MP-003',cant:190},
+    {id_mp:'MP-005',cant:4},{id_mp:'MP-002',cant:100},{id_mp:'MP-010',cant:150}]},
+  {id:'RC-002',id_producto:'P-002',version:1,rendimiento:8,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:180},{id_mp:'MP-002',cant:90},{id_mp:'MP-003',cant:120},
+    {id_mp:'MP-012',cant:300},{id_mp:'MP-005',cant:2},{id_mp:'MP-010',cant:200}]},
+  {id:'RC-003',id_producto:'P-003',version:1,rendimiento:24,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:400},{id_mp:'MP-002',cant:250},{id_mp:'MP-004',cant:80},
+    {id_mp:'MP-005',cant:2},{id_mp:'MP-009',cant:5}]},
+  {id:'RC-004',id_producto:'P-004',version:1,rendimiento:12,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:200},{id_mp:'MP-003',cant:150},{id_mp:'MP-002',cant:80},
+    {id_mp:'MP-005',cant:2},{id_mp:'MP-004',cant:120},{id_mp:'MP-007',cant:8},{id_mp:'MP-008',cant:6}]},
+  {id:'RC-005',id_producto:'P-005',version:1,rendimiento:30,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:300},{id_mp:'MP-003',cant:160},{id_mp:'MP-002',cant:150},
+    {id_mp:'MP-014',cant:100},{id_mp:'MP-005',cant:1}]},
+  {id:'RC-006',id_producto:'P-006',version:1,rendimiento:16,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:120},{id_mp:'MP-006',cant:60},{id_mp:'MP-003',cant:180},
+    {id_mp:'MP-002',cant:100},{id_mp:'MP-005',cant:3},{id_mp:'MP-007',cant:5}]},
+  {id:'RC-007',id_producto:'P-008',version:1,rendimiento:8,activa:true,ingredientes:[
+    {id_mp:'MP-001',cant:160},{id_mp:'MP-002',cant:80},{id_mp:'MP-003',cant:100},
+    {id_mp:'MP-005',cant:3},{id_mp:'MP-010',cant:100}]},
+];
+
+/* ── ÓRDENES DATA ── */
+let ordenes = [
+  {id:'ORD-001',id_receta:'RC-001',id_producto:'P-001',cantidad:24,estado:'FINALIZADO',
+   fecha_inicio:'2026-02-10',fecha_fin:'2026-02-10',costo:284.50,obs:'Pedido especial boda'},
+  {id:'ORD-002',id_receta:'RC-002',id_producto:'P-002',cantidad:16,estado:'FINALIZADO',
+   fecha_inicio:'2026-02-12',fecha_fin:'2026-02-12',costo:148.20,obs:''},
+  {id:'ORD-003',id_receta:'RC-003',id_producto:'P-003',cantidad:48,estado:'EN_PROCESO',
+   fecha_inicio:'2026-03-05',fecha_fin:null,costo:312.80,obs:'Pedido quinceañera'},
+  {id:'ORD-004',id_receta:'RC-004',id_producto:'P-004',cantidad:36,estado:'PENDIENTE',
+   fecha_inicio:null,fecha_fin:null,costo:null,obs:''},
+  {id:'ORD-005',id_receta:'RC-005',id_producto:'P-005',cantidad:60,estado:'PENDIENTE',
+   fecha_inicio:null,fecha_fin:null,costo:null,obs:'Stock pedido semana'},
+  {id:'ORD-006',id_receta:'RC-001',id_producto:'P-001',cantidad:12,estado:'CANCELADO',
+   fecha_inicio:null,fecha_fin:null,costo:null,obs:'Cancelado por cliente'},
+];
+
+let accionPendiente = null;
+let accionIdx       = null;
+
+const bsOrden   = new bootstrap.Modal(document.getElementById('modalOrden'));
+const bsVer     = new bootstrap.Modal(document.getElementById('modalVer'));
+const bsConfirm = new bootstrap.Modal(document.getElementById('modalConfirm'));
+
+/* ── Helpers ── */
+function getMp(id){ return MATERIAS.find(m=>m.id===id)||null; }
+function getRec(id){ return RECETAS.find(r=>r.id===id)||null; }
+
+function estadoBadge(e){
+  const map={
+    PENDIENTE:'<span class="badge-estado be-pendiente"><i class="bi bi-clock-fill"></i>Pendiente</span>',
+    EN_PROCESO:'<span class="badge-estado be-proceso"><i class="bi bi-arrow-repeat"></i>En proceso</span>',
+    FINALIZADO:'<span class="badge-estado be-finalizado"><i class="bi bi-check-circle-fill"></i>Finalizado</span>',
+    CANCELADO:'<span class="badge-estado be-cancelado"><i class="bi bi-x-circle-fill"></i>Cancelado</span>',
+  };
+  return map[e]||e;
+}
+
+function updateKPIs(){
+  document.getElementById('kpi-total').textContent       = ordenes.length;
+  document.getElementById('kpi-proceso').textContent     = ordenes.filter(o=>o.estado==='EN_PROCESO').length;
+  document.getElementById('kpi-finalizadas').textContent = ordenes.filter(o=>o.estado==='FINALIZADO').length;
+  document.getElementById('kpi-pendientes').textContent  = ordenes.filter(o=>o.estado==='PENDIENTE').length;
+}
+
+/* ── RENDER TABLA ── */
+function renderTabla(lista){
+  const body = document.getElementById('ordenesBody');
+  if(!lista.length){
+    body.innerHTML=`<tr><td colspan="8"><div class="empty-state"><i class="bi bi-cpu"></i>Sin órdenes para este filtro.</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = lista.map(o=>{
+    const idx = ordenes.indexOf(o);
+    const rec = getRec(o.id_receta);
+    const acciones = buildAcciones(o, idx);
+    return `<tr>
+      <td><span style="font-size:.7rem;font-weight:700;color:var(--vino);">${o.id}</span></td>
+      <td>
+        <div class="prod-chip">
+          <div class="prod-icon"><i class="bi bi-cake2-fill"></i></div>
+          <div>
+            <div class="prod-name">${PRODUCTOS[o.id_producto]||'—'}</div>
+            <div class="prod-rec">Receta ${rec?'v'+rec.version:'—'}</div>
+          </div>
+        </div>
+      </td>
+      <td><strong>${o.cantidad.toLocaleString('es-MX')}</strong> pzas</td>
+      <td>${o.costo!=null?`<span class="costo-chip">$${o.costo.toFixed(2)}</span>`:'<span style="color:var(--muted);font-size:.7rem;">Por calcular</span>'}</td>
+      <td>${estadoBadge(o.estado)}</td>
+      <td style="font-size:.72rem;color:var(--muted);">${o.fecha_inicio||'—'}</td>
+      <td style="font-size:.72rem;color:var(--muted);">${o.fecha_fin||'—'}</td>
+      <td><div style="display:flex;gap:.3rem;flex-wrap:wrap;">${acciones}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function buildAcciones(o, idx){
+  let html = `<button class="btn-tbl btn-ver" onclick="verOrden(${idx})"><i class="bi bi-eye-fill"></i> Ver</button>`;
+  if(o.estado==='PENDIENTE'){
+    html+=`<button class="btn-tbl btn-iniciar" onclick="pedirAccion(${idx},'iniciar')"><i class="bi bi-play-fill"></i> Iniciar</button>`;
+    html+=`<button class="btn-tbl btn-cancelar" onclick="pedirAccion(${idx},'cancelar')"><i class="bi bi-x-lg"></i> Cancelar</button>`;
+  }
+  if(o.estado==='EN_PROCESO'){
+    html+=`<button class="btn-tbl btn-finalizar" onclick="pedirAccion(${idx},'finalizar')"><i class="bi bi-check2-all"></i> Finalizar</button>`;
+  }
+  return html;
+}
+
+/* ── Filtrar ── */
+function filtrar(){
+  const q  = document.getElementById('searchInput').value.toLowerCase();
+  const est= document.getElementById('filtroEstado').value;
+  const res= ordenes.filter(o=>{
+    const prod=(PRODUCTOS[o.id_producto]||'').toLowerCase();
+    const matchQ = prod.includes(q) || o.id.toLowerCase().includes(q);
+    const matchE = est==='todos'?true:o.estado===est;
+    return matchQ && matchE;
+  });
+  renderTabla(res);
+}
+document.getElementById('searchInput').addEventListener('input', filtrar);
+
+/* ── Nueva orden ── */
+function abrirNuevaOrden(){
+  document.getElementById('f_producto').value  = '';
+  document.getElementById('f_receta').innerHTML= '<option value="">Selecciona primero un producto…</option>';
+  document.getElementById('f_cantidad').value  = '';
+  document.getElementById('f_obs').value       = '';
+  document.getElementById('recetaHint').textContent='Sólo se muestran versiones activas.';
+  document.getElementById('rendHint').textContent='';
+  document.getElementById('explosionWrap').style.display='none';
+  bsOrden.show();
+}
+
+function onProductoChange(){
+  const pid = document.getElementById('f_producto').value;
+  const sel = document.getElementById('f_receta');
+  const recs = RECETAS.filter(r=>r.id_producto===pid && r.activa);
+  if(!recs.length){
+    sel.innerHTML='<option value="">Sin receta activa para este producto</option>';
+    document.getElementById('recetaHint').style.color='var(--red)';
+    document.getElementById('recetaHint').textContent='⚠ No existe receta activa. Regístrala primero en el módulo de Recetas.';
+  } else {
+    sel.innerHTML='<option value="">Seleccionar receta…</option>'+
+      recs.map(r=>`<option value="${r.id}">v${r.version} — Rendimiento: ${r.rendimiento} pzas</option>`).join('');
+    document.getElementById('recetaHint').style.color='var(--muted)';
+    document.getElementById('recetaHint').textContent='Sólo se muestran versiones activas.';
+  }
+  document.getElementById('explosionWrap').style.display='none';
+}
+
+function onRecetaChange(){
+  const rid = document.getElementById('f_receta').value;
+  const rec = getRec(rid);
+  document.getElementById('rendHint').textContent = rec?`Rendimiento base: ${rec.rendimiento} pzas/lote`:'';
+  document.getElementById('explosionWrap').style.display='none';
+  calcularCosto();
+}
+
+function calcularCosto(){ /* se calcula en verificarExplosion */ }
+
+/* ── Verificar explosión ── */
+function verificarExplosion(){
+  const rid  = document.getElementById('f_receta').value;
+  const cant = parseInt(document.getElementById('f_cantidad').value)||0;
+  const rec  = getRec(rid);
+  if(!rec){alert('Selecciona un producto y una receta activa.');return;}
+  if(cant<=0){alert('Indica una cantidad a producir mayor a 0.');return;}
+
+  const factor = cant / rec.rendimiento;
+  let todoOk = true;
+  let costoTotal = 0;
+  let rows = '';
+
+  rec.ingredientes.forEach((ing,i)=>{
+    const mp = getMp(ing.id_mp);
+    if(!mp) return;
+    const cantNec  = ing.cant * factor;
+    const cantReal = cantNec * (1 + mp.merma / 100);
+    const ok       = mp.stock >= cantReal;
+    if(!ok) todoOk = false;
+    costoTotal += cantReal * mp.costo;
+    rows += `<tr>
+      <td>${i+1}</td>
+      <td><strong>${mp.nombre}</strong></td>
+      <td><span style="background:var(--blue-s);color:var(--blue);padding:.1rem .4rem;border-radius:5px;font-weight:700;font-size:.65rem;">${mp.ub}</span></td>
+      <td>${ing.cant.toLocaleString('es-MX')} ${mp.ub}</td>
+      <td>${cantNec.toFixed(2)} ${mp.ub}</td>
+      <td><span style="font-size:.68rem;color:var(--muted);">${mp.merma}%</span></td>
+      <td><strong>${cantReal.toFixed(2)} ${mp.ub}</strong></td>
+      <td>${mp.stock.toLocaleString('es-MX')} ${mp.ub}</td>
+      <td><span class="stock-chip ${ok?'sc-ok':'sc-bad'}">
+        <i class="bi ${ok?'bi-check-circle-fill':'bi-x-circle-fill'}"></i>
+        ${ok?'OK':'Insuficiente'}
+      </span></td>
+    </tr>`;
+  });
+
+  document.getElementById('explosionBody').innerHTML = rows;
+
+  // Costo preview
+  document.getElementById('costoPreviewWrap').innerHTML=`
+    <div class="costo-preview">
+      <div class="cp-row"><span>Costo estimado de materiales</span><span>$${costoTotal.toFixed(2)}</span></div>
+      <div class="cp-row"><span>Piezas a producir</span><span>${cant} pzas</span></div>
+      <div class="cp-row"><span>Costo por pieza</span><span>$${(costoTotal/cant).toFixed(2)}</span></div>
+    </div>`;
+
+  // Alerta global
+  document.getElementById('stockAlertBox').innerHTML = todoOk
+    ?`<div class="success-box"><i class="bi bi-check-circle-fill"></i><span><strong>Materiales suficientes.</strong> El inventario cubre esta producción.</span></div>`
+    :`<div class="error-box"><i class="bi bi-x-circle-fill"></i><span><strong>Inventario insuficiente</strong> en uno o más ingredientes. La orden puede crearse pero no podrá iniciarse hasta reabastecer.</span></div>`;
+
+  document.getElementById('explosionWrap').style.display='block';
+  // Guardar costo calculado para usarlo al guardar
+  document.getElementById('f_cantidad').dataset.costo = costoTotal.toFixed(2);
+}
+
+/* ── Guardar orden ── */
+function guardarOrden(){
+  const pid  = document.getElementById('f_producto').value;
+  const rid  = document.getElementById('f_receta').value;
+  const cant = parseInt(document.getElementById('f_cantidad').value)||0;
+  const obs  = document.getElementById('f_obs').value;
+  if(!pid){alert('Selecciona un producto.');return;}
+  if(!rid){alert('Selecciona una receta activa.');return;}
+  if(cant<=0){alert('La cantidad a producir debe ser mayor a 0.');return;}
+
+  const rec = getRec(rid);
+  if(!rec||!rec.activa){alert('La receta seleccionada no está activa.');return;}
+
+  const costoCalc = parseFloat(document.getElementById('f_cantidad').dataset.costo)||null;
+  const newId = 'ORD-'+String(ordenes.length+1).padStart(3,'0');
+
+  ordenes.unshift({
+    id: newId,
+    id_receta: rid,
+    id_producto: pid,
+    cantidad: cant,
+    estado: 'PENDIENTE',
+    fecha_inicio: null,
+    fecha_fin: null,
+    costo: costoCalc,
+    obs: obs
+  });
+
+  updateKPIs();
+  filtrar();
+  bsOrden.hide();
+  toast(`Orden ${newId} creada — ${PRODUCTOS[pid]}, ${cant} pzas.`);
+}
+
+/* ── Ver orden ── */
+function verOrden(idx){
+  const o   = ordenes[idx];
+  const rec = getRec(o.id_receta);
+  document.getElementById('verTitulo').textContent = `${PRODUCTOS[o.id_producto]} — ${o.id}`;
+
+  document.getElementById('verCabecera').innerHTML=`
+    <div class="col-6 col-md-3"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Orden</div><div style="font-size:.8rem;font-weight:700;">${o.id}</div></div>
+    <div class="col-6 col-md-3"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Producto</div><div style="font-size:.8rem;font-weight:700;">${PRODUCTOS[o.id_producto]||'—'}</div></div>
+    <div class="col-6 col-md-2"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Cantidad</div><div style="font-size:.8rem;font-weight:700;">${o.cantidad} pzas</div></div>
+    <div class="col-6 col-md-2"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Estado</div><div style="margin-top:.2rem;">${estadoBadge(o.estado)}</div></div>
+    <div class="col-6 col-md-2"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Costo</div><div style="font-size:.8rem;font-weight:700;color:var(--green);">${o.costo!=null?'$'+o.costo.toFixed(2):'N/A'}</div></div>
+    ${o.obs?`<div class="col-12"><div style="font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Obs.</div><div style="font-size:.78rem;">${o.obs}</div></div>`:''}`;
+
+  if(rec){
+    const factor = o.cantidad / rec.rendimiento;
+    document.getElementById('verTbody').innerHTML = rec.ingredientes.map((ing,i)=>{
+      const mp = getMp(ing.id_mp);
+      if(!mp) return '';
+      const cantNec  = ing.cant * factor;
+      const cantReal = cantNec * (1 + mp.merma / 100);
+      const ok       = mp.stock >= cantReal;
+      return `<tr>
+        <td>${i+1}</td>
+        <td><strong>${mp.nombre}</strong></td>
+        <td>${mp.ub}</td>
+        <td>${ing.cant} ${mp.ub}</td>
+        <td>${cantReal.toFixed(2)} ${mp.ub}</td>
+        <td>${mp.stock.toLocaleString('es-MX')} ${mp.ub}</td>
+        <td><span class="stock-chip ${ok?'sc-ok':'sc-bad'}">
+          <i class="bi ${ok?'bi-check-circle-fill':'bi-x-circle-fill'}"></i>
+          ${ok?'OK':'Insuficiente'}
+        </span></td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('verTbody').innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);">Receta no encontrada.</td></tr>';
+  }
+
+  const estadoMsgs = {
+    PENDIENTE:`<div class="info-box" style="margin-bottom:0;"><i class="bi bi-clock-fill"></i><span>Orden <strong>pendiente</strong>. Puede iniciarse cuando el stock sea suficiente.</span></div>`,
+    EN_PROCESO:`<div class="warn-box" style="margin-bottom:0;"><i class="bi bi-arrow-repeat"></i><span>Orden <strong>en proceso</strong>. La materia prima ya fue descontada del inventario.</span></div>`,
+    FINALIZADO:`<div class="success-box" style="margin-bottom:0;"><i class="bi bi-check-circle-fill"></i><span>Orden <strong>finalizada</strong>. El producto terminado fue ingresado al inventario de ventas.</span></div>`,
+    CANCELADO:`<div style="text-align:center;padding:.5rem;font-size:.77rem;color:var(--muted);">Orden <strong>cancelada</strong>.</div>`,
+  };
+  document.getElementById('verEstadoBox').innerHTML = estadoMsgs[o.estado]||'';
+  bsVer.show();
+}
+
+/* ── Acciones (iniciar / finalizar / cancelar) ── */
+function pedirAccion(idx, accion){
+  accionIdx       = idx;
+  accionPendiente = accion;
+  const o = ordenes[idx];
+  const prod = PRODUCTOS[o.id_producto]||'—';
+
+  const cfg = {
+    iniciar:{
+      icon:'ci-green', iconI:'bi-play-circle-fill',
+      titulo:'¿Iniciar producción?',
+      msg:`<strong>${prod}</strong> — ${o.cantidad} pzas.<br>Se descontará la materia prima del inventario.`,
+      btnClass:'btn-modal-green', btnTxt:'<i class="bi bi-play-fill me-1"></i>Iniciar'
+    },
+    finalizar:{
+      icon:'ci-purple', iconI:'bi-check2-circle',
+      titulo:'¿Finalizar producción?',
+      msg:`<strong>${prod}</strong> — ${o.cantidad} pzas.<br>El producto terminado se ingresará al inventario de ventas.`,
+      btnClass:'btn-modal-purple', btnTxt:'<i class="bi bi-check2-all me-1"></i>Finalizar'
+    },
+    cancelar:{
+      icon:'ci-red', iconI:'bi-x-circle-fill',
+      titulo:'¿Cancelar orden?',
+      msg:`<strong>${prod}</strong> — ${o.cantidad} pzas.<br>Esta acción no se puede deshacer.`,
+      btnClass:'btn-modal-red', btnTxt:'<i class="bi bi-x-lg me-1"></i>Cancelar orden'
+    },
+  };
+  const c = cfg[accion];
+  document.getElementById('confirmIcon').className = `confirm-icon ${c.icon}`;
+  document.getElementById('confirmIcon').innerHTML = `<i class="bi ${c.iconI}"></i>`;
+  document.getElementById('confirmTitulo').textContent = c.titulo;
+  document.getElementById('confirmMsg').innerHTML  = c.msg;
+  const btn = document.getElementById('confirmBtn');
+  btn.className = c.btnClass;
+  btn.innerHTML = c.btnTxt;
+  bsConfirm.show();
+}
+
+function ejecutarAccion(){
+  const o = ordenes[accionIdx];
+  const hoy = now.toLocaleDateString('es-MX',{year:'numeric',month:'2-digit',day:'2-digit'}).split('/').reverse().join('-');
+
+  if(accionPendiente==='iniciar'){
+    // Descuento de inventario (simulado en frontend)
+    const rec = getRec(o.id_receta);
+    if(rec){
+      const factor = o.cantidad / rec.rendimiento;
+      rec.ingredientes.forEach(ing=>{
+        const mp = getMp(ing.id_mp);
+        if(mp){
+          const cantReal = ing.cant * factor * (1 + mp.merma / 100);
+          mp.stock = Math.max(0, mp.stock - cantReal);
+        }
+      });
+    }
+    o.estado       = 'EN_PROCESO';
+    o.fecha_inicio = hoy;
+    toast(`Producción iniciada — ${PRODUCTOS[o.id_producto]}. MP descontada del inventario.`);
+
+  } else if(accionPendiente==='finalizar'){
+    o.estado   = 'FINALIZADO';
+    o.fecha_fin= hoy;
+    toast(`Orden finalizada — ${o.cantidad} pzas de ${PRODUCTOS[o.id_producto]} ingresadas al inventario.`);
+
+  } else if(accionPendiente==='cancelar'){
+    o.estado = 'CANCELADO';
+    toast(`Orden ${o.id} cancelada.`);
+  }
+
+  updateKPIs();
+  filtrar();
+  bsConfirm.hide();
+}
+
+/* ── Toast ── */
+function toast(msg){
+  let t=document.getElementById('softToast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='softToast';
+    t.style.cssText='position:fixed;bottom:1.5rem;right:1.5rem;background:var(--vino);color:#fff;padding:.7rem 1.2rem;border-radius:11px;font-size:.78rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(94,32,32,.3);display:flex;align-items:center;gap:.5rem;transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.innerHTML=`<i class="bi bi-check-circle-fill"></i> ${msg}`;
+  t.style.opacity='1';
+  setTimeout(()=>{t.style.opacity='0';},3500);
+}
+
+/* ── Sidebar ── */
+function setActive(el){document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x=>x.classList.remove('active'));el.classList.add('active');}
+function toggleMenu(toggle){
+  const sub=toggle.nextElementSibling,isOpen=sub.classList.contains('open');
+  document.querySelectorAll('.nav-submenu.open').forEach(m=>{m.classList.remove('open');m.previousElementSibling.classList.remove('open');});
+  if(!isOpen){sub.classList.add('open');toggle.classList.add('open');}
+}
+
+/* ── Init ── */
+renderTabla(ordenes);
+updateKPIs();
+</script>
+</body>
+</html>

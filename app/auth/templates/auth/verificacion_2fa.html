@@ -1,0 +1,17 @@
+{% extends "base_template.html" %} {% block title %}Verificacion 2FA{% endblock %} {% block content
+%}
+<section class="section">
+	<div class="row justify-content-center">
+		<div class="col-lg-5 col-md-8">
+			<div class="card p-4">
+				<h2 class="mb-3">Verificacion en dos pasos</h2>
+				<p class="text-secondary">Ingresa el codigo enviado a tu correo.</p>
+				<form method="post" class="simple">
+					{{ form.hidden_tag() }} {{ form.code.label }} {{ form.code() }} {{
+					form.submit(class_='btn') }}
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}

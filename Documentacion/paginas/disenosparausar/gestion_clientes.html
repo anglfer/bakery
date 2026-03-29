@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Pedidos – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vino:#9E3B3B; --vino-hover:#7a2c2c; --vino-light:#fdeaea; --vino-mid:#c96060;
+  --crema:#fdf6f0; --crema-dark:#eeddd5; --bg:#f4ede9;
+  --text:#2c1810; --muted:#9a7a72;
+  --sidebar-w:240px; --topbar-h:62px;
+  --green:#2e7d52; --green-s:#e8f5ee;
+  --blue:#1a5fa0;  --blue-s:#e6f0fb;
+  --orange:#c05a1a;--orange-s:#fdebd8;
+  --red:#c0392b;   --red-s:#fce8e6;
+  --purple:#6a3ba0;--purple-s:#f0eafa;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--vino-mid);}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;border-right:1px solid var(--crema-dark);display:flex;flex-direction:column;z-index:200;box-shadow:3px 0 18px rgba(94,32,32,.07);overflow-y:auto;overflow-x:hidden;}
+.sidebar-brand{display:flex;align-items:center;gap:.75rem;padding:1.15rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);}
+.brand-icon{width:38px;height:38px;border-radius:11px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(158,59,59,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.95rem 1.3rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:500;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.nav-group-toggle{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:600;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;user-select:none;}
+.nav-group-toggle i.icon-main{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-group-toggle .gtlabel{flex:1;}
+.nav-group-toggle .chevron{font-size:.7rem;transition:transform .22s ease;margin-left:auto;}
+.nav-group-toggle:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-group-toggle.open{color:var(--vino);}
+.nav-group-toggle.open .chevron{transform:rotate(90deg);}
+.nav-submenu{overflow:hidden;max-height:0;transition:max-height .28s cubic-bezier(.4,0,.2,1);background:#fdf8f6;border-left:3px solid var(--crema-dark);}
+.nav-submenu.open{max-height:400px;}
+.nav-submenu .nav-link-side{padding:.5rem 1.3rem .5rem 2.5rem;font-size:.77rem;border-left:none;}
+.nav-submenu .nav-link-side::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--crema-dark);flex-shrink:0;transition:background .15s;}
+.nav-submenu .nav-link-side:hover::before,.nav-submenu .nav-link-side.active::before{background:var(--vino);}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b !important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.73rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(158,59,59,.3);border:2px solid var(--crema-dark);cursor:pointer;}
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.7rem 1.9rem;min-height:calc(100vh - var(--topbar-h));}
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+.toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.search-input{width:100%;padding:.52rem .9rem .52rem 2.2rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);transition:border .17s;}
+.search-input:focus{outline:none;border-color:var(--vino);}
+.filter-select{padding:.52rem .9rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);cursor:pointer;min-width:130px;}
+.filter-select:focus{outline:none;border-color:var(--vino);}
+.card-table{background:#fff;border-radius:14px;border:1.5px solid var(--crema-dark);border-top:3px solid var(--vino);overflow:hidden;}
+.card-table-header{padding:.9rem 1.3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--crema-dark);}
+.ct-title{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem;}
+.ct-title i{color:var(--vino);}
+.ct-count{font-size:.72rem;color:var(--muted);background:var(--crema-dark);padding:.18rem .65rem;border-radius:20px;}
+.sb-table{width:100%;border-collapse:collapse;}
+.sb-table thead tr{background:var(--vino);}
+.sb-table th{font-size:.63rem;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.62rem .9rem;white-space:nowrap;border:none;}
+.sb-table tbody tr{transition:background .13s;}
+.sb-table tbody tr:nth-child(even){background:#fdf3f0;}
+.sb-table tbody tr:hover{background:var(--vino-light);}
+.sb-table td{font-size:.75rem;vertical-align:middle;border-bottom:1px solid #f4ede9;padding:.62rem .9rem;color:var(--text);}
+.badge-estado{font-size:.62rem;padding:.22rem .7rem;border-radius:50px;font-weight:700;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
+.st-pendiente {background:var(--orange-s);color:var(--orange);}
+.st-confirmado{background:var(--blue-s);  color:var(--blue);}
+.st-pagado    {background:var(--purple-s);color:var(--purple);}
+.st-entregado {background:var(--green-s); color:var(--green);}
+.st-cancelado {background:#f0f0f0;        color:#888;}
+.btn-tbl{height:27px;border:none;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:.25rem;font-size:.65rem;font-weight:700;cursor:pointer;padding:0 .65rem;font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-tbl-view   {background:var(--blue-s); color:var(--blue);}
+.btn-tbl-view:hover {background:var(--blue); color:#fff;}
+.btn-tbl-confirm{background:var(--green-s);color:var(--green);}
+.btn-tbl-confirm:hover{background:var(--green);color:#fff;}
+.btn-tbl-cancel {background:var(--red-s);  color:var(--red);}
+.btn-tbl-cancel:hover{background:var(--red);color:#fff;}
+.pagination-wrap{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.2rem;border-top:1px solid var(--crema-dark);font-size:.73rem;color:var(--muted);}
+.page-btns{display:flex;gap:.35rem;}
+.page-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--crema-dark);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;cursor:pointer;color:var(--muted);transition:all .15s;}
+.page-btn:hover{border-color:var(--vino);color:var(--vino);}
+.page-btn.active{background:var(--vino);color:#fff;border-color:var(--vino);}
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;box-shadow:0 20px 60px rgba(94,32,32,.2);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.modal-section{background:var(--crema);border-radius:10px;padding:.8rem 1rem;margin-bottom:.9rem;border-left:3px solid var(--vino);}
+.modal-section-title{font-size:.7rem;font-weight:700;color:var(--vino);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;cursor:pointer;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+.tbl-detalle{width:100%;border-collapse:collapse;font-size:.76rem;}
+.tbl-detalle th{background:var(--vino);color:#fff;padding:.45rem .75rem;font-size:.63rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+.tbl-detalle td{padding:.5rem .75rem;border-bottom:1px solid var(--crema-dark);vertical-align:middle;}
+.tbl-detalle tr:last-child td{border:none;}
+.tbl-detalle tfoot td{background:var(--crema);font-weight:700;color:var(--vino);}
+.confirm-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto .9rem;}
+.ci-green{background:var(--green-s);color:var(--green);}
+.ci-red  {background:var(--red-s);  color:var(--red);}
+.btn-modal-save{background:var(--vino);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;transition:all .18s;}
+.btn-modal-save:hover{background:var(--vino-hover);}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast-msg{border-radius:9px;padding:11px 16px;font-size:.79rem;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.18);animation:slideIn .3s ease;color:#fff;white-space:nowrap;}
+.toast-success{background:#27ae60;}
+.toast-warn   {background:var(--orange);}
+@keyframes slideIn {from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeUp  {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </div>
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-speedometer2"></i>Dashboard</a>
+  <div class="nav-section-label">Gestión</div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-people-fill icon-main"></i><span class="gtlabel">Personal</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Empleados</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-truck"></i>Proveedores</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-box-seam-fill icon-main"></i><span class="gtlabel">Almacén</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-archive-fill"></i>Materia Prima</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cart-fill"></i>Compras</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Producto Terminado</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-gear-fill icon-main"></i><span class="gtlabel">Producción</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-journal-richtext"></i>Recetas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cpu-fill"></i>Órdenes</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-send-fill"></i>Solicitudes</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-cash-coin icon-main"></i><span class="gtlabel">Comercial</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-receipt"></i>Ventas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-arrow-down-circle-fill"></i>Salidas Efectivo</a>
+  </div>
+  <div class="nav-group-toggle open" onclick="toggleMenu(this)">
+    <i class="bi bi-person-hearts icon-main"></i><span class="gtlabel">Gestión Clientes</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu open">
+    <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-clipboard-check-fill"></i>Pedidos Clientes</a>
+  </div>
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Gestión de Pedidos de Clientes</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <div class="topbar-avatar">JR</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Pedidos Clientes</li>
+      </ol>
+    </nav>
+    <h4>Gestión de Pedidos de Clientes</h4>
+  </div>
+
+  <!-- Toolbar — sin filtro de fecha -->
+  <div class="toolbar fu d2">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput"
+             placeholder="Buscar por folio o nombre de cliente…" oninput="filtrar()">
+    </div>
+    <select class="filter-select" id="filtroEstado" onchange="filtrar()">
+      <option value="">Todos los estados</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="confirmado">Confirmado</option>
+      <option value="pagado">Pagado</option>
+      <option value="entregado">Entregado</option>
+      <option value="cancelado">Cancelado</option>
+    </select>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card-table fu d3">
+    <div class="card-table-header">
+      <div class="ct-title"><i class="bi bi-clipboard-check-fill"></i>Pedidos recibidos</div>
+      <span class="ct-count" id="contadorTabla">—</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="sb-table">
+        <thead>
+          <tr>
+            <th>Folio</th>
+            <th>Cliente</th>
+            <th>Fecha pedido</th>
+            <th>Fecha entrega</th>
+            <th>Productos</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th style="text-align:center;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPedidos"></tbody>
+      </table>
+    </div>
+    <div class="pagination-wrap">
+      <span id="pag-info"></span>
+      <div class="page-btns">
+        <div class="page-btn"><i class="bi bi-chevron-left"></i></div>
+        <div class="page-btn active">1</div>
+        <div class="page-btn"><i class="bi bi-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL DETALLE PEDIDO — sin id_cliente, sin flujo de estados -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard-check-fill me-2"></i>Detalle — <span id="det-folio"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Información del pedido</div>
+          <div class="row g-2" id="det-info"></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-bag-fill"></i>Productos solicitados</div>
+          <div style="overflow-x:auto;">
+            <table class="tbl-detalle">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th style="text-align:right;">Precio unit.</th>
+                  <th style="text-align:right;">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="det-tbody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" style="text-align:right;font-size:.78rem;">Total del pedido:</td>
+                  <td style="text-align:right;" id="det-total"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR CAMBIO -->
+<div class="modal fade" id="modalConfirmar" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <div class="confirm-icon" id="conf-icon"></div>
+      <h6 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:.4rem;" id="conf-titulo"></h6>
+      <p style="font-size:.76rem;color:var(--muted);margin-bottom:1rem;" id="conf-texto"></p>
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-save" id="conf-btn-ok" onclick="ejecutarCambio()">
+          <i class="bi bi-check-lg"></i>Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const ahora = new Date();
+document.getElementById('fecha-top').textContent =
+  ahora.toLocaleDateString('es-MX', {day:'2-digit', month:'2-digit', year:'numeric'});
+document.getElementById('hora-top').textContent =
+  ahora.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+
+const CLIENTES = {
+  1: { nombre: 'Laura Martínez',  tel: '477-100-0001' },
+  2: { nombre: 'Sergio Ramírez',  tel: '477-100-0002' },
+  3: { nombre: 'Patricia Gómez',  tel: '477-100-0003' },
+  4: { nombre: 'Eduardo Flores',  tel: '477-100-0004' },
+};
+
+let pedidos = [
+  { id_pedido:1, folio:'PED-0001', id_cliente:1, fecha_pedido:'01/03/2026', fecha_entrega:'08/03/2026', estado_pedido:'pendiente',
+    detalle:[{nombre:'Pastel de Chocolate 1kg',cantidad:1,precio_unitario:320,subtotal:320},{nombre:'Concha de Vainilla',cantidad:12,precio_unitario:14,subtotal:168}], total_pedido:488 },
+  { id_pedido:2, folio:'PED-0002', id_cliente:2, fecha_pedido:'02/03/2026', fecha_entrega:'09/03/2026', estado_pedido:'confirmado',
+    detalle:[{nombre:'Donas Glaseadas (6pz)',cantidad:2,precio_unitario:90,subtotal:180}], total_pedido:180 },
+  { id_pedido:3, folio:'PED-0003', id_cliente:3, fecha_pedido:'28/02/2026', fecha_entrega:'07/03/2026', estado_pedido:'pagado',
+    detalle:[{nombre:'Pastel Red Velvet 1kg',cantidad:1,precio_unitario:380,subtotal:380},{nombre:'Cuerno de Mantequilla',cantidad:20,precio_unitario:18,subtotal:360}], total_pedido:740 },
+  { id_pedido:4, folio:'PED-0004', id_cliente:4, fecha_pedido:'25/02/2026', fecha_entrega:'01/03/2026', estado_pedido:'entregado',
+    detalle:[{nombre:'Pay de Manzana',cantidad:2,precio_unitario:180,subtotal:360}], total_pedido:360 },
+  { id_pedido:5, folio:'PED-0005', id_cliente:1, fecha_pedido:'20/02/2026', fecha_entrega:'22/02/2026', estado_pedido:'cancelado',
+    detalle:[{nombre:'Cuerno de Mantequilla',cantidad:30,precio_unitario:18,subtotal:540}], total_pedido:540 },
+  { id_pedido:6, folio:'PED-0006', id_cliente:2, fecha_pedido:'03/03/2026', fecha_entrega:'11/03/2026', estado_pedido:'pendiente',
+    detalle:[{nombre:'Pastel de Chocolate 1kg',cantidad:2,precio_unitario:320,subtotal:640}], total_pedido:640 },
+];
+
+const fmt$ = n => '$' + Number(n).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+const EST_LABEL = { pendiente:'Pendiente', confirmado:'Confirmado', pagado:'Pagado', entregado:'Entregado', cancelado:'Cancelado' };
+const EST_ICON  = { pendiente:'bi-clock-fill', confirmado:'bi-check-circle-fill', pagado:'bi-credit-card-fill', entregado:'bi-box-seam-fill', cancelado:'bi-x-circle-fill' };
+
+function badgeEstado(e) {
+  const cls = { pendiente:'st-pendiente', confirmado:'st-confirmado', pagado:'st-pagado', entregado:'st-entregado', cancelado:'st-cancelado' };
+  return `<span class="badge-estado ${cls[e]}"><i class="bi ${EST_ICON[e]}"></i>${EST_LABEL[e]}</span>`;
+}
+
+function renderTabla(lista) {
+  const tbody = document.getElementById('tbodyPedidos');
+  document.getElementById('contadorTabla').textContent = lista.length + ' pedido' + (lista.length !== 1 ? 's' : '');
+  document.getElementById('pag-info').textContent = 'Mostrando ' + lista.length + ' de ' + pedidos.length + ' pedidos';
+
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--muted);font-size:.8rem;">
+      <i class="bi bi-search" style="font-size:1.6rem;display:block;margin-bottom:.5rem;opacity:.5;"></i>Sin pedidos para este filtro.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = lista.map(p => {
+    const cli = CLIENTES[p.id_cliente] || { nombre: 'Cliente #' + p.id_cliente };
+    const esPendiente = p.estado_pedido === 'pendiente';
+    const puedeCanc   = ['pendiente', 'confirmado'].includes(p.estado_pedido);
+    return `<tr>
+      <td><strong style="color:var(--vino);">${p.folio}</strong></td>
+      <td><div style="font-weight:600;font-size:.78rem;">${cli.nombre}</div></td>
+      <td style="color:var(--muted);">${p.fecha_pedido}</td>
+      <td style="color:var(--muted);">${p.fecha_entrega}</td>
+      <td><span style="background:var(--crema-dark);color:var(--muted);border-radius:5px;padding:.1rem .5rem;font-size:.7rem;font-weight:700;">${p.detalle.length} prod.</span></td>
+      <td><strong>${fmt$(p.total_pedido)}</strong></td>
+      <td>${badgeEstado(p.estado_pedido)}</td>
+      <td>
+        <div style="display:flex;gap:.35rem;justify-content:center;flex-wrap:wrap;">
+          <button class="btn-tbl btn-tbl-view" onclick="verDetalle(${p.id_pedido})"><i class="bi bi-eye-fill"></i> Ver</button>
+          ${esPendiente ? `<button class="btn-tbl btn-tbl-confirm" onclick="iniciarConfirmar(${p.id_pedido})"><i class="bi bi-check-circle-fill"></i> Confirmar</button>` : ''}
+          ${puedeCanc   ? `<button class="btn-tbl btn-tbl-cancel"  onclick="iniciarCancelar(${p.id_pedido})"><i class="bi bi-x-circle-fill"></i> Cancelar</button>`  : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filtrar() {
+  const q   = document.getElementById('searchInput').value.toLowerCase().trim();
+  const est = document.getElementById('filtroEstado').value;
+  renderTabla(pedidos.filter(p => {
+    const cli = CLIENTES[p.id_cliente] || { nombre: '' };
+    return (!q || p.folio.toLowerCase().includes(q) || cli.nombre.toLowerCase().includes(q))
+        && (!est || p.estado_pedido === est);
+  }));
+}
+
+let pedidoActivo = null;
+let accionPendiente = null;
+
+function verDetalle(id) {
+  const p = pedidos.find(x => x.id_pedido === id);
+  pedidoActivo = p;
+  const cli = CLIENTES[p.id_cliente] || { nombre: '—', tel: '—' };
+  document.getElementById('det-folio').textContent = p.folio;
+  document.getElementById('det-info').innerHTML = `
+    <div class="col-sm-5">
+      <div style="font-size:.67rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.15rem;">Cliente</div>
+      <div style="font-size:.82rem;font-weight:600;">${cli.nombre}</div>
+      <div style="font-size:.7rem;color:var(--muted);">${cli.tel}</div>
+    </div>
+    <div class="col-sm-3">
+      <div style="font-size:.67rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.15rem;">Fecha pedido</div>
+      <div style="font-size:.8rem;">${p.fecha_pedido}</div>
+    </div>
+    <div class="col-sm-2">
+      <div style="font-size:.67rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.15rem;">Fecha entrega</div>
+      <div style="font-size:.8rem;color:var(--vino);font-weight:600;">${p.fecha_entrega}</div>
+    </div>
+    <div class="col-sm-2">
+      <div style="font-size:.67rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:.15rem;">Estado</div>
+      <div>${badgeEstado(p.estado_pedido)}</div>
+    </div>`;
+  document.getElementById('det-tbody').innerHTML = p.detalle.map((d, i) => `
+    <tr>
+      <td style="color:var(--muted);">${i + 1}</td>
+      <td><strong>${d.nombre}</strong></td>
+      <td style="text-align:center;">${d.cantidad}</td>
+      <td style="text-align:right;">${fmt$(d.precio_unitario)}</td>
+      <td style="text-align:right;font-weight:600;">${fmt$(d.subtotal)}</td>
+    </tr>`).join('');
+  document.getElementById('det-total').textContent = fmt$(p.total_pedido);
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalle')).show();
+}
+
+function iniciarConfirmar(id) {
+  pedidoActivo = pedidos.find(x => x.id_pedido === id);
+  mostrarConfirm('confirmado');
+}
+function iniciarCancelar(id) {
+  pedidoActivo = pedidos.find(x => x.id_pedido === id);
+  mostrarConfirm('cancelado');
+}
+
+function mostrarConfirm(nuevoEstado) {
+  accionPendiente = nuevoEstado;
+  const cfg = {
+    confirmado: { icon:'<i class="bi bi-check-circle-fill"></i>', iconCls:'ci-green',
+      titulo:`Confirmar pedido ${pedidoActivo.folio}`,
+      texto:'El pedido pasará a estado <strong>Confirmado</strong>. El cliente será notificado.', btnStyle:'' },
+    cancelado:  { icon:'<i class="bi bi-x-circle-fill"></i>', iconCls:'ci-red',
+      titulo:`Cancelar pedido ${pedidoActivo.folio}`,
+      texto:'El pedido pasará a estado <strong>Cancelado</strong>. Esta acción no se puede deshacer.', btnStyle:'background:var(--red);' },
+  };
+  const c = cfg[nuevoEstado];
+  const iconEl = document.getElementById('conf-icon');
+  iconEl.className = 'confirm-icon ' + c.iconCls;
+  iconEl.innerHTML = c.icon;
+  document.getElementById('conf-titulo').textContent = c.titulo;
+  document.getElementById('conf-texto').innerHTML    = c.texto;
+  document.getElementById('conf-btn-ok').style.cssText = c.btnStyle;
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmar')).show();
+}
+
+function ejecutarCambio() {
+  pedidoActivo.estado_pedido = accionPendiente;
+  filtrar();
+  bootstrap.Modal.getInstance(document.getElementById('modalConfirmar')).hide();
+  bootstrap.Modal.getInstance(document.getElementById('modalDetalle'))?.hide();
+  const msgs = {
+    confirmado: { txt:`✓ Pedido ${pedidoActivo.folio} confirmado correctamente.`, tipo:'toast-success' },
+    cancelado:  { txt:`Pedido ${pedidoActivo.folio} cancelado.`,                  tipo:'toast-warn'    },
+  };
+  const m = msgs[accionPendiente];
+  showToast(m.txt, m.tipo);
+}
+
+function showToast(msg, tipo = 'toast-info') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-msg ' + tipo;
+  const ic = tipo === 'toast-success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill';
+  t.innerHTML = `<i class="bi ${ic}"></i>${msg}`;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function setActive(el) {
+  document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleMenu(toggle) {
+  const sub = toggle.nextElementSibling;
+  const isOpen = sub.classList.contains('open');
+  document.querySelectorAll('.nav-submenu.open').forEach(m => {
+    m.classList.remove('open');
+    m.previousElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { sub.classList.add('open'); toggle.classList.add('open'); }
+}
+
+renderTabla(pedidos);
+</script>
+</body>
+</html>

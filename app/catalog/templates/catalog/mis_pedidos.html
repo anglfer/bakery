@@ -1,0 +1,52 @@
+{% extends "base_template.html" %}
+{% block title %}Mis pedidos{% endblock %}
+{% block content %}
+<section class="section">
+	<div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+		<h2 class="mb-0">Mis pedidos</h2>
+		<a class="btn btn-sm" href="{{ url_for('catalog.catalogo') }}">Volver al catálogo</a>
+	</div>
+
+	<div class="card p-3">
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Fecha</th>
+						<th>Entrega</th>
+						<th>Total</th>
+						<th>Estado</th>
+						<th>Pago</th>
+						<th>Detalle</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for p in pedidos %}
+					<tr>
+						<td>{{ p.id_pedido }}</td>
+						<td>{{ p.fecha_pedido.strftime('%Y-%m-%d') }}</td>
+						<td>{{ p.fecha_entrega.strftime('%Y-%m-%d') }}</td>
+						<td>${{ '%.2f'|format(p.total) }}</td>
+						<td><span class="badge text-bg-secondary">{{ p.estado_pedido }}</span></td>
+						<td><span class="badge text-bg-light">{{ p.estado_pago }}</span></td>
+						<td>
+							{% for d in p.detalles %}
+							<div>{{ d.producto.nombre }} x {{ d.cantidad }}</div>
+							{% else %}
+							<div class="text-secondary">Sin detalle</div>
+							{% endfor %}
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="7">Aún no tienes pedidos.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}
+

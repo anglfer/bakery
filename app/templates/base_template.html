@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{% block title %}SoftBakery{% endblock %}</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+			crossorigin="anonymous" />
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Poppins:wght@300;400;500;600&display=swap"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+		{% block extra_css %}{% endblock %}
+	</head>
+	<body class="app-body">
+		{% set is_staff = current_user.is_authenticated and current_user.rol and current_user.rol.nombre
+		in ['Administrador', 'Ventas', 'Produccion'] %} {% if is_staff %}
+		<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+		<nav class="sidebar" id="sidebar" aria-label="Navegación del panel">
+			<a class="sidebar-brand" href="{{ url_for('admin.dashboard') }}">
+				<div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+				<div>
+					<span class="brand-name">SoftBakery</span>
+					<span class="brand-sub">Sistema Interno</span>
+				</div>
+			</a>
+
+			{% set rol = current_user.rol.nombre %}
+			<div class="nav-section-label">Principal</div>
+			<a
+				href="{{ url_for('admin.dashboard') }}"
+				class="nav-link-side {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+				<i class="bi bi-speedometer2"></i>
+				Dashboard
+			</a>
+
+			{% if rol == 'Administrador' %}
+			<div class="nav-group-toggle">
+				<i class="bi bi-diagram-3-fill icon-main me-2"></i>
+				<span class="gtlabel">Gestión</span>
+				<i class="bi bi-chevron-right chevron"></i>
+			</div>
+			<div class="nav-submenu">
+				<a
+					href="{{ url_for('admin.usuarios') }}"
+					class="nav-link-side {% if request.endpoint == 'admin.usuarios' %}active{% endif %}">
+					<i class="bi bi-people-fill"></i>
+					Empleados
+				</a>
+				<a
+					href="{{ url_for('admin.roles') }}"
+					class="nav-link-side {% if request.endpoint == 'admin.roles' %}active{% endif %}">
+					<i class="bi bi-shield-lock-fill"></i>
+					Roles y Permisos
+				</a>
+			</div>
+			{% endif %} {% if rol in ['Administrador', 'Produccion'] %}
+			<div class="nav-group-toggle">
+				<i class="bi bi-boxes icon-main me-2"></i>
+				<span class="gtlabel">Inventario</span>
+				<i class="bi bi-chevron-right chevron"></i>
+			</div>
+			<div class="nav-submenu">
+				<a
+					href="{{ url_for('admin.proveedores') }}"
+					class="nav-link-side {% if request.endpoint == 'admin.proveedores' %}active{% endif %}">
+					<i class="bi bi-truck"></i>
+					Proveedores
+				</a>
+				<a
+					href="{{ url_for('production.inventario_mp') }}"
+					class="nav-link-side {% if request.endpoint == 'production.inventario_mp' %}active{% endif %}">
+					<i class="bi bi-box-seam-fill"></i>
+					Materia Prima
+				</a>
+				<a
+					href="{{ url_for('sales.compras_mp') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.compras_mp' %}active{% endif %}">
+					<i class="bi bi-cart-check-fill"></i>
+					Compras
+				</a>
+			</div>
+			{% endif %} {% if rol in ['Administrador', 'Produccion'] %}
+			<div class="nav-group-toggle">
+				<i class="bi bi-gear-wide-connected icon-main me-2"></i>
+				<span class="gtlabel">Producción</span>
+				<i class="bi bi-chevron-right chevron"></i>
+			</div>
+			<div class="nav-submenu">
+				<a
+					href="{{ url_for('production.recetas') }}"
+					class="nav-link-side {% if request.endpoint == 'production.recetas' %}active{% endif %}">
+					<i class="bi bi-journal-text"></i>
+					Recetas
+				</a>
+				<a
+					href="{{ url_for('production.ordenes') }}"
+					class="nav-link-side {% if request.endpoint == 'production.ordenes' %}active{% endif %}">
+					<i class="bi bi-gear-fill"></i>
+					Ordenes
+				</a>
+				<a
+					href="{{ url_for('production.solicitudes') }}"
+					class="nav-link-side {% if request.endpoint == 'production.solicitudes' %}active{% endif %}">
+					<i class="bi bi-clipboard2-check-fill"></i>
+					Solicitudes
+				</a>
+			</div>
+			{% endif %} {% if rol == 'Ventas' %}
+			<a
+				href="{{ url_for('sales.solicitudes') }}"
+				class="nav-link-side {% if request.endpoint == 'sales.solicitudes' %}active{% endif %}">
+				<i class="bi bi-clipboard2-check-fill"></i>
+				Solicitudes Prod.
+			</a>
+			{% endif %} {% if rol in ['Administrador', 'Ventas'] %}
+			<div class="nav-group-toggle">
+				<i class="bi bi-shop icon-main me-2"></i>
+				<span class="gtlabel">Comercial</span>
+				<i class="bi bi-chevron-right chevron"></i>
+			</div>
+			<div class="nav-submenu">
+				<a
+					href="{{ url_for('sales.producto_terminado') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.producto_terminado' %}active{% endif %}">
+					<i class="bi bi-bag-fill"></i>
+					Productos
+				</a>
+				{% if rol == 'Administrador' %}
+				<a href="#" class="nav-link-side text-muted" title="Proximamente">
+					<i class="bi bi-calculator-fill"></i>
+					Costos y Utilidad
+				</a>
+				{% endif %}
+				<a
+					href="{{ url_for('sales.ventas') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.ventas' %}active{% endif %}">
+					<i class="bi bi-receipt-cutoff"></i>
+					Punto de Venta
+				</a>
+				<a
+					href="{{ url_for('sales.pedidos_clientes') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.pedidos_clientes' %}active{% endif %}">
+					<i class="bi bi-globe2"></i>
+					Pedidos Portal
+				</a>
+			</div>
+			{% endif %} {% if rol == 'Produccion' %}
+			<div class="nav-group-toggle">
+				<i class="bi bi-bag icon-main me-2"></i>
+				<span class="gtlabel">Catalogo</span>
+				<i class="bi bi-chevron-right chevron"></i>
+			</div>
+			<div class="nav-submenu">
+				<a
+					href="{{ url_for('sales.producto_terminado') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.producto_terminado' %}active{% endif %}">
+					<i class="bi bi-bag-fill"></i>
+					Productos
+				</a>
+			</div>
+			{% endif %}
+
+			<div class="sidebar-footer">
+				<a href="{{ url_for('auth.logout') }}" class="nav-link-side logout">
+					<i class="bi bi-box-arrow-left"></i>
+					Cerrar sesion
+				</a>
+			</div>
+		</nav>
+
+		<header class="topbar" role="banner">
+			{% set persona_nombre = current_user.persona.nombre if current_user.persona else
+			current_user.username %} {% set persona_apellidos = current_user.persona.apellidos if
+			current_user.persona else '' %} {% set nombre_completo = (persona_nombre ~ ' ' ~
+			persona_apellidos).strip() %} {% set inicial_nombre = persona_nombre[:1] | upper %} {% set
+			inicial_apellido = persona_apellidos[:1] | upper if persona_apellidos else '' %}
+			<button
+				class="topbar-icon-btn d-lg-none border-0"
+				onclick="openSidebar()"
+				aria-label="Abrir menu">
+				<i class="bi bi-list"></i>
+			</button>
+			<span class="topbar-title">{% block page_title %}Panel{% endblock %}</span>
+			<div class="topbar-right">
+				<span class="topbar-time d-none d-md-block"><span id="reloj">--:--</span></span>
+				<div class="dropdown">
+					<div
+						class="topbar-avatar"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+						title="{{ nombre_completo }}">
+						{{ inicial_nombre }}{{ inicial_apellido }}
+					</div>
+					<ul
+						class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+						style="border-radius: 12px; min-width: 200px; font-size: 0.82rem">
+						<li class="px-3 py-2">
+							<div class="fw-bold" style="color: var(--sb-text)">{{ nombre_completo }}</div>
+							<div style="color: var(--sb-muted); font-size: 0.72rem">
+								{{ current_user.rol.nombre | capitalize }}
+							</div>
+						</li>
+						<li><hr class="dropdown-divider my-1" /></li>
+						<li>
+							<a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}">
+								<i class="bi bi-box-arrow-left me-2"></i>
+								Cerrar sesion
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		{% else %} {% from '_macros.html' import nav_shell %} {{ nav_shell(current_user, request.path)
+		}} {% endif %}
+
+		<main
+			class="{{ 'main-content' if is_staff else 'app-main container-fluid py-4' }}"
+			id="main-content">
+			{% if not is_staff %}
+			<div class="app-content mx-auto">
+				{% endif %} {% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+				%}
+				<div class="mb-4">
+					{% for cat, msg in messages %} {% set icon = 'check-circle-fill' if cat == 'success' else
+					'exclamation-triangle-fill' if cat == 'warning' else 'x-circle-fill' if cat == 'danger'
+					else 'info-circle-fill' %} {% set alert_class = 'alert-success' if cat == 'success' else
+					'alert-warning' if cat == 'warning' else 'alert-danger' if cat == 'danger' else
+					'alert-primary' %}
+					<div
+						class="alert {{ alert_class }} d-flex align-items-center gap-2 alert-dismissible fade show"
+						role="alert">
+						<i class="bi bi-{{ icon }}"></i>
+						<div>{{ msg }}</div>
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="alert"
+							aria-label="Close"></button>
+					</div>
+					{% endfor %}
+				</div>
+				{% endif %} {% endwith %} {% block content %}{% endblock %} {% if not is_staff %}
+			</div>
+			{% endif %}
+		</main>
+
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+			crossorigin="anonymous"></script>
+		<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+		{% if is_staff %}
+		<script>
+			(function actualizarReloj() {
+				const el = document.getElementById('reloj');
+				if (!el) return;
+				const ahora = new Date();
+				const h = String(ahora.getHours()).padStart(2, '0');
+				const m = String(ahora.getMinutes()).padStart(2, '0');
+				el.textContent = h + ':' + m;
+				setTimeout(actualizarReloj, 60000);
+			})();
+
+			function openSidebar() {
+				document.getElementById('sidebar').classList.add('open');
+				document.getElementById('sidebarOverlay').classList.add('open');
+				document.body.style.overflow = 'hidden';
+			}
+
+			function closeSidebar() {
+				document.getElementById('sidebar').classList.remove('open');
+				document.getElementById('sidebarOverlay').classList.remove('open');
+				document.body.style.overflow = '';
+			}
+
+			document.querySelectorAll('.nav-group-toggle').forEach(function (toggle) {
+				toggle.addEventListener('click', function () {
+					const sub = this.nextElementSibling;
+					if (!sub) return;
+					this.classList.toggle('open');
+					sub.classList.toggle('open');
+				});
+				const sub = toggle.nextElementSibling;
+				if (sub && sub.querySelector('.active')) {
+					toggle.classList.add('open');
+					sub.classList.add('open');
+				}
+			});
+		</script>
+		{% endif %} {% block scripts %}{% endblock %}
+	</body>
+</html>

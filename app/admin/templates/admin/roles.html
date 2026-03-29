@@ -1,0 +1,622 @@
+{% extends "base_template.html" %} {% block title %}Roles y Permisos{% endblock %} {% block
+page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
+<style>
+	.roles-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1.1rem;
+		margin-bottom: 1.5rem;
+	}
+	.rol-card {
+		background: #fff;
+		border-radius: 14px;
+		border: 1.5px solid var(--sb-border);
+		border-top: 4px solid transparent;
+		overflow: hidden;
+		transition: all 0.2s ease;
+	}
+	.rol-card.base {
+		border-top-color: var(--sb-primary);
+	}
+	.rol-card:hover {
+		box-shadow: 0 6px 22px rgba(158, 59, 59, 0.13);
+		transform: translateY(-3px);
+	}
+	.rol-card-body {
+		padding: 1.1rem 1.2rem;
+	}
+	.rol-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.7rem;
+	}
+	.rol-left {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+	}
+	.rol-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 11px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.05rem;
+		flex-shrink: 0;
+	}
+	.ic-admin {
+		background: #fdeaea;
+		color: var(--sb-primary);
+	}
+	.ic-ventas {
+		background: #e8f5e9;
+		color: #2e7d32;
+	}
+	.ic-prod {
+		background: #e8eaf6;
+		color: #3949ab;
+	}
+	.ic-custom {
+		background: #f3e5f5;
+		color: #7b1fa2;
+	}
+	.rol-nombre {
+		font-size: 0.92rem;
+		font-weight: 700;
+		color: var(--sb-text);
+	}
+	.badge-base {
+		font-size: 0.6rem;
+		background: #fce9e9;
+		color: var(--sb-primary);
+		border-radius: 50px;
+		padding: 0.18rem 0.55rem;
+		font-weight: 600;
+	}
+	.badge-activo {
+		background: #e8f5e9;
+		color: #2e7d32;
+		font-size: 0.62rem;
+		padding: 0.18rem 0.55rem;
+		border-radius: 50px;
+		font-weight: 600;
+	}
+	.badge-inactivo {
+		background: #f5f5f5;
+		color: #757575;
+		font-size: 0.62rem;
+		padding: 0.18rem 0.55rem;
+		border-radius: 50px;
+		font-weight: 600;
+	}
+	.rol-desc {
+		font-size: 0.75rem;
+		color: var(--sb-muted);
+		line-height: 1.5;
+		margin-bottom: 0.8rem;
+	}
+	.perms-summary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin-bottom: 0.9rem;
+	}
+	.chip-mod {
+		font-size: 0.6rem;
+		padding: 0.15rem 0.5rem;
+		border-radius: 50px;
+		font-weight: 600;
+		background: #f8efea;
+		color: var(--sb-muted);
+	}
+	.chip-mod.has {
+		background: #fce9e9;
+		color: var(--sb-primary);
+	}
+	.rol-meta {
+		font-size: 0.68rem;
+		color: var(--sb-muted);
+		margin-bottom: 0.8rem;
+	}
+	.rol-acciones {
+		display: flex;
+		gap: 0.45rem;
+		padding: 0.75rem 1.2rem;
+		border-top: 1px solid var(--sb-border);
+		background: #fdf8f6;
+		flex-wrap: wrap;
+	}
+	.btn-accion-rol {
+		height: 30px;
+		border-radius: 8px;
+		border: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.3rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0 0.75rem;
+		transition: all 0.16s;
+		font-family: 'Poppins', sans-serif;
+	}
+	.btn-edit {
+		background: #e8eaf6;
+		color: #3949ab;
+	}
+	.btn-edit:hover {
+		background: #3949ab;
+		color: #fff;
+	}
+	.btn-perms {
+		background: #fce9e9;
+		color: var(--sb-primary);
+	}
+	.btn-perms:hover {
+		background: var(--sb-primary);
+		color: #fff;
+	}
+	.btn-deact {
+		background: #fff8e1;
+		color: #e65100;
+	}
+	.btn-deact:hover {
+		background: #e65100;
+		color: #fff;
+	}
+	.perms-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.78rem;
+	}
+	.perms-table th {
+		background: var(--sb-primary);
+		color: #fff;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.65rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	.perms-table td {
+		padding: 0.45rem 0.75rem;
+		border-bottom: 1px solid var(--sb-border);
+		vertical-align: middle;
+	}
+	.perms-table tbody tr:hover {
+		background: #fce9e9;
+	}
+	.perms-check {
+		width: 18px;
+		height: 18px;
+		accent-color: var(--sb-primary);
+		cursor: pointer;
+	}
+</style>
+{% endblock %} {% block content %}
+<section class="section">
+	<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+		<div>
+			<h4 class="mb-0" style="font-family: 'Playfair Display', serif; font-size: 1.2rem">
+				Roles del sistema
+			</h4>
+			<p class="mb-0" style="font-size: 0.78rem; color: var(--sb-muted)">
+				Gestiona roles y asigna permisos por módulo
+			</p>
+		</div>
+		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoRol">
+			<i class="bi bi-plus-lg"></i>
+			Nuevo rol
+		</button>
+	</div>
+
+	<div class="roles-grid">
+		{% for r in roles %} {% set rn = r.nombre.lower() %} {% set perms_list = r.permisos.all() %}
+		<div class="rol-card {% if r.es_base %}base{% endif %}">
+			<div class="rol-card-body">
+				<div class="rol-top">
+					<div class="rol-left">
+						<div
+							class="rol-icon {% if rn == 'administrador' %}ic-admin{% elif rn in ('ventas','vendedor') %}ic-ventas{% elif rn == 'produccion' %}ic-prod{% else %}ic-custom{% endif %}">
+							<i
+								class="bi bi-{% if rn == 'administrador' %}shield-lock-fill{% elif rn in ('ventas','vendedor') %}cash-coin{% elif rn == 'produccion' %}gear-fill{% else %}person-fill{% endif %}"></i>
+						</div>
+						<span class="rol-nombre">{{ r.nombre }}</span>
+					</div>
+					<div class="d-flex gap-1 flex-wrap">
+						{% if r.es_base %}
+						<span class="badge-base">Sistema</span>
+						{% endif %} {% if r.activo %}
+						<span class="badge-activo">Activo</span>
+						{% else %}
+						<span class="badge-inactivo">Inactivo</span>
+						{% endif %}
+					</div>
+				</div>
+
+				{% if r.descripcion %}
+				<p class="rol-desc">{{ r.descripcion }}</p>
+				{% else %}
+				<p class="rol-desc text-muted" style="font-style: italic">Sin descripción</p>
+				{% endif %}
+
+				<div class="perms-summary">
+					{% for m in modulos %} {% set tiene =
+					perms_list|selectattr('id_modulo','eq',m.id_modulo)|list %} {% if tiene and
+					(tiene[0].lectura or tiene[0].escritura or tiene[0].actualizacion or tiene[0].eliminacion)
+					%}
+					<span class="chip-mod has">{{ m.nombre }}</span>
+					{% endif %} {% endfor %}
+				</div>
+
+				<div class="rol-meta">
+					<i class="bi bi-people me-1"></i>
+					{{ usuarios_activos_por_rol.get(r.id_rol, 0) }} empleado(s) activo(s)
+				</div>
+			</div>
+			<div class="rol-acciones">
+				{% if not r.es_base %}
+				<button
+					class="btn-accion-rol btn-edit"
+					data-action="edit-rol"
+					data-id-rol="{{ r.id_rol }}"
+					data-desc='{{ (r.descripcion or "") | tojson }}'
+					data-activo="{{ 'true' if r.activo else 'false' }}"
+					type="button">
+					<i class="bi bi-pencil-fill"></i>
+					Editar
+				</button>
+				{% endif %}
+				<button
+					class="btn-accion-rol btn-perms"
+					data-action="open-perms"
+					data-id-rol="{{ r.id_rol }}"
+					data-nombre="{{ r.nombre | tojson }}"
+					type="button">
+					<i class="bi bi-key-fill"></i>
+					Permisos
+				</button>
+				{% if not r.es_base and r.activo %}
+				<button
+					class="btn-accion-rol btn-deact"
+					data-action="deactivate-rol"
+					data-id-rol="{{ r.id_rol }}"
+					data-nombre="{{ r.nombre | tojson }}"
+					type="button">
+					<i class="bi bi-slash-circle"></i>
+					Desactivar
+				</button>
+				{% elif not r.es_base and not r.activo %}
+				<form
+					method="post"
+					action="{{ url_for('admin.activar_rol', id_rol=r.id_rol) }}"
+					style="display: inline">
+					<button type="submit" class="btn-accion-rol" style="background: #e8f5ee; color: #2e7d52">
+						<i class="bi bi-check-circle-fill"></i>
+						Activar
+					</button>
+				</form>
+				{% endif %}
+			</div>
+		</div>
+		{% else %}
+		<div
+			class="text-center py-5"
+			style="color: var(--sb-muted); font-size: 0.82rem; grid-column: 1/-1">
+			<i class="bi bi-shield-x fs-2 d-block mb-2"></i>
+			No hay roles registrados
+		</div>
+		{% endfor %}
+	</div>
+
+	<div class="modal fade" id="modalNuevoRol" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form method="post" action="{{ url_for('admin.roles') }}">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							<i class="bi bi-plus-circle-fill me-2"></i>
+							Nuevo rol
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label class="form-label" for="nuevo-rol-nombre">Nombre del rol</label>
+							<input
+								id="nuevo-rol-nombre"
+								type="text"
+								name="nombre"
+								class="form-control"
+								required
+								maxlength="50"
+								pattern="[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 _\-]+"
+								placeholder="ej. supervisor" />
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="nuevo-rol-descripcion">Descripción</label>
+							<textarea
+								id="nuevo-rol-descripcion"
+								name="descripcion"
+								class="form-control"
+								rows="2"
+								maxlength="255"
+								required></textarea>
+						</div>
+					</div>
+					<div class="modal-footer border-0">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-check2 me-1"></i>
+							Crear rol
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalEditarRol" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form method="post" id="formEditarRol">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							<i class="bi bi-pencil-fill me-2"></i>
+							Editar rol
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label class="form-label" for="edit-rol-desc">Descripción</label>
+							<textarea
+								name="descripcion"
+								id="edit-rol-desc"
+								class="form-control"
+								rows="2"
+								maxlength="255"
+								required></textarea>
+						</div>
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								name="activo"
+								id="edit-rol-activo"
+								value="on"
+								checked />
+							<label class="form-check-label" for="edit-rol-activo">Activo</label>
+						</div>
+					</div>
+					<div class="modal-footer border-0">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">Guardar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div
+		class="modal fade"
+		id="modalPermisos"
+		tabindex="-1"
+		aria-labelledby="labelPermisos"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="labelPermisos">
+						<i class="bi bi-key-fill me-2"></i>
+						Permisos -
+						<span id="rolPermNombre"></span>
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="permsIdRol" />
+					<table class="perms-table">
+						<thead>
+							<tr>
+								<th>Modulo</th>
+								<th class="text-center">Leer</th>
+								<th class="text-center">Crear</th>
+								<th class="text-center">Editar</th>
+								<th class="text-center">Desactivar</th>
+							</tr>
+						</thead>
+						<tbody id="permsTbody"></tbody>
+					</table>
+				</div>
+				<div class="modal-footer border-0">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-primary" id="btnGuardarPermisos">
+						<i class="bi bi-key-fill me-1"></i>
+						Guardar permisos
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalDesactivarRol" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<div
+						style="
+							width: 56px;
+							height: 56px;
+							border-radius: 50%;
+							background: #fff8e1;
+							color: #e65100;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							font-size: 1.5rem;
+							margin: 0 auto 1rem;
+						">
+						<i class="bi bi-slash-circle-fill"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1rem">¿Desactivar rol?</h5>
+					<p style="font-size: 0.78rem; color: var(--sb-muted)" id="nombreDesactivarRol"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<form method="post" id="formDesactivarRol">
+						<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button
+							type="submit"
+							class="btn btn-primary"
+							style="background: #e65100; border-color: #e65100">
+							Desactivar
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script id="datosModulos" type="application/json">
+		{{ modulos | tojson }}
+	</script>
+	<script id="datosRoles" type="application/json">
+		[
+			{% for r in roles %}
+			{
+				"id_rol": {{ r.id_rol }},
+				"permisos": [
+					{% for p in r.permisos %}
+					{
+						"id_modulo": {{ p.id_modulo }},
+						"leer": {{ p.lectura | tojson }},
+						"crear": {{ p.escritura | tojson }},
+						"editar": {{ p.actualizacion | tojson }},
+						"desactivar": {{ p.eliminacion | tojson }}
+					}{% if not loop.last %},{% endif %}
+					{% endfor %}
+				]
+			}{% if not loop.last %},{% endif %}
+			{% endfor %}
+		]
+	</script>
+</section>
+{% endblock %} {% block scripts %} {{ super() }}
+<script>
+	const MODULOS = JSON.parse(document.getElementById('datosModulos').textContent);
+	const ROLES = JSON.parse(document.getElementById('datosRoles').textContent);
+
+	function abrirEditarRol(idRol, desc, activo) {
+		document.getElementById('formEditarRol').action = `/admin/roles/${idRol}/editar`;
+		document.getElementById('edit-rol-desc').value = desc || '';
+		document.getElementById('edit-rol-activo').checked = !!activo;
+		new bootstrap.Modal(document.getElementById('modalEditarRol')).show();
+	}
+
+	function abrirPermisos(idRol, nombre) {
+		document.getElementById('permsIdRol').value = idRol;
+		document.getElementById('rolPermNombre').textContent = nombre;
+
+		const rolData = ROLES.find((r) => r.id_rol === idRol);
+		const permsActuales = rolData ? rolData.permisos : [];
+
+		const tbody = document.getElementById('permsTbody');
+		tbody.innerHTML = '';
+		MODULOS.forEach((m) => {
+			const p = permsActuales.find((x) => x.id_modulo === m.id_modulo) || {};
+			tbody.insertAdjacentHTML(
+				'beforeend',
+				`
+			<tr>
+				<td><strong style="font-size:.8rem">${m.nombre}</strong></td>
+				<td class="text-center"><input type="checkbox" class="perms-check" data-m="${m.id_modulo}" data-t="leer" ${p.leer ? 'checked' : ''}></td>
+				<td class="text-center"><input type="checkbox" class="perms-check" data-m="${m.id_modulo}" data-t="crear" ${p.crear ? 'checked' : ''}></td>
+				<td class="text-center"><input type="checkbox" class="perms-check" data-m="${m.id_modulo}" data-t="editar" ${p.editar ? 'checked' : ''}></td>
+				<td class="text-center"><input type="checkbox" class="perms-check" data-m="${m.id_modulo}" data-t="desactivar" ${p.desactivar ? 'checked' : ''}></td>
+			</tr>
+		`
+			);
+		});
+		new bootstrap.Modal(document.getElementById('modalPermisos')).show();
+	}
+
+	function guardarPermisos() {
+		const idRol = document.getElementById('permsIdRol').value;
+		const checks = document.querySelectorAll('.perms-check');
+		const mapa = {};
+		checks.forEach((cb) => {
+			const m = cb.dataset.m;
+			if (!mapa[m]) {
+				mapa[m] = {
+					id_modulo: Number.parseInt(m, 10),
+					leer: false,
+					crear: false,
+					editar: false,
+					desactivar: false,
+				};
+			}
+			mapa[m][cb.dataset.t] = cb.checked;
+		});
+
+		fetch(`/admin/roles/${idRol}/permisos`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ permisos: Object.values(mapa) }),
+		})
+			.then((r) => r.json())
+			.then((d) => {
+				if (d.ok) {
+					bootstrap.Modal.getInstance(document.getElementById('modalPermisos')).hide();
+					location.reload();
+				} else {
+					alert('No se pudo guardar permisos');
+				}
+			})
+			.catch(() => alert('Error al guardar permisos'));
+	}
+
+	function confirmarDesactivarRol(idRol, nombre) {
+		document.getElementById('nombreDesactivarRol').textContent = `Rol: ${nombre}`;
+		document.getElementById('formDesactivarRol').action = `/admin/roles/${idRol}/desactivar`;
+		new bootstrap.Modal(document.getElementById('modalDesactivarRol')).show();
+	}
+
+	document.querySelectorAll('[data-action="edit-rol"]').forEach((button) => {
+		button.addEventListener('click', () => {
+			const idRol = Number.parseInt(button.dataset.idRol || '0', 10);
+			const desc = JSON.parse(button.dataset.desc || '""');
+			const activo = button.dataset.activo === 'true';
+			abrirEditarRol(idRol, desc, activo);
+		});
+	});
+
+	document.querySelectorAll('[data-action="open-perms"]').forEach((button) => {
+		button.addEventListener('click', () => {
+			const idRol = Number.parseInt(button.dataset.idRol || '0', 10);
+			const nombre = JSON.parse(button.dataset.nombre || '""');
+			abrirPermisos(idRol, nombre);
+		});
+	});
+
+	document.querySelectorAll('[data-action="deactivate-rol"]').forEach((button) => {
+		button.addEventListener('click', () => {
+			const idRol = Number.parseInt(button.dataset.idRol || '0', 10);
+			const nombre = JSON.parse(button.dataset.nombre || '""');
+			confirmarDesactivarRol(idRol, nombre);
+		});
+	});
+
+	document.getElementById('btnGuardarPermisos').addEventListener('click', guardarPermisos);
+</script>
+{% endblock %}

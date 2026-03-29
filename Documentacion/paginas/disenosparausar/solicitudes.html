@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitudes de Producción – SoftBakery</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vino:       #9E3B3B;
+  --vino-hover: #7a2c2c;
+  --vino-light: #fdeaea;
+  --vino-mid:   #c96060;
+  --crema:      #fdf6f0;
+  --crema-dark: #eeddd5;
+  --bg:         #f4ede9;
+  --text:       #2c1810;
+  --muted:      #9a7a72;
+  --sidebar-w:  240px;
+  --topbar-h:   62px;
+  --green:      #2e7d52;
+  --green-s:    #e8f5ee;
+  --blue:       #1a5fa0;
+  --blue-s:     #e6f0fb;
+  --orange:     #c05a1a;
+  --orange-s:   #fdebd8;
+  --red:        #c0392b;
+  --red-s:      #fce8e6;
+  --gold:       #b8860b;
+  --gold-s:     #fdf3d0;
+  --purple:     #6d3fa0;
+  --purple-s:   #f0e8fb;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+h1,h2,h3,h4,h5,h6{font-family:'Playfair Display',serif;}
+a{text-decoration:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--crema-dark);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--vino-mid);}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:#fff;border-right:1px solid var(--crema-dark);display:flex;flex-direction:column;z-index:200;box-shadow:3px 0 18px rgba(94,32,32,.07);overflow-y:auto;overflow-x:hidden;}
+.sidebar-brand{display:flex;align-items:center;gap:.75rem;padding:1.15rem 1.3rem 1rem;border-bottom:1px solid var(--crema-dark);}
+.brand-icon{width:38px;height:38px;border-radius:11px;background:var(--vino);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(158,59,59,.35);}
+.brand-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:900;color:var(--vino);display:block;}
+.brand-sub{font-size:.63rem;color:var(--muted);display:block;}
+.nav-section-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.95rem 1.3rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.nav-section-label::after{content:'';flex:1;height:1px;background:var(--crema-dark);}
+.nav-link-side{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:500;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;}
+.nav-link-side i{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-link-side:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-link-side.active{color:#fff;background:var(--vino);border-left-color:var(--vino-hover);font-weight:600;}
+.nav-group-toggle{display:flex;align-items:center;gap:.75rem;padding:.58rem 1.3rem;color:var(--muted);font-size:.8rem;font-weight:600;border-left:3px solid transparent;transition:all .17s ease;cursor:pointer;user-select:none;}
+.nav-group-toggle i.icon-main{font-size:.95rem;width:18px;text-align:center;flex-shrink:0;}
+.nav-group-toggle .gtlabel{flex:1;}
+.nav-group-toggle .chevron{font-size:.7rem;transition:transform .22s ease;margin-left:auto;}
+.nav-group-toggle:hover{color:var(--vino);background:var(--vino-light);border-left-color:var(--vino);}
+.nav-group-toggle.open{color:var(--vino);}
+.nav-group-toggle.open .chevron{transform:rotate(90deg);}
+.nav-submenu{overflow:hidden;max-height:0;transition:max-height .28s cubic-bezier(.4,0,.2,1);background:#fdf8f6;border-left:3px solid var(--crema-dark);}
+.nav-submenu.open{max-height:400px;}
+.nav-submenu .nav-link-side{padding:.5rem 1.3rem .5rem 2.5rem;font-size:.77rem;border-left:none;}
+.nav-submenu .nav-link-side::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--crema-dark);flex-shrink:0;transition:background .15s;}
+.nav-submenu .nav-link-side:hover::before,.nav-submenu .nav-link-side.active::before{background:var(--vino);}
+.sidebar-footer{margin-top:auto;border-top:1px solid var(--crema-dark);padding:.6rem 0;}
+.nav-link-side.logout{color:#c0392b !important;}
+.nav-link-side.logout:hover{background:#fdecea;border-left-color:#c0392b;}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--crema-dark);display:flex;align-items:center;padding:0 1.8rem;gap:1rem;z-index:199;box-shadow:0 2px 10px rgba(94,32,32,.04);}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.9rem;}
+.topbar-time{font-size:.73rem;color:var(--muted);}
+.topbar-time span{color:var(--vino);font-weight:600;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(158,59,59,.3);border:2px solid var(--crema-dark);cursor:pointer;}
+
+/* ── MAIN ── */
+.main-content{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:1.7rem 1.9rem;min-height:calc(100vh - var(--topbar-h));}
+.page-header{margin-bottom:1.4rem;}
+.page-header h4{font-size:1.3rem;color:var(--text);margin-bottom:.15rem;}
+.page-header p{font-size:.78rem;color:var(--muted);margin:0;}
+.breadcrumb{font-size:.73rem;margin-bottom:.3rem;}
+.breadcrumb-item a{color:var(--vino);}
+.breadcrumb-item.active{color:var(--muted);}
+
+/* ── KPIs ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem;}
+.kpi-mini{background:#fff;border:1.5px solid var(--crema-dark);border-top:3px solid var(--vino);border-radius:13px;padding:1rem 1.15rem;transition:all .2s ease;cursor:pointer;}
+.kpi-mini:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(94,32,32,.1);}
+.kpi-mini.k-gold   {border-top-color:var(--gold);}
+.kpi-mini.k-green  {border-top-color:var(--green);}
+.kpi-mini.k-red    {border-top-color:var(--red);}
+.km-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;font-weight:600;}
+.km-val{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--text);line-height:1;}
+.km-sub{font-size:.67rem;color:var(--muted);margin-top:.25rem;display:flex;align-items:center;gap:3px;}
+.km-sub.gold  {color:var(--gold);font-weight:600;}
+.km-sub.green {color:var(--green);font-weight:600;}
+.km-sub.red   {color:var(--red);font-weight:600;}
+.km-sub.vino  {color:var(--vino);font-weight:600;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.search-input{width:100%;padding:.52rem .9rem .52rem 2.2rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);transition:border .17s;}
+.search-input:focus{outline:none;border-color:var(--vino);}
+.filter-select{padding:.52rem .9rem;border:1.5px solid var(--crema-dark);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);cursor:pointer;min-width:145px;}
+.filter-select:focus{outline:none;border-color:var(--vino);}
+.btn-vino{background:var(--vino);color:#fff;border:none;border-radius:10px;padding:.52rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;gap:.4rem;transition:all .18s;white-space:nowrap;}
+.btn-vino:hover{background:var(--vino-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(158,59,59,.25);}
+
+/* ── TABLA ── */
+.table-wrap{background:#fff;border-radius:14px;border:1.5px solid var(--crema-dark);overflow:hidden;}
+.sol-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.sol-table thead tr{background:var(--vino);}
+.sol-table th{color:#fff;font-weight:700;font-size:.63rem;text-transform:uppercase;letter-spacing:.06em;padding:.65rem .9rem;border:none;white-space:nowrap;}
+.sol-table tbody tr{border-bottom:1px solid var(--crema-dark);transition:background .15s;}
+.sol-table tbody tr:hover{background:var(--vino-light);}
+.sol-table tbody tr:last-child{border:none;}
+.sol-table td{padding:.62rem .9rem;vertical-align:middle;}
+
+/* Estado badges */
+.badge-estado{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;padding:.22rem .65rem;border-radius:50px;white-space:nowrap;}
+.be-pendiente {background:var(--gold-s);  color:var(--gold);}
+.be-aprobada  {background:var(--green-s); color:var(--green);}
+.be-rechazada {background:var(--red-s);   color:var(--red);}
+
+/* Producto chip */
+.prod-chip{display:flex;align-items:center;gap:.5rem;}
+.prod-icon{width:30px;height:30px;border-radius:8px;background:var(--vino-light);color:var(--vino);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.prod-name{font-weight:600;color:var(--text);font-size:.78rem;}
+.prod-sub{font-size:.65rem;color:var(--muted);}
+
+/* Usuario chip */
+.user-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--vino),var(--vino-mid));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;flex-shrink:0;}
+
+/* Botones tabla */
+.btn-tbl{height:26px;border:none;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:.2rem;font-size:.62rem;font-weight:700;cursor:pointer;padding:0 .6rem;font-family:'Poppins',sans-serif;transition:all .15s;white-space:nowrap;}
+.btn-ver      {background:var(--blue-s); color:var(--blue);}
+.btn-ver:hover{background:var(--blue);color:#fff;}
+.btn-aprobar  {background:var(--green-s);color:var(--green);}
+.btn-aprobar:hover{background:var(--green);color:#fff;}
+.btn-rechazar {background:var(--red-s);  color:var(--red);}
+.btn-rechazar:hover{background:var(--red);color:#fff;}
+.btn-orden    {background:var(--purple-s);color:var(--purple);}
+.btn-orden:hover{background:var(--purple);color:#fff;}
+
+/* ── MODALES ── */
+.modal-header{background:var(--vino);color:#fff;border:none;border-radius:12px 12px 0 0 !important;}
+.modal-header .btn-close{filter:invert(1);}
+.modal-content{border-radius:14px !important;border:none;box-shadow:0 20px 60px rgba(94,32,32,.2);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.form-label{font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.28rem;}
+.req{color:var(--vino);}
+.form-control,.form-select{font-size:.8rem;border:1.5px solid var(--crema-dark);border-radius:9px;font-family:'Poppins',sans-serif;transition:border .17s;}
+.form-control:focus,.form-select:focus{border-color:var(--vino);box-shadow:0 0 0 3px rgba(158,59,59,.09);}
+.form-hint{font-size:.66rem;color:var(--muted);margin-top:.2rem;}
+
+.modal-section{background:var(--crema);border-radius:10px;padding:.85rem 1rem;margin-bottom:.9rem;border-left:3px solid var(--vino);}
+.modal-section-title{font-size:.7rem;font-weight:700;color:var(--vino);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem;}
+
+.info-box   {background:var(--blue-s);  border:1.5px solid #b8d4f0;border-radius:10px;padding:.7rem 1rem;font-size:.75rem;color:var(--blue);  display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.warn-box   {background:var(--orange-s);border:1.5px solid #f0b898;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--orange);display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.success-box{background:var(--green-s); border:1.5px solid #a8d5bb;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--green);  display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.error-box  {background:var(--red-s);   border:1.5px solid #f0b8b5;border-radius:10px;padding:.65rem 1rem;font-size:.74rem;color:var(--red);    display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.9rem;}
+.info-box i,.warn-box i,.success-box i,.error-box i{flex-shrink:0;margin-top:.1rem;}
+
+/* Stock bar */
+.stock-bar-wrap{margin-top:.5rem;}
+.stock-bar-label{display:flex;justify-content:space-between;font-size:.67rem;color:var(--muted);margin-bottom:.2rem;}
+.stock-bar{height:7px;border-radius:4px;background:var(--crema-dark);overflow:hidden;}
+.stock-bar-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.sb-ok   {background:var(--green);}
+.sb-warn {background:var(--orange);}
+.sb-bad  {background:var(--red);}
+
+/* Detalle info en modal ver */
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;}
+.detail-item{background:#fff;border:1.5px solid var(--crema-dark);border-radius:9px;padding:.6rem .85rem;}
+.di-label{font-size:.63rem;color:var(--muted);text-transform:uppercase;font-weight:600;letter-spacing:.05em;margin-bottom:.2rem;}
+.di-val{font-size:.82rem;font-weight:700;color:var(--text);}
+
+/* Timeline de estados */
+.timeline{position:relative;padding-left:1.6rem;}
+.timeline::before{content:'';position:absolute;left:.55rem;top:0;bottom:0;width:2px;background:var(--crema-dark);}
+.tl-item{position:relative;margin-bottom:.85rem;}
+.tl-item:last-child{margin-bottom:0;}
+.tl-dot{position:absolute;left:-1.08rem;top:.1rem;width:14px;height:14px;border-radius:50%;border:2px solid var(--crema-dark);background:#fff;z-index:1;}
+.tl-dot.done{background:var(--green);border-color:var(--green);}
+.tl-dot.active{background:var(--vino);border-color:var(--vino);}
+.tl-dot.rejected{background:var(--red);border-color:var(--red);}
+.tl-title{font-size:.75rem;font-weight:700;color:var(--text);}
+.tl-sub{font-size:.67rem;color:var(--muted);}
+
+/* Botones footer */
+.btn-modal-save  {background:var(--vino);  color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-save:hover{background:var(--vino-hover);}
+.btn-modal-cancel{background:#fff;color:var(--muted);border:1.5px solid var(--crema-dark);border-radius:9px;padding:.55rem 1.2rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;}
+.btn-modal-cancel:hover{background:var(--crema-dark);}
+.btn-modal-green {background:var(--green); color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-green:hover{background:#236040;}
+.btn-modal-red   {background:var(--red);   color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-red:hover{background:#992d22;}
+.btn-modal-purple{background:var(--purple);color:#fff;border:none;border-radius:9px;padding:.55rem 1.4rem;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .18s;display:flex;align-items:center;gap:.35rem;}
+.btn-modal-purple:hover{background:#532e80;}
+
+/* Confirm */
+.confirm-icon{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem;}
+.ci-green {background:var(--green-s);color:var(--green);}
+.ci-red   {background:var(--red-s);  color:var(--red);}
+.ci-purple{background:var(--purple-s);color:var(--purple);}
+
+/* Rol badge */
+.rol-chip{font-size:.6rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;}
+.rc-ventas    {background:var(--blue-s);color:var(--blue);}
+.rc-produccion{background:var(--purple-s);color:var(--purple);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.13s}.d4{animation-delay:.18s}
+
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:.85rem;}
+.empty-state i{font-size:2rem;display:block;margin-bottom:.5rem;}
+
+@media(max-width:1100px){.kpi-strip{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.main-content{margin-left:0;padding:1rem}.sidebar{transform:translateX(-100%)}.topbar{left:0}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-cake2-fill"></i></div>
+    <div><span class="brand-name">SoftBakery</span><span class="brand-sub">Pastelería Artesanal</span></div>
+  </div>
+  <div class="nav-section-label">Principal</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-speedometer2"></i>Dashboard</a>
+  <div class="nav-section-label">Gestión</div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-people-fill icon-main"></i><span class="gtlabel">Personal</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-person-fill"></i>Empleados</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-shield-lock-fill"></i>Roles y Permisos</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-truck"></i>Proveedores</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-box-seam-fill icon-main"></i><span class="gtlabel">Almacén</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-archive-fill"></i>Materia Prima</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cart-fill"></i>Compras</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-bag-fill"></i>Producto Terminado</a>
+  </div>
+  <div class="nav-group-toggle open" onclick="toggleMenu(this)">
+    <i class="bi bi-gear-fill icon-main"></i><span class="gtlabel">Producción</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu open">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-journal-richtext"></i>Recetas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-cpu-fill"></i>Órdenes</a>
+    <a href="#" class="nav-link-side active" onclick="setActive(this)"><i class="bi bi-send-fill"></i>Solicitudes</a>
+  </div>
+  <div class="nav-group-toggle" onclick="toggleMenu(this)">
+    <i class="bi bi-cash-coin icon-main"></i><span class="gtlabel">Comercial</span><i class="bi bi-chevron-right chevron"></i>
+  </div>
+  <div class="nav-submenu">
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-receipt"></i>Ventas</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-calculator-fill"></i>Costos y Utilidad</a>
+    <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-arrow-down-circle-fill"></i>Salidas Efectivo</a>
+  </div>
+  <div class="nav-section-label">Sistema</div>
+  <a href="#" class="nav-link-side" onclick="setActive(this)"><i class="bi bi-clock-history"></i>Auditoría / Logs</a>
+  <div class="sidebar-footer">
+    <a href="#" class="nav-link-side logout"><i class="bi bi-box-arrow-left"></i>Cerrar sesión</a>
+  </div>
+</nav>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<header class="topbar">
+  <div class="topbar-title">Módulo de Producción — Solicitudes</div>
+  <div class="topbar-right">
+    <span class="topbar-time">Último acceso: <span id="fecha-top"></span> — <span id="hora-top"></span></span>
+    <!-- Simular rol: cambiar entre 'ventas' y 'produccion' -->
+    <span id="rolBadge" class="rol-chip rc-ventas" style="cursor:pointer;" onclick="toggleRol()" title="Click para cambiar rol (demo)">Ventas</span>
+    <div class="topbar-avatar">JR</div>
+  </div>
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main-content">
+
+  <div class="page-header fu d1">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Solicitudes</li>
+      </ol>
+    </nav>
+    <h4>Solicitudes de Producción</h4>
+  </div>
+
+  <!-- Banner rol -->
+  <div id="bannerRol" class="info-box fu d1" style="margin-bottom:1.2rem;">
+    <i class="bi bi-info-circle-fill"></i>
+    <span id="bannerRolMsg"></span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar fu d3">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por producto, solicitud, usuario…">
+    </div>
+    <select class="filter-select" id="filtroEstado" onchange="filtrar()">
+      <option value="todos">Todos los estados</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="aprobada">Aprobada</option>
+      <option value="rechazada">Rechazada</option>
+    </select>
+    <button class="btn-vino" id="btnNueva" onclick="abrirNueva()">
+      <i class="bi bi-plus-lg"></i>Nueva solicitud
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap fu d4">
+    <div style="overflow-x:auto;">
+      <table class="sol-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cant. solicitada</th>
+            <th>Stock actual</th>
+            <th>Solicitante</th>
+            <th>Fecha solicitud</th>
+            <th>Estado</th>
+            <th>Resuelto por</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="solicitudesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════════
+     MODAL NUEVA SOLICITUD
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalNueva" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-send me-2"></i>Nueva Solicitud de Producción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Datos de la solicitud</div>
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Producto <span class="req">*</span></label>
+              <select class="form-select" id="f_producto" onchange="onProductoChange()">
+                <option value="">Seleccionar producto…</option>
+                <option value="P-001">Pastel de Chocolate</option>
+                <option value="P-002">Pay de Fresa</option>
+                <option value="P-003">Cuernos de Mantequilla</option>
+                <option value="P-004">Muffin de Vainilla</option>
+                <option value="P-005">Galleta de Nuez</option>
+                <option value="P-006">Brownie de Chocolate</option>
+                <option value="P-007">Pan de Canela</option>
+                <option value="P-008">Tarta de Limón</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Cantidad solicitada <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_cantidad" min="1" step="1" placeholder="Ej. 24">
+              <div class="form-hint">Piezas / porciones requeridas.</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Observaciones</label>
+              <input type="text" class="form-control" id="f_obs" placeholder="Motivo, pedido especial…">
+            </div>
+          </div>
+          <!-- Stock preview -->
+          <div id="stockPreview" style="display:none;margin-top:.85rem;"></div>
+        </div>
+        <div class="info-box">
+          <i class="bi bi-info-circle-fill"></i>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-save" onclick="guardarSolicitud()">
+          <i class="bi bi-send-fill"></i>Enviar solicitud
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL VER DETALLE
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalVer" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-eye-fill me-2"></i><span id="verTitulo"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-info-circle-fill"></i>Información general</div>
+          <div class="detail-grid" id="verGrid"></div>
+        </div>
+        <div class="modal-section" style="margin-bottom:.9rem;">
+          <div class="modal-section-title"><i class="bi bi-diagram-3-fill"></i>Seguimiento del estado</div>
+          <div class="timeline" id="verTimeline"></div>
+        </div>
+        <div id="verObsBox"></div>
+        <div id="verOrdenBox"></div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL APROBAR / RECHAZAR
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalResolucion" tabindex="-1">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" id="resHeader">
+        <h5 class="modal-title" id="resTitulo"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="resInfoBox"></div>
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-chat-dots-fill"></i>Observaciones</div>
+          <textarea class="form-control" id="res_obs" rows="3" placeholder="Comentarios adicionales (opcional)…" style="font-size:.8rem;"></textarea>
+          <div class="form-hint">Se registrará junto con la decisión.</div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button id="resBtn" onclick="ejecutarResolucion()"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL GENERAR ORDEN (desde solicitud aprobada)
+══════════════════════════════════════ -->
+<div class="modal fade" id="modalGenOrden" tabindex="-1">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cpu me-2"></i>Generar Orden de Producción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="genOrdenInfo"></div>
+        <div class="modal-section">
+          <div class="modal-section-title"><i class="bi bi-journal-richtext"></i>Receta a utilizar</div>
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label">Receta activa <span class="req">*</span></label>
+              <select class="form-select" id="gen_receta">
+                <option value="">Cargando recetas…</option>
+              </select>
+              <div class="form-hint">Solo se muestran recetas activas del producto.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Observaciones</label>
+              <input type="text" class="form-control" id="gen_obs" placeholder="Referencia a solicitud, notas adicionales…">
+            </div>
+          </div>
+        </div>
+        <div class="success-box" style="margin-bottom:0;">
+          <i class="bi bi-link-45deg"></i>
+          <span>La orden creada quedará vinculada a esta solicitud mediante <code>id_solicitud</code>, manteniendo la trazabilidad completa.</span>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4 gap-2">
+        <button class="btn-modal-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn-modal-purple" onclick="confirmarGenOrden()">
+          <i class="bi bi-cpu-fill"></i>Crear orden de producción
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Fecha / hora ── */
+const now = new Date();
+document.getElementById('fecha-top').textContent = now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hora-top').textContent  = now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+
+/* ── ROL SIMULADO ── */
+let rolActual = 'ventas'; // 'ventas' | 'produccion'
+function toggleRol(){
+  rolActual = rolActual==='ventas'?'produccion':'ventas';
+  aplicarRol();
+  filtrar();
+  toast(`Rol cambiado a: ${rolActual}`);
+}
+function aplicarRol(){
+  const badge = document.getElementById('rolBadge');
+  const banner= document.getElementById('bannerRolMsg');
+  const btnN  = document.getElementById('btnNueva');
+  if(rolActual==='ventas'){
+    badge.textContent='Ventas';
+    badge.className='rol-chip rc-ventas';
+    banner.innerHTML='Estás como <strong>Ventas</strong>. Puedes registrar solicitudes de producción y consultar su estado. La aprobación/rechazo es responsabilidad del área de producción.';
+    btnN.style.display='flex';
+  } else {
+    badge.textContent='Producción';
+    badge.className='rol-chip rc-produccion';
+    banner.innerHTML='Estás como <strong>Producción</strong>. Puedes revisar las solicitudes pendientes, aprobarlas o rechazarlas, y generar órdenes de producción a partir de las aprobadas.';
+    btnN.style.display='none';
+  }
+}
+
+/* ── DATOS MAESTROS ── */
+const PRODUCTOS = {
+  'P-001':'Pastel de Chocolate','P-002':'Pay de Fresa',
+  'P-003':'Cuernos de Mantequilla','P-004':'Muffin de Vainilla',
+  'P-005':'Galleta de Nuez','P-006':'Brownie de Chocolate',
+  'P-007':'Pan de Canela','P-008':'Tarta de Limón'
+};
+const STOCK_PROD = {
+  'P-001':4,'P-002':8,'P-003':22,'P-004':15,'P-005':30,'P-006':6,'P-007':0,'P-008':3
+};
+const STOCK_MIN = {
+  'P-001':10,'P-002':10,'P-003':20,'P-004':20,'P-005':30,'P-006':10,'P-007':5,'P-008':8
+};
+const RECETAS_ACT = {
+  'P-001':[{id:'RC-001',label:'v2 — Rendimiento: 12 pzas'}],
+  'P-002':[{id:'RC-002',label:'v1 — Rendimiento: 8 pzas'}],
+  'P-003':[{id:'RC-003',label:'v1 — Rendimiento: 24 pzas'}],
+  'P-004':[{id:'RC-004',label:'v1 — Rendimiento: 12 pzas'}],
+  'P-005':[{id:'RC-005',label:'v1 — Rendimiento: 30 pzas'}],
+  'P-006':[{id:'RC-006',label:'v1 — Rendimiento: 16 pzas'}],
+  'P-007':[],
+  'P-008':[{id:'RC-007',label:'v1 — Rendimiento: 8 pzas'}],
+};
+
+/* ── SOLICITUDES DATA ── */
+let solicitudes = [
+  {id:'SOL-001',id_producto:'P-001',cantidad:24,fecha:'2026-02-08',
+   solicitante:'Ana García',id_sol_u:'U-02',
+   estado:'aprobada',obs:'Boda el sábado, necesitamos 24 porciones.',
+   fecha_res:'2026-02-08',resuelto_por:'Carlos M.',id_ord:'ORD-001'},
+  {id:'SOL-002',id_producto:'P-002',cantidad:16,fecha:'2026-02-11',
+   solicitante:'Ana García',id_sol_u:'U-02',
+   estado:'aprobada',obs:'Stock muy bajo.',
+   fecha_res:'2026-02-11',resuelto_por:'Carlos M.',id_ord:'ORD-002'},
+  {id:'SOL-003',id_producto:'P-003',cantidad:48,fecha:'2026-03-04',
+   solicitante:'Laura R.',id_sol_u:'U-03',
+   estado:'aprobada',obs:'Quinceañera viernes.',
+   fecha_res:'2026-03-04',resuelto_por:'Carlos M.',id_ord:'ORD-003'},
+  {id:'SOL-004',id_producto:'P-006',cantidad:32,fecha:'2026-03-04',
+   solicitante:'Ana García',id_sol_u:'U-02',
+   estado:'rechazada',obs:'Solo quedan 6 brownies.',
+   fecha_res:'2026-03-04',resuelto_por:'Carlos M.',id_ord:null,
+   obs_res:'No hay suficiente cacao en inventario. Se reabastecerá la próxima semana.'},
+  {id:'SOL-005',id_producto:'P-004',cantidad:36,fecha:'2026-03-05',
+   solicitante:'Laura R.',id_sol_u:'U-03',
+   estado:'pendiente',obs:'Evento corporativo lunes.',
+   fecha_res:null,resuelto_por:null,id_ord:null},
+  {id:'SOL-006',id_producto:'P-008',cantidad:12,fecha:'2026-03-05',
+   solicitante:'Ana García',id_sol_u:'U-02',
+   estado:'pendiente',obs:'Stock mínimo alcanzado.',
+   fecha_res:null,resuelto_por:null,id_ord:null},
+];
+
+let idxResolucion = null;
+let accionResolucion = null;
+let idxGenOrden = null;
+
+const bsNueva      = new bootstrap.Modal(document.getElementById('modalNueva'));
+const bsVer        = new bootstrap.Modal(document.getElementById('modalVer'));
+const bsResolucion = new bootstrap.Modal(document.getElementById('modalResolucion'));
+const bsGenOrden   = new bootstrap.Modal(document.getElementById('modalGenOrden'));
+
+/* ── Helpers ── */
+function estadoBadge(e){
+  const map={
+    pendiente: '<span class="badge-estado be-pendiente"><i class="bi bi-clock-fill"></i>Pendiente</span>',
+    aprobada:  '<span class="badge-estado be-aprobada"><i class="bi bi-check-circle-fill"></i>Aprobada</span>',
+    rechazada: '<span class="badge-estado be-rechazada"><i class="bi bi-x-circle-fill"></i>Rechazada</span>',
+  };
+  return map[e]||e;
+}
+function stockBar(pid){
+  const act = STOCK_PROD[pid]||0;
+  const min = STOCK_MIN[pid]||1;
+  const pct = Math.min(100, (act/Math.max(min*1.5,act+1))*100);
+  const cls = act<=0?'sb-bad':act<min?'sb-warn':'sb-ok';
+  return `<div class="stock-bar-wrap">
+    <div class="stock-bar-label"><span>Stock actual</span><span>${act} pzas (mín: ${min})</span></div>
+    <div class="stock-bar"><div class="stock-bar-fill ${cls}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+function initials(name){ return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function updateKPIs(){
+  document.getElementById('kpi-total').textContent     = solicitudes.length;
+  document.getElementById('kpi-pendientes').textContent= solicitudes.filter(s=>s.estado==='pendiente').length;
+  document.getElementById('kpi-aprobadas').textContent = solicitudes.filter(s=>s.estado==='aprobada').length;
+  document.getElementById('kpi-rechazadas').textContent= solicitudes.filter(s=>s.estado==='rechazada').length;
+}
+
+/* ── RENDER TABLA ── */
+function renderTabla(lista){
+  const body = document.getElementById('solicitudesBody');
+  if(!lista.length){
+    body.innerHTML=`<tr><td colspan="9"><div class="empty-state"><i class="bi bi-send"></i>Sin solicitudes para este filtro.</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = lista.map(s=>{
+    const idx = solicitudes.indexOf(s);
+    const act = STOCK_PROD[s.id_producto]||0;
+    const min = STOCK_MIN[s.id_producto]||1;
+    const stockBadge = act<=0
+      ?`<span style="font-size:.65rem;font-weight:700;color:var(--red);">0 pzas <i class="bi bi-exclamation-triangle-fill"></i></span>`
+      :act<min
+      ?`<span style="font-size:.65rem;font-weight:700;color:var(--orange);">${act} pzas ↓</span>`
+      :`<span style="font-size:.65rem;font-weight:700;color:var(--green);">${act} pzas ✓</span>`;
+
+    const acciones = buildAcciones(s, idx);
+    return `<tr>
+      <td><span style="font-size:.7rem;font-weight:700;color:var(--vino);">${s.id}</span></td>
+      <td>
+        <div class="prod-chip">
+          <div class="prod-icon"><i class="bi bi-cake2-fill"></i></div>
+          <div>
+            <div class="prod-name">${PRODUCTOS[s.id_producto]||'—'}</div>
+            <div class="prod-sub">Prod. terminado</div>
+          </div>
+        </div>
+      </td>
+      <td><strong>${s.cantidad.toLocaleString('es-MX')}</strong> pzas</td>
+      <td>${stockBadge}</td>
+      <td>
+        <div class="user-chip">
+          <div class="user-avatar">${initials(s.solicitante)}</div>
+          <span>${s.solicitante}</span>
+        </div>
+      </td>
+      <td style="font-size:.72rem;color:var(--muted);">${s.fecha}</td>
+      <td>${estadoBadge(s.estado)}</td>
+      <td style="font-size:.72rem;color:var(--muted);">${s.resuelto_por||'—'}</td>
+      <td><div style="display:flex;gap:.3rem;flex-wrap:wrap;">${acciones}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function buildAcciones(s, idx){
+  let html = `<button class="btn-tbl btn-ver" onclick="verSolicitud(${idx})"><i class="bi bi-eye-fill"></i> Ver</button>`;
+  if(rolActual==='produccion' && s.estado==='pendiente'){
+    html += `<button class="btn-tbl btn-aprobar" onclick="abrirResolucion(${idx},'aprobada')"><i class="bi bi-check-lg"></i> Aprobar</button>`;
+    html += `<button class="btn-tbl btn-rechazar" onclick="abrirResolucion(${idx},'rechazada')"><i class="bi bi-x-lg"></i> Rechazar</button>`;
+  }
+  if(rolActual==='produccion' && s.estado==='aprobada' && !s.id_ord){
+    html += `<button class="btn-tbl btn-orden" onclick="abrirGenOrden(${idx})"><i class="bi bi-cpu-fill"></i> Crear orden</button>`;
+  }
+  if(s.estado==='aprobada' && s.id_ord){
+    html += `<span style="font-size:.65rem;font-weight:700;color:var(--purple);background:var(--purple-s);padding:.2rem .5rem;border-radius:6px;"><i class="bi bi-link-45deg"></i> ${s.id_ord}</span>`;
+  }
+  return html;
+}
+
+/* ── Filtrar ── */
+function filtrar(){
+  const q  = document.getElementById('searchInput').value.toLowerCase();
+  const est= document.getElementById('filtroEstado').value;
+  const res= solicitudes.filter(s=>{
+    const prod=(PRODUCTOS[s.id_producto]||'').toLowerCase();
+    const matchQ = prod.includes(q)||s.id.toLowerCase().includes(q)||s.solicitante.toLowerCase().includes(q);
+    const matchE = est==='todos'?true:s.estado===est;
+    return matchQ && matchE;
+  });
+  renderTabla(res);
+}
+document.getElementById('searchInput').addEventListener('input', filtrar);
+
+function setFiltro(val){
+  document.getElementById('filtroEstado').value = val;
+  filtrar();
+}
+
+/* ── Nueva solicitud ── */
+function abrirNueva(){
+  document.getElementById('f_producto').value = '';
+  document.getElementById('f_cantidad').value = '';
+  document.getElementById('f_obs').value      = '';
+  document.getElementById('stockPreview').style.display='none';
+  bsNueva.show();
+}
+function onProductoChange(){
+  const pid = document.getElementById('f_producto').value;
+  const wrap= document.getElementById('stockPreview');
+  if(!pid){wrap.style.display='none';return;}
+  const act = STOCK_PROD[pid]||0;
+  const min = STOCK_MIN[pid]||1;
+  const bajo= act<min;
+  wrap.innerHTML=`
+    <div class="${bajo?'warn-box':'success-box'}" style="margin-bottom:.5rem;">
+      <i class="bi bi-${bajo?'exclamation-triangle-fill':'box-seam-fill'}"></i>
+      <div>
+        <strong>${bajo?'Stock bajo — justificación de la solicitud':'Stock suficiente actualmente'}</strong>
+        ${stockBar(pid)}
+      </div>
+    </div>`;
+  wrap.style.display='block';
+}
+function guardarSolicitud(){
+  const pid  = document.getElementById('f_producto').value;
+  const cant = parseInt(document.getElementById('f_cantidad').value)||0;
+  const obs  = document.getElementById('f_obs').value;
+  if(!pid){alert('Selecciona un producto.');return;}
+  if(cant<=0){alert('La cantidad debe ser mayor a 0.');return;}
+  const newId='SOL-'+String(solicitudes.length+1).padStart(3,'0');
+  solicitudes.unshift({
+    id:newId, id_producto:pid, cantidad:cant,
+    fecha:now.toLocaleDateString('es-MX',{year:'numeric',month:'2-digit',day:'2-digit'}).split('/').reverse().join('-'),
+    solicitante:'Juan R.', id_sol_u:'U-01',
+    estado:'pendiente', obs,
+    fecha_res:null, resuelto_por:null, id_ord:null
+  });
+  updateKPIs(); filtrar(); bsNueva.hide();
+  toast(`Solicitud ${newId} enviada. Pendiente de revisión por producción.`);
+}
+
+/* ── Ver solicitud ── */
+function verSolicitud(idx){
+  const s = solicitudes[idx];
+  document.getElementById('verTitulo').textContent=`${PRODUCTOS[s.id_producto]} — ${s.id}`;
+  const act = STOCK_PROD[s.id_producto]||0;
+  document.getElementById('verGrid').innerHTML=`
+    <div class="detail-item"><div class="di-label">ID Solicitud</div><div class="di-val">${s.id}</div></div>
+    <div class="detail-item"><div class="di-label">Producto</div><div class="di-val">${PRODUCTOS[s.id_producto]||'—'}</div></div>
+    <div class="detail-item"><div class="di-label">Cantidad solicitada</div><div class="di-val">${s.cantidad} pzas</div></div>
+    <div class="detail-item"><div class="di-label">Stock actual</div><div class="di-val">${act} pzas</div></div>
+    <div class="detail-item"><div class="di-label">Solicitante</div><div class="di-val">${s.solicitante}</div></div>
+    <div class="detail-item"><div class="di-label">Fecha solicitud</div><div class="di-val">${s.fecha}</div></div>
+    <div class="detail-item"><div class="di-label">Estado</div><div class="di-val">${estadoBadge(s.estado)}</div></div>
+    <div class="detail-item"><div class="di-label">Fecha resolución</div><div class="di-val">${s.fecha_res||'Pendiente'}</div></div>`;
+
+  // Timeline
+  const steps = [
+    {label:'Solicitud registrada', sub:`${s.fecha} — ${s.solicitante}`, dot:'done'},
+    {label:'En revisión por producción', sub:'Área de producción', dot: s.estado==='pendiente'?'active':
+      s.estado==='aprobada'?'done':s.estado==='rechazada'?'done':''},
+    {label: s.estado==='rechazada'?'Solicitud rechazada':s.estado==='aprobada'?'Solicitud aprobada':'Aprobación / Rechazo',
+     sub: s.fecha_res?(s.resuelto_por+' · '+s.fecha_res):'Pendiente',
+     dot: s.estado==='aprobada'?'done':s.estado==='rechazada'?'rejected':''},
+    {label:'Orden de producción generada', sub: s.id_ord?`Vinculada a ${s.id_ord}`:'Pendiente',
+     dot: s.id_ord?'done':''},
+  ];
+  document.getElementById('verTimeline').innerHTML = steps.map(st=>`
+    <div class="tl-item">
+      <div class="tl-dot ${st.dot}"></div>
+      <div class="tl-title">${st.label}</div>
+      <div class="tl-sub">${st.sub}</div>
+    </div>`).join('');
+
+  // Obs
+  document.getElementById('verObsBox').innerHTML = s.obs
+    ?`<div class="info-box" style="margin-bottom:.75rem;"><i class="bi bi-chat-dots-fill"></i><span><strong>Observaciones solicitud:</strong> ${s.obs}</span></div>`:'';
+
+  // Obs resolución
+  if(s.obs_res){
+    document.getElementById('verObsBox').innerHTML+=`<div class="${s.estado==='rechazada'?'error-box':'success-box'}" style="margin-bottom:.75rem;"><i class="bi bi-person-check-fill"></i><span><strong>Respuesta producción:</strong> ${s.obs_res}</span></div>`;
+  }
+
+  document.getElementById('verOrdenBox').innerHTML = s.id_ord
+    ?`<div class="success-box" style="margin-bottom:0;"><i class="bi bi-link-45deg"></i><span>Orden de producción vinculada: <strong>${s.id_ord}</strong></span></div>`:'';
+
+  bsVer.show();
+}
+
+/* ── Aprobar / Rechazar ── */
+function abrirResolucion(idx, accion){
+  idxResolucion = idx;
+  accionResolucion = accion;
+  const s = solicitudes[idx];
+  document.getElementById('res_obs').value='';
+
+  const isAp = accion==='aprobada';
+  document.getElementById('resTitulo').innerHTML=`<i class="bi bi-${isAp?'check-circle':'x-circle'} me-2"></i>${isAp?'Aprobar solicitud':'Rechazar solicitud'}`;
+  document.getElementById('resInfoBox').innerHTML=`
+    <div class="${isAp?'success-box':'error-box'}">
+      <i class="bi bi-${isAp?'check-circle-fill':'x-circle-fill'}"></i>
+      <div>
+        <strong>${PRODUCTOS[s.id_producto]} — ${s.cantidad} pzas</strong><br>
+        <span style="font-size:.72rem;">Solicitado por: ${s.solicitante} · ${s.fecha}</span>
+        ${isAp?'<br><span style="font-size:.72rem;">Al aprobar, quedará disponible para generar una orden de producción.</span>':''}
+      </div>
+    </div>`;
+
+  const btn = document.getElementById('resBtn');
+  btn.className = isAp?'btn-modal-green':'btn-modal-red';
+  btn.innerHTML = isAp?'<i class="bi bi-check-lg me-1"></i>Confirmar aprobación':'<i class="bi bi-x-lg me-1"></i>Confirmar rechazo';
+  bsResolucion.show();
+}
+function ejecutarResolucion(){
+  const s = solicitudes[idxResolucion];
+  const hoy = now.toLocaleDateString('es-MX',{year:'numeric',month:'2-digit',day:'2-digit'}).split('/').reverse().join('-');
+  s.estado      = accionResolucion;
+  s.fecha_res   = hoy;
+  s.resuelto_por= 'Carlos M.';
+  const obs = document.getElementById('res_obs').value;
+  if(obs) s.obs_res = obs;
+  updateKPIs(); filtrar(); bsResolucion.hide();
+  const msg = accionResolucion==='aprobada'
+    ?`Solicitud ${s.id} aprobada. Puedes generar la orden de producción.`
+    :`Solicitud ${s.id} rechazada.`;
+  toast(msg);
+}
+
+/* ── Generar orden desde solicitud ── */
+function abrirGenOrden(idx){
+  idxGenOrden = idx;
+  const s = solicitudes[idx];
+  const recs = RECETAS_ACT[s.id_producto]||[];
+  document.getElementById('gen_obs').value = `Generada desde ${s.id}`;
+  document.getElementById('gen_receta').innerHTML = recs.length
+    ? recs.map(r=>`<option value="${r.id}">${r.label}</option>`).join('')
+    : '<option value="">Sin receta activa para este producto</option>';
+  document.getElementById('genOrdenInfo').innerHTML=`
+    <div class="info-box" style="margin-bottom:.85rem;">
+      <i class="bi bi-link-45deg"></i>
+      <div><strong>${PRODUCTOS[s.id_producto]}</strong> — ${s.cantidad} pzas<br>
+      <span style="font-size:.72rem;">Solicitud: ${s.id} · Solicitante: ${s.solicitante}</span></div>
+    </div>`;
+  bsGenOrden.show();
+}
+function confirmarGenOrden(){
+  const s = solicitudes[idxGenOrden];
+  const recId = document.getElementById('gen_receta').value;
+  if(!recId){alert('Selecciona una receta activa.');return;}
+  const newOrdId = 'ORD-'+String(Math.floor(Math.random()*900)+100);
+  s.id_ord = newOrdId;
+  updateKPIs(); filtrar(); bsGenOrden.hide();
+  toast(`Orden ${newOrdId} creada y vinculada a ${s.id}.`);
+}
+
+/* ── Toast ── */
+function toast(msg){
+  let t=document.getElementById('softToast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='softToast';
+    t.style.cssText='position:fixed;bottom:1.5rem;right:1.5rem;background:var(--vino);color:#fff;padding:.7rem 1.2rem;border-radius:11px;font-size:.78rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(94,32,32,.3);display:flex;align-items:center;gap:.5rem;transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.innerHTML=`<i class="bi bi-check-circle-fill"></i> ${msg}`;
+  t.style.opacity='1';
+  setTimeout(()=>{t.style.opacity='0';},3500);
+}
+
+/* ── Sidebar ── */
+function setActive(el){document.querySelectorAll('.nav-link-side:not(.logout)').forEach(x=>x.classList.remove('active'));el.classList.add('active');}
+function toggleMenu(toggle){
+  const sub=toggle.nextElementSibling,isOpen=sub.classList.contains('open');
+  document.querySelectorAll('.nav-submenu.open').forEach(m=>{m.classList.remove('open');m.previousElementSibling.classList.remove('open');});
+  if(!isOpen){sub.classList.add('open');toggle.classList.add('open');}
+}
+
+/* ── Init ── */
+aplicarRol();
+renderTabla(solicitudes);
+updateKPIs();
+</script>
+</body>
+</html>

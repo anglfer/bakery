@@ -1,0 +1,48 @@
+{% extends "base_template.html" %} {% block title %}Salidas de Efectivo{% endblock %} {% block
+content %}
+<section class="section">
+	<h2 class="mb-3">Salidas de efectivo</h2>
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Registrar salida</h3>
+		<form method="post" class="grid-form">
+			<input type="text" name="concepto" placeholder="Concepto" required />
+			<input type="number" step="0.01" min="0.01" name="monto" placeholder="Monto" required />
+			<input type="text" name="tipo" placeholder="Tipo" value="OTRO" required />
+			<input type="text" name="referencia" placeholder="Referencia" />
+			<button type="submit">Registrar salida</button>
+		</form>
+	</div>
+
+	<div class="card p-3">
+		<h3 class="mb-2">Historial de salidas</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Fecha</th>
+						<th>Concepto</th>
+						<th>Tipo</th>
+						<th>Monto</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in salidas %}
+					<tr>
+						<td>{{ s.id_salida }}</td>
+						<td>{{ s.fecha_creacion.strftime('%Y-%m-%d') }}</td>
+						<td>{{ s.concepto }}</td>
+						<td>{{ s.tipo }}</td>
+						<td>${{ '%.2f'|format(s.monto) }}</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="5">No hay salidas registradas.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Clientes – SoftBakery</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #fdf6f3, #f7e9e4);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* ── CARD ── */
+.login-container {
+  background: white;
+  padding: 2.6rem 2.8rem;
+  border-radius: 30px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px rgba(0,0,0,.08);
+  animation: fadeIn .6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(15px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── LOGO / TÍTULO ── */
+.logo-icon   { font-size: 2.8rem; color: #9E3B3B; }
+.login-title { font-family: 'Playfair Display', serif; color: #9E3B3B; font-size: 1.75rem; }
+.subtitle    { color: #888; font-size: .85rem; }
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  background: #fdf6f3;
+  border-radius: 50px;
+  padding: 4px;
+  margin-bottom: 1.6rem;
+}
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 50px;
+  padding: .52rem .5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: .78rem;
+  font-weight: 500;
+  color: #999;
+  cursor: pointer;
+  transition: all .22s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+}
+.tab-btn.active {
+  background: #9E3B3B;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(158,59,59,.3);
+}
+.tab-btn:not(.active):hover { color: #9E3B3B; background: #fdeaea; }
+
+/* ── PANELES ── */
+.form-panel { display: none; }
+.form-panel.active { display: block; animation: fadeIn .3s ease; }
+
+/* ── INPUTS ── */
+.input-group {
+  border-radius: 50px;
+  overflow: hidden;
+}
+.input-group-text {
+  background: #fff;
+  border-radius: 50px 0 0 50px;
+  border: 1px solid #eee;
+  border-right: none;
+  color: #9E3B3B;
+}
+.form-control {
+  border-radius: 0 50px 50px 0 !important;
+  padding: .72rem 1rem;
+  border: 1px solid #eee;
+  border-left: none;
+  font-size: .84rem;
+  font-family: 'Poppins', sans-serif;
+}
+.form-control:focus {
+  border-color: #9E3B3B;
+  box-shadow: none;
+}
+/* input con toggle de contraseña al final */
+.input-group .form-control.mid {
+  border-radius: 0 !important;
+  border-right: none;
+}
+.toggle-password {
+  cursor: pointer;
+  color: #aaa;
+  background: #fff;
+  border: 1px solid #eee;
+  border-left: none;
+  border-radius: 0 50px 50px 0;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  transition: color .18s;
+}
+.toggle-password:hover { color: #9E3B3B; }
+
+/* ── LABEL ── */
+.form-label { font-size: .8rem; font-weight: 600; margin-bottom: .35rem; color: #444; }
+.req        { color: #9E3B3B; }
+
+/* ── VALIDACIÓN ── */
+.field-msg {
+  font-size: .68rem;
+  margin-top: .28rem;
+  min-height: 14px;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.field-msg.ok  { color: #2e7d52; }
+.field-msg.err { color: #c0392b; }
+.form-control.valid   { border-color: #2e7d52 !important; }
+.form-control.invalid { border-color: #c0392b !important; }
+
+/* ── REGLAS CONTRASEÑA ── */
+.pwd-rules {
+  background: #fdf6f3;
+  border-radius: 12px;
+  padding: .65rem .9rem;
+  margin-top: .45rem;
+  border: 1px solid #f0e0d8;
+}
+.pwd-rule {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .68rem;
+  color: #999;
+  padding: .15rem 0;
+  transition: color .18s;
+}
+.pwd-rule i.ok-ic  { display: none; }
+.pwd-rule i.err-ic { color: #ccc; }
+.pwd-rule.ok       { color: #2e7d52; }
+.pwd-rule.ok i.ok-ic  { display: inline; color: #2e7d52; }
+.pwd-rule.ok i.err-ic { display: none; }
+
+/* ── BOTÓN SUBMIT ── */
+.btn-login {
+  background-color: #9E3B3B;
+  border: none;
+  border-radius: 50px;
+  padding: .75rem;
+  color: white;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  font-size: .86rem;
+  transition: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+}
+.btn-login:hover {
+  background-color: #862f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(158,59,59,.35);
+}
+
+/* ── LINK ── */
+.link { font-size: .82rem; text-decoration: none; color: #9E3B3B; }
+.link:hover { text-decoration: underline; }
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #ccc;
+  font-size: .72rem;
+  margin: 1rem 0;
+}
+.divider::before, .divider::after { content:''; flex:1; height:1px; background:#eee; }
+
+/* ── FILA 2 COLS ── */
+.row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+@media(max-width:460px){ .row-fields{ grid-template-columns:1fr; } }
+
+/* ── SUCCESS ── */
+.success-screen { display:none; text-align:center; animation:fadeIn .4s ease; padding:.5rem 0; }
+.success-screen.show { display:block; }
+.success-icon {
+  width: 66px; height: 66px; border-radius: 50%;
+  background: linear-gradient(135deg,#2e7d52,#45a06a);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: #fff;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 24px rgba(46,125,82,.3);
+  animation: pop .5s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+.success-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:#1e0e09; margin-bottom:.4rem; }
+.success-msg   { font-size:.8rem; color:#888; line-height:1.6; margin-bottom:1.3rem; }
+.btn-go-login  {
+  background:#9E3B3B; color:#fff; border:none; border-radius:50px;
+  padding:.65rem 1.6rem; font-family:'Poppins',sans-serif; font-size:.83rem; font-weight:500;
+  cursor:pointer; transition:.3s; display:inline-flex; align-items:center; gap:.4rem;
+}
+.btn-go-login:hover { background:#862f2f; }
+
+/* ── TOAST ── */
+.toast-wrap {
+  position: fixed; bottom:1.5rem; right:1.5rem;
+  z-index:9999; display:flex; flex-direction:column; gap:.4rem;
+}
+.toast-pop {
+  padding:.7rem 1.1rem; border-radius:12px;
+  font-size:.78rem; font-weight:500; color:#fff;
+  display:flex; align-items:center; gap:.45rem;
+  box-shadow:0 4px 18px rgba(0,0,0,.14);
+  animation:slideIn .3s ease; white-space:nowrap;
+}
+.toast-success { background:#27ae60; }
+.toast-error   { background:#c0392b; }
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.security-note { font-size:.72rem; color:#aaa; text-align:center; margin-top:.9rem; }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+
+  <!-- LOGO -->
+  <div class="text-center mb-3">
+    <i class="bi bi-cake2-fill logo-icon"></i>
+    <h2 class="login-title mt-1">SoftBakery</h2>
+    <p class="subtitle">Portal de Clientes</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">
+      <i class="bi bi-person-fill"></i>Iniciar sesión
+    </button>
+    <button class="tab-btn" id="tab-registro" onclick="switchTab('registro')">
+      <i class="bi bi-person-plus-fill"></i>Crear cuenta
+    </button>
+  </div>
+
+  <!-- ══ PANEL LOGIN ══ -->
+  <div class="form-panel active" id="panel-login">
+
+    <div class="mb-3">
+      <label class="form-label">Usuario <span class="req">*</span></label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+        <input type="text" class="form-control" id="l-usuario" placeholder="Ingresa tu usuario"
+               oninput="liveCheck(this,'l-usuario-msg',v=>v.length>0,'')">
+      </div>
+      <div class="field-msg" id="l-usuario-msg"></div>
+    </div>
+
+    <div class="mb-1">
+      <label class="form-label">Contraseña <span class="req">*</span></label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+        <input type="password" class="form-control mid" id="l-password" placeholder="Ingresa tu contraseña"
+               oninput="liveCheck(this,'l-pwd-msg',v=>v.length>0,'')">
+        <span class="toggle-password" onclick="togglePwd('l-password',this)">
+          <i class="bi bi-eye-slash"></i>
+        </span>
+      </div>
+      <div class="field-msg" id="l-pwd-msg"></div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-2 mb-3">
+      <a href="#" class="link">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <button class="btn btn-login w-100" onclick="submitLogin()">
+      <i class="bi bi-box-arrow-in-right"></i>Iniciar sesión
+    </button>
+
+    <div class="divider">o</div>
+    <p class="text-center" style="font-size:.8rem;color:#888;">
+      ¿Aún no tienes cuenta?
+      <a class="link fw-semibold" onclick="switchTab('registro')" style="cursor:pointer;">Créala aquí</a>
+    </p>
+    <p class="security-note"><i class="bi bi-shield-check"></i> Conexión segura · tus datos están protegidos</p>
+  </div>
+
+  <!-- ══ PANEL REGISTRO ══ -->
+  <div class="form-panel" id="panel-registro">
+
+    <!-- Formulario -->
+    <div id="reg-fields">
+
+      <!-- Nombre / Apellido -->
+      <div class="row-fields mb-3">
+        <div>
+          <label class="form-label">Nombre <span class="req">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input type="text" class="form-control" id="r-nombre" placeholder="Laura"
+                   oninput="liveCheck(this,'r-nombre-msg',
+                     v=>/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s'-]{2,}$/.test(v),
+                     'Mínimo 2 letras')">
+          </div>
+          <div class="field-msg" id="r-nombre-msg"></div>
+        </div>
+        <div>
+          <label class="form-label">Apellido <span class="req">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input type="text" class="form-control" id="r-apellido" placeholder="Martínez"
+                   oninput="liveCheck(this,'r-apellido-msg',
+                     v=>/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s'-]{2,}$/.test(v),
+                     'Mínimo 2 letras')">
+          </div>
+          <div class="field-msg" id="r-apellido-msg"></div>
+        </div>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="mb-3">
+        <label class="form-label">Teléfono <span class="req">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+          <input type="tel" class="form-control" id="r-telefono" placeholder="477-100-0001"
+                 oninput="liveCheck(this,'r-tel-msg',
+                   v=>/^[\d\s\-\+\(\)]{7,20}$/.test(v),
+                   'Formato inválido (7–20 dígitos)')">
+        </div>
+        <div class="field-msg" id="r-tel-msg"></div>
+      </div>
+
+      <!-- Usuario -->
+      <div class="mb-3">
+        <label class="form-label">Usuario <span class="req">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-at"></i></span>
+          <input type="text" class="form-control" id="r-usuario" placeholder="laura_martinez"
+                 oninput="checkUsuario(this)">
+        </div>
+        <div class="field-msg" id="r-usuario-msg"></div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="mb-3">
+        <label class="form-label">Contraseña <span class="req">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+          <input type="password" class="form-control mid" id="r-password"
+                 placeholder="Mínimo 8 caracteres" autocomplete="new-password"
+                 oninput="validatePwd()">
+          <span class="toggle-password" onclick="togglePwd('r-password',this)">
+            <i class="bi bi-eye-slash"></i>
+          </span>
+        </div>
+        <!-- Reglas visuales -->
+        <div class="pwd-rules" id="pwd-rules">
+          <div class="pwd-rule" id="rule-len">
+            <i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Mínimo 8 caracteres
+          </div>
+          <div class="pwd-rule" id="rule-upper">
+            <i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos una mayúscula
+          </div>
+          <div class="pwd-rule" id="rule-lower">
+            <i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos una minúscula
+          </div>
+          <div class="pwd-rule" id="rule-num">
+            <i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos un número
+          </div>
+          <div class="pwd-rule" id="rule-special">
+            <i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos un carácter especial (!@#$%&*)
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmar contraseña -->
+      <div class="mb-3">
+        <label class="form-label">Confirmar contraseña <span class="req">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+          <input type="password" class="form-control mid" id="r-confirm"
+                 placeholder="Repite tu contraseña" autocomplete="new-password"
+                 oninput="validateConfirm()">
+          <span class="toggle-password" onclick="togglePwd('r-confirm',this)">
+            <i class="bi bi-eye-slash"></i>
+          </span>
+        </div>
+        <div class="field-msg" id="r-confirm-msg"></div>
+      </div>
+
+      <button class="btn btn-login w-100" onclick="submitRegistro()">
+        <i class="bi bi-person-plus-fill"></i>Crear mi cuenta
+      </button>
+
+      <div class="divider">o</div>
+      <p class="text-center" style="font-size:.8rem;color:#888;">
+        ¿Ya tienes cuenta?
+        <a class="link fw-semibold" onclick="switchTab('login')" style="cursor:pointer;">Inicia sesión</a>
+      </p>
+      <p class="security-note"><i class="bi bi-shield-check"></i> Conexión segura · tus datos están protegidos</p>
+
+    </div><!-- /reg-fields -->
+
+    <!-- Pantalla de éxito -->
+    <div class="success-screen" id="success-reg">
+      <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+      <h4 class="success-title">¡Cuenta creada!</h4>
+      <p class="success-msg">Tu registro fue exitoso.<br>Ya puedes iniciar sesión y comenzar a hacer pedidos.</p>
+      <button class="btn-go-login" onclick="switchTab('login')">
+        <i class="bi bi-box-arrow-in-right"></i>Ir a iniciar sesión
+      </button>
+    </div>
+
+  </div><!-- /panel-registro -->
+
+</div><!-- /login-container -->
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ── TABS ── */
+function switchTab(tab) {
+  ['login','registro'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'registro') {
+    document.getElementById('reg-fields').style.display = 'block';
+    document.getElementById('success-reg').classList.remove('show');
+  }
+}
+
+/* ── TOGGLE CONTRASEÑA ── */
+function togglePwd(id, el) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  el.querySelector('i').className = show ? 'bi bi-eye' : 'bi bi-eye-slash';
+}
+
+/* ── VALIDACIÓN GENÉRICA ── */
+function liveCheck(inp, msgId, testFn, errMsg) {
+  const v = inp.value.trim();
+  if (!v) {
+    inp.classList.remove('valid','invalid');
+    setMsg(msgId,'','');
+    return false;
+  }
+  const ok = testFn(v);
+  inp.classList.toggle('valid',   ok);
+  inp.classList.toggle('invalid', !ok);
+  setMsg(msgId, ok ? '' : errMsg, ok ? 'ok' : 'err');
+  return ok;
+}
+
+function setMsg(id, txt, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!txt) { el.innerHTML = ''; el.className = 'field-msg'; return; }
+  el.innerHTML = `<i class="bi ${cls==='ok'?'bi-check-circle':'bi-exclamation-circle'}"></i>${txt}`;
+  el.className = 'field-msg ' + cls;
+}
+
+/* ── USUARIO ÚNICO ── */
+const TOMADOS = ['laura_martinez','admin','softbakery','usuario1'];
+function checkUsuario(inp) {
+  const v = inp.value.trim();
+  if (!v) { inp.classList.remove('valid','invalid'); setMsg('r-usuario-msg','',''); return; }
+  const fmt = v.length >= 4 && /^[a-z0-9_.]+$/i.test(v);
+  const libre = !TOMADOS.includes(v.toLowerCase());
+  const ok = fmt && libre;
+  inp.classList.toggle('valid', ok);
+  inp.classList.toggle('invalid', !ok);
+  const msg = !fmt ? 'Mín. 4 caracteres, solo letras, números, _ y .'
+            : !libre ? 'Ese usuario ya está en uso'
+            : 'Usuario disponible';
+  setMsg('r-usuario-msg', ok ? '' : msg, ok ? 'ok' : 'err');
+  if (ok) setMsg('r-usuario-msg','Usuario disponible','ok');
+}
+
+/* ── REGLAS CONTRASEÑA ── */
+function allPwdOk() {
+  const v = document.getElementById('r-password').value;
+  return v.length>=8 && /[A-Z]/.test(v) && /[a-z]/.test(v)
+      && /[0-9]/.test(v) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(v);
+}
+function validatePwd() {
+  const v = document.getElementById('r-password').value;
+  setRule('rule-len',     v.length >= 8);
+  setRule('rule-upper',   /[A-Z]/.test(v));
+  setRule('rule-lower',   /[a-z]/.test(v));
+  setRule('rule-num',     /[0-9]/.test(v));
+  setRule('rule-special', /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(v));
+  validateConfirm();
+}
+function setRule(id, ok) {
+  document.getElementById(id).classList.toggle('ok', ok);
+}
+function validateConfirm() {
+  const pwd  = document.getElementById('r-password').value;
+  const conf = document.getElementById('r-confirm').value;
+  const inp  = document.getElementById('r-confirm');
+  if (!conf) { inp.classList.remove('valid','invalid'); setMsg('r-confirm-msg','',''); return; }
+  const ok = pwd === conf && allPwdOk();
+  inp.classList.toggle('valid',   ok);
+  inp.classList.toggle('invalid', !ok);
+  setMsg('r-confirm-msg',
+    !allPwdOk()  ? 'La contraseña no cumple los requisitos' :
+    ok           ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden',
+    ok ? 'ok' : 'err');
+}
+
+/* ── SUBMIT LOGIN ── */
+function submitLogin() {
+  const u = document.getElementById('l-usuario').value.trim();
+  const p = document.getElementById('l-password').value;
+  if (!u || !p) { toast('Completa todos los campos.','error'); return; }
+  // POST /api/clientes/login  →  { usuario_cliente, password }
+  toast('✓ Sesión iniciada. Redirigiendo…','success');
+}
+
+/* ── SUBMIT REGISTRO ── */
+function submitRegistro() {
+  const nombre   = document.getElementById('r-nombre').value.trim();
+  const apellido = document.getElementById('r-apellido').value.trim();
+  const tel      = document.getElementById('r-telefono').value.trim();
+  const usuario  = document.getElementById('r-usuario').value.trim();
+  const pwd      = document.getElementById('r-password').value;
+  const conf     = document.getElementById('r-confirm').value;
+
+  if (!nombre||!apellido||!tel||!usuario||!pwd||!conf) {
+    toast('Completa todos los campos obligatorios.','error'); return;
+  }
+  if (!/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s'-]{2,}$/.test(nombre))  { toast('Nombre inválido.','error'); return; }
+  if (!/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s'-]{2,}$/.test(apellido)){ toast('Apellido inválido.','error'); return; }
+  if (!/^[\d\s\-\+\(\)]{7,20}$/.test(tel))                { toast('Teléfono inválido.','error'); return; }
+  if (usuario.length<4||!/^[a-z0-9_.]+$/i.test(usuario))  { toast('Usuario inválido.','error'); return; }
+  if (TOMADOS.includes(usuario.toLowerCase()))             { toast('Ese usuario ya está registrado.','error'); return; }
+  if (!allPwdOk())  { toast('La contraseña no cumple los requisitos.','error'); return; }
+  if (pwd !== conf) { toast('Las contraseñas no coinciden.','error'); return; }
+
+  // POST /api/clientes/registro  →  { nombre, apellido, telefono, usuario_cliente, password_hash }
+  document.getElementById('reg-fields').style.display = 'none';
+  document.getElementById('success-reg').classList.add('show');
+}
+
+/* ── TOAST ── */
+function toast(msg, tipo='success') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast-pop toast-' + tipo;
+  t.innerHTML = `<i class="bi ${tipo==='success'?'bi-check-circle-fill':'bi-exclamation-circle-fill'}"></i>${msg}`;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3600);
+}
+</script>
+</body>
+</html>

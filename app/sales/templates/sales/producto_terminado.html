@@ -1,0 +1,555 @@
+{% extends "base_template.html" %} {% block title %}Inventario y Producto Terminado{% endblock %} {%
+block content %}
+<div class="row mb-4 align-items-center">
+	<div class="col">
+		<h2 class="h3 mb-0 text-primary-emphasis fw-bold">Almacén — Producto Terminado</h2>
+		<p class="text-muted mb-0">Gestiona el catálogo, inventario y alertas de stock.</p>
+	</div>
+	<div class="col-auto">
+		<span class="text-secondary small">
+			Último acceso: {{ utc_now().strftime('%d/%m/%Y — %I:%M %p') }}
+		</span>
+	</div>
+</div>
+
+<!-- Tabs de Navegación -->
+<ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+	<li class="nav-item" role="presentation">
+		<button
+			class="nav-link active rounded-pill px-4 me-2"
+			id="pills-catalogo-tab"
+			data-bs-toggle="pill"
+			data-bs-target="#pills-catalogo"
+			type="button"
+			role="tab"
+			aria-controls="pills-catalogo"
+			aria-selected="true">
+			<i class="bi bi-grid-fill me-2"></i>
+			Catálogo
+		</button>
+	</li>
+	<li class="nav-item" role="presentation">
+		<button
+			class="nav-link rounded-pill px-4"
+			id="pills-inventario-tab"
+			data-bs-toggle="pill"
+			data-bs-target="#pills-inventario"
+			type="button"
+			role="tab"
+			aria-controls="pills-inventario"
+			aria-selected="false">
+			<i class="bi bi-table me-2"></i>
+			Inventario
+		</button>
+	</li>
+</ul>
+
+<!-- Controles Principales -->
+<div class="card border-0 shadow-sm mb-4">
+	<div class="card-body p-3">
+		<div class="row g-3 align-items-center">
+			<div class="col-md-6">
+				<div class="input-group">
+					<span class="input-group-text bg-transparent border-end-0">
+						<i class="bi bi-search"></i>
+					</span>
+					<input
+						type="text"
+						class="form-control border-start-0 ps-0"
+						id="searchInput"
+						placeholder="Buscar producto..." />
+				</div>
+			</div>
+			<div class="col-md-auto ms-auto">
+				<select class="form-select w-auto d-inline-block me-2" id="filterStatus">
+					<option value="all">Todos</option>
+					<option value="active">Activos</option>
+					<option value="inactive">Inactivos</option>
+				</select>
+				<select class="form-select w-auto d-inline-block me-2" id="filterStock">
+					<option value="all">Todo el stock</option>
+					<option value="low">Stock bajo</option>
+					<option value="available">Disponible</option>
+				</select>
+				<button
+					type="button"
+					class="btn btn-primary px-4 rounded-pill"
+					data-bs-toggle="modal"
+					data-bs-target="#modalProducto"
+					onclick="resetForm()">
+					<i class="bi bi-heptagon-fill me-2"></i>
+					Nuevo producto
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="tab-content" id="pills-tabContent">
+	<!-- Vista Catálogo (Cards) -->
+	<div
+		class="tab-pane fade show active"
+		id="pills-catalogo"
+		role="tabpanel"
+		aria-labelledby="pills-catalogo-tab">
+		<div class="row g-4" id="catalogGrid">
+			{% for p in productos %}
+			<div
+				class="col-md-6 col-lg-3 product-item"
+				data-status="{{ 'active' if p.activo else 'inactive' }}"
+				data-stock="{{ 'low' if p.cantidad_disponible < p.stock_minimo else 'available' }}"
+				data-name="{{ p.nombre|lower }}">
+				<div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+					<div class="card-body position-relative">
+						<!-- Badge Stock -->
+						{% if p.activo %} {% if p.cantidad_disponible < p.stock_minimo %}
+						<span class="position-absolute top-0 end-0 m-3 badge bg-warning text-dark rounded-pill">
+							<i class="bi bi-exclamation-triangle-fill me-1"></i>
+							Stock bajo
+						</span>
+						{% else %}
+						<span
+							class="position-absolute top-0 end-0 m-3 badge bg-success-subtle text-success rounded-pill">
+							<i class="bi bi-check-circle-fill me-1"></i>
+							Disponible
+						</span>
+						{% endif %} {% else %}
+						<span class="position-absolute top-0 end-0 m-3 badge bg-secondary rounded-pill">
+							Inactivo
+						</span>
+						{% endif %}
+
+						<div
+							class="text-center mb-3 mt-2 overflow-hidden rounded"
+							style="height: 150px; width: 100%">
+							{% if p.imagen and p.imagen.startswith('img/') %}
+							<img
+								src="{{ url_for('static', filename=p.imagen) }}"
+								alt="{{ p.nombre }}"
+								class="img-fluid h-100 w-100 object-fit-cover" />
+							{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
+							<img
+								src="{{ p.imagen }}"
+								alt="{{ p.nombre }}"
+								class="img-fluid h-100 w-100 object-fit-cover" />
+							{% else %}
+							<span
+								class="display-3 d-flex align-items-center justify-content-center h-100 bg-light">
+								{{ p.imagen or '🍞' }}
+							</span>
+							{% endif %}
+						</div>
+
+						<h5 class="card-title fw-bold text-truncate" title="{{ p.nombre }}">{{ p.nombre }}</h5>
+						<p class="card-text text-muted small text-truncate">
+							{{ p.descripcion or 'Sin descripción' }}
+						</p>
+
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<div>
+								<h4 class="mb-0 text-primary-emphasis fw-bold">
+									${{ '%.2f'|format(p.precio_venta) }}
+								</h4>
+								<small class="text-muted">/ {{ p.unidad_venta }}</small>
+							</div>
+							{% if p.activo %}
+							<span
+								class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2">
+								Activo
+							</span>
+							{% else %}
+							<span
+								class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2">
+								Inactivo
+							</span>
+							{% endif %}
+						</div>
+
+						<div
+							class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-3">
+							<span class="small text-muted">Stock:</span>
+							<span class="fw-bold">{{ p.cantidad_disponible }}</span>
+							<span class="small text-muted mx-1">/</span>
+							<span class="small text-muted">Mín: {{ p.stock_minimo }}</span>
+						</div>
+
+						<div class="d-grid gap-2 d-md-flex justify-content-md-between">
+							<button
+								class="btn btn-outline-primary btn-sm flex-grow-1"
+								onclick="openEditModal({{ p.id_producto }})">
+								<i class="bi bi-pencil-fill me-1"></i>
+								Editar
+							</button>
+							<!-- Placeholder buttons for future functionality -->
+							<button class="btn btn-outline-secondary btn-sm" disabled title="Ver detalles">
+								<i class="bi bi-eye-fill"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<div class="col-12 text-center py-5">
+				<i class="bi bi-box-seam display-1 text-muted opacity-25"></i>
+				<p class="mt-3 text-muted">No hay productos registrados.</p>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<!-- Vista Inventario (Tabla) -->
+	<div
+		class="tab-pane fade"
+		id="pills-inventario"
+		role="tabpanel"
+		aria-labelledby="pills-inventario-tab">
+		<div class="card border-0 shadow-sm">
+			<div class="card-body p-0">
+				<div class="table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead class="bg-light">
+							<tr>
+								<th class="ps-4">ID</th>
+								<th>Producto</th>
+								<th>Precio Venta</th>
+								<th>Cant. Actual</th>
+								<th>Stock Mínimo</th>
+								<th>Estado Stock</th>
+								<th>Última Actualiz.</th>
+								<th>Estado</th>
+								<th class="text-end pe-4">Acciones</th>
+							</tr>
+						</thead>
+						<tbody id="inventoryTableBody">
+							{% for p in productos %}
+							<tr
+								class="product-row"
+								data-status="{{ 'active' if p.activo else 'inactive' }}"
+								data-stock="{{ 'low' if p.cantidad_disponible < p.stock_minimo else 'available' }}"
+								data-name="{{ p.nombre|lower }}">
+								<td class="ps-4 text-muted fw-mono">P-{{ '%03d'|format(p.id_producto) }}</td>
+								<td>
+									<div class="d-flex align-items-center">
+										<div
+											class="rounded p-1 me-3 border d-flex align-items-center justify-content-center bg-light"
+											style="width: 48px; height: 48px; overflow: hidden">
+											{% if p.imagen and p.imagen.startswith('img/') %}
+											<img
+												src="{{ url_for('static', filename=p.imagen) }}"
+												alt="{{ p.nombre }}"
+												class="w-100 h-100 object-fit-cover" />
+											{% elif p.imagen and (p.imagen.startswith('http') or
+											p.imagen.startswith('data:')) %}
+											<img
+												src="{{ p.imagen }}"
+												alt="{{ p.nombre }}"
+												class="w-100 h-100 object-fit-cover" />
+											{% else %}
+											<span class="fs-4">{{ p.imagen or '🍞' }}</span>
+											{% endif %}
+										</div>
+										<div>
+											<div class="fw-bold">{{ p.nombre }}</div>
+											<div class="small text-muted">{{ p.unidad_venta }}</div>
+										</div>
+									</div>
+								</td>
+								<td>${{ '%.2f'|format(p.precio_venta) }}</td>
+								<td class="fw-bold fs-5">
+									{{ p.cantidad_disponible }}
+									<span class="fs-6 fw-normal text-muted">{{ p.unidad_venta }}s</span>
+								</td>
+								<td>
+									{{ p.stock_minimo }}
+									<span class="small text-muted">{{ p.unidad_venta }}s</span>
+								</td>
+								<td>
+									{% if p.cantidad_disponible < p.stock_minimo %}
+									<span class="badge bg-warning text-dark">
+										<i class="bi bi-exclamation-triangle me-1"></i>
+										Stock bajo
+									</span>
+									{% else %}
+									<span class="badge bg-success-subtle text-success">
+										<i class="bi bi-check-circle me-1"></i>
+										Disponible
+									</span>
+									{% endif %}
+								</td>
+								<td>
+									<small class="text-muted">
+										{{ p.fecha_actualizacion.strftime('%Y-%m-%d') if p.fecha_actualizacion else
+										'N/A' }}
+									</small>
+								</td>
+								<td>
+									{% if p.activo %}
+									<span class="badge bg-success-subtle text-success rounded-pill">Activo</span>
+									{% else %}
+									<span class="badge bg-secondary rounded-pill">Inactivo</span>
+									{% endif %}
+								</td>
+								<td class="text-end pe-4">
+									<button
+										class="btn btn-sm btn-outline-primary"
+										onclick="openEditModal({{ p.id_producto }})">
+										<i class="bi bi-pencil-fill"></i>
+									</button>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Producto (Crear/Editar) -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header bg-primary text-white">
+				<h5 class="modal-title fw-bold" id="modalTitle">Nuevo Producto</h5>
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="modal"
+					aria-label="Close"></button>
+			</div>
+			<form method="post" id="formProducto" enctype="multipart/form-data">
+				<div class="modal-body p-4 bg-light-subtle">
+					<input type="hidden" name="action" id="formAction" value="crear" />
+					<input type="hidden" name="id_producto" id="productId" />
+
+					<!-- Sección Datos del Producto -->
+					<h6 class="text-danger fw-bold border-bottom border-danger pb-2 mb-3">
+						<i class="bi bi-info-circle-fill me-2"></i>
+						DATOS DEL PRODUCTO
+					</h6>
+
+					<div class="row g-3 mb-4">
+						<div class="col-md-6">
+							<label class="form-label fw-bold small text-muted">
+								Nombre
+								<span class="text-danger">*</span>
+							</label>
+							<input
+								type="text"
+								class="form-control"
+								name="nombre"
+								id="nombre"
+								placeholder="Ej. Pastel de Chocolate"
+								required />
+						</div>
+						<div class="col-md-3">
+							<label class="form-label fw-bold small text-muted">
+								Precio de venta
+								<span class="text-danger">*</span>
+							</label>
+							<div class="input-group">
+								<span class="input-group-text">$</span>
+								<input
+									type="number"
+									step="0.01"
+									min="0"
+									class="form-control"
+									name="precio_venta"
+									id="precio_venta"
+									placeholder="0.00"
+									required />
+							</div>
+						</div>
+						<div class="col-md-3">
+							<label class="form-label fw-bold small text-muted">
+								Unidad de venta
+								<span class="text-danger">*</span>
+							</label>
+							<select class="form-select" name="unidad_venta" id="unidad_venta">
+								<option value="Pieza">Pieza</option>
+								<option value="Kg">Kg</option>
+								<option value="Paquete">Paquete</option>
+								<option value="Litro">Litro</option>
+								<option value="Caja">Caja</option>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label fw-bold small text-muted">
+								Receta base
+								<span class="text-danger">*</span>
+							</label>
+							<select class="form-select" name="id_receta" id="id_receta" required>
+								<option value="">Selecciona una receta</option>
+								{% for r in recetas %}
+								<option value="{{ r.id_receta }}">{{ r.nombre }} v{{ r.version }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="col-md-12">
+							<label class="form-label fw-bold small text-muted">Descripción</label>
+							<textarea
+								class="form-control"
+								name="descripcion"
+								id="descripcion"
+								rows="2"
+								placeholder="Descripción del producto (opcional)..."></textarea>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label fw-bold small text-muted">Imagen / Emoji</label>
+							<div class="input-group">
+								<input
+									type="file"
+									class="form-control"
+									name="imagen_archivo"
+									id="imagen_archivo"
+									accept="image/*" />
+							</div>
+							<div class="input-group mt-2">
+								<span class="input-group-text">o Emoji/URL</span>
+								<input
+									type="text"
+									class="form-control"
+									name="imagen"
+									id="imagen"
+									placeholder="🍞 o URL imagen" />
+							</div>
+							<div class="form-text">Sube una imagen o usa un emoji.</div>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label fw-bold small text-muted">Estado</label>
+							<div class="form-check form-switch mt-2">
+								<input class="form-check-input" type="checkbox" name="activo" id="activo" checked />
+								<label class="form-check-label" for="activo">Producto activo para venta</label>
+							</div>
+						</div>
+					</div>
+
+					<!-- Sección Inventario Inicial -->
+					<h6 class="text-danger fw-bold border-bottom border-danger pb-2 mb-3">
+						<i class="bi bi-boxes me-2"></i>
+						INVENTARIO (Parámetros)
+					</h6>
+
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label class="form-label fw-bold small text-muted">
+								Stock mínimo
+								<span class="text-danger">*</span>
+							</label>
+							<input
+								type="number"
+								min="0"
+								class="form-control"
+								name="stock_minimo"
+								id="stock_minimo"
+								value="0"
+								required />
+							<div class="form-text">
+								Alerta visual cuando baje de este nivel. (El stock inicial es 0 por defecto)
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer bg-white">
+					<button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn btn-primary px-4">
+						<i class="bi bi-save-fill me-2"></i>
+						Guardar producto
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+	// Datos de productos para el modal (serializados desde backend o construidos aqui)
+	const productsData = {
+	    {% for p in productos %}
+	    {{ p.id_producto }}: {
+	        id: {{ p.id_producto }},
+	        nombre: "{{ p.nombre }}",
+	        descripcion: "{{ p.descripcion }}",
+	        precio: {{ p.precio_venta }},
+	        unidad: "{{ p.unidad_venta }}",
+	        id_receta: {{ p.id_receta or 'null' }},
+	        stock_min: {{ p.stock_minimo }},
+	        activo: {{ 'true' if p.activo else 'false' }},
+	        imagen: "{{ p.imagen|default('', true) }}"
+	    },
+	    {% endfor %}
+	};
+
+	function resetForm() {
+	    document.getElementById('formProducto').reset();
+	    document.getElementById('formAction').value = 'crear';
+	    document.getElementById('productId').value = '';
+	    document.getElementById('modalTitle').textContent = 'Nuevo Producto';
+	    document.getElementById('activo').checked = true;
+	    document.getElementById('id_receta').value = '';
+	}
+
+	function openEditModal(id) {
+	    const p = productsData[id];
+	    if (!p) return;
+
+	    document.getElementById('formAction').value = 'editar';
+	    document.getElementById('productId').value = p.id;
+	    document.getElementById('nombre').value = p.nombre;
+	    document.getElementById('descripcion').value = p.descripcion;
+	    document.getElementById('precio_venta').value = p.precio;
+	    document.getElementById('unidad_venta').value = p.unidad;
+	    document.getElementById('id_receta').value = p.id_receta || '';
+	    document.getElementById('stock_minimo').value = p.stock_min;
+	    document.getElementById('imagen').value = p.imagen;
+	    document.getElementById('activo').checked = p.activo;
+
+	    document.getElementById('modalTitle').textContent = 'Editar Producto';
+
+	    const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+	    modal.show();
+	}
+
+	// Filtrado simple en JS
+	const searchInput = document.getElementById('searchInput');
+	const filterStatus = document.getElementById('filterStatus');
+	const filterStock = document.getElementById('filterStock');
+
+	function applyFilters() {
+	    const term = searchInput.value.toLowerCase();
+	    const status = filterStatus.value;
+	    const stock = filterStock.value;
+
+	    const items = document.querySelectorAll('.product-item, .product-row'); // Select both cards and rows
+
+	    items.forEach(item => {
+	        const name = item.dataset.name;
+	        const itemStatus = item.dataset.status;
+	        const itemStock = item.dataset.stock;
+
+	        let matchesSearch = name.includes(term);
+	        let matchesStatus = (status === 'all') || (status === itemStatus);
+	        let matchesStock = (stock === 'all') || (stock === itemStock);
+
+	        if (matchesSearch && matchesStatus && matchesStock) {
+	            if(item.classList.contains('product-row')) {
+	                 item.style.display = ''; // Table row
+	            } else {
+	                 item.parentElement.style.display = ''; // Grid column (wrapper of card needs hiding?) No, item is the col.
+	                 item.style.display = '';
+	            }
+	        } else {
+	            item.style.display = 'none';
+	        }
+	    });
+	}
+
+	searchInput.addEventListener('keyup', applyFilters);
+	filterStatus.addEventListener('change', applyFilters);
+	filterStock.addEventListener('change', applyFilters);
+</script>
+{% endblock %}

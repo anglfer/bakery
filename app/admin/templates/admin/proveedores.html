@@ -1,0 +1,89 @@
+{% extends "base_template.html" %}
+{% block title %}Proveedores{% endblock %}
+{% block content %}
+<section class="section">
+	<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+		<h2 class="mb-0">Gestion de proveedores</h2>
+		<form method="get" class="d-flex gap-2">
+			<input type="text" name="q" value="{{ q or '' }}" placeholder="Buscar proveedor" />
+			<button type="submit" class="btn btn-sm">Buscar</button>
+		</form>
+	</div>
+
+	<div class="card p-3 mb-3">
+		<h3 class="mb-2">Registrar proveedor</h3>
+		<form method="post" class="grid-form">
+			<input type="text" name="nombre_empresa" placeholder="Empresa" required />
+			<input type="email" name="correo" placeholder="Correo" required />
+			<input type="text" name="telefono" placeholder="Telefono" required />
+			<input type="text" name="direccion" placeholder="Direccion" required />
+			<button type="submit">Registrar proveedor</button>
+		</form>
+	</div>
+
+	<div class="card p-3">
+		<h3 class="mb-2">Listado de proveedores</h3>
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Empresa</th>
+						<th>Correo</th>
+						<th>Telefono</th>
+						<th>Direccion</th>
+						<th>Activo</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for p in proveedores %}
+					<tr>
+						<td>{{ p.id_proveedor }}</td>
+						<td>{{ p.nombre_empresa }}</td>
+						<td>{{ p.correo }}</td>
+						<td>{{ p.telefono }}</td>
+						<td>{{ p.direccion }}</td>
+						<td>{{ 'Si' if p.activo else 'No' }}</td>
+						<td>
+							<div class="d-grid gap-2" style="min-width: 220px">
+								<form
+									method="post"
+									action="{{ url_for('admin.editar_proveedor', id_proveedor=p.id_proveedor) }}"
+									class="d-grid gap-2">
+									<input type="text" name="nombre_empresa" value="{{ p.nombre_empresa }}" required />
+									<input type="email" name="correo" value="{{ p.correo }}" required />
+									<input type="text" name="telefono" value="{{ p.telefono }}" required />
+									<input type="text" name="direccion" value="{{ p.direccion }}" required />
+									<div class="form-check">
+										<input
+											class="form-check-input"
+											type="checkbox"
+											name="activo"
+											{{ 'checked' if p.activo else '' }} />
+										<span class="small text-secondary">Activo</span>
+									</div>
+									<button type="submit" class="btn btn-sm">Guardar</button>
+								</form>
+							<form method="post" action="{{ url_for('admin.desactivar_proveedor', id_proveedor=p.id_proveedor) }}">
+								<button
+									type="submit"
+									class="btn btn-sm btn-outline-dark"
+									{{ 'disabled' if not p.activo else '' }}>
+									Desactivar
+								</button>
+							</form>
+							</div>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="7">No hay proveedores para mostrar.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+{% endblock %}
