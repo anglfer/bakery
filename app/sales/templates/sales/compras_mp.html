@@ -1,28 +1,32 @@
 {% extends "base_template.html" %}
-{% block title %}Compras MP{% endblock %}
-{% block content %}
-<section class="section">
-	{% set ns = namespace(total=0, pendientes=0, pagadas=0) %}
-	{% for c in compras %}
-		{% set ns.total = ns.total + c.total %}
-		{% if c.estado_pago == 'PAGADO' %}
-			{% set ns.pagadas = ns.pagadas + 1 %}
-		{% else %}
-			{% set ns.pendientes = ns.pendientes + 1 %}
-		{% endif %}
-	{% endfor %}
+{% block title %}Compras de Materia Prima{% endblock %}
+{% block page_title %}Compras de Materia Prima{% endblock %}
 
+{% block content %}
+{% set ns = namespace(total=0, pendientes=0, pagadas=0, registros=compras|length) %}
+{% for compra in compras %}
+	{% set ns.total = ns.total + (compra.total or 0) %}
+	{% if compra.estado_pago == 'PAGADO' %}
+		{% set ns.pagadas = ns.pagadas + 1 %}
+	{% else %}
+		{% set ns.pendientes = ns.pendientes + 1 %}
+	{% endif %}
+{% endfor %}
+
+<section class="section compras-page">
 	<div class="ops-hero">
-		<p class="ops-meta mb-1">Panel de compras</p>
-		<h2 class="ops-hero-title">Compras de materia prima</h2>
-		<p class="ops-hero-text">Registra entradas de insumos y controla su pago a proveedores.</p>
+		<p class="ops-meta mb-1">Compras</p>
+		<h2 class="ops-hero-title">Compras de Materia Prima</h2>
+		<p class="ops-hero-text">
+			Registra compras con cabecera y detalle, actualiza inventario y controla pagos.
+		</p>
 	</div>
 
 	<div class="ops-kpi-grid compact">
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Compras registradas</p>
 			<p class="ops-kpi-value">{{ compras|length }}</p>
-			<p class="ops-kpi-sub">Histórico acumulado</p>
+			<p class="ops-kpi-sub">Historial acumulado</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Pendientes de pago</p>
@@ -30,204 +34,767 @@
 			<p class="ops-kpi-sub">Requieren salida de efectivo</p>
 		</article>
 		<article class="ops-kpi">
-			<p class="ops-kpi-label">Total comprado</p>
+			<p class="ops-kpi-label">Compras pagadas</p>
+			<p class="ops-kpi-value">{{ ns.pagadas }}</p>
+			<p class="ops-kpi-sub">Liquidaciones completadas</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Total histórico</p>
 			<p class="ops-kpi-value">${{ '%.2f'|format(ns.total) }}</p>
-			<p class="ops-kpi-sub">Monto histórico registrado</p>
+			<p class="ops-kpi-sub">Monto acumulado en compras</p>
 		</article>
 	</div>
 
-	<div class="ops-card d-flex flex-wrap justify-content-between align-items-center gap-3">
-		<div>
-			<h3 class="ops-card-title mb-1">Registro de compras</h3>
-			<p class="text-secondary mb-0 small">Usa una pantallita dedicada para capturar la compra completa.</p>
+	<div class="ops-toolbar compras-toolbar">
+		<div class="ops-input-wrap">
+			<i class="bi bi-search"></i>
+			<input
+				type="text"
+				id="comprasSearch"
+				placeholder="Buscar por proveedor o folio..." />
 		</div>
-		<button
-			type="button"
-			class="btn btn-sm"
-			data-bs-toggle="modal"
-			data-bs-target="#modalCompraCrear">
-			Registrar compra
+		<select id="comprasEstadoFiltro" class="form-select form-select-sm compras-filter">
+			<option value="TODOS">Todos los pagos</option>
+			<option value="PENDIENTE">Pendiente</option>
+			<option value="PAGADO">Pagado</option>
+		</select>
+		<button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiarFiltros">
+			<i class="bi bi-eraser me-1"></i>Limpiar
+		</button>
+		<button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalCompraCrear">
+			<i class="bi bi-plus-lg me-1"></i>Nueva compra
 		</button>
 	</div>
 
-	<div class="ops-card">
-		<h3 class="ops-card-title">Historial de compras</h3>
-		<div class="ops-toolbar">
-			<div class="ops-input-wrap">
-				<i class="bi bi-search"></i>
-				<input type="text" id="comprasSearch" placeholder="Buscar por proveedor o id" />
+	<div class="ops-card compras-table-card">
+		<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+			<div>
+				<h3 class="ops-card-title mb-1">Historial de Compras</h3>
+				<p class="text-secondary mb-0 small">
+					Consulta el proveedor, el detalle de insumos y el estado de pago de cada compra.
+				</p>
 			</div>
-			<select id="comprasEstadoFiltro" style="max-width: 220px">
-				<option value="TODOS">Todos los pagos</option>
-				<option value="PENDIENTE">Pendiente</option>
-				<option value="PAGADO">Pagado</option>
-			</select>
+			<span class="ops-chip neutral" id="comprasCountChip">{{ compras|length }} registros</span>
 		</div>
-		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
+
+		<div class="ops-table table-responsive compras-table-wrap">
+			<table class="table table-hover align-middle mb-0 compras-table">
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th>Folio</th>
 						<th>Proveedor</th>
 						<th>Fecha</th>
+						<th>Materias primas</th>
 						<th>Total</th>
 						<th>Estado pago</th>
-						<th>Accion</th>
+						<th>Registrado por</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for c in compras %}
+					{% for compra in compras %}
 					<tr
 						data-row="compra"
-						data-label="{{ (c.id_compra|string ~ ' ' ~ c.proveedor.nombre_empresa)|lower }}"
-						data-estado="{{ c.estado_pago }}">
-						<td>{{ c.id_compra }}</td>
-						<td>{{ c.proveedor.nombre_empresa }}</td>
-						<td>{{ c.fecha.strftime('%Y-%m-%d') }}</td>
-						<td>${{ '%.2f'|format(c.total) }}</td>
+						data-id="{{ compra.id_compra }}"
+						data-folio="{{ compra.folio_formateado|lower }}"
+						data-proveedor="{{ compra.proveedor.nombre_empresa|lower if compra.proveedor else '' }}"
+						data-estado="{{ compra.estado_pago }}"
+						data-label="{{ (compra.folio_formateado ~ ' ' ~ (compra.proveedor.nombre_empresa if compra.proveedor else '') ~ ' ' ~ compra.resumen_materias)|lower }}"
+						data-detalle-url="{{ url_for('sales.compra_mp_detalle', id_compra=compra.id_compra) }}"
+						data-pago-url="{{ url_for('sales.pagar_compra_route', id_compra=compra.id_compra) }}"
+						data-total="{{ '%.2f'|format(compra.total or 0) }}"
+						data-proveedor-nombre="{{ compra.proveedor.nombre_empresa if compra.proveedor else '' }}"
+						data-registrado-por="{{ compra.comprador.username if compra.comprador else '' }}"
+						data-fecha="{{ compra.fecha.strftime('%Y-%m-%d') }}">
+						<td class="fw-semibold text-nowrap">{{ compra.folio_formateado }}</td>
+						<td>{{ compra.proveedor.nombre_empresa if compra.proveedor else '-' }}</td>
+						<td class="text-nowrap">{{ compra.fecha.strftime('%Y-%m-%d') }}</td>
+						<td class="text-truncate compras-resumen" title="{{ compra.resumen_materias }}">
+							{{ compra.resumen_materias }}
+						</td>
+						<td class="fw-bold text-nowrap compras-total">${{ '%.2f'|format(compra.total or 0) }}</td>
 						<td>
-							<span class="ops-chip {{ 'success' if c.estado_pago == 'PAGADO' else 'warning' }}">
-								{{ c.estado_pago }}
+							<span class="ops-chip {{ 'success' if compra.estado_pago == 'PAGADO' else 'warning' }}">
+								{{ 'Pagado' if compra.estado_pago == 'PAGADO' else 'Pendiente' }}
 							</span>
 						</td>
+						<td>{{ compra.comprador.username if compra.comprador else '-' }}</td>
 						<td>
-							<form method="post" action="{{ url_for('sales.pagar_compra_route', id_compra=c.id_compra) }}">
+							<div class="btn-action-group">
 								<button
-									type="submit"
-									class="btn btn-sm btn-icon-sm"
-									title="Marcar compra como pagada"
-									{{ 'disabled' if c.estado_pago == 'PAGADO' else '' }}>
+									type="button"
+									class="btn btn-outline-secondary btn-icon-sm btnVerCompra"
+									data-bs-toggle="modal"
+									data-bs-target="#modalCompraDetalle"
+									title="Ver detalle"
+									data-id="{{ compra.id_compra }}"
+									data-folio="{{ compra.folio_formateado }}"
+									data-proveedor="{{ compra.proveedor.nombre_empresa if compra.proveedor else '' }}"
+									data-total="{{ '%.2f'|format(compra.total or 0) }}"
+									data-estado="{{ compra.estado_pago }}">
+									<i class="bi bi-eye-fill"></i>
+								</button>
+								<button
+									type="button"
+									class="btn btn-outline-success btn-icon-sm btnPagarCompra"
+									data-bs-toggle="modal"
+									data-bs-target="#modalConfirmarPago"
+									title="Registrar pago"
+									{{ 'disabled' if compra.estado_pago == 'PAGADO' else '' }}>
 									<i class="bi bi-cash-coin"></i>
 								</button>
-							</form>
+							</div>
 						</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="6">No hay compras registradas.</td>
+						<td colspan="8" class="text-center py-4 text-secondary">
+							No hay compras registradas.
+						</td>
 					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
 		</div>
-	</div>
 
-	<div class="modal fade" id="modalCompraCrear" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-xl modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Registrar compra de materia prima</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<form method="post" class="ops-grid p-3">
-					<select name="id_proveedor" required>
-						<option value="">Proveedor</option>
-						{% for p in proveedores %}
-						<option value="{{ p.id_proveedor }}">{{ p.nombre_empresa }}</option>
-						{% endfor %}
-					</select>
-
-					<div id="detalle-compra-container" class="d-grid gap-2" style="grid-column: 1 / -1">
-						<div class="row g-2 align-items-center detalle-compra-row">
-							<div class="col-md-5">
-								<select name="id_materia[]" class="form-select" required>
-									<option value="">Materia prima</option>
-									{% for m in materias %}
-									<option value="{{ m.id_materia }}">{{ m.nombre }}</option>
-									{% endfor %}
-								</select>
-							</div>
-							<div class="col-md-3">
-								<input
-									type="number"
-									step="0.0001"
-									min="0.0001"
-									name="cantidad_comprada[]"
-									class="form-control"
-									placeholder="Cantidad"
-									required />
-							</div>
-							<div class="col-md-3">
-								<input
-									type="number"
-									step="0.01"
-									min="0"
-									name="precio_unitario[]"
-									class="form-control"
-									placeholder="Precio unitario"
-									required />
-							</div>
-							<div class="col-md-1">
-								<button
-									type="button"
-									class="btn btn-outline-danger w-100"
-									onclick="removeDetalleCompra(this)">
-									-
-								</button>
-							</div>
-						</div>
-					</div>
-
-					<div style="grid-column: 1 / -1" class="d-flex gap-2">
-						<button type="button" class="btn btn-outline-primary btn-sm" onclick="addDetalleCompra()">
-							Agregar renglón
-						</button>
-					</div>
-
-					<div class="d-flex justify-content-end gap-2" style="grid-column: 1 / -1">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit">Registrar compra</button>
-					</div>
-				</form>
+		<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 small text-secondary">
+			<span id="comprasTableStatus">Mostrando {{ compras|length }} de {{ compras|length }} registros</span>
+			<div class="compras-pagination">
+				<button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+					<i class="bi bi-chevron-left"></i>
+				</button>
+				<button type="button" class="btn btn-sm" disabled>1</button>
+				<button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+					<i class="bi bi-chevron-right"></i>
+				</button>
 			</div>
 		</div>
 	</div>
 </section>
+
+<div class="modal fade" id="modalCompraCrear" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content border-0 shadow compras-create-modal">
+			<div class="modal-header compras-modal-header">
+				<div>
+					<p class="ops-meta mb-1 text-white-50">Nueva compra</p>
+					<h5 class="modal-title text-white mb-0">Nueva Compra de Materia Prima</h5>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" id="formCompraMateriaPrima" class="compras-create-form">
+				<div class="modal-body compras-modal-body">
+					<div class="compras-section-card">
+						<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Cabecera de compra</p>
+						<div class="ops-grid compras-header-grid">
+							<div>
+								<label for="compraProveedor" class="form-label fw-semibold">Proveedor *</label>
+								<select id="compraProveedor" name="id_proveedor" required>
+									<option value="">Seleccionar proveedor...</option>
+									{% for proveedor in proveedores %}
+									<option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre_empresa }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div>
+								<label for="compraFecha" class="form-label fw-semibold">Fecha de compra *</label>
+								<input id="compraFecha" type="date" name="fecha" value="{{ fecha_hoy }}" required />
+							</div>
+							<div>
+								<label for="compraEstadoPago" class="form-label fw-semibold">Estado de pago</label>
+								<select id="compraEstadoPago" name="estado_pago" required>
+									<option value="PENDIENTE">Pendiente</option>
+									<option value="PAGADO">Pagado</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="compras-info-banner">
+						<i class="bi bi-info-circle-fill"></i>
+						<div>
+							<p class="mb-1 fw-semibold">La conversión de unidades es automática.</p>
+							<p class="mb-0">
+								Al ingresar la cantidad en unidad de compra, el sistema calcula
+								<b>cantidad_base = cantidad_comprada × factor_conversion</b> y actualiza el inventario.
+							</p>
+						</div>
+					</div>
+
+					<div class="compras-section-card">
+						<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+							<p class="ops-meta mb-0"><i class="bi bi-list-check me-1"></i>Detalle de insumos adquiridos</p>
+							<button type="button" class="btn btn-outline-secondary btn-sm" id="btnAgregarDetalleCompra">
+								<i class="bi bi-plus-lg me-1"></i>Agregar materia prima
+							</button>
+						</div>
+
+						<div id="detalleCompraContainer" class="compras-detail-list"></div>
+						<template id="detalleCompraTemplate">
+							<div class="compras-detail-item" data-row="detalle-compra">
+								<div class="compras-detail-item-head">
+									<div class="compras-detail-item-index">1</div>
+									<div>
+										<p class="fw-bold mb-0">Insumo #1</p>
+										<small class="text-secondary">Captura la materia prima, su cantidad y precio.</small>
+									</div>
+									<button type="button" class="btn btn-outline-secondary btn-icon-sm btnEliminarDetalle" title="Eliminar renglón">
+										<i class="bi bi-x-lg"></i>
+									</button>
+								</div>
+
+								<div class="ops-grid compras-detail-grid">
+									<div class="compras-field-wide">
+										<label for="detalle-materia-template" class="form-label fw-semibold js-label-materia">Materia prima *</label>
+										<select id="detalle-materia-template" name="id_materia[]" class="js-materia" required>
+											<option value="">Seleccionar...</option>
+											{% for materia in materias %}
+											<option
+												value="{{ materia.id_materia }}"
+												data-nombre="{{ materia.nombre }}"
+												data-unidad-compra-id="{{ materia.id_unidad_compra }}"
+												data-unidad-compra="{{ materia.unidad_compra.abreviatura }}"
+												data-unidad-base="{{ materia.unidad_base.abreviatura }}"
+												data-factor="{{ materia.factor_conversion }}">
+												{{ materia.nombre }}
+											</option>
+											{% endfor %}
+										</select>
+									</div>
+
+									<div>
+										<label for="detalle-cantidad-template" class="form-label fw-semibold js-label-cantidad">Cant. comprada *</label>
+										<input id="detalle-cantidad-template" type="number" step="0.0001" min="0.0001" name="cantidad_comprada[]" class="js-cantidad" placeholder="0" required />
+									</div>
+
+									<div>
+										<label for="detalle-unidad-template" class="form-label fw-semibold js-label-unidad-compra">Unidad compra</label>
+										<input id="detalle-unidad-template" type="text" class="js-unidad-compra" readonly value="" placeholder="--" />
+										<input type="hidden" name="id_unidad_compra[]" class="js-id-unidad-compra" />
+									</div>
+
+									<div>
+										<label for="detalle-precio-template" class="form-label fw-semibold js-label-precio">Precio unitario *</label>
+										<input id="detalle-precio-template" type="number" step="0.01" min="0" name="precio_unitario[]" class="js-precio" placeholder="0.00" required />
+									</div>
+
+									<div>
+										<label for="detalle-subtotal-template" class="form-label fw-semibold js-label-subtotal">Subtotal</label>
+										<input id="detalle-subtotal-template" type="text" class="js-subtotal" readonly value="$0.00" />
+									</div>
+								</div>
+
+								<div class="compras-conversion-note js-conversion-note" aria-live="polite"></div>
+							</div>
+						</template>
+					</div>
+
+					<div class="compras-total-card">
+						<div>
+							<p class="mb-1 fw-semibold"><i class="bi bi-calculator me-1"></i>Total de la compra (calculado automáticamente)</p>
+							<small class="text-secondary">La suma de los subtotales se recalcula al instante.</small>
+						</div>
+						<div class="compras-total-value" id="totalCompraPreview">$0.00</div>
+						<input type="hidden" name="total" id="totalCompraHidden" value="0" />
+					</div>
+				</div>
+				<div class="modal-footer compras-modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-sm">
+						<i class="bi bi-check2 me-1"></i>Registrar compra y actualizar inventario
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalCompraDetalle" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content border-0 shadow compras-detail-modal">
+			<div class="modal-header compras-modal-header">
+				<div>
+					<p class="ops-meta mb-1 text-white-50">Detalle de compra</p>
+					<h5 class="modal-title text-white mb-0" id="detalleCompraTitulo">Detalle de Compra</h5>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body compras-modal-body">
+				<div class="compras-section-card compras-detail-info">
+					<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Información general</p>
+					<div class="compras-detail-meta-grid">
+						<div>
+							<span class="compras-detail-label">Proveedor</span>
+							<strong id="detalleCompraProveedor">-</strong>
+						</div>
+						<div>
+							<span class="compras-detail-label">Fecha</span>
+							<strong id="detalleCompraFecha">-</strong>
+						</div>
+						<div>
+							<span class="compras-detail-label">Estado pago</span>
+							<span class="ops-chip" id="detalleCompraEstado">-</span>
+						</div>
+						<div>
+							<span class="compras-detail-label">Registrado por</span>
+							<strong id="detalleCompraUsuario">-</strong>
+						</div>
+					</div>
+				</div>
+
+				<div class="compras-section-card">
+					<p class="ops-meta mb-2"><i class="bi bi-list-check me-1"></i>Materias primas adquiridas</p>
+					<div class="ops-table table-responsive">
+						<table class="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th>Materia prima</th>
+									<th>Unidad compra</th>
+									<th>Cant. comprada</th>
+									<th>Cant. base</th>
+									<th>Unidad base</th>
+									<th>Precio unit.</th>
+									<th>Subtotal</th>
+								</tr>
+							</thead>
+							<tbody id="detalleCompraBody">
+								<tr>
+									<td colspan="7" class="text-center text-secondary py-4">Cargando detalle...</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="compras-total-card mt-3 mb-0">
+						<div>
+							<p class="mb-1 fw-semibold">Total de la compra</p>
+							<small class="text-secondary">Incluye la suma de los subtotales del detalle.</small>
+						</div>
+						<div class="compras-total-value" id="detalleCompraTotal">$0.00</div>
+					</div>
+				</div>
+
+				<div class="compras-info-banner mt-3">
+					<i class="bi bi-arrow-repeat"></i>
+					<div>
+						<p class="mb-1 fw-semibold">Actualización automática de inventario</p>
+						<p class="mb-0">
+							Al registrar esta compra se generaron movimientos <b>ENTRADA</b> en inventario_materia_prima para cada insumo adquirido.
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer compras-modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalConfirmarPago" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-sm modal-dialog-centered">
+		<div class="modal-content border-0 shadow compras-pay-modal">
+			<div class="modal-body text-center p-4">
+				<div class="compras-pay-icon mx-auto mb-3">
+					<i class="bi bi-cash-coin"></i>
+				</div>
+				<h5 class="fw-bold mb-2">¿Registrar pago?</h5>
+				<p class="text-secondary mb-2" id="pagoCompraTexto">Compra - Proveedor</p>
+				<div class="compras-pay-amount" id="pagoCompraMonto">$0.00</div>
+				<p class="text-secondary mt-3 mb-0">
+					Se generará automáticamente un registro en <b>Salidas de Efectivo</b> vinculado a esta compra.
+				</p>
+			</div>
+			<div class="modal-footer justify-content-center gap-2 border-0 pt-0 pb-4">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+				<form method="post" id="formPagoCompra" class="d-inline">
+					<button type="submit" class="btn btn-sm">
+						<i class="bi bi-check2 me-1"></i>Confirmar pago
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 	(function () {
-		const container = document.getElementById('detalle-compra-container');
 		const comprasSearchInput = document.getElementById('comprasSearch');
 		const comprasEstadoFiltro = document.getElementById('comprasEstadoFiltro');
+		const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+		const comprasTableStatus = document.getElementById('comprasTableStatus');
+		const comprasCountChip = document.getElementById('comprasCountChip');
 
-		function applyComprasFilters() {
+		const detalleCompraContainer = document.getElementById('detalleCompraContainer');
+		const detalleCompraTemplate = document.getElementById('detalleCompraTemplate');
+		const btnAgregarDetalleCompra = document.getElementById('btnAgregarDetalleCompra');
+		const totalCompraPreview = document.getElementById('totalCompraPreview');
+		const totalCompraHidden = document.getElementById('totalCompraHidden');
+		const formCompraMateriaPrima = document.getElementById('formCompraMateriaPrima');
+
+		const detalleCompraTitulo = document.getElementById('detalleCompraTitulo');
+		const detalleCompraProveedor = document.getElementById('detalleCompraProveedor');
+		const detalleCompraFecha = document.getElementById('detalleCompraFecha');
+		const detalleCompraEstado = document.getElementById('detalleCompraEstado');
+		const detalleCompraUsuario = document.getElementById('detalleCompraUsuario');
+		const detalleCompraBody = document.getElementById('detalleCompraBody');
+		const detalleCompraTotal = document.getElementById('detalleCompraTotal');
+
+		const pagoCompraTexto = document.getElementById('pagoCompraTexto');
+		const pagoCompraMonto = document.getElementById('pagoCompraMonto');
+		const formPagoCompra = document.getElementById('formPagoCompra');
+
+		const detalleStateClass = {
+			PAGADO: 'success',
+			PENDIENTE: 'warning',
+		};
+
+		const formatMoney = (value) => {
+			const numberValue = Number(value || 0);
+			return `$${numberValue.toFixed(2)}`;
+		};
+
+		const formatNumber = (value) => {
+			return Number(value || 0).toLocaleString('es-MX', { maximumFractionDigits: 4 });
+		};
+
+		const applyFilters = () => {
 			const searchValue = String(comprasSearchInput?.value || '').toLowerCase().trim();
 			const estadoValue = String(comprasEstadoFiltro?.value || 'TODOS').toUpperCase();
+			let visibleCount = 0;
+
 			document.querySelectorAll('tr[data-row="compra"]').forEach((tableRowElement) => {
 				const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
 				const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
 				const matchesSearch = rowLabel.includes(searchValue);
 				const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
-				tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+				const visible = matchesSearch && matchesEstado;
+				tableRowElement.style.display = visible ? '' : 'none';
+				if (visible) visibleCount += 1;
 			});
-		}
 
-		if (comprasSearchInput) {
-			comprasSearchInput.addEventListener('input', applyComprasFilters);
-		}
-		if (comprasEstadoFiltro) {
-			comprasEstadoFiltro.addEventListener('change', applyComprasFilters);
-		}
-
-		globalThis.addDetalleCompra = function () {
-			if (!container) return;
-			const first = container.querySelector('.detalle-compra-row');
-			if (!first) return;
-			const clone = first.cloneNode(true);
-			clone.querySelectorAll('select').forEach((item) => (item.value = ''));
-			clone.querySelectorAll('input').forEach((item) => (item.value = ''));
-			container.appendChild(clone);
+			if (comprasTableStatus) {
+				comprasTableStatus.textContent = `Mostrando ${visibleCount} de ${document.querySelectorAll('tr[data-row="compra"]').length} registros`;
+			}
+			if (comprasCountChip) {
+				comprasCountChip.textContent = `${visibleCount} registros`;
+			}
 		};
 
-		globalThis.removeDetalleCompra = function (button) {
-			if (!container) return;
-			const rows = container.querySelectorAll('.detalle-compra-row');
+		btnLimpiarFiltros?.addEventListener('click', () => {
+			if (comprasSearchInput) comprasSearchInput.value = '';
+			if (comprasEstadoFiltro) comprasEstadoFiltro.value = 'TODOS';
+			applyFilters();
+		});
+
+		comprasSearchInput?.addEventListener('input', applyFilters);
+		comprasEstadoFiltro?.addEventListener('change', applyFilters);
+
+		const updateRowSubtotal = (row) => {
+			if (!row) return 0;
+			const cantidad = Number(row.querySelector('.js-cantidad')?.value || 0);
+			const precio = Number(row.querySelector('.js-precio')?.value || 0);
+			const subtotal = cantidad > 0 && precio >= 0 ? cantidad * precio : 0;
+			const subtotalInput = row.querySelector('.js-subtotal');
+			if (subtotalInput) subtotalInput.value = formatMoney(subtotal);
+			return subtotal;
+		};
+
+		const updateConversionPreview = (row) => {
+			if (!row) return;
+			const conversionNote = row.querySelector('.js-conversion-note');
+			if (!conversionNote) return;
+
+			const materiaOption = row.querySelector('.js-materia')?.selectedOptions?.[0];
+			const cantidad = Number(row.querySelector('.js-cantidad')?.value || 0);
+			const factor = Number(materiaOption?.dataset?.factor || 0);
+			const unidadCompra = materiaOption?.dataset?.unidadCompra || '';
+			const unidadBase = materiaOption?.dataset?.unidadBase || '';
+
+			if (!materiaOption?.value || cantidad <= 0 || factor <= 0) {
+				conversionNote.classList.remove('is-visible');
+				conversionNote.innerHTML = '';
+				return;
+			}
+
+			const cantidadBase = cantidad * factor;
+			conversionNote.innerHTML =
+				`<i class="bi bi-arrow-right-circle-fill"></i>${formatNumber(cantidad)} ${unidadCompra} × ${formatNumber(factor)} = <b>${formatNumber(cantidadBase)} ${unidadBase}</b> en inventario`;
+			conversionNote.classList.add('is-visible');
+		};
+
+		const updateTotalCompra = () => {
+			let total = 0;
+			document.querySelectorAll('[data-row="detalle-compra"]').forEach((row) => {
+				total += updateRowSubtotal(row);
+			});
+			if (totalCompraPreview) totalCompraPreview.textContent = formatMoney(total);
+			if (totalCompraHidden) totalCompraHidden.value = total.toFixed(2);
+			return total;
+		};
+
+		const updateRowMeta = (row) => {
+			if (!row) return;
+			const select = row.querySelector('.js-materia');
+			const unitInput = row.querySelector('.js-unidad-compra');
+			const unitHidden = row.querySelector('.js-id-unidad-compra');
+			const selectedOption = select?.selectedOptions?.[0];
+
+			if (!selectedOption || !selectedOption.value) {
+				if (unitInput) unitInput.value = '';
+				if (unitHidden) unitHidden.value = '';
+				updateConversionPreview(row);
+				updateRowSubtotal(row);
+				updateTotalCompra();
+				return;
+			}
+
+			const unidadCompra = selectedOption.dataset.unidadCompra || '';
+			const unidadCompraId = selectedOption.dataset.unidadCompraId || '';
+			if (unitInput) unitInput.value = unidadCompra;
+			if (unitHidden) unitHidden.value = unidadCompraId;
+			updateConversionPreview(row);
+			updateRowSubtotal(row);
+			updateTotalCompra();
+		};
+
+		const validarFormularioCompra = () => {
+			const rows = Array.from(document.querySelectorAll('[data-row="detalle-compra"]'));
+			const idsMateriaSeleccionadas = new Set();
+			let rowsValidas = 0;
+
+			for (const row of rows) {
+				const materiaSelect = row.querySelector('.js-materia');
+				const cantidadInput = row.querySelector('.js-cantidad');
+				const precioInput = row.querySelector('.js-precio');
+				const idMateria = String(materiaSelect?.value || '').trim();
+				const cantidad = Number(cantidadInput?.value || 0);
+				const precio = Number(precioInput?.value || 0);
+
+				if (!idMateria) continue;
+				rowsValidas += 1;
+
+				if (idsMateriaSeleccionadas.has(idMateria)) {
+					alert('No puedes repetir la misma materia prima en más de un renglón.');
+					materiaSelect?.focus();
+					return false;
+				}
+				idsMateriaSeleccionadas.add(idMateria);
+
+				if (cantidad <= 0) {
+					alert('La cantidad comprada debe ser mayor a cero.');
+					cantidadInput?.focus();
+					return false;
+				}
+
+				if (precio < 0) {
+					alert('El precio unitario no puede ser negativo.');
+					precioInput?.focus();
+					return false;
+				}
+			}
+
+			if (rowsValidas === 0) {
+				alert('Debes registrar al menos un insumo en el detalle de compra.');
+				rows[0]?.querySelector('.js-materia')?.focus();
+				return false;
+			}
+
+			return true;
+		};
+
+		const refreshRowLabels = () => {
+			document.querySelectorAll('[data-row="detalle-compra"]').forEach((row, index) => {
+				const sequence = index + 1;
+				const badge = row.querySelector('.compras-detail-item-index');
+				const title = row.querySelector('.compras-detail-item-head p');
+				if (badge) badge.textContent = String(sequence);
+				if (title) title.textContent = `Insumo #${sequence}`;
+
+				const materiaInput = row.querySelector('.js-materia');
+				const cantidadInput = row.querySelector('.js-cantidad');
+				const unidadInput = row.querySelector('.js-unidad-compra');
+				const precioInput = row.querySelector('.js-precio');
+				const subtotalInput = row.querySelector('.js-subtotal');
+
+				const inputMap = [
+					{ input: materiaInput, labelSelector: '.js-label-materia', key: 'materia' },
+					{ input: cantidadInput, labelSelector: '.js-label-cantidad', key: 'cantidad' },
+					{ input: unidadInput, labelSelector: '.js-label-unidad-compra', key: 'unidad' },
+					{ input: precioInput, labelSelector: '.js-label-precio', key: 'precio' },
+					{ input: subtotalInput, labelSelector: '.js-label-subtotal', key: 'subtotal' },
+				];
+
+				inputMap.forEach(({ input, labelSelector, key }) => {
+					if (!input) return;
+					const inputId = `detalle-${key}-${sequence}`;
+					input.id = inputId;
+					const label = row.querySelector(labelSelector);
+					if (label) label.setAttribute('for', inputId);
+				});
+
+				const removeButton = row.querySelector('.btnEliminarDetalle');
+				if (removeButton) removeButton.disabled = index === 0;
+			});
+		};
+
+		const addDetalleRow = () => {
+			if (!detalleCompraTemplate || !detalleCompraContainer) return;
+			const clone = detalleCompraTemplate.content.firstElementChild.cloneNode(true);
+			detalleCompraContainer.appendChild(clone);
+			clone.querySelectorAll('select, input').forEach((field) => {
+				if (field.type === 'text' || field.type === 'number') {
+					field.value = '';
+				}
+			});
+			refreshRowLabels();
+			updateTotalCompra();
+		};
+
+		btnAgregarDetalleCompra?.addEventListener('click', addDetalleRow);
+
+		document.addEventListener('input', (event) => {
+			const target = event.target;
+			const row = target?.closest?.('[data-row="detalle-compra"]');
+			if (!row) return;
+			if (target.classList.contains('js-cantidad') || target.classList.contains('js-precio')) {
+				updateConversionPreview(row);
+				updateRowSubtotal(row);
+				updateTotalCompra();
+			}
+		});
+
+		document.addEventListener('change', (event) => {
+			const target = event.target;
+			const row = target?.closest?.('[data-row="detalle-compra"]');
+			if (!row) return;
+			if (target.classList.contains('js-materia')) {
+				updateRowMeta(row);
+			}
+		});
+
+		document.addEventListener('click', (event) => {
+			const button = event.target.closest('.btnEliminarDetalle');
+			if (!button) return;
+			const row = button.closest('[data-row="detalle-compra"]');
+			if (!row) return;
+			const rows = document.querySelectorAll('[data-row="detalle-compra"]');
 			if (rows.length <= 1) return;
-			const row = button.closest('.detalle-compra-row');
-			if (row) row.remove();
+			row.remove();
+			refreshRowLabels();
+			updateTotalCompra();
+		});
+
+		const initPurchaseForm = () => {
+			if (!detalleCompraContainer || detalleCompraContainer.children.length > 0) return;
+			addDetalleRow();
 		};
+
+		const setDetailModalState = (estado) => {
+			const stateClass = detalleStateClass[estado] || 'neutral';
+			detalleCompraEstado.className = `ops-chip ${stateClass}`;
+			if (estado === 'PAGADO') {
+				detalleCompraEstado.textContent = 'Pagado';
+				return;
+			}
+			detalleCompraEstado.textContent = 'Pendiente';
+		};
+
+		const renderDetalleCompra = (detalleRows) => {
+			if (!detalleCompraBody) return;
+			if (!Array.isArray(detalleRows) || !detalleRows.length) {
+				detalleCompraBody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary py-4">Sin detalle disponible.</td></tr>';
+				return;
+			}
+
+			detalleCompraBody.innerHTML = detalleRows
+				.map((row) => {
+					return `
+						<tr>
+							<td class="fw-semibold">${row.materia_prima}</td>
+							<td><span class="ops-chip neutral">${row.unidad_compra || '-'}</span></td>
+							<td>${Number(row.cantidad_comprada).toLocaleString('es-MX')}</td>
+							<td class="text-success fw-semibold">${Number(row.cantidad_base).toLocaleString('es-MX')}</td>
+							<td><span class="ops-chip neutral">${row.unidad_base || '-'}</span></td>
+							<td>$${Number(row.precio_unitario).toFixed(2)}</td>
+							<td class="fw-bold text-danger">$${Number(row.subtotal).toFixed(2)}</td>
+						</tr>
+					`;
+				})
+				.join('');
+		};
+
+		async function loadCompraDetalle(url) {
+			if (!detalleCompraBody) return;
+			detalleCompraBody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary py-4">Cargando detalle...</td></tr>';
+			try {
+				const response = await fetch(url);
+				if (!response.ok) throw new Error('No fue posible cargar el detalle.');
+				const compra = await response.json();
+
+				if (detalleCompraTitulo) detalleCompraTitulo.textContent = `Detalle de Compra — ${compra.folio}`;
+				if (detalleCompraProveedor) detalleCompraProveedor.textContent = compra.proveedor || '-';
+				if (detalleCompraFecha) detalleCompraFecha.textContent = compra.fecha ? compra.fecha.slice(0, 10) : '-';
+				if (detalleCompraUsuario) detalleCompraUsuario.textContent = compra.registrado_por || '-';
+				if (detalleCompraTotal) detalleCompraTotal.textContent = formatMoney(compra.total);
+				setDetailModalState(compra.estado_pago);
+				renderDetalleCompra(compra.detalles);
+			} catch (error) {
+				console.error('Error al cargar detalle de compra', error);
+				detalleCompraBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">No fue posible cargar el detalle.</td></tr>';
+			}
+		}
+
+		document.querySelectorAll('.btnVerCompra').forEach((button) => {
+			button.addEventListener('click', () => {
+				const url = button.closest('tr[data-row="compra"]')?.dataset.detalleUrl;
+				if (url) loadCompraDetalle(url);
+			});
+		});
+
+		document.querySelectorAll('.btnPagarCompra').forEach((button) => {
+			button.addEventListener('click', () => {
+				const row = button.closest('tr[data-row="compra"]');
+				if (!row || !formPagoCompra) return;
+				const proveedor = row.dataset.proveedorNombre || '-';
+				const folio = row.dataset.folio?.toUpperCase() || '-';
+				const total = row.dataset.total || '0.00';
+				const pagoUrl = row.dataset.pagoUrl || '';
+				formPagoCompra.action = pagoUrl;
+				if (pagoCompraTexto) pagoCompraTexto.textContent = `${folio} — ${proveedor}`;
+				if (pagoCompraMonto) pagoCompraMonto.textContent = formatMoney(total);
+			});
+		});
+
+		document.getElementById('modalCompraCrear')?.addEventListener('shown.bs.modal', () => {
+			initPurchaseForm();
+			refreshRowLabels();
+			updateTotalCompra();
+		});
+
+		const resetPurchaseForm = () => {
+			if (!detalleCompraContainer) return;
+			detalleCompraContainer.innerHTML = '';
+			addDetalleRow();
+			updateTotalCompra();
+		};
+
+		formCompraMateriaPrima?.addEventListener('submit', (event) => {
+			if (!validarFormularioCompra()) {
+				event.preventDefault();
+			}
+		});
+
+		document.getElementById('modalCompraCrear')?.addEventListener('hidden.bs.modal', resetPurchaseForm);
+		document.getElementById('modalCompraDetalle')?.addEventListener('hidden.bs.modal', () => {
+			if (detalleCompraTitulo) detalleCompraTitulo.textContent = 'Detalle de Compra';
+		});
+
+		initPurchaseForm();
+		refreshRowLabels();
+		updateTotalCompra();
+		applyFilters();
 	})();
 </script>
 {% endblock %}

@@ -326,7 +326,7 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
             cantidad_comprada=cantidad_comprada,
             id_unidad_compra=materia.id_unidad_compra,
             precio_unitario=precio_unitario,
-            subtotal=subtotal,
+            subtotal=_to_mxn(subtotal),
             cantidad_base=cantidad_base,
         )
         compra.detalles.append(detalle)
@@ -346,7 +346,7 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
         total += subtotal
         ids_materia_impactadas.add(materia.id_materia)
 
-    compra.total = total
+    compra.total = _to_mxn(total)
     recalcular_costos_productos_afectados_por_materias(
         ids_materia=list(ids_materia_impactadas)
     )
@@ -1122,7 +1122,7 @@ def pagar_compra(id_compra: int, id_usuario: int) -> None:
 
     salida = SalidaEfectivo(
         concepto=f"Pago compra {compra.id_compra}",
-        monto=compra.total,
+        monto=_to_mxn(Decimal(str(compra.total or 0))),
         tipo="COMPRA_MATERIA_PRIMA",
         id_usuario=id_usuario,
         referencia=f"COMPRA-{compra.id_compra}",

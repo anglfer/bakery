@@ -899,3 +899,260 @@ tr:last-child td {
 		padding: 0 1rem;
 	}
 }
+
+/* RF07 · Compras de Materia Prima */
+.compras-page {
+	padding: 1.15rem;
+}
+
+.compras-toolbar .compras-filter {
+	min-width: 150px;
+	max-width: 180px;
+}
+
+.compras-table-card {
+	border-top: 3px solid var(--sb-primary);
+}
+
+.compras-table-wrap {
+	max-height: min(52vh, 560px);
+	overflow: auto;
+	border-radius: 12px;
+}
+
+.compras-table tbody td {
+	font-size: 0.77rem;
+}
+
+.compras-resumen {
+	max-width: 260px;
+}
+
+.compras-total {
+	color: var(--sb-primary);
+}
+
+.compras-pagination .btn {
+	min-width: 32px;
+}
+
+.compras-create-modal,
+.compras-detail-modal,
+.compras-pay-modal {
+	border-radius: 14px !important;
+	overflow: hidden;
+	box-shadow: 0 24px 50px rgba(94, 32, 32, 0.2) !important;
+}
+
+.compras-modal-header {
+	background: linear-gradient(135deg, var(--sb-primary), var(--sb-primary-dark));
+	border-bottom: none;
+	padding: 0.95rem 1.25rem;
+}
+
+.compras-modal-body {
+	background: #fcf7f4;
+	padding: 1rem 1rem 0.9rem;
+	max-height: min(74vh, 760px);
+	overflow-y: auto;
+}
+
+.compras-modal-body::-webkit-scrollbar,
+.compras-detail-list::-webkit-scrollbar,
+.compras-table-wrap::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+.compras-modal-body::-webkit-scrollbar-thumb,
+.compras-detail-list::-webkit-scrollbar-thumb,
+.compras-table-wrap::-webkit-scrollbar-thumb {
+	background: #d7bcb4;
+	border-radius: 999px;
+}
+
+.compras-modal-footer {
+	border-top: 0;
+	padding: 0.8rem 1.2rem 1rem;
+	background: #fff;
+}
+
+.compras-section-card {
+	background: #f8f1ed;
+	border: 1px solid #ebdbd3;
+	border-left: 3px solid var(--sb-primary);
+	border-radius: 12px;
+	padding: 0.8rem 0.9rem;
+	margin-bottom: 0.85rem;
+}
+
+.compras-header-grid {
+	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.compras-info-banner {
+	display: flex;
+	gap: 0.55rem;
+	align-items: flex-start;
+	background: #e8f1fd;
+	border: 1px solid #bfd8f7;
+	border-radius: 10px;
+	padding: 0.7rem 0.85rem;
+	font-size: 0.77rem;
+	color: #1a5fa0;
+	margin-bottom: 0.85rem;
+}
+
+.compras-info-banner i {
+	font-size: 0.9rem;
+	margin-top: 0.15rem;
+	flex-shrink: 0;
+}
+
+.compras-detail-list {
+	max-height: min(40vh, 420px);
+	overflow-y: auto;
+	padding-right: 0.2rem;
+	margin-bottom: 0.4rem;
+}
+
+.compras-detail-item {
+	background: #fff;
+	border: 1px solid #e8d9d2;
+	border-radius: 11px;
+	padding: 0.75rem 0.85rem;
+	margin-bottom: 0.55rem;
+}
+
+.compras-detail-item-head {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	margin-bottom: 0.65rem;
+}
+
+.compras-detail-item-index {
+	width: 23px;
+	height: 23px;
+	border-radius: 7px;
+	background: var(--sb-primary);
+	color: #fff;
+	font-size: 0.7rem;
+	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.compras-detail-grid {
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 0.55rem;
+}
+
+.compras-field-wide {
+	grid-column: 1 / span 2;
+}
+
+.compras-conversion-note {
+	display: none;
+	margin-top: 0.5rem;
+	background: #e6f0fb;
+	border-radius: 8px;
+	color: #1a5fa0;
+	padding: 0.36rem 0.65rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.compras-conversion-note.is-visible {
+	display: inline-flex;
+}
+
+.compras-total-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.8rem;
+	background: #f6ede8;
+	border-radius: 10px;
+	padding: 0.7rem 0.9rem;
+	margin-bottom: 0.6rem;
+}
+
+.compras-total-value {
+	font-family: 'Playfair Display', serif;
+	font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+	font-weight: 700;
+	color: var(--sb-primary);
+	white-space: nowrap;
+}
+
+.compras-detail-meta-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 0.75rem;
+}
+
+.compras-detail-label {
+	display: block;
+	font-size: 0.67rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	font-weight: 700;
+	color: #9a7a72;
+	margin-bottom: 0.15rem;
+}
+
+.compras-pay-modal .modal-footer .btn {
+	min-width: 142px;
+	justify-content: center;
+}
+
+.compras-pay-icon {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.3rem;
+	background: #e8f5ee;
+	color: #1f5a3a;
+}
+
+.compras-pay-amount {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.8rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #2f1b16;
+}
+
+@media (max-width: 768px) {
+	.compras-page {
+		padding: 0.8rem;
+	}
+
+	.compras-toolbar {
+		gap: 0.5rem;
+	}
+
+	.compras-toolbar .ops-input-wrap,
+	.compras-toolbar .compras-filter,
+	.compras-toolbar button {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.compras-field-wide {
+		grid-column: 1 / -1;
+	}
+
+	.compras-total-card {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}

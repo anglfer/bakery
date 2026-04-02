@@ -1,10 +1,20 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, time
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required
+from sqlalchemy.orm import selectinload
 from werkzeug.utils import secure_filename
 
 from app.common.security import log_audit_event, require_permission
@@ -20,6 +30,7 @@ from app.extensions import db
 from app.models import (
     Compra,
     CorteDiario,
+    DetalleCompra,
     MateriaPrima,
     Pedido,
     Producto,
@@ -48,8 +59,65 @@ def _dec(value: str, default: str = "0") -> Decimal:
         return Decimal(default)
 
 
+def _parse_fecha_compra(value: str | None) -> datetime:
+    if not value:
+        return datetime.combine(utc_today(), time.min)
+    try:
+        fecha = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return datetime.combine(utc_today(), time.min)
+    return datetime.combine(fecha.date(), time.min)
+
+
 def _to_mxn(value: Decimal) -> Decimal:
-    return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return Decimal(str(value)).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP,
+    )
+
+
+def _nombre_unidad(unidad) -> str:
+    if not unidad:
+        return ""
+    return unidad.abreviatura
+
+
+def _detalle_compra_payload(detalle: DetalleCompra) -> dict:
+    materia = detalle.materia_prima
+    unidad_base = materia.unidad_base if materia else None
+    unidad_compra = detalle.unidad_compra
+    if not unidad_compra and materia:
+        unidad_compra = materia.unidad_compra
+
+    nombre_materia = "Materia prima"
+    if materia:
+        nombre_materia = materia.nombre
+
+    return {
+        "id_detalle": detalle.id_detalle,
+        "materia_prima": nombre_materia,
+        "id_materia_prima": detalle.id_materia_prima,
+        "unidad_compra": _nombre_unidad(unidad_compra),
+        "id_unidad_compra": detalle.id_unidad_compra,
+        "cantidad_comprada": float(detalle.cantidad_comprada),
+        "cantidad_base": float(detalle.cantidad_base),
+        "unidad_base": _nombre_unidad(unidad_base),
+        "precio_unitario": float(detalle.precio_unitario),
+        "subtotal": float(detalle.subtotal),
+    }
+
+
+def _compra_payload(compra: Compra) -> dict:
+    return {
+        "id_compra": compra.id_compra,
+        "folio": compra.folio_formateado,
+        "proveedor": (compra.proveedor.nombre_empresa if compra.proveedor else ""),
+        "fecha": compra.fecha.isoformat() if compra.fecha else None,
+        "estado_pago": compra.estado_pago,
+        "total": float(compra.total or 0),
+        "registrado_por": (compra.comprador.username if compra.comprador else ""),
+        "detalles": [_detalle_compra_payload(detalle) for detalle in compra.detalles],
+    }
 
 
 def _sugerir_precio_venta(*, costo: Decimal, margen_pct: Decimal) -> Decimal:
@@ -75,7 +143,12 @@ def _handle_image_upload(file):
     # For simplicity, using original filename but secure.
     # Considerations: You might want to prepend ID or timestamp.
 
-    upload_folder = os.path.join(current_app.root_path, "static", "img", "productos")
+    upload_folder = os.path.join(
+        current_app.root_path,
+        "static",
+        "img",
+        "productos",
+    )
     os.makedirs(upload_folder, exist_ok=True)
 
     file_path = os.path.join(upload_folder, filename)
@@ -100,8 +173,8 @@ def producto_terminado():
 
         if action == "crear":
             nombre = request.form.get("nombre", "").strip()
-            descripcion = (
-                request.form.get("descripcion", "").strip() or "Sin descripcion"
+            descripcion = request.form.get("descripcion", "").strip() or (
+                "Sin descripcion"
             )
             id_receta = _int(request.form.get("id_receta", "0"))
             precio = _dec(request.form.get("precio_venta", "0"))
@@ -117,10 +190,16 @@ def producto_terminado():
 
             receta = Receta.query.get(id_receta)
             if not nombre or precio <= 0 or not receta or not receta.activa:
-                flash("Nombre, precio y receta activa son obligatorios.", "warning")
+                flash(
+                    "Nombre, precio y receta activa son obligatorios.",
+                    "warning",
+                )
                 return redirect(url_for("sales.producto_terminado"))
             if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
-                flash("El margen objetivo debe estar entre 0 y 100.", "warning")
+                flash(
+                    "El margen objetivo debe estar entre 0 y 100.",
+                    "warning",
+                )
                 return redirect(url_for("sales.producto_terminado"))
 
             db.session.add(
@@ -142,7 +221,10 @@ def producto_terminado():
             if producto_creado:
                 log_audit_event(
                     "PRODUCTO_CREADO",
-                    f"id_producto={producto_creado.id_producto}; nombre={producto_creado.nombre}",
+                    (
+                        f"id_producto={producto_creado.id_producto}; "
+                        f"nombre={producto_creado.nombre}"
+                    ),
                 )
             flash("Producto terminado creado.", "success")
             return redirect(url_for("sales.producto_terminado"))
@@ -388,6 +470,12 @@ def ventas():
 def compras_mp():
     if request.method == "POST":
         id_proveedor = _int(request.form.get("id_proveedor", "0"))
+        estado_pago_form = request.form.get("estado_pago", "PENDIENTE").strip().upper()
+        if estado_pago_form not in {"PENDIENTE", "PAGADO"}:
+            flash("Estado de pago invalido.", "danger")
+            return redirect(url_for("sales.compras_mp"))
+
+        fecha_compra = _parse_fecha_compra(request.form.get("fecha"))
         materias_rows = request.form.getlist("id_materia[]")
         cantidades_rows = request.form.getlist("cantidad_comprada[]")
         precios_rows = request.form.getlist("precio_unitario[]")
@@ -472,19 +560,41 @@ def compras_mp():
             id_proveedor=id_proveedor,
             id_usuario_comprador=current_user.id_usuario,
             estado_pago="PENDIENTE",
+            fecha=fecha_compra,
         )
         try:
             registrar_compra(compra, detalles_compra)
+            if estado_pago_form == "PAGADO":
+                pagar_compra(
+                    id_compra=compra.id_compra,
+                    id_usuario=current_user.id_usuario,
+                )
+                log_audit_event("COMPRA_MP_PAGADA", f"id_compra={compra.id_compra}")
             log_audit_event(
                 "COMPRA_MP_REGISTRADA",
                 f"id_compra={compra.id_compra}; id_proveedor={id_proveedor}; detalles={len(detalles_compra)}",
             )
-            flash("Compra registrada.", "success")
+            flash(
+                (
+                    "Compra registrada y pagada."
+                    if estado_pago_form == "PAGADO"
+                    else "Compra registrada."
+                ),
+                "success",
+            )
         except ValueError as exc:
             flash(str(exc), "danger")
         return redirect(url_for("sales.compras_mp"))
 
-    compras = Compra.query.order_by(Compra.id_compra.desc()).all()
+    compras = (
+        Compra.query.options(
+            selectinload(Compra.proveedor),
+            selectinload(Compra.comprador),
+            selectinload(Compra.detalles).selectinload(DetalleCompra.materia_prima),
+        )
+        .order_by(Compra.id_compra.desc())
+        .all()
+    )
     proveedores = (
         Proveedor.query.filter_by(activo=True)
         .order_by(Proveedor.nombre_empresa.asc())
@@ -500,7 +610,25 @@ def compras_mp():
         compras=compras,
         proveedores=proveedores,
         materias=materias,
+        fecha_hoy=utc_today().isoformat(),
     )
+
+
+@sales_bp.get("/compras-mp/<int:id_compra>/detalle")
+@login_required
+@require_permission("Compras MP", "leer")
+def compra_mp_detalle(id_compra: int):
+    compra = (
+        Compra.query.options(
+            selectinload(Compra.proveedor),
+            selectinload(Compra.comprador),
+            selectinload(Compra.detalles).selectinload(DetalleCompra.materia_prima),
+            selectinload(Compra.detalles).selectinload(DetalleCompra.unidad_compra),
+        )
+        .filter(Compra.id_compra == id_compra)
+        .first_or_404()
+    )
+    return jsonify(_compra_payload(compra))
 
 
 @sales_bp.post("/compras-mp/<int:id_compra>/pagar")

@@ -276,6 +276,25 @@ class Compra(TimestampMixin, db.Model):
         "DetalleCompra", back_populates="compra", cascade=CASCADE_DELETE_ORPHAN
     )
 
+    @property
+    def folio_formateado(self) -> str:
+        if not self.id_compra:
+            return "C-000"
+        return f"C-{self.id_compra:03d}"
+
+    @property
+    def resumen_materias(self) -> str:
+        nombres = [
+            detalle.materia_prima.nombre
+            for detalle in self.detalles[:3]
+            if detalle.materia_prima
+        ]
+        if not nombres:
+            return "Sin detalle"
+        if len(self.detalles) > 3:
+            return f"{', '.join(nombres)} y {len(self.detalles) - 3} más"
+        return ", ".join(nombres)
+
 
 class DetalleCompra(db.Model):
     __tablename__ = "detalle_compra"
