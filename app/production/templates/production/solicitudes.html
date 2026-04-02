@@ -2,10 +2,62 @@
 {% block title %}Solicitudes{% endblock %}
 {% block content %}
 <section class="section">
-	<h2 class="mb-3">Solicitudes de produccion</h2>
-	<div class="card p-3">
-		<div class="table-responsive">
-			<table>
+	{% set ns = namespace(pendientes=0, aprobadas=0, rechazadas=0) %}
+	{% for s in solicitudes %}
+		{% if s.estado == 'PENDIENTE' %}
+			{% set ns.pendientes = ns.pendientes + 1 %}
+		{% elif s.estado == 'APROBADA' %}
+			{% set ns.aprobadas = ns.aprobadas + 1 %}
+		{% elif s.estado == 'RECHAZADA' %}
+			{% set ns.rechazadas = ns.rechazadas + 1 %}
+		{% endif %}
+	{% endfor %}
+
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de producción</p>
+		<h2 class="ops-hero-title">Solicitudes de producción</h2>
+		<p class="ops-hero-text">Revisa solicitudes del área de ventas y define su resolución.</p>
+	</div>
+
+	<div class="ops-kpi-grid compact">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Solicitudes totales</p>
+			<p class="ops-kpi-value">{{ solicitudes|length }}</p>
+			<p class="ops-kpi-sub">Registros del tablero</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pendientes</p>
+			<p class="ops-kpi-value">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">Requieren resolución</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Aprobadas</p>
+			<p class="ops-kpi-value">{{ ns.aprobadas }}</p>
+			<p class="ops-kpi-sub">Listas para orden</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Rechazadas</p>
+			<p class="ops-kpi-value">{{ ns.rechazadas }}</p>
+			<p class="ops-kpi-sub">No autorizadas</p>
+		</article>
+	</div>
+
+	<div class="ops-card">
+		<h3 class="ops-card-title">Bandeja de solicitudes</h3>
+		<div class="ops-toolbar">
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input type="text" id="solicitudesSearch" placeholder="Buscar por id o producto" />
+			</div>
+			<select id="solicitudesEstadoFiltro" style="max-width: 220px">
+				<option value="TODOS">Todos los estados</option>
+				<option value="PENDIENTE">Pendiente</option>
+				<option value="APROBADA">Aprobada</option>
+				<option value="RECHAZADA">Rechazada</option>
+			</select>
+		</div>
+		<div class="ops-table table-responsive">
+			<table class="table table-hover align-middle mb-0">
 		<thead>
 			<tr>
 				<th>ID</th>
@@ -18,22 +70,30 @@
 		</thead>
 		<tbody>
 			{% for s in solicitudes %}
-			<tr>
+			<tr
+				data-row="solicitud"
+				data-label="{{ (s.id_solicitud|string ~ ' ' ~ s.producto.nombre)|lower }}"
+				data-estado="{{ s.estado }}">
 				<td>{{ s.id_solicitud }}</td>
 				<td>{{ s.producto.nombre }}</td>
 				<td>{{ s.cantidad }}</td>
-				<td>{{ s.estado }}</td>
+				<td>
+					<span
+						class="ops-chip {{ 'warning' if s.estado == 'PENDIENTE' else 'success' if s.estado == 'APROBADA' else 'danger' }}">
+						{{ s.estado }}
+					</span>
+				</td>
 				<td>{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
 				<td>
-					<form method="post">
-						<input type="hidden" name="id_solicitud" value="{{ s.id_solicitud }}" />
-						<select name="estado" {{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
-							<option value="APROBADA">Aprobar</option>
-							<option value="RECHAZADA">Rechazar</option>
-						</select>
-						<input type="text" name="observaciones" placeholder="Observaciones" />
-						<button type="submit" class="btn btn-sm" {{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>Guardar</button>
-					</form>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline-primary btn-icon-sm js-resolver-solicitud"
+						title="Resolver solicitud"
+						data-id="{{ s.id_solicitud }}"
+						data-estado="{{ s.estado }}"
+						{{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
+						<i class="bi bi-check2-square"></i>
+					</button>
 				</td>
 			</tr>
 			{% else %}
@@ -45,5 +105,67 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalResolverSolicitud" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title">Resolver solicitud de producción</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" id="formResolverSolicitud">
+					<div class="modal-body">
+						<input type="hidden" name="id_solicitud" id="resolverSolicitudId" />
+						<div class="ops-grid">
+							<select name="estado" id="resolverSolicitudEstado" required>
+								<option value="APROBADA">Aprobar</option>
+								<option value="RECHAZADA">Rechazar</option>
+							</select>
+							<input type="text" name="observaciones" id="resolverSolicitudObs" placeholder="Observaciones" />
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm">Guardar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	const solicitudesSearchInput = document.getElementById('solicitudesSearch');
+	const solicitudesEstadoFiltro = document.getElementById('solicitudesEstadoFiltro');
+
+	function applySolicitudesFilters() {
+		const searchValue = String(solicitudesSearchInput?.value || '').toLowerCase().trim();
+		const estadoValue = String(solicitudesEstadoFiltro?.value || 'TODOS').toUpperCase();
+		document.querySelectorAll('tr[data-row="solicitud"]').forEach((tableRowElement) => {
+			const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
+			const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
+			const matchesSearch = rowLabel.includes(searchValue);
+			const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
+			tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+		});
+	}
+
+	if (solicitudesSearchInput) {
+		solicitudesSearchInput.addEventListener('input', applySolicitudesFilters);
+	}
+	if (solicitudesEstadoFiltro) {
+		solicitudesEstadoFiltro.addEventListener('change', applySolicitudesFilters);
+	}
+
+	document.querySelectorAll('.js-resolver-solicitud').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			document.getElementById('resolverSolicitudId').value = buttonElement.dataset.id || '';
+			document.getElementById('resolverSolicitudEstado').value = 'APROBADA';
+			document.getElementById('resolverSolicitudObs').value = '';
+			new bootstrap.Modal(document.getElementById('modalResolverSolicitud')).show();
+		});
+	});
+</script>
 {% endblock %}

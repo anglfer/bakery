@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 import os
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from app.common.security import require_permission
+from app.common.security import log_audit_event, require_permission
 from app.common.services import (
     actualizar_estado_pedido,
     calcular_costo_producto,
     generar_venta_desde_pedido,
     pagar_compra,
     registrar_compra,
+    registrar_venta_mostrador,
 )
 from app.extensions import db
 from app.models import (
     Compra,
     CorteDiario,
-    DetalleVenta,
     MateriaPrima,
     Pedido,
     Producto,
@@ -48,11 +48,29 @@ def _dec(value: str, default: str = "0") -> Decimal:
         return Decimal(default)
 
 
+def _to_mxn(value: Decimal) -> Decimal:
+    return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _sugerir_precio_venta(*, costo: Decimal, margen_pct: Decimal) -> Decimal:
+    if costo <= 0 or margen_pct <= 0 or margen_pct >= 100:
+        return Decimal("0")
+    divisor = Decimal("1") - (margen_pct / Decimal("100"))
+    if divisor <= 0:
+        return Decimal("0")
+    return _to_mxn(costo / divisor)
+
+
 def _handle_image_upload(file):
     if not file or not file.filename:
         return None
 
     filename = secure_filename(file.filename)
+    _, ext = os.path.splitext(filename.lower())
+    allowed = {".jpg", ".jpeg", ".png"}
+    if ext not in allowed:
+        raise ValueError("Formato de imagen no permitido. Usa JPG, JPEG o PNG.")
+
     # Ensure filename is unique or handle overwrites if desired.
     # For simplicity, using original filename but secure.
     # Considerations: You might want to prepend ID or timestamp.
@@ -74,7 +92,11 @@ def producto_terminado():
         action = request.form.get("action", "")
         # Handle image upload
         image_file = request.files.get("imagen_archivo")
-        image_path = _handle_image_upload(image_file)
+        try:
+            image_path = _handle_image_upload(image_file)
+        except ValueError as exc:
+            flash(str(exc), "warning")
+            return redirect(url_for("sales.producto_terminado"))
 
         if action == "crear":
             nombre = request.form.get("nombre", "").strip()
@@ -83,6 +105,10 @@ def producto_terminado():
             )
             id_receta = _int(request.form.get("id_receta", "0"))
             precio = _dec(request.form.get("precio_venta", "0"))
+            margen_objetivo_pct = _dec(
+                request.form.get("margen_objetivo_pct", "25"),
+                "25",
+            )
             stock_minimo = _int(request.form.get("stock_minimo", "0"))
             unidad_venta = request.form.get("unidad_venta", "Pieza")
 
@@ -93,12 +119,16 @@ def producto_terminado():
             if not nombre or precio <= 0 or not receta or not receta.activa:
                 flash("Nombre, precio y receta activa son obligatorios.", "warning")
                 return redirect(url_for("sales.producto_terminado"))
+            if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
+                flash("El margen objetivo debe estar entre 0 y 100.", "warning")
+                return redirect(url_for("sales.producto_terminado"))
 
             db.session.add(
                 Producto(
                     nombre=nombre,
                     descripcion=descripcion,
                     precio_venta=precio,
+                    margen_objetivo_pct=margen_objetivo_pct,
                     unidad_venta=unidad_venta,
                     cantidad_disponible=0,
                     stock_minimo=max(stock_minimo, 0),
@@ -108,6 +138,12 @@ def producto_terminado():
                 )
             )
             db.session.commit()
+            producto_creado = Producto.query.filter_by(nombre=nombre).first()
+            if producto_creado:
+                log_audit_event(
+                    "PRODUCTO_CREADO",
+                    f"id_producto={producto_creado.id_producto}; nombre={producto_creado.nombre}",
+                )
             flash("Producto terminado creado.", "success")
             return redirect(url_for("sales.producto_terminado"))
 
@@ -118,6 +154,16 @@ def producto_terminado():
         producto.precio_venta = _dec(
             request.form.get("precio_venta", str(producto.precio_venta))
         )
+        producto.margen_objetivo_pct = _dec(
+            request.form.get(
+                "margen_objetivo_pct",
+                str(producto.margen_objetivo_pct or "25"),
+            ),
+            "25",
+        )
+        if producto.margen_objetivo_pct <= 0 or producto.margen_objetivo_pct >= 100:
+            flash("El margen objetivo debe estar entre 0 y 100.", "warning")
+            return redirect(url_for("sales.producto_terminado"))
         producto.stock_minimo = _int(
             request.form.get("stock_minimo", str(producto.stock_minimo)),
             producto.stock_minimo,
@@ -139,14 +185,53 @@ def producto_terminado():
 
         producto.activo = request.form.get("activo") == "on"
         db.session.commit()
+        log_audit_event(
+            "PRODUCTO_EDITADO",
+            f"id_producto={producto.id_producto}; nombre={producto.nombre}; activo={producto.activo}",
+        )
         flash("Producto actualizado.", "success")
         return redirect(url_for("sales.producto_terminado"))
 
     productos = Producto.query.order_by(Producto.id_producto.desc()).all()
+    metricas_producto: dict[int, dict] = {}
+    for producto in productos:
+        costo_unitario = Decimal(str(producto.costo_produccion_actual or 0))
+        if costo_unitario <= 0 and producto.id_receta:
+            try:
+                costo_unitario = calcular_costo_producto(
+                    id_producto=producto.id_producto,
+                    cantidad=1,
+                )
+            except ValueError:
+                costo_unitario = Decimal("0")
+
+        precio_venta = Decimal(str(producto.precio_venta or 0))
+        margen_objetivo = Decimal(str(producto.margen_objetivo_pct or 25))
+        precio_sugerido = Decimal(str(producto.precio_sugerido or 0))
+        if precio_sugerido <= 0:
+            precio_sugerido = _sugerir_precio_venta(
+                costo=_to_mxn(costo_unitario),
+                margen_pct=margen_objetivo,
+            )
+
+        utilidad_unitaria = _to_mxn(precio_venta - _to_mxn(costo_unitario))
+        porcentaje_utilidad = Decimal("0")
+        if precio_venta > 0:
+            porcentaje_utilidad = _to_mxn((utilidad_unitaria / precio_venta) * 100)
+
+        metricas_producto[producto.id_producto] = {
+            "costo_unitario": _to_mxn(costo_unitario),
+            "precio_sugerido": precio_sugerido,
+            "margen_objetivo_pct": _to_mxn(margen_objetivo),
+            "utilidad_unitaria": utilidad_unitaria,
+            "porcentaje_utilidad": porcentaje_utilidad,
+        }
+
     recetas = Receta.query.filter_by(activa=True).order_by(Receta.nombre.asc()).all()
     return render_template(
         "sales/producto_terminado.html",
         productos=productos,
+        metricas_producto=metricas_producto,
         recetas=recetas,
         utc_now=utc_now,
     )
@@ -156,13 +241,30 @@ def producto_terminado():
 @login_required
 @require_permission("Solicitudes", "leer")
 def solicitudes():
+    role_name = current_user.rol.nombre if current_user.rol else ""
+
     if request.method == "POST":
+        if role_name != "Ventas":
+            flash(
+                "Solo el area de ventas puede registrar solicitudes de produccion.",
+                "danger",
+            )
+            return redirect(url_for("sales.solicitudes"))
+
         id_producto = _int(request.form.get("id_producto", "0"))
         cantidad = _int(request.form.get("cantidad", "0"))
         observaciones = request.form.get("observaciones", "").strip() or None
         producto = Producto.query.get(id_producto)
         if not producto or not producto.activo or cantidad <= 0:
             flash("Producto o cantidad invalida para solicitud.", "warning")
+            return redirect(url_for("sales.solicitudes"))
+
+        receta = Receta.query.get(producto.id_receta) if producto.id_receta else None
+        if not receta or not receta.activa:
+            flash(
+                "El producto seleccionado no tiene una receta activa para producir.",
+                "warning",
+            )
             return redirect(url_for("sales.solicitudes"))
 
         db.session.add(
@@ -175,6 +277,10 @@ def solicitudes():
             )
         )
         db.session.commit()
+        log_audit_event(
+            "SOLICITUD_PRODUCCION_CREADA",
+            f"id_usuario={current_user.id_usuario}; id_producto={id_producto}; cantidad={cantidad}",
+        )
         flash("Solicitud de produccion registrada.", "success")
         return redirect(url_for("sales.solicitudes"))
 
@@ -201,10 +307,13 @@ def pedidos_clientes():
         if action == "entregar":
             requiere_ticket = request.form.get("requiere_ticket") == "on"
             try:
-                generar_venta_desde_pedido(
+                venta = generar_venta_desde_pedido(
                     id_pedido=id_pedido,
-                    id_usuario_emite=current_user.id_usuario,
                     requiere_ticket=requiere_ticket,
+                )
+                log_audit_event(
+                    "PEDIDO_ENTREGADO_VENTA_GENERADA",
+                    f"id_pedido={id_pedido}; id_venta={venta.id_venta}; requiere_ticket={requiere_ticket}",
                 )
                 flash(
                     "Pedido entregado. Venta generada y stock actualizado.", "success"
@@ -220,6 +329,10 @@ def pedidos_clientes():
                 id_pedido=id_pedido,
                 nuevo_estado=nuevo_estado,
                 referencia_pago=referencia,
+            )
+            log_audit_event(
+                "PEDIDO_ESTADO_ACTUALIZADO",
+                f"id_pedido={id_pedido}; nuevo_estado={nuevo_estado}",
             )
             flash("Pedido actualizado.", "success")
         except ValueError as exc:
@@ -239,59 +352,29 @@ def ventas():
         cantidad = _int(request.form.get("cantidad", "1"), 1)
         tipo_pago = (request.form.get("tipo_pago") or "EFECTIVO").strip().upper()
         requiere_ticket = request.form.get("requiere_ticket") == "on"
-
-        producto = Producto.query.get(id_producto)
-        if not producto or not producto.activo:
-            flash("Producto no disponible para venta.", "danger")
-            return redirect(url_for("sales.ventas"))
-
-        if cantidad <= 0:
-            flash("La cantidad debe ser mayor a cero.", "warning")
-            return redirect(url_for("sales.ventas"))
-
-        if cantidad > 5:
-            flash(
-                "No se permite vender mas de 5 unidades por producto en una venta.",
-                "warning",
-            )
-            return redirect(url_for("sales.ventas"))
-
-        if producto.cantidad_disponible < cantidad:
-            flash("Stock insuficiente para completar la venta.", "danger")
-            return redirect(url_for("sales.ventas"))
-
-        if tipo_pago not in {"EFECTIVO", "TARJETA"}:
-            flash("Tipo de pago invalido.", "warning")
-            return redirect(url_for("sales.ventas"))
-
-        subtotal = Decimal(str(producto.precio_venta)) * cantidad
-        venta = Venta(
-            id_usuario_cliente=current_user.id_usuario,
-            total=subtotal,
-            estado="CONFIRMADO",
-            tipo_pago=tipo_pago,
-            requiere_ticket=requiere_ticket,
-        )
-        db.session.add(venta)
-        db.session.flush()
-        db.session.add(
-            DetalleVenta(
-                id_venta=venta.id_venta,
-                id_producto=producto.id_producto,
+        try:
+            venta = registrar_venta_mostrador(
+                id_producto=id_producto,
                 cantidad=cantidad,
-                precio_unitario=producto.precio_venta,
-                subtotal=subtotal,
+                tipo_pago=tipo_pago,
+                requiere_ticket=requiere_ticket,
+                id_usuario_emite=current_user.id_usuario,
             )
-        )
-        producto.cantidad_disponible -= cantidad
-        db.session.commit()
-        flash("Venta registrada y stock actualizado.", "success")
+            detalle = venta.detalles[0] if venta.detalles else None
+            log_audit_event(
+                "VENTA_REGISTRADA",
+                f"id_venta={venta.id_venta}; id_producto={detalle.id_producto if detalle else id_producto}; cantidad={detalle.cantidad if detalle else cantidad}; tipo_pago={tipo_pago}",
+            )
+            flash("Venta registrada y stock actualizado.", "success")
+        except ValueError as exc:
+            flash(str(exc), "warning")
         return redirect(url_for("sales.ventas"))
 
     data = Venta.query.order_by(Venta.id_venta.desc()).all()
     productos = (
         Producto.query.filter(
-            Producto.activo.is_(True), Producto.cantidad_disponible > 0
+            Producto.activo.is_(True),
+            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,
         )
         .order_by(Producto.nombre.asc())
         .all()
@@ -305,19 +388,81 @@ def ventas():
 def compras_mp():
     if request.method == "POST":
         id_proveedor = _int(request.form.get("id_proveedor", "0"))
-        id_materia = _int(request.form.get("id_materia", "0"))
-        cantidad_comprada = _dec(request.form.get("cantidad_comprada", "0"))
-        precio_unitario = _dec(request.form.get("precio_unitario", "0"))
+        materias_rows = request.form.getlist("id_materia[]")
+        cantidades_rows = request.form.getlist("cantidad_comprada[]")
+        precios_rows = request.form.getlist("precio_unitario[]")
+
+        detalles_compra: list[dict] = []
+        if (
+            materias_rows
+            and cantidades_rows
+            and precios_rows
+            and len(materias_rows) == len(cantidades_rows) == len(precios_rows)
+        ):
+            for materia_raw, cantidad_raw, precio_raw in zip(
+                materias_rows,
+                cantidades_rows,
+                precios_rows,
+            ):
+                id_materia = _int(materia_raw, 0)
+                cantidad_comprada = _dec(cantidad_raw, "0")
+                precio_unitario = _dec(precio_raw, "0")
+                if id_materia <= 0:
+                    continue
+                if cantidad_comprada <= 0:
+                    flash(
+                        "La cantidad comprada debe ser mayor a cero en todos los renglones.",
+                        "danger",
+                    )
+                    return redirect(url_for("sales.compras_mp"))
+                if precio_unitario < 0:
+                    flash(
+                        "El precio unitario no puede ser negativo en ningun renglon.",
+                        "danger",
+                    )
+                    return redirect(url_for("sales.compras_mp"))
+                detalles_compra.append(
+                    {
+                        "id_materia_prima": id_materia,
+                        "cantidad_comprada": cantidad_comprada,
+                        "precio_unitario": precio_unitario,
+                    }
+                )
+
+        if not detalles_compra:
+            id_materia = _int(request.form.get("id_materia", "0"))
+            cantidad_comprada = _dec(request.form.get("cantidad_comprada", "0"))
+            precio_unitario = _dec(request.form.get("precio_unitario", "0"))
+            if cantidad_comprada <= 0:
+                flash("La cantidad comprada debe ser mayor a cero.", "danger")
+                return redirect(url_for("sales.compras_mp"))
+            if precio_unitario < 0:
+                flash("El precio unitario no puede ser negativo.", "danger")
+                return redirect(url_for("sales.compras_mp"))
+            detalles_compra = [
+                {
+                    "id_materia_prima": id_materia,
+                    "cantidad_comprada": cantidad_comprada,
+                    "precio_unitario": precio_unitario,
+                }
+            ]
 
         proveedor = Proveedor.query.get(id_proveedor)
-        materia = MateriaPrima.query.get(id_materia)
         if not proveedor or not proveedor.activo:
             flash("Proveedor invalido o inactivo.", "danger")
             return redirect(url_for("sales.compras_mp"))
 
-        if not materia or not materia.activa:
-            flash("Materia prima invalida o inactiva.", "danger")
-            return redirect(url_for("sales.compras_mp"))
+        for detalle_compra in detalles_compra:
+            materia = MateriaPrima.query.get(detalle_compra["id_materia_prima"])
+            if not materia or not materia.activa:
+                flash("Materia prima invalida o inactiva.", "danger")
+                return redirect(url_for("sales.compras_mp"))
+            if Decimal(str(materia.factor_conversion)) <= 0:
+                flash(
+                    "La materia prima tiene un factor de conversion invalido.",
+                    "danger",
+                )
+                return redirect(url_for("sales.compras_mp"))
 
         compra = Compra(
             id_proveedor=id_proveedor,
@@ -325,15 +470,10 @@ def compras_mp():
             estado_pago="PENDIENTE",
         )
         try:
-            registrar_compra(
-                compra,
-                [
-                    {
-                        "id_materia_prima": id_materia,
-                        "cantidad_comprada": cantidad_comprada,
-                        "precio_unitario": precio_unitario,
-                    }
-                ],
+            registrar_compra(compra, detalles_compra)
+            log_audit_event(
+                "COMPRA_MP_REGISTRADA",
+                f"id_compra={compra.id_compra}; id_proveedor={id_proveedor}; detalles={len(detalles_compra)}",
             )
             flash("Compra registrada.", "success")
         except ValueError as exc:
@@ -365,6 +505,7 @@ def compras_mp():
 def pagar_compra_route(id_compra: int):
     try:
         pagar_compra(id_compra=id_compra, id_usuario=current_user.id_usuario)
+        log_audit_event("COMPRA_MP_PAGADA", f"id_compra={id_compra}")
         flash("Compra marcada como pagada.", "success")
     except ValueError as exc:
         flash(str(exc), "danger")
@@ -393,6 +534,10 @@ def salidas():
             )
         )
         db.session.commit()
+        log_audit_event(
+            "SALIDA_EFECTIVO_REGISTRADA",
+            f"concepto={concepto}; monto={monto}; tipo={tipo}",
+        )
         flash("Salida registrada.", "success")
         return redirect(url_for("sales.salidas"))
 
@@ -412,13 +557,19 @@ def cortes():
         costo_produccion = Decimal("0")
         for v in ventas_hoy:
             for d in v.detalles:
+                if d.costo_unitario_produccion is not None:
+                    costo_produccion += Decimal(
+                        str(d.costo_unitario_produccion)
+                    ) * Decimal(str(d.cantidad))
+                    continue
+
                 try:
                     costo_produccion += calcular_costo_producto(
                         id_producto=d.id_producto,
                         cantidad=d.cantidad,
                     )
                 except ValueError:
-                    # Si no hay receta/costos, no se puede calcular; se asume 0 para no romper corte.
+                    # Legacy sin snapshot de costo, mantener continuidad del corte.
                     pass
         salidas_hoy = SalidaEfectivo.query.filter(
             db.func.date(SalidaEfectivo.fecha_creacion) == fecha
@@ -436,6 +587,10 @@ def cortes():
         )
         db.session.add(corte)
         db.session.commit()
+        log_audit_event(
+            "CORTE_DIARIO_GENERADO",
+            f"fecha={fecha}; total_ventas={total_ventas}; total_salidas={total_salidas}; utilidad={utilidad}",
+        )
         flash("Corte diario generado.", "success")
         return redirect(url_for("sales.cortes"))
 
@@ -446,19 +601,36 @@ def cortes():
     costos = []
     for p in productos:
         try:
-            costo_unit = calcular_costo_producto(id_producto=p.id_producto, cantidad=1)
+            costo_unit = Decimal(str(p.costo_produccion_actual or 0))
+            if costo_unit <= 0:
+                costo_unit = calcular_costo_producto(
+                    id_producto=p.id_producto, cantidad=1
+                )
+
             utilidad_unit = Decimal(str(p.precio_venta)) - costo_unit
             porcentaje = (
                 (utilidad_unit / Decimal(str(p.precio_venta))) * Decimal("100")
                 if Decimal(str(p.precio_venta)) > 0
                 else Decimal("0")
             )
+
+            precio_sugerido = Decimal(str(p.precio_sugerido or 0))
+            if precio_sugerido <= 0:
+                precio_sugerido = _sugerir_precio_venta(
+                    costo=_to_mxn(costo_unit),
+                    margen_pct=Decimal(str(p.margen_objetivo_pct or 25)),
+                )
+
             costos.append(
                 {
                     "producto": p,
-                    "costo_unitario": costo_unit,
-                    "utilidad_unitaria": utilidad_unit,
-                    "porcentaje_utilidad": porcentaje,
+                    "costo_unitario": _to_mxn(costo_unit),
+                    "utilidad_unitaria": _to_mxn(utilidad_unit),
+                    "porcentaje_utilidad": _to_mxn(porcentaje),
+                    "precio_sugerido": _to_mxn(precio_sugerido),
+                    "margen_objetivo_pct": _to_mxn(
+                        Decimal(str(p.margen_objetivo_pct or 25))
+                    ),
                 }
             )
         except ValueError:

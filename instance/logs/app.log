@@ -1,0 +1,21 @@
+2026-03-29 00:31:53,237 INFO AUDIT|evento=USUARIO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_usuario=10; username=ventas; id_rol=3; activo=True
+2026-03-29 01:10:12,882 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-03-29; total_ventas=810.00; total_salidas=2200.00; utilidad=-1395.6910000
+2026-04-01 21:16:08,423 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-04-02; total_ventas=0; total_salidas=0; utilidad=0
+2026-04-01 21:32:33,538 INFO AUDIT|evento=PROVEEDOR_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401
+2026-04-01 21:33:12,589 INFO AUDIT|evento=COMPRA_MP_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_compra=2; id_proveedor=4; detalles=1
+2026-04-01 21:33:57,981 INFO AUDIT|evento=INVENTARIO_MP_AJUSTE|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=1; tipo=SALIDA; cantidad=100
+2026-04-01 21:36:18,619 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=5
+2026-04-01 21:38:09,802 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=2; estado=APROBADA; id_usuario_resuelve=3
+2026-04-01 21:38:42,624 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2; id_solicitud=2; id_receta=1; cantidad=5
+2026-04-01 21:38:49,465 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2
+2026-04-01 21:38:56,052 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2; id_producto=1; cantidad=5
+2026-04-01 21:42:12,753 INFO AUDIT|evento=VENTA_REGISTRADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_venta=2; id_producto=1; cantidad=2; tipo_pago=EFECTIVO
+2026-04-01 21:42:45,328 INFO AUDIT|evento=COMPRA_MP_PAGADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_compra=2
+2026-04-01 21:50:26,900 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=1; cantidad=2
+2026-04-01 21:50:53,241 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=1; tipo_pago=EN_LINEA
+2026-04-01 21:53:09,439 INFO AUDIT|evento=PEDIDO_ENTREGADO_VENTA_GENERADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_pedido=1; id_venta=3; requiere_ticket=True
+2026-04-01 21:53:50,364 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=4
+2026-04-01 21:56:39,696 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=3; estado=APROBADA; id_usuario_resuelve=3
+2026-04-01 21:57:33,184 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_solicitud=3; id_receta=1; cantidad=4
+2026-04-01 21:58:22,455 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3
+2026-04-01 21:58:50,757 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_producto=1; cantidad=4

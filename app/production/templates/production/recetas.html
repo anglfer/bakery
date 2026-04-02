@@ -1,73 +1,200 @@
 {% extends "base_template.html" %} {% block title %}Recetas{% endblock %} {% block content %}
 <section class="section">
-	<h2 class="mb-3">Recetas de produccion</h2>
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de producción</p>
+		<h2 class="ops-hero-title">Recetas de producción</h2>
+		<p class="ops-hero-text">Gestiona versión activa, ingredientes y rendimiento base.</p>
+	</div>
 
-	<div class="card p-3 mb-3">
-		<h3 class="mb-2">Crear receta</h3>
-		<form method="post" class="grid-form" id="form-receta">
-			<input type="text" name="nombre" placeholder="Nombre de la receta" required />
-			<input
-				type="text"
-				name="unidad_produccion"
-				placeholder="Unidad (pieza, docena...)"
-				value="pieza" />
-			<input
-				type="number"
-				min="0.01"
-				step="0.01"
-				name="rendimiento"
-				placeholder="Rendimiento base"
-				required />
-			<input type="text" name="categoria" placeholder="Categoria" />
-			<input type="text" name="descripcion" placeholder="Descripcion corta" />
-
-			<div class="w-100 mt-2" id="ingredientes-container">
-				<div class="row g-2 mb-2 ingrediente-row">
-					<div class="col-md-8">
-						<select name="id_materia_prima[]" class="form-select" required>
-							<option value="">Materia prima</option>
-							{% for m in materias %}
-							<option value="{{ m.id_materia }}">{{ m.nombre }}</option>
-							{% endfor %}
-						</select>
-					</div>
-					<div class="col-md-3">
-						<input
-							type="number"
-							min="0.001"
-							step="0.001"
-							name="cantidad_receta[]"
-							class="form-control"
-							placeholder="Cantidad"
-							required />
-					</div>
-					<div class="col-md-1">
-						<button
-							type="button"
-							class="btn btn-outline-danger btn-sm w-100"
-							onclick="quitarIngrediente(this)">
-							<i class="bi bi-x"></i>
-						</button>
-					</div>
+	<!-- Controles superiores: botón para abrir modal de nueva receta -->
+	<div class="card border-0 shadow-sm mb-4">
+		<div class="card-body p-3">
+			<div class="row g-3 align-items-center">
+				<div class="col">
+					<h3 class="mb-0">Recetas de producción</h3>
+					<p class="text-muted small mb-0">Gestiona recetas y explosión de materiales.</p>
+				</div>
+				<div class="col-auto ms-auto">
+					<button
+						type="button"
+						class="btn btn-primary px-4 rounded-pill"
+						data-bs-toggle="modal"
+						data-bs-target="#modalReceta"
+						onclick="resetRecetaForm()">
+						<i class="bi bi-plus me-2"></i>
+						Nueva receta
+					</button>
 				</div>
 			</div>
+		</div>
+	</div>
 
-			<div class="d-flex gap-2 mt-2">
-				<button
-					type="button"
-					class="btn btn-outline-secondary btn-sm"
-					onclick="agregarIngrediente()">
-					Agregar ingrediente
-				</button>
-				<button type="submit">Crear receta</button>
+	<!-- Modal Receta (Crear/Editar) -->
+	<div class="modal fade" id="modalReceta" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title fw-bold" id="modalRecetaTitle">
+						<i class="bi bi-journal-plus me-2"></i>
+						Nueva Receta
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<form method="post" id="form-receta" novalidate>
+					<div class="modal-body p-4 bg-light-subtle">
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label for="id_producto" class="form-label">Producto asociado</label>
+								<select id="id_producto" name="id_producto" class="form-select" required>
+									<option value="">Selecciona producto</option>
+									{% for p in productos %}
+									<option value="{{ p.id_producto }}">{{ p.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+
+							<div class="col-md-6">
+								<label for="nombre" class="form-label">Nombre de la receta</label>
+								<input
+									id="nombre"
+									type="text"
+									name="nombre"
+									class="form-control"
+									placeholder="Ej: Pastel de chocolate"
+									required />
+							</div>
+
+							<div class="col-md-3">
+								<label for="unidad_produccion" class="form-label">Unidad</label>
+								<select
+									id="unidad_produccion"
+									name="unidad_produccion"
+									class="form-select"
+									required>
+									<option value="">Selecciona unidad</option>
+									{% for u in unidades %}
+									<option value="{{ u.abreviatura }}" data-id="{{ u.id_unidad }}">
+										{{ u.nombre }} ({{ u.abreviatura }})
+									</option>
+									{% endfor %}
+								</select>
+							</div>
+
+							<div class="col-md-3">
+								<label for="rendimiento" class="form-label">Rendimiento base</label>
+								<input
+									id="rendimiento"
+									type="number"
+									min="0.01"
+									step="0.01"
+									name="rendimiento"
+									class="form-control"
+									placeholder="Rendimiento"
+									required />
+							</div>
+
+							<div class="col-md-4">
+								<label for="categoria" class="form-label">Categoría</label>
+								<input
+									id="categoria"
+									type="text"
+									name="categoria"
+									class="form-control"
+									placeholder="Ej: Pastelería" />
+							</div>
+
+							<div class="col-md-8">
+								<label for="descripcion" class="form-label">Descripción corta</label>
+								<textarea
+									id="descripcion"
+									name="descripcion"
+									class="form-control"
+									rows="2"
+									placeholder="Descripción breve visible en catálogo"></textarea>
+							</div>
+
+							<div class="col-12">
+								<div id="ingredientes-label" class="form-label">Ingredientes (en unidad base)</div>
+								<div
+									class="w-100 mt-2"
+									id="ingredientes-container"
+									aria-live="polite"
+									aria-labelledby="ingredientes-label">
+									<div class="row g-2 mb-2 ingrediente-row align-items-center">
+										<div class="col-md-7">
+											<select name="id_materia_prima[]" class="form-select" required>
+												<option value="">Seleccionar materia prima</option>
+												{% for m in materias %}
+												<option
+													value="{{ m.id_materia }}"
+													data-unidad="{{ m.unidad_base.abreviatura }}">
+													{{ m.nombre }} / {{ m.unidad_base.abreviatura }}
+												</option>
+												{% endfor %}
+											</select>
+										</div>
+										<div class="col-md-3">
+											<div class="input-group">
+												<input
+													type="number"
+													min="0.001"
+													step="0.001"
+													name="cantidad_receta[]"
+													class="form-control"
+													placeholder="Cantidad"
+													required />
+												<span class="input-group-text">u</span>
+											</div>
+										</div>
+										<div class="col-md-2 text-end">
+											<button
+												type="button"
+												class="btn btn-outline-danger btn-sm w-100"
+												onclick="quitarIngrediente(this)"
+												aria-label="Quitar ingrediente">
+												<i class="bi bi-x"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="mt-2 d-flex gap-2">
+									<button
+										type="button"
+										class="btn btn-sm btn-outline-primary"
+										onclick="agregarIngrediente()">
+										<i class="bi bi-plus-lg me-1"></i>
+										Agregar ingrediente
+									</button>
+								</div>
+								<div class="form-text">
+									Define las cantidades en la unidad base de la materia prima. Convierte unidades
+									antes de guardar si es necesario.
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer border-0">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-check2 me-1"></i>
+							Crear receta
+						</button>
+					</div>
+				</form>
 			</div>
-		</form>
+		</div>
 	</div>
 
 	<div class="card p-3">
 		<h3 class="mb-2">Recetas registradas</h3>
 		<div class="table-responsive">
-			<table>
+			<table class="table table-sm table-striped">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -110,24 +237,103 @@
 </section>
 {% endblock %} {% block scripts %}
 <script>
-	function agregarIngrediente() {
+	(function () {
+		const form = document.getElementById('form-receta');
 		const container = document.getElementById('ingredientes-container');
-		const firstRow = container.querySelector('.ingrediente-row');
-		if (!firstRow) {
-			return;
-		}
-		const clone = firstRow.cloneNode(true);
-		clone.querySelector('select').value = '';
-		clone.querySelector('input').value = '';
-		container.appendChild(clone);
-	}
+		const productoSelect = document.getElementById('id_producto');
+		const nombreInput = document.getElementById('nombre');
 
-	function quitarIngrediente(button) {
-		const rows = document.querySelectorAll('#ingredientes-container .ingrediente-row');
-		if (rows.length <= 1) {
-			return;
+		// Añade una nueva fila de ingrediente clonando la primera
+		globalThis.agregarIngrediente = function () {
+			if (!container) return;
+			const firstRow = container.querySelector('.ingrediente-row');
+			if (!firstRow) return;
+			const clone = firstRow.cloneNode(true);
+			// Limpiar selects e inputs en el clone y restablecer sufijo unidad
+			clone.querySelectorAll('select').forEach((s) => (s.value = ''));
+			clone.querySelectorAll('input').forEach((i) => (i.value = ''));
+			const suffix = clone.querySelector('.input-group-text');
+			if (suffix) suffix.textContent = 'u';
+			container.appendChild(clone);
+			const sel = clone.querySelector('select');
+			if (sel) sel.focus();
+		};
+
+		// Quitar una fila de ingrediente, pero mantener al menos una
+		globalThis.quitarIngrediente = function (button) {
+			if (!container) return;
+			const rows = container.querySelectorAll('.ingrediente-row');
+			if (rows.length <= 1) return;
+			const row = button.closest('.ingrediente-row');
+			if (row) row.remove();
+		};
+
+		// Actualiza el sufijo de unidad al seleccionar materia prima
+		if (container) {
+			container.addEventListener('change', function (e) {
+				const target = e.target;
+				if (!target) return;
+				if (target.matches('select[name="id_materia_prima[]"]')) {
+					const unidad = target.selectedOptions[0]?.dataset?.unidad || 'u';
+					const row = target.closest('.ingrediente-row');
+					const suffix = row ? row.querySelector('.input-group-text') : null;
+					if (suffix) suffix.textContent = unidad;
+				}
+			});
 		}
-		button.closest('.ingrediente-row').remove();
-	}
+
+		if (productoSelect && nombreInput) {
+			productoSelect.addEventListener('change', function () {
+				const nombreProducto = productoSelect.selectedOptions[0]?.textContent?.trim() || '';
+				nombreInput.value = nombreProducto;
+			});
+		}
+
+		// Reinicia el formulario y deja solo una fila de ingrediente limpia
+		globalThis.resetRecetaForm = function () {
+			if (!form || !container) return;
+			form.reset();
+			const rows = container.querySelectorAll('.ingrediente-row');
+			rows.forEach((r, idx) => {
+				if (idx === 0) {
+					r.querySelectorAll('select').forEach((s) => (s.value = ''));
+					r.querySelectorAll('input').forEach((i) => (i.value = ''));
+					const suffix = r.querySelector('.input-group-text');
+					if (suffix) suffix.textContent = 'u';
+				} else {
+					r.remove();
+				}
+			});
+		};
+
+		// Validación al enviar
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				const selects = form.querySelectorAll('select[name="id_materia_prima[]"]');
+				const inputs = form.querySelectorAll('input[name="cantidad_receta[]"]');
+				for (let i = 0; i < selects.length; i++) {
+					const sel = selects[i];
+					const inp = inputs[i];
+					if (!sel || !sel.value) {
+						e.preventDefault();
+						sel.classList.add('is-invalid');
+						sel.focus();
+						return;
+					} else {
+						sel.classList.remove('is-invalid');
+					}
+					const val = Number.parseFloat(inp.value);
+					if (Number.isNaN(val) || val <= 0) {
+						e.preventDefault();
+						inp.classList.add('is-invalid');
+						inp.focus();
+						return;
+					} else {
+						inp.classList.remove('is-invalid');
+					}
+				}
+			});
+		}
+	})();
 </script>
 {% endblock %}

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.catalog import catalog_bp
-from app.common.security import require_permission
+from app.common.security import log_audit_event, require_permission
 from app.common.services import agregar_producto_a_carrito, crear_pedido_desde_carrito
 from app.extensions import db
 from app.models import Carrito, DetalleCarrito, Pedido, Producto
@@ -16,7 +16,10 @@ from app.models import Carrito, DetalleCarrito, Pedido, Producto
 @catalog_bp.route("/")
 def home():
     destacados = (
-        Producto.query.filter(Producto.activo == True, Producto.cantidad_disponible > 0)
+        Producto.query.filter(
+            Producto.activo.is_(True),
+            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,
+        )
         .order_by(Producto.cantidad_disponible.desc(), Producto.id_producto.asc())
         .limit(6)
         .all()
@@ -27,7 +30,10 @@ def home():
 @catalog_bp.route("/catalogo")
 def catalogo():
     productos = (
-        Producto.query.filter(Producto.activo == True, Producto.cantidad_disponible > 0)
+        Producto.query.filter(
+            Producto.activo.is_(True),
+            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,
+        )
         .order_by(Producto.nombre.asc())
         .all()
     )
@@ -54,6 +60,10 @@ def carrito_agregar():
             id_usuario=current_user.id_usuario,
             id_producto=id_producto,
             cantidad=cantidad,
+        )
+        log_audit_event(
+            "CARRITO_AGREGAR",
+            f"id_usuario={current_user.id_usuario}; id_producto={id_producto}; cantidad={cantidad}",
         )
         flash("Producto agregado al carrito.", "success")
     except (ValueError, TypeError) as exc:
@@ -89,23 +99,52 @@ def carrito():
         if action == "eliminar":
             db.session.delete(detalle)
             db.session.commit()
+            log_audit_event(
+                "CARRITO_ELIMINAR",
+                f"id_usuario={current_user.id_usuario}; id_producto={detalle.id_producto}",
+            )
             flash("Producto eliminado del carrito.", "info")
             return redirect(url_for("catalog.carrito"))
 
         if action == "actualizar":
             try:
-                cantidad = int(request.form.get("cantidad", str(detalle.cantidad)) or detalle.cantidad)
+                cantidad = int(
+                    request.form.get("cantidad", str(detalle.cantidad))
+                    or detalle.cantidad
+                )
             except ValueError:
                 cantidad = detalle.cantidad
             if cantidad < 1 or cantidad > 5:
                 flash("La cantidad debe estar entre 1 y 5.", "warning")
                 return redirect(url_for("catalog.carrito"))
+
+            producto = detalle.producto
+            if not producto or not producto.activo:
+                flash("Producto no disponible.", "danger")
+                return redirect(url_for("catalog.carrito"))
+            stock_libre = max(
+                int(producto.cantidad_disponible or 0)
+                - int(producto.cantidad_reservada or 0),
+                0,
+            )
+            if cantidad > stock_libre:
+                flash(
+                    "La cantidad solicitada excede el inventario disponible.", "danger"
+                )
+                return redirect(url_for("catalog.carrito"))
+
             detalle.cantidad = cantidad
             db.session.commit()
+            log_audit_event(
+                "CARRITO_ACTUALIZAR",
+                f"id_usuario={current_user.id_usuario}; id_producto={detalle.id_producto}; cantidad={cantidad}",
+            )
             flash("Carrito actualizado.", "success")
             return redirect(url_for("catalog.carrito"))
 
-    carrito_db = Carrito.query.filter_by(id_usuario_cliente=current_user.id_usuario).first()
+    carrito_db = Carrito.query.filter_by(
+        id_usuario_cliente=current_user.id_usuario
+    ).first()
     detalles = carrito_db.detalles if carrito_db else []
     total = Decimal("0")
     for d in detalles:
@@ -129,14 +168,27 @@ def checkout():
         return redirect(url_for("catalog.catalogo"))
 
     fecha_entrega_raw = (request.form.get("fecha_entrega") or "").strip()
-    tipo_pago_pedido = (request.form.get("tipo_pago_pedido") or "CONTRA_ENTREGA").strip().upper()
-    tipo_pago = (request.form.get("tipo_pago") or "EFECTIVO").strip().upper()
+    tipo_entrega = (request.form.get("tipo_entrega") or "pickup").strip().lower()
+
+    # Regla de negocio: pedidos web se pagan en linea con tarjeta y se recolectan en sucursal.
+    tipo_pago_pedido = "EN_LINEA"
+    tipo_pago = "TARJETA"
     referencia = (request.form.get("referencia_pago") or "").strip() or None
+    if not referencia:
+        referencia = f"WEB-{current_user.id_usuario}-{int(datetime.now().timestamp())}"
 
     try:
         fecha_entrega = date.fromisoformat(fecha_entrega_raw)
     except ValueError:
         flash("Fecha de entrega invalida.", "warning")
+        return redirect(url_for("catalog.carrito"))
+
+    if fecha_entrega < date.today():
+        flash("La fecha de entrega no puede ser anterior al dia actual.", "warning")
+        return redirect(url_for("catalog.carrito"))
+
+    if tipo_entrega != "pickup":
+        flash("Los pedidos solo pueden recolectarse en sucursal.", "warning")
         return redirect(url_for("catalog.carrito"))
 
     try:
@@ -146,6 +198,10 @@ def checkout():
             tipo_pago_pedido=tipo_pago_pedido,
             tipo_pago=tipo_pago,
             referencia_pago=referencia,
+        )
+        log_audit_event(
+            "PEDIDO_WEB_CREADO",
+            f"id_usuario={current_user.id_usuario}; id_pedido={pedido.id_pedido}; tipo_pago={tipo_pago_pedido}",
         )
         flash(f"Pedido generado correctamente (ID {pedido.id_pedido}).", "success")
         return redirect(url_for("catalog.mis_pedidos"))

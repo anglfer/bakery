@@ -571,7 +571,10 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 
 		fetch(`/admin/roles/${idRol}/permisos`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': globalThis.CSRF_TOKEN || '',
+			},
 			body: JSON.stringify({ permisos: Object.values(mapa) }),
 		})
 			.then((r) => r.json())

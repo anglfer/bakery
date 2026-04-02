@@ -1,10 +1,14 @@
 {% extends "base_template.html" %} {% block title %}Solicitudes de Produccion{% endblock %} {% block
 content %}
 <section class="section">
-	<h2 class="mb-3">Solicitudes de produccion (Ventas)</h2>
-	<div class="card p-3 mb-3">
-		<h3 class="mb-2">Nueva solicitud</h3>
-		<form method="post" class="grid-form">
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de ventas</p>
+		<h2 class="ops-hero-title">Solicitudes de producción</h2>
+		<p class="ops-hero-text">Genera solicitudes cuando el stock esté cerca del mínimo.</p>
+	</div>
+	<div class="ops-card">
+		<h3 class="ops-card-title">Nueva solicitud</h3>
+		<form method="post" class="ops-grid">
 			<select name="id_producto" required>
 				<option value="">Producto</option>
 				{% for p in productos %}
@@ -17,10 +21,10 @@ content %}
 		</form>
 	</div>
 
-	<div class="card p-3">
-		<h3 class="mb-2">Historial de solicitudes</h3>
-		<div class="table-responsive">
-			<table>
+	<div class="ops-card">
+		<h3 class="ops-card-title">Historial de solicitudes</h3>
+		<div class="ops-table table-responsive">
+			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -36,7 +40,7 @@ content %}
 						<td>{{ s.id_solicitud }}</td>
 						<td>{{ s.producto.nombre }}</td>
 						<td>{{ s.cantidad }}</td>
-						<td>{{ s.estado }}</td>
+						<td><span class="ops-chip neutral">{{ s.estado }}</span></td>
 						<td>{{ s.id_usuario_solicita }}</td>
 					</tr>
 					{% else %}

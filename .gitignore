@@ -5,3 +5,8 @@ instance/*.db
 *.sqlite3
 .env
 .pytest_cache/
+.github/
+.agents
+.vscode
+.vscode/*
+.vscode/PythonImportHelper-v2-Completion.json

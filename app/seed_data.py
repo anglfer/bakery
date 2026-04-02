@@ -1,7 +1,12 @@
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
+from app.common.services import (
+    calcular_costo_unitario_producto,
+    recalcular_costo_y_precio_sugerido_producto,
+    recalcular_costos_productos_afectados_por_materias,
+)
 from app.extensions import db
 from app.models import (
     BitacoraAcceso,
@@ -40,6 +45,60 @@ MP_HARINA = "Harina de Trigo"
 MP_AZUCAR = "Azucar Refinada"
 MP_MANTEQUILLA = "Mantequilla s/sal"
 MP_HUEVO = "Huevo Fresco"
+PRODUCTO_PASTEL_CHOCOLATE = "Pastel de Chocolate"
+MXN_QUANTIZE = Decimal("0.01")
+
+DEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {
+    PRODUCTO_PASTEL_CHOCOLATE: Decimal("30.00"),
+    "Pay de Fresa": Decimal("28.00"),
+    "Galleta de Nuez": Decimal("25.00"),
+}
+
+
+def _to_mxn(value: Decimal) -> Decimal:
+    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)
+
+
+def _resolver_costo_unitario_para_snapshot(producto: Producto) -> Decimal:
+    costo_actual = Decimal(str(producto.costo_produccion_actual or 0))
+    if costo_actual > 0:
+        return _to_mxn(costo_actual)
+
+    try:
+        return _to_mxn(
+            calcular_costo_unitario_producto(
+                id_producto=producto.id_producto,
+            )
+        )
+    except ValueError:
+        return Decimal("0.00")
+
+
+def _asegurar_snapshots_historicos_venta(venta: Venta) -> Decimal:
+    utilidad_total = Decimal("0")
+    detalles_venta = DetalleVenta.query.filter_by(
+        id_venta=venta.id_venta,
+    ).all()
+    for detalle in detalles_venta:
+        producto = Producto.query.get(detalle.id_producto)
+        if not producto:
+            continue
+
+        costo_unitario = _resolver_costo_unitario_para_snapshot(producto)
+        utilidad_unitaria = _to_mxn(
+            Decimal(str(detalle.precio_unitario)) - costo_unitario
+        )
+
+        if detalle.costo_unitario_produccion is None:
+            detalle.costo_unitario_produccion = costo_unitario
+        if detalle.utilidad_unitaria is None:
+            detalle.utilidad_unitaria = utilidad_unitaria
+
+        utilidad_total += Decimal(str(detalle.utilidad_unitaria)) * Decimal(
+            str(detalle.cantidad)
+        )
+
+    return _to_mxn(utilidad_total)
 
 
 def seed_full_data() -> None:
@@ -49,6 +108,7 @@ def seed_full_data() -> None:
     _seed_raw_materials()
     _seed_recipes()
     _seed_purchase_and_inventory(users)
+    _seed_product_costing()
     _seed_production_flow(users)
     _seed_customer_flow(users)
     _seed_access_logs(users)
@@ -284,7 +344,8 @@ def _seed_suppliers() -> None:
 def _seed_raw_materials() -> None:
     units = {u.abreviatura: u for u in UnidadMedida.query.all()}
     materials = [
-        # name, unidad_base, unidad_compra, factor_conversion, merma%, stock_minimo, stock_inicial, costo_unitario(MXN por unidad_base)
+        # name, unidad_base, unidad_compra, factor_conversion, merma%,
+        # stock_minimo, stock_inicial, costo_unitario (MXN por unidad_base)
         (MP_HARINA, "g", "cos", "25000", "2.0", "10000", "2000", "0.03"),
         (MP_AZUCAR, "g", "cos", "25000", "0.5", "5000", "18000", "0.028"),
         (MP_MANTEQUILLA, "g", "kg", "1000", "1.5", "2000", "800", "0.16"),
@@ -353,18 +414,25 @@ def _seed_recipes() -> None:
         if not product:
             continue
 
+        # Receta model no contiene id_producto; ahora las recetas se crean
+        # por nombre/version y se asocian al producto via Producto.id_receta
         recipe = Receta.query.filter_by(
-            id_producto=product.id_producto,
+            nombre=product.nombre,
             version=1,
         ).first()
         if not recipe:
             recipe = Receta(
-                id_producto=product.id_producto,
+                nombre=product.nombre,
                 version=1,
                 rendimiento_base=12,
                 activa=True,
             )
             db.session.add(recipe)
+            db.session.flush()
+
+            # asociar la receta creada al producto
+            product.id_receta = recipe.id_receta
+            db.session.add(product)
             db.session.flush()
 
         for material_name, amount in detail_rows:
@@ -417,10 +485,12 @@ def _seed_purchase_and_inventory(users: dict[str, Usuario]) -> None:
         (mp_azucar, Decimal("2"), Decimal("500")),
     ]
     total = Decimal("0")
+    ids_materia_impactadas: set[int] = set()
     for material, quantity, unit_price in details:
         subtotal = quantity * unit_price
         base_qty = quantity * Decimal(str(material.factor_conversion))
         total += subtotal
+        ids_materia_impactadas.add(material.id_materia)
         db.session.add(
             DetalleCompra(
                 id_compra=purchase.id_compra,
@@ -455,13 +525,44 @@ def _seed_purchase_and_inventory(users: dict[str, Usuario]) -> None:
             referencia=f"COMPRA-{purchase.id_compra}",
         )
     )
+
+    recalcular_costos_productos_afectados_por_materias(
+        ids_materia=sorted(ids_materia_impactadas)
+    )
+    db.session.flush()
+
+
+def _seed_product_costing() -> None:
+    for product_name, margen in DEFAULT_MARGIN_BY_PRODUCT.items():
+        producto = Producto.query.filter_by(nombre=product_name).first()
+        if not producto:
+            continue
+        producto.margen_objetivo_pct = margen
+
+    db.session.flush()
+
+    productos_con_receta = (
+        Producto.query.filter(Producto.activo.is_(True))
+        .filter(Producto.id_receta.isnot(None))
+        .all()
+    )
+    for producto in productos_con_receta:
+        try:
+            recalcular_costo_y_precio_sugerido_producto(
+                id_producto=producto.id_producto,
+            )
+        except ValueError:
+            continue
+
     db.session.flush()
 
 
 def _seed_production_flow(users: dict[str, Usuario]) -> None:
     sales_user = users.get(ROLE_SALES)
     prod_user = users.get(ROLE_PRODUCTION)
-    product = Producto.query.filter_by(nombre="Pastel de Chocolate").first()
+    product = Producto.query.filter_by(
+        nombre=PRODUCTO_PASTEL_CHOCOLATE,
+    ).first()
     recipe = Receta.query.filter_by(activa=True).first()
     if not sales_user or not prod_user or not product or not recipe:
         return
@@ -488,7 +589,9 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
                 fecha_inicio=utc_now(),
                 fecha_fin=utc_now(),
                 id_usuario_responsable=prod_user.id_usuario,
-                costo_total=Decimal("284.50"),
+                costo_total=_to_mxn(
+                    _resolver_costo_unitario_para_snapshot(product) * Decimal("24")
+                ),
             )
         )
 
@@ -520,38 +623,53 @@ def _seed_customer_flow(users: dict[str, Usuario]) -> None:
                 )
             )
 
-    if not Venta.query.filter_by(
+    sale = Venta.query.filter_by(
         id_usuario_cliente=customer.id_usuario,
-    ).first():
+    ).first()
+    if not sale:
         sale = Venta(
             id_usuario_cliente=customer.id_usuario,
             estado="CONFIRMADO",
-            pagado_en_linea=True,
-            total=Decimal("810.00"),
+            tipo_pago="TARJETA",
+            total=Decimal("0.00"),
         )
         db.session.add(sale)
         db.session.flush()
 
         products = Producto.query.limit(3).all()
+        total_venta = Decimal("0")
         for index, product in enumerate(products, start=1):
             qty = 1 if index != 2 else 2
-            subtotal = Decimal(str(product.precio_venta)) * qty
+            precio_unitario = Decimal(str(product.precio_venta))
+            costo_unitario = _resolver_costo_unitario_para_snapshot(product)
+            utilidad_unitaria = _to_mxn(precio_unitario - costo_unitario)
+            subtotal = _to_mxn(precio_unitario * Decimal(str(qty)))
+            total_venta += subtotal
             db.session.add(
                 DetalleVenta(
                     id_venta=sale.id_venta,
                     id_producto=product.id_producto,
                     cantidad=qty,
                     precio_unitario=product.precio_venta,
+                    costo_unitario_produccion=costo_unitario,
+                    utilidad_unitaria=utilidad_unitaria,
                     subtotal=subtotal,
                 )
             )
+
+        sale.total = _to_mxn(total_venta)
+    else:
+        _asegurar_snapshots_historicos_venta(sale)
+
+    if not CorteDiario.query.filter_by(fecha=utc_today()).first():
+        utilidad_diaria = _asegurar_snapshots_historicos_venta(sale)
 
         db.session.add(
             CorteDiario(
                 fecha=utc_today(),
                 total_ventas=sale.total,
                 numero_ventas=1,
-                utilidad_diaria=Decimal("120.00"),
+                utilidad_diaria=utilidad_diaria,
                 salida_efectivo_proveedores=Decimal("85.00"),
                 id_usuario=sales_user.id_usuario,
             )
@@ -570,3 +688,13 @@ def _seed_access_logs(users: dict[str, Usuario]) -> None:
                 error_mensaje=f"Acceso inicial seed para rol {role_name}",
             )
         )
+
+
+if __name__ == "__main__":
+    from app import create_app
+
+    app = create_app()
+    with app.app_context():
+        seed_full_data()
+        db.session.commit()
+        print("Seed completa ejecutada.")

@@ -68,7 +68,7 @@ content %}
 			{% if show_captcha %}
 			<div class="mb-3">
 				<div class="d-flex justify-content-center">
-					<!-- Se quitó el campo recaptcha temporalmente para no bloquear el login. -->
+					<div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
 				</div>
 			</div>
 			{% endif %}
@@ -86,7 +86,9 @@ content %}
 		</form>
 	</div>
 </div>
-{% endblock %} {% block scripts %}
+{% endblock %} {% block scripts %} {% if show_captcha %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
 <script>
 	const toggle = document.getElementById('togglePassword');
 	if (toggle) {

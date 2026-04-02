@@ -174,6 +174,13 @@ class MateriaPrima(TimestampMixin, db.Model):
     __tablename__ = "materia_prima"
     __table_args__ = (
         CheckConstraint("cantidad_disponible >= 0", name="ck_mp_cantidad_no_negativa"),
+        CheckConstraint(
+            "factor_conversion > 0", name="ck_mp_factor_conversion_positiva"
+        ),
+        CheckConstraint(
+            "porcentaje_merma >= 0", name="ck_mp_porcentaje_merma_no_negativo"
+        ),
+        CheckConstraint("stock_minimo >= 0", name="ck_mp_stock_minimo_no_negativo"),
     )
 
     id_materia = db.Column(db.Integer, primary_key=True)
@@ -229,6 +236,17 @@ class Compra(TimestampMixin, db.Model):
 
 class DetalleCompra(db.Model):
     __tablename__ = "detalle_compra"
+    __table_args__ = (
+        CheckConstraint(
+            "cantidad_comprada > 0", name="ck_detalle_compra_cantidad_positiva"
+        ),
+        CheckConstraint(
+            "precio_unitario >= 0", name="ck_detalle_compra_precio_no_negativo"
+        ),
+        CheckConstraint(
+            "cantidad_base > 0", name="ck_detalle_compra_cantidad_base_positiva"
+        ),
+    )
 
     id_detalle = db.Column(db.Integer, primary_key=True)
     id_compra = db.Column(db.Integer, db.ForeignKey("compra.id_compra"), nullable=False)
@@ -246,6 +264,33 @@ class DetalleCompra(db.Model):
 
 class Producto(TimestampMixin, db.Model):
     __tablename__ = "producto"
+    __table_args__ = (
+        CheckConstraint(
+            "cantidad_disponible >= 0", name="ck_producto_stock_no_negativo"
+        ),
+        CheckConstraint(
+            "cantidad_reservada >= 0", name="ck_producto_reserva_no_negativa"
+        ),
+        CheckConstraint(
+            "cantidad_reservada <= cantidad_disponible",
+            name="ck_producto_reserva_no_supera_stock",
+        ),
+        CheckConstraint(
+            "stock_minimo >= 0", name="ck_producto_stock_minimo_no_negativo"
+        ),
+        CheckConstraint(
+            "costo_produccion_actual >= 0",
+            name="ck_producto_costo_produccion_no_negativo",
+        ),
+        CheckConstraint(
+            "margen_objetivo_pct > 0 AND margen_objetivo_pct < 100",
+            name="ck_producto_margen_objetivo_rango",
+        ),
+        CheckConstraint(
+            "precio_sugerido IS NULL OR precio_sugerido >= 0",
+            name="ck_producto_precio_sugerido_no_negativo",
+        ),
+    )
 
     id_producto = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(120), unique=True, nullable=False)
@@ -253,7 +298,12 @@ class Producto(TimestampMixin, db.Model):
     precio_venta = db.Column(db.Numeric(12, 2), nullable=False)
     unidad_venta = db.Column(db.String(20), default="Pieza", nullable=False)
     cantidad_disponible = db.Column(db.Integer, default=0, nullable=False)
+    cantidad_reservada = db.Column(db.Integer, default=0, nullable=False)
     stock_minimo = db.Column(db.Integer, default=0, nullable=False)
+    costo_produccion_actual = db.Column(db.Numeric(12, 2), default=0, nullable=False)
+    margen_objetivo_pct = db.Column(db.Numeric(5, 2), default=25, nullable=False)
+    precio_sugerido = db.Column(db.Numeric(12, 2), nullable=True)
+    fecha_costo_actualizado = db.Column(db.DateTime, nullable=True)
     id_receta = db.Column(db.Integer, db.ForeignKey("receta.id_receta"), nullable=True)
     activo = db.Column(db.Boolean, default=True, nullable=False)
     imagen = db.Column(db.String(255), nullable=True)
@@ -262,6 +312,13 @@ class Producto(TimestampMixin, db.Model):
     )
 
     receta_base = db.relationship("Receta", foreign_keys=[id_receta])
+
+    @property
+    def cantidad_libre(self) -> int:
+        return max(
+            int(self.cantidad_disponible or 0) - int(self.cantidad_reservada or 0),
+            0,
+        )
 
 
 class Receta(TimestampMixin, db.Model):
@@ -287,6 +344,11 @@ class Receta(TimestampMixin, db.Model):
 
 class DetalleReceta(db.Model):
     __tablename__ = "detalle_receta"
+    __table_args__ = (
+        CheckConstraint(
+            "cantidad_base > 0", name="ck_detalle_receta_cantidad_positiva"
+        ),
+    )
 
     id_detalle = db.Column(db.Integer, primary_key=True)
     id_receta = db.Column(db.Integer, db.ForeignKey("receta.id_receta"), nullable=False)
@@ -299,6 +361,9 @@ class DetalleReceta(db.Model):
 
 class SolicitudProduccion(TimestampMixin, db.Model):
     __tablename__ = "solicitud_produccion"
+    __table_args__ = (
+        CheckConstraint("cantidad > 0", name="ck_solicitud_cantidad_positiva"),
+    )
 
     id_solicitud = db.Column(db.Integer, primary_key=True)
     id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
@@ -318,6 +383,9 @@ class SolicitudProduccion(TimestampMixin, db.Model):
 
 class OrdenProduccion(TimestampMixin, db.Model):
     __tablename__ = "orden_produccion"
+    __table_args__ = (
+        CheckConstraint("cantidad_producir > 0", name="ck_orden_cantidad_positiva"),
+    )
 
     id_orden = db.Column(db.Integer, primary_key=True)
     id_solicitud = db.Column(
@@ -476,6 +544,8 @@ class DetalleVenta(db.Model):
     id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
     precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)
+    costo_unitario_produccion = db.Column(db.Numeric(12, 2), nullable=True)
+    utilidad_unitaria = db.Column(db.Numeric(12, 2), nullable=True)
     subtotal = db.Column(db.Numeric(12, 2), nullable=False)
 
     venta = db.relationship("Venta", back_populates="detalles")

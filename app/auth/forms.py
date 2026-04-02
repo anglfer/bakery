@@ -1,4 +1,4 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 
@@ -34,6 +34,7 @@ class RegisterClientForm(FlaskForm):
         "Usuario", validators=[DataRequired(), Length(min=3, max=60)]
     )
     password = PasswordField("Contrasena", validators=[DataRequired(), PASSWORD_RULE])
+    recaptcha = RecaptchaField()
     submit = SubmitField("Crear cuenta")
 
     def validate_password(self, field) -> None:

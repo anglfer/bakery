@@ -1,0 +1,832 @@
+Módulo: Login / Autenticación  
+Reglas de negocio  
+• Los clientes pueden registrarse de manera autónoma  a través d e la opción “Crear 
+cuenta”  disponible en el módulo de login.  Campos: id_cliente, nombre, apellido, 
+teléfono, usuario_cliente, password_hash, fecha_registro, estado_cliente .  
+• Los empleados no pueden registrarse por sí mismos; su registro debe ser realizado 
+exclusivamente por un usuario con rol de administrador.  
+• Todo usuario debe autenticarse mediante credenciales válidas (usuario y contraseña) 
+para acceder al sistema.  
+• Las contraseñas deben cumplir con una política de seguridad que incluya:  
+✓ Mínimo 8 caracteres  
+✓ Al menos una letra mayúscula  
+✓ Al menos una letra minúscula  
+✓ Al menos un número  
+✓ Al menos un carácter especial  
+• El sistema debe validar las contraseñas contra listas de contraseñas inseguras para 
+evitar combinaciones vulnerables.  
+• El sistema debe implementar un mecanismo de CAPTCHA en el inicio de sesión para 
+prevenir accesos automatizados.  
+• El sistema debe implementar autenticación de dos factores (2FA), generando un 
+código de un solo uso con tiempo de expiración limitado  (5 minutos). 
+• Se permite un máximo de 3 intentos fallidos de inicio de sesión; al exceder este límite, 
+la cuenta debe ser bloqueada temporalmente.  
+• El sistema debe registrar todos los intentos de inicio de sesión, exitosos y fallidos  
+deberán registrarse en un archivo de logs o en base de dato  (no sé dónde es que iban 
+a usar mongo). Los datos mínimos deberán ser el error presentado y la fecha .  
+• Los usuarios deben cambiar su contraseña de manera periódica según la política 
+definida por el sistema.  
+• Las contraseñas deben almacenarse de forma encriptada y nunca en texto plano.  
+• El sistema debe mostrar al usuario la información de su último inicio de sesión.  
+• Las sesiones de usuario deben tener una duración máxima de 10 minutos; al expirar, 
+el usuario deberá autenticarse nuevamente.  
+• No se debe permitir el acceso a usuarios inactivos o bloqueados.  
+• El acceso a las funcionalidades del sistema debe estar controlado según el rol del 
+usuario (principio de mínimo privilegio).  
+• El sistema no debe mostrar mensajes de error que revelen información sensible (por 
+ejemplo, si el usuario o la contraseña son incorrectos de forma específica).  
+
+ 
+Módulo: Dashboard  
+Reglas de negocio  
+• El dashboard debe mostrar por defecto la información correspondiente al día actual.  
+• El sistema solo debe considerar ventas confirmadas para el cálculo de indicadores.  
+• El total de ventas del día debe calcularse como la suma de todas las ventas 
+registradas en el día.  
+• El número de ventas debe corresponder al total de transacciones realizadas en el 
+día.  
+• El producto más vendido debe determinarse con base en la cantidad total vendida.  
+• Las gráficas de ventas por hora deben agrupar la información en intervalos horarios 
+del día.  
+• Las gráficas de productos más vendidos deben representar únicamente productos 
+activos.  
+• Las presentaciones más vendidas deben calcularse en función de la cantidad total 
+vendida por presentación.  
+• La tabla de ventas recientes debe mostrar únicamente registros del día actual.  
+• El sistema debe permitir consultar información de días específicos mediante filtros.  
+• La información del dashboard debe actualizarse automáticamente cada vez que el 
+usuario accede al módulo.  
+• En caso de no existir datos, el sistema debe mostrar valores en cero o mensajes 
+informativos.  
+• El acceso a la información debe estar controlado por el rol del usuario (principio de 
+mínimo privilegio).  
+• No se deben mostrar datos de ventas no confirmadas.  
+• No se deben mostrar datos fuera del rango de fecha seleccionado.  
+• No se permite modificar informaci ón desde el dashboard (solo visualizaci ón).  
+• No se deben mostrar datos de m ódulos no autorizados para el rol del usuario.  
+• No se deben mostrar datos sensibles a usuarios sin permisos .   
+• No se permite acceder al dashboard  sin autenticaci ón.  
+• No se deben mostrar datos inconsistentes o incompletos.  
+• El administrador tendrá a cceso completo al dashboard.  
+• El de ventas  vera el total de ventas del día , Número de ventas , Producto más vendido , 
+Gráfica de ventas por hora y Tabla de ventas recientes . 
+• El de producción vera, producto más vendido , Presentaciones más vendidas y 
+Historial de ventas recientes (solo productos y cantidades) .  
+
+ 
+Módulo: Gestión de Usuarios  
+Reglas de negocio  
+• Solo los usuarios con rol de Administrador  pueden crear, modificar o desactivar 
+usuarios del sistema.  
+• Los empleados no pueden registrarse por sí mismos ; su registro debe ser realizado 
+exclusivamente por un usuario con rol de Administrador.  
+• Todos los campos del formulario gestión usuario deben estar validados.  
+• El nombre de usuario debe ser único dentro del sistema y no puede repetirse.  
+• Todo usuario debe contar obligatoriamente con un rol asignado para determinar sus 
+permisos de acceso.  
+• No se permite la eliminación física de usuarios; únicamente se permite su 
+desactivación lógica. Y se pueden volver a activar.  
+• Los usuarios en estado inactivo o bloqueado no podrán acceder al sistema.  
+• La contraseña del usuario debe cumplir con la política de seguridad definida: Mínimo 
+8 caracteres y Al menos una mayúscula, una minúscula, un número y un carácter 
+especial  
+• Las contraseñas deben almacenarse de forma cifrada mediante algoritmos seguros 
+(bcrypt).  
+• El sistema debe registrar la fecha de creación del usuario, así como su estado 
+(activo/inactivo). Y también puede volver a activarse.  
+• El sistema debe registrar la fecha del último acceso del usuario.  
+• El sistema debe permitir la actualización de datos del usuario únicamente por 
+usuarios autorizados.  
+• El sistema debe permitir el cambio de contraseña de forma segura y validada.  
+• El sistema debe validar que no se utilicen contraseñas consideradas inseguras o 
+comunes.  
+• El sistema debe registrar todos los cambios realizados sobre los usuarios para fines 
+de auditoría.  
+• El acceso a las funcionalidades del sistema debe estar controlado por el rol del 
+usuario bajo el principio de mínimo privilegio.  
+• No se permite acceder al módulo sin autenticación previa .  
+ 
+ 
+ 
+
+Módulo: Gestión de roles  
+Reglas del negocio  
+• Solo los usuarios con rol de Administrador  tienen la autoridad para crear, modificar 
+o desactivar roles dentro del sistema.  
+• Cada rol debe contar con un nombre único que lo identifique dentro del sistema.  
+• Todo rol debe definir de manera explícita los permisos y acciones que puede realizar 
+en cada módulo del sistema.  
+• Los roles base del sistema ( Administrador, Ventas y Producción ) son obligatorios y 
+no pueden ser eliminados ni desactivados.  
+• Todo usuario debe tener un rol asignado para poder acceder y operar dentro del 
+sistema.  
+• Los permisos deben asignarse bajo el principio de mínimo privilegio , otorgando 
+únicamente los accesos necesarios según la función del usuario.  
+• Los cambios realizados en los permisos de un rol deben aplicarse de forma 
+inmediata a todos los usuarios que tengan dicho rol asignado.  
+• No se permite la eliminación física de roles; únicamente se permite su desactivación 
+lógica para conservar la trazabilidad. Y también puden activarse cuando sea 
+necesario.  
+• Un rol en estado inactivo no puede ser asignado a nuevos usuarios.  
+• La definición de roles debe estar alineada con las funciones reales del personal 
+dentro de la organización.  
+• El sistema debe registrar la fecha de creación y el estado del rol (activo/inactivo).  
+• El sistema debe permitir la asignación de permisos por módulo y tipo de acción 
+(lectura, escritura, actualización, eliminación).  
+• No se permite acceder al módulo sin autenticación.  
+• Validar que el nombre del rol no exista previamente.  
+• Validar que el rol tenga al menos un permiso asignado.  
+• Validar coherencia en la asignación de permisos.  
+• Verificar que no se modifiquen roles base críticos.  
+ 
+Módulo: Gestión de proveedores  
+Reglas del negocio  
+• Solo los usuarios pertenecientes al área administrativa  (rol Administrador) pueden 
+registrar, modificar o desactivar proveedores.  
+
+• Todo proveedor debe contar con información básica obligatoria para su registro, 
+incluyendo datos de contacto válidos (nombre, teléfono, correo electrónico, dirección,  
+etc).  
+• Cada proveedor debe ser identificable de manera única dentro del sistema.  
+• No se permite la duplicidad de proveedores; el sistema debe evitar registros repetidos 
+mediante validaciones.  
+• No se permite la eliminación física de proveedores; únicamente se permite su 
+desactivación lógica para conservar la trazabilidad. Y se pueden volver a activar.  
+• Un proveedor en estado inactivo no podrá ser utilizado para registrar compras de 
+materia prima.  
+• El registro de proveedores es un requisito obligatorio para poder realizar compras 
+dentro del sistema.  
+• La información de los proveedores debe mantenerse actualizada para garantizar el 
+correcto abastecimiento de insumos.  
+• El sistema debe permitir la consulta del historial de compras asociadas a cada 
+proveedor.  
+• La relación entre proveedores y compras  de inventario  debe garantizar la trazabilidad 
+de todas las operaciones realizadas.  
+• El sistema debe registrar la fecha de alta del proveedor y su estado (activo/inactivo).  
+• El correo electrónico del proveedor debe cumplir con un formato válido.  
+• Validar que el proveedor no exista previamente.  
+• Validar formato correcto de correo electrónico.  
+• Validar campos obligatorios (nombre, contacto, etc.).  
+• Validar formato de teléfono (si aplica).  
+• Confirmar registro o actualización exitosa.  
+• Mostrar mensajes claros de error en caso de fallo.  
+• Registrar operation es en logs.  
+ 
+Módulo: Inventario de Materia Prima  
+Reglas del negocio  
+• Toda materia prima debe registrarse obligatoriamente con una unidad base para su 
+control interno.  
+• La unidad de compra puede ser distinta a la unidad base; sin embargo, debe existir un 
+factor de conversión definido.   
+
+• El factor de conversión debe ser mayor a cero y válido para garantizar cálculos 
+correctos.  
+• El sistema debe almacenar todas las cantidades en unidad base para mantener la 
+consistencia del inventario.  
+• El inventario de materia prima no puede presentar valores negativos bajo ninguna 
+circunstancia.  
+• Toda entrada de materia prima debe originarse exclusivamente a partir de una compra 
+registrada en el sistema.  
+• Toda salida de materia prima debe estar asociada a un proceso de producción o a un 
+ajuste autorizado.  
+• El sistema debe registrar todos los movimientos de inventario (entradas, salidas y 
+ajustes) para garantizar la trazabilidad.  
+• El porcentaje de merma debe aplicarse automáticamente en los cálculos de consumo 
+de materia prima durante la producción.  
+• El sistema debe generar alertas cuando la cantidad disponible de una materia prima 
+sea menor al stock mínimo definido.  
+• No se permite la eliminación física de materias primas; únicamente se permite su 
+desactivación lógica. Y se puede volver a activar.  
+• Las materias primas en estado inactivo no podrán ser utilizadas en nuevos procesos de 
+producción ni en compras.  
+• El sistema debe garantizar la disponibilidad de insumos necesarios para la operación 
+diaria mediante el control del inventario.  
+• Cada materia prima debe ser identificable de manera única dentro del sistema.   
+• Las materias primas inactivas no deben utilizarse en nuevos procesos de producción.  
+• El control del inventario debe permitir asegurar la disponibilidad de insumos para la 
+operación diaria.  
+• Se debe generar una alerta cuando el stock sea menor al mínimo.  
+• No se permite acceder al módulo sin autenticación.  
+• Todas las operaciones sobre inventario deben validarse en el backend para evitar 
+manipulación indebida .  
+• Validar que la materia prima exista.  
+• Validar unidad base definida.  
+• Validar factor de conversión.  
+• Validar cantidades numéricas válidas.  
+• Confirmar actualización correcta del inventario.  
+• Generar alertas de stock mínimo.  
+• Mostrar mensajes claros al usuario.  
+
+Módulo: Compra de Materia Prima  
+Reglas del negocio  
+• Toda compra debe registrarse mediante una estructura de cabecera y detalle.  
+• Cada compra debe contar obligatoriamente con al menos un registro en el detalle.  
+• El identificador de la compra (id_compra) debe generarse automáticamente por el 
+sistema.  
+• Al comprar materia prima se deberá de modificar la existencia adecuando la cantidad 
+en la medida correcta (Ej. 1 bulto de harina → 50 kilogramos → 50,000 gramos). En cada 
+materia prima deberá de contener un % de merma ya sea por producción, por manejo 
+o por desperdicio.  
+• La fecha de compra es obligatoria y debe registrarse al momento de crear la compra.  
+• El usuario que registra la compra debe quedar asociado a la operación para garantizar 
+trazabilidad.  
+• Solo se pueden registrar compras con proveedores en estado activo.  
+• No se permite seleccionar proveedores inexistentes o desactivados.  
+• El proveedor debe existir previamente en el sistema.  
+• Cada registro del detalle debe incluir: Materia prima válida , Unidad de compra válida , 
+Cantidad mayor a cero , Precio unitario mayor o igual a cero  
+• El subtotal de cada detalle debe calcularse automáticamente:  subtotal = 
+cantidad_comprada × precio_unitario  
+• El total de la compra debe calcularse automáticamente como la suma de subtotales.  
+• No se permite capturar manualmente el total de la compra.  
+• La conversión de unidades a unidad base es obligatoria en cada registro de detalle.  
+• La cantidad base debe calcularse automáticamente utilizando el factor de conversión 
+definido en la materia prima.  
+• El factor de conversión debe ser válido y mayor a cero.  
+• Al guardar la compra, el sistema debe actualizar automáticamente el inventario:  
+Incrementando la cantidad disponible , Registrando un movimiento tipo ENTRADA  . 
+• No se permite la eliminación ni modificación de compras registradas (solo consulta).  
+• Toda compra debe registrarse inicialmente con estado de pago PENDIENTE .  
+• El estado de pago puede actualizarse a PAGADO  posteriormente.  
+• El registro del pago debe vincularse con el módulo de salida de efectivo  Modulo de 
+ventas.  
+• Todos los movimientos generados deben garantizar la trazabilidad de la operación.  
+• Validar existencia y estado del proveedor.  
+• Validar existencia de materia prima.  
+
+• Validar cantidad > 0.  
+• Validar precio ≥ 0.  
+• Validar unidad de compra válida.  
+• Validar cálculo correcto de subtotales.  
+• Validar cálculo correcto del total.  
+• Validar conversión a unidad base.  
+• Validar factor de conversión.  
+• Validar actualización de inventario.  
+• Confirmar registro exitoso de compra.  
+• Confirmar actualización del inventario.  
+• Mostrar mensajes claros al usuario.  
+ 
+Modulo Explosión de Materiales (Recetas)  
+Reglas del negocio  
+• Toda receta debe estar obligatoriamente asociada a un producto existente en el 
+sistema.  
+• Cada receta debe registrarse mediante una estructura de cabecera y detalle.  
+• El identificador de la receta (id_receta) debe generarse automáticamente.  
+• El sistema contará inicialmente con un catálogo de 10 estilos de pasteles predefinidos 
+(chocolate, red velvet, vainilla, zanahoria, chocoflan, cheesecake, moka, frutos secos, 
+tres leches y pastel helado de Oreo). El alta de nuevos estilos de productos esta rá 
+restringida al administrador.  
+• Cada receta debe definir un rendimiento base , el cual indica la cantidad de producto 
+que se obtiene al ejecutar la receta.  
+• Todas las cantidades de materia prima en el detalle de la receta deben definirse en 
+unidad base.  
+• Una receta puede contener múltiples materias primas asociadas.  
+• El sistema debe calcular automáticamente la explosión de materiales, es decir, la 
+cantidad de insumos requeridos en función de la cantidad a producir.  
+• Antes de iniciar un proceso de producción, el sistema debe validar la disponibilidad de 
+materia prima en inventario.  
+• No se permitirá iniciar producción si no existe suficiente materia prima disponible.  
+• En caso de insuficiencia de insumos, el sistema debe mostrar alertas claras indicando 
+los faltantes.  
+
+• Una receta puede tener múltiples versiones; sin embargo, solo una versión puede estar 
+activa por producto.  
+• Al modificar una receta, se debe generar una nueva versión, conservando el historial 
+de versiones anteriores.  
+• No se permite la eliminación física de recetas; únicamente se permite su desactivación 
+lógica. Y se puede volver a activar.  
+• Toda producción debe basarse obligatoriamente en una receta activa.  
+• Al iniciar un proceso de producción, el sistema debe descontar automáticamente del 
+inventario las materias primas según la explosión de materiales calculada.  
+• El consumo de materia prima debe considerar el porcentaje de merma definido en el 
+sistema.  
+• Al finalizar la producción, los productos elaborados deben agregarse automáticamente 
+al inventario de productos terminados.  
+• El sistema debe permitir la actualización controlada de recetas únicamente por 
+usuarios autorizados.  
+• El área de ventas debe poder visualizar los productos en proceso de producción y las 
+cantidades disponibles.  
+• El área de ventas podrá generar solicitudes de producción en función de la demanda 
+detectada.  
+• El acceso al módulo debe estar restringido por roles (Administrador y Producción) . 
+• Validar existencia del producto.  
+• Validar existencia de materias primas.  
+• Validar cantidades mayores a cero.  
+• Validar unidad base.  
+• Validar rendimiento base > 0.  
+• Confirmar registro o actualización de receta.  
+• Confirmar cálculo de insumos.  
+• Confirmar descuento de inventario.  
+• Confirmar actualización de productos terminados.  
+• Mostrar alertas en caso de faltantes.  
+• Validar receta activa antes de producción.  
+• Validar disponibilidad de inventario.  
+• Validar cálculo correcto de explosión de materiales.  
+• Validar aplicación de merma.  
+• Validar consistencia en versiones.  
+ 
+
+Módulo de Producción  
+Reglas del negocio  
+• Toda orden de producción debe registrarse con una estructura definida que incluya:  
+id_orden (automático) , receta asociada , producto , cantidad a producir , fechas y 
+usuario responsable .  
+• El identificador de la orden (id_orden) debe generarse automáticamente.  
+• Toda orden de producción debe estar asociada obligatoriamente a una receta activa.  
+• Antes de iniciar la producción, el sistema debe validar: Que la receta esté activa , Que 
+exista suficiente materia prima en inventario , Toda orden de producción debe iniciar en 
+estado PENDIENTE.  
+• Las órdenes de producción deben manejar los siguientes estados: PENDIENTE , 
+EN_PROCESO , FINALIZADO y CANCELADO  
+• Al cambiar el estado a EN_PROCESO, el sistema debe: Calcular automáticamente el 
+consumo de materia prima , Aplicar el porcentaje de merma , Descontar los insumos 
+del inventario .  
+• El consumo de materia prima debe calcularse con la fórmula: cantidad_real = 
+cantidad_receta × cantidad_producir × (1 + porcentaje_merma / 100)  
+• Todo descuento de materia prima debe registrarse como un movimiento tipo SALIDA 
+en el inventario.  
+• No se permitirá iniciar producción si no existe suficiente materia prima disponible.  
+• Solo se puede cancelar una orden de producción si se encuentra en estado 
+PENDIENTE.  
+• No se permite cancelar órdenes en estado EN_PROCESO o FINALIZADO.  
+• Al finalizar una orden de producción (estado FINALIZADO), el sistema debe:  
+Incrementar automáticamente el inventario de productos terminados , Registrar el 
+movimiento correspondiente .  
+• Toda orden de producción debe quedar registrada para consulta y trazabilidad.  
+• El sistema debe permitir visualizar el detalle de la producción .   
+• El sistema debe calcular automáticamente el costo de producción con base en los 
+insumos utilizados.  
+• El área de ventas podrá consultar las órdenes de producción y la disponibilidad de 
+productos, pero no podrá modificarlas.  
+• El sistema debe garantizar la trazabilidad completa desde el consumo de insumos 
+hasta la generación del producto terminado.  
+• Validar existencia de receta.  
+• Validar receta activa.  
+
+• Validar cantidad a producir > 0.  
+• Validar usuario autorizado.  
+• Validar disponibilidad de materia prima.  
+• Validar cálculo correcto de consumo.  
+• Validar aplicación de merma.  
+• Validar transición correcta de estados.  
+• Confirmar creación de orden.  
+• Confirmar descuento de inventario.  
+• Confirmar incremento de producto terminado.  
+• Mostrar mensajes claros en caso de error.  
+Producción  
+Puede:  
+• Crear órdenes  
+• Iniciar producción  
+• Finalizar órdenes  
+• Ver consumo de insumos  
+Ventas  
+Puede:  
+• Ver órdenes de producción  
+• Ver productos disponibles  
+• Consultar productos en proceso  
+ 
+Modulo de Solicitud de Produccion  
+Reglas del negocio  
+• Solo los usuarios del área de ventas pueden registrar solicitudes de producción.  
+• Toda solicitud debe registrarse con todos los datos obligatorios.  
+• El identificador de la solicitud (id_solicitud) debe generarse automáticamente.  
+• Toda solicitud debe iniciar en estado PENDIENTE .  
+• Las solicitudes deben manejar los siguientes estados: PENDIENTE , APROBADA y 
+RECHAZADA  
+• Solo el área de producción  puede aprobar o rechazar solicitudes.  
+• Una solicitud en estado APROBADA  puede utilizarse como base para generar una 
+orden de producción.  
+
+• Las solicitudes en estado RECHAZADA  no deben generar órdenes de producción.  
+• El sistema debe permitir la vinculación entre la solicitud y la orden de producción 
+mediante el identificador correspondiente.  
+• Las solicitudes solo pueden modificarse mientras se encuentren en estado 
+PENDIENTE .  
+• Una vez que la solicitud ha sido aprobada o rechazada, no puede ser modificada.  
+• Todas las solicitudes deben almacenarse para consulta y trazabilidad.  
+• El sistema debe permitir consultar solicitudes por estado, fecha y producto.  
+• El sistema debe registrar el usuario responsable tanto de la solicitud como de su 
+aprobación o rechazo.  
+• Las cantidades solicitadas deben ser mayores a cero.  
+• El sistema debe permitir registrar observaciones tanto en la solicitud como en su 
+resolución.  
+• Validar existencia del producto.  
+• Validar cantidad solicitada > 0.  
+• Validar usuario autenticado.  
+• Validar campos obligatorios.  
+• Validar rol del usuario (ventas o producción).  
+• Validar estado de la solicitud antes de modificar.  
+• Validar transición correcta de estados.  
+• Validar vinculación con orden de producción  
+• Confirmar registro de solicitud.  
+• Confirmar aprobación o rechazo.  
+• Confirmar generación de orden de producción.  
+• Mostrar mensajes claros al usuario.  
+Área de Ventas  
+Puede:  
+• Crear solicitudes  
+• Ver sus solicitudes  
+• Consultar estado  
+Área de Producción  
+ Puede: 
+• Ver solicitudes  
+
+• Aprobar o rechazar  
+• Generar orden de producción  
+ 
+Módulo Inventario y Producto Terminado  
+Reglas del negoci o 
+• Todo producto debe registrarse obligatoriamente con: Nombre, Precio de venta , 
+Unidad de venta e imagen.  
+• La venta de los pasteles serán pasteles completos.  
+• El identificador del producto ( id_producto ) debe generarse automáticamente.  
+• Cada producto debe ser único dentro del sistema (no duplicados).  
+• El sistema debe permitir la gestión del catálogo mediante: Registro, Consulta , 
+Actualización y Desactivación /Activación  lógica. 
+• No se permite la eliminación física de productos; únicamente su desactivación.  
+• Todo producto debe tener un registro asociado en inventario: cantidad_actual y 
+stock_minimo . 
+• El inventario de productos terminados se incrementa exclusivamente al finalizar una 
+orden de producción.  
+• El inventario se reduce exclusivamente al registrar una venta.  
+• No se permite modificar manualmente el inventario de productos terminados.  
+• El sistema debe garantizar que la cantidad disponible nunca sea negativa.  
+• El sistema debe generar alertas cuando la cantidad disponible sea menor al stock 
+mínimo.  
+• Un producto inactivo no puede ser vendido ni aparecer como disponible en ventas.  
+• El sistema debe permitir actualizar la información del producto, excepto su 
+identificador.  
+• El sistema debe registrar la fecha de creación ( created_at ) y actualización 
+(updated_at ).  
+• Cada producto puede estar asociado a una receta activa para su producción.  
+• No se permite acceder al módulo sin autenticación.  
+• No se permite vender más productos de los disponibles.  
+• Validar nombre no vacío.  
+• Validar precio > 0.  
+• Validar formato de imagen (JPG, PNG, JPEG).  
+• Validar que el producto no exista previamente.  
+
+• Validar estado activo/inactivo.  
+• Validar existencia del producto.  
+• Validar disponibilidad antes de venta.  
+• Validar actualización automática del inventario.  
+• Confirmar registro o actualización.  
+• Confirmar cambios en inventario.  
+• Generar alertas de stock mínimo.  
+• Mostrar mensajes claros al usuario.  
+Ventas  
+Puede:  
+• Ver productos disponibles  
+• Ver stock actual  
+Administrador  
+Puede:  
+• Crear productos  
+• Editar productos  
+• Desactivar productos  
+• Ver inventario  
+Producción  
+Puede:  
+• Consultar productos  
+• Ver disponibilidad  
+ 
+Modulo Costo y Utilidad de Producto  
+Reglas del neg ocio  
+• Todo producto debe tener obligatoriamente una receta asociada  para poder calcular 
+su costo.  
+• El costo de producción debe calcularse con base en las materias primas definidas 
+en la receta.  
+• El sistema debe calcular el costo de cada ingrediente considerando: Cantidad 
+requerida , Costo unitario de la materia prima y Porcentaje de merma  
+
+• La cantidad real de materia prima debe calcularse automáticamente aplicando 
+merma:  cantidad_real = cantidad_requerida × (1 + porcentaje_merma / 100)  
+• El costo por ingrediente debe calcularse automáticamente: costo_ingrediente = 
+cantidad_real × costo_unitario  
+• El costo total de producción debe ser la suma de todos los costos de ingredientes.  
+• El sistema debe calcular la utilidad del producto: utilidad = precio_venta − 
+costo_produccion .  
+• El porcentaje de utilidad debe calcularse automáticamente: porcentaje_utilidad = 
+(utilidad / precio_venta) × 100  
+• El cálculo de costos debe actualizarse automáticamente cuando: Cambie el costo 
+de una materia prima , Se modifique una receta , Se actualice el precio de venta .  
+• No se permite modificar manualmente el costo de producción.  
+• El sistema debe permitir consultar el desglose de costos por ingrediente.  
+• El sistema debe mostrar la utilidad y porcentaje de ganancia por producto.  
+• Si un producto no tiene receta activa, no se podrá calcular su costo.  
+• Si alguna materia prima no tiene costo definido, no se podrá realizar el cálculo.  
+• El sistema debe trabajar con valores monetarios en pesos mexicanos (MXN) . 
+• No se permite acceder al módulo sin autenticación.  
+• No se permite registrar precios de venta negativos o en cero.  
+• Validar existencia de receta.  
+• Validar existencia de materias primas.  
+• Validar costo unitario definido.  
+• Validar precio de venta > 0.  
+• Validar cálculo correcto de merma.  
+• Validar cálculo correcto de costos por ingrediente.  
+• Validar suma total de costos.  
+• Validar cálculo de utilidad.  
+• Mostrar costo total de producción.  
+• Mostrar utilidad.  
+• Mostrar porcentaje de ganancia.  
+• Mostrar desglose por ingrediente.  
+• Mostrar mensajes claros al usuario.  
+• Administración  puede: Ver costos de producción  y Ver utilidad . 
+ 
+ 
+
+Módulo de ventas  
+Regla de negocio  
+• Toda venta debe registrarse mediante una estructura de: Cabecera (datos generales) 
+y Detalle (productos vendidos) . 
+• El identificador de la venta debe generarse automáticamente.  
+• Toda venta debe tener al menos un producto en el detalle.  
+• Solo se pueden vender productos que: Estén activos , Tengan inventario disponible  
+• La venta es por pasteles completos.  
+• El sistema no contempla la aplicación de descuentos, promociones o precios 
+especiales, garantizando la estabilidad en la estructura de precios y el control de 
+utilidades.  
+• No se permite vender fracciones de productos.  
+• El sistema debe validar que exista suficiente inventario antes de confirmar la venta.  
+• El cálculo de subtotales debe realizarse automáticamente: subtotal = cantidad × 
+precio_unitario .  
+• El total de la venta debe calcularse automáticamente como la suma de los 
+subtotales.  
+• El precio del producto debe tomarse del catálogo vigente y no puede modificarse 
+manualmente durante la venta.  
+• El inventario de productos terminados debe descontarse automáticamente al 
+confirmar la venta.  
+• No se permite registrar ventas si el inventario es insuficiente.  
+• El sistema debe manejar tipos de pago: Efectivo y Tarjeta. Si el pedido es e n línea el 
+pago deberá ser por tarjeta.  
+• Para ventas en línea: El pago debe realizarse obligatoriamente en línea para 
+confirmar el pedido.  
+• El ticket debe generarse únicamente si el cliente lo solicita, pero siempre debe 
+almacenarse en la base de datos.  
+• El ticket debe contener: Folio único , Fecha, Productos , Total y Identificador de venta  
+• El sistema debe registrar todas las ventas realizadas durante el día.  
+• El corte de ventas diario debe consolidar: Total de ventas, Número de transacciones , 
+Total por tipo de pago , Salidas de efectivo  y Utilidad del día .  
+• La utilidad diaria debe calcularse como: utilidad = total_ventas_dia − total_salidas − 
+costo_produccion .  
+• Las salidas de efectivo  por pago a proveedores  deben registrarse correctamente y 
+vincularse a su origen.  
+
+• No se permite cancelar ventas ya confirmadas.  
+• No se permite cancelar pedidos que estén en proceso de producción o confirmados.  
+• Todos los pedidos deben ser recolectados en sucursal (no hay envíos).  
+• Si el cliente no recoge su pedido en 24 horas, la empresa no se hace responsable.  
+• No se manejan devoluciones ni reembolsos.  
+• Una vez entregado el producto, la responsabilidad pasa al cliente.  
+• Solo contamos c on una sucursal.  
+• No se permite vender más de 5 unidades por producto en un mismo pedido.  
+• No se permite acceder al módulo sin autenticación.  
+• Validar producto existente.  
+• Validar producto activo.  
+• Validar cantidad > 0.  
+• Validar tipo de pago válido.  
+• Validar stock disponible.  
+• Validar cálculo de subtotales.  
+• Validar cálculo del total.  
+• Validar descuento automático de inventario.  
+• Validar generación de ticket.  
+• Confirmación de venta registrada.  
+• Ticket generado correctamente.  
+• Inventario actualizado.  
+• Registro en corte de ventas.  
+• Mensajes claros al usuario.  
+• Ventas: Registrar ventas , Generar tickets y Ver productos disponibles .  
+• Administración : Consultar ventas , Ver corte diario  y Ver utilidad  
+• Producción : Consultar disponib ilidad de productos.  
+ 
+Modulo Gestión de Pedidos de Clientes  
+Reglas de negocio  
+• Todo pedido debe registrarse con: Cliente, Productos , Fecha de pedido , Fecha de 
+entrega.  
+• El identificador del pedido ( id_pedido ) debe generarse automáticamente.  
+• Todo pedido debe contener al menos un producto en su detalle.  
+• La cantidad de productos solicitados debe ser por pasteles completos.  
+
+• No se permiten fracciones de productos en pedidos.  
+• El total del pedido debe calcularse automáticamente con base en los productos 
+seleccionados.  
+• El sistema debe manejar los siguientes estados del pedido: PENDIENTE , PAGADO, 
+CONFIRMADO , ENTREGADO , CANCELADO  
+• Todo pedido debe iniciar en estado PENDIENTE .  
+• Un pedido debe ser confir , mado antes de poder avanzar a los siguientes estados.  
+• No se permite marcar como ENTREGADO  un pedido que no haya sido previamente 
+confirmado y pagado.  
+• Solo los pedidos en estado ENTREGADO  generan automáticamente una venta en el 
+módulo RF13.  
+• La generación de la venta debe realizarse de forma automática al cambiar el estado 
+a ENTREGADO.  
+• El inventario de productos terminados debe descontarse únicamente cuando se 
+genera la venta.  
+• No se permite cancelar pedidos que ya estén: CONFIRMADOS , EN PROCESO y 
+ENTREGADOS .  
+• Los pedidos deben pagarse antes de ser confirmados (para pedidos en línea).  
+• Todos los pedidos deben ser recolectados en sucursal (no hay entregas a domicilio).  
+• Si el cliente no recoge el pedido en un plazo de 24 horas después de la fecha 
+acordada, la empresa no se hace responsable del producto.  
+• No se manejan devoluciones ni reembolsos.  
+• Cada pedido debe mantener trazabilidad completa: Cliente, Productos , Estados, 
+Fechas, Usuario responsable .  
+• No se permite acceder al módulo sin autenticación.  
+• Validar cliente existente.  
+• Validar productos existentes y activos.  
+• Validar cantidades > 0.  
+• Validar fecha de entrega válida  
+• Validar transición correcta de estados: PENDIENTE → CONFIRMADO → PAGADO → 
+ENTREGADO .  
+• Validar pago antes de confirmar.  
+• Validar generación automática de venta.  
+• Validar disponibilidad de inventario al momento de generar la venta.  
+• Confirmación de pedido registrado.  
+• Confirmación de cambio de estado.  
+• Confirmación de venta generada.  
+
+• Actualización de inventario.  
+• Mensajes claros al usuario.  
+• El de ventas puede : Ver pedidos , Confirmar pedidos , Gestionar estados y Entregar 
+pedidos. 
+• Administrac ión: Puede hacer todo.  
+ 
+Modulo Catálogo de Productos  
+Reglas de negocio  
+• El catálogo debe mostrar únicamente productos: Activos, Con existencia disponible 
+(stock > 0)  
+• Cada producto debe mostrar la siguiente información: Imagen, Nombre, 
+Descripción , Precio de venta (en MXN)  y Disponibilidad (existencia) .  
+• La venta de los pasteles es por pasteles completos.  
+• El sistema no debe mostrar productos: Inactivos , Sin inventario .  
+• El precio mostrado debe ser el definido en el catálogo del sistema (no editable por el 
+cliente).  
+• El catálogo debe reflejar información actualizada en tiempo real o al momento de la 
+consulta.  
+• Los productos deben corresponder al catálogo predefinido del sistema (estilos de 
+pasteles establecidos).  
+• No se permiten personalizaciones de productos desde el catálogo.  
+• El cliente podrá seleccionar productos para agregarlos al carrito de compra.  
+• El sistema debe garantizar que la información mostrada sea consistente con el 
+inventario real.  
+• Validar que el producto exista antes de mostrarlo.  
+• Mostrar mensaje en caso de no haber productos disponibles.  
+ 
+Modulo Carrito de compras  
+Reglas del negocio  
+• El carrito de compras debe estar asociado obligatoriamente a un cliente autenticado.  
+• Cada cliente puede tener un único carrito activo.  
+• El carrito debe permitir: Agregar productos , Editar cantidades y Eliminar productos . 
+• Solo se pueden agregar productos que: Estén activos , Tengan inventario disponible . 
+• La cantidad de productos debe manejarse en números enteros .  
+
+• No se permiten fracciones de productos.  
+• El sistema debe validar que la cantidad agregada no exceda el inventario disponible.  
+• El sistema debe respetar la regla de negocio: Máximo 5 unidades por producto en un 
+mismo pedido .  
+• El subtotal por producto debe calcularse automáticamente: subtotal = cantidad × 
+precio_unitario .  
+• El total del carrito debe calcularse automáticamente como la suma de los 
+subtotales.  
+• El precio del producto debe tomarse del catálogo vigente y no puede modificarse por 
+el cliente.  
+• El carrito debe actualizarse automáticamente al modificar cantidades o eliminar 
+productos.  
+• El carrito debe reflejar cambios en el inventario al momento de que el pedido haya 
+sido pagado.   
+• Si un producto queda sin stock: Debe bloquearse su compra .  
+• El carrito debe poder convertirse en un pedido .  
+• El carrito debe vaciarse automáticamente al confirmar un pedido.  
+• Validar cliente autenticado.  
+• Validar producto existente.  
+• Validar producto activo.  
+• Validar cantidad > 0.  
+• Validar cantidad ≤ stock disponible.  
+• Validar cálculo de subtotal.  
+• Validar cálculo de total.  
+• Validar límite de 5 productos.  
+• Validar consistencia con inventario.  
+• Mostrar carrito actualizado.  
+• Mostrar total calculado.  
+• Mostrar mensajes claros al usuario.  
+• Mostrar advertencias si no hay stock suficiente.  
+Modulo Generar Pedido  y Pago.  
+Reglas de negocio  
+• Para que el cliente pued a realizar su pedi do y pagar, debe estar autentica do.  
+• Todo pedido debe generarse obligatoriamente a partir de un carrito de compras 
+válido.  
+
+• El carrito debe contener al menos un producto para poder generar el pedido.  
+• El identificador del pedido ( id_pedido ) debe generarse automáticamente.  
+• El pedido debe almacenar: Productos , Cantidades , Subtotales y Total. 
+• El total del pedido debe calcularse automáticamente.  
+• El pedido debe iniciar con:  estado_pedido = PENDIENTE , estado_pago = 
+PENDIENTE . 
+• El sistema debe validar la disponibilidad de stock antes de generar el pedido.  
+• Si no hay suficiente inventario, el pedido no debe generarse .  
+• Si el cliente hizo su pedido en línea deberá pagarlo directamente desde el portal, par a 
+poder CONFIRMAR su pedido y pueda ser entregado en su cursal. 
+• Se debe registrar una referencia de pago.  El estado_pago cambia a PAGADO  para 
+posteriormente ser confirmado su pedido .  
+• Si el cliente hizo su pedido en la tienda tendrá que liquidar el pastel en la misma 
+sucursal para poder confirmar su pedido y entregárselo . Permanecera  en PENDIENTE  
+hasta que haya sido pagado .  
+• El sistema debe almacenar: tipo_pago (efectivo, tarjeta ), estado_pago y 
+referencia_pago . 
+• Estados permitidos:  
+✓ Todo pedido inicia en PENDIENTE .  
+✓ Solo pedidos en estado PENDIENTE  pueden ser cancelados.  
+✓ Un pedido pagado en línea pasar a CONFIRMADO  
+✓ El pedido no genera venta hasta que sea entregado .  
+• El pedido debe generarse automáticamente a partir del carrito.  
+• El sistema debe copiar el detalle del carrito al pedido.  
+• El carrito debe vaciarse automáticamente después de generar el pedido.  
+• El sistema debe registrar la fecha del pedido y la fecha de entrega.  
+• El sistema debe permitir al cliente consultar sus pedidos.  
+• Todos los pedidos deben pasar al módulo de gestión interna .  
+• Validar cliente autenticado.  
+• Validar carrito existente.  
+• Validar carrito no vacío.  
+• Validar fecha de entrega válida.  
+• Confirmación de pedido generado.  
+• Estado del pedido actualizado.  
+• Estado de pago actualizado.  
+• Mensajes claros al usuario.  
+• Si el cliente requiere el ti cket se le dará, si no se al macena en la base de datos .  
+
+Reglas de seguridad  generales.  
+OWASP TOP TEN  
+A01:2021 - Pérdida de Control de Acceso Los usuarios no podrán acceder a las pantallas y 
+métodos de API privados si no se ha iniciado sesión  
+Los usuarios no podrán acceder a las pantallas y métodos de API privados si su rol 
+no cuenta con los privilegios requeridos  
+Deberá evitarse utilizar el nombre de rutas por defecto como podrían ser “/usuarios”, 
+“/admin”  
+ 
+A02:2021 - Fallas Criptográficas En la base de datos las contraseñas deberán estar 
+encriptadas.  
+En caso de implementar una arquitectura FRONT -API deberán implementarse 
+estándares de autenticación de token como JWT, bajo ningún motivo deberá 
+utilizarse una autenticación básica que implique el envío del usuario y contraseña en 
+texto plano.  
+ 
+A03:2021 – Inyección Deberán implementarse medidas de prevención de inyección SQL 
+como la parametrización o el uso de un ORM al momento de realizar las operaciones con la 
+base de datos  
+Deberán implementarse medidas de prevención de inyección de código como la 
+sanitización de los inputs.  
+En las pantallas donde se realice la subida de archivos deberán restringirse las 
+extensiones válidas tales como PDF, JPG, PNG, JPEG.  
+ 
+A04:2021 - Diseño Inseguro Deberá contarse con la declaración específica de los 
+requerimientos de seguridad y reglas de negocio pertinentes para el sistema  
+ 
+A05:2021 - Configuración de Seguridad Incorrecta Deberá crearse para la aplicación un 
+usuario de la base de datos que no cuente con permisos de modificación de estructuras, así 
+como estar restringido al uso únicamente de la base de datos de la aplicación. Bajo ningún 
+
+motivo deberá tenerse habilitados usuarios como ROOT, ADMIN, ANÓNIMO o cualquier 
+usuario por defecto conocido del sistema gestor de base de datos.  
+Al presentarse un error no deberá mostrarse mensajes donde se exponga nombres 
+de clases, directorios, variables, configuraciones o líneas de código de la aplicación.  
+Al presentarse una ruta o un documento que no exista no deberá mostrarse mensajes 
+donde se exponga nombres de clases, variables o líneas de código de la aplicación  
+No deberán mostrarse los archivos contenidos de ningún directorio si se intenta 
+acceder directamente desde la URL  
+A06:2021 - Componentes Vulnerables y Desactualizados Deberá entregarse un plan de 
+seguridad para verificación de actualizaciones de seguridad del sistema de despliegue 
+(servidor, sistema operativo, etc.)  
+ 
+A07:2021 - Fallas de Identificación y Autenticación Política de contraseñas seguras. Mínimo 
+8 caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial.  
+• Contrastar contraseñas con lista de contraseñas inseguras.  
+• Implementar captcha en inicio de sesión  
+• Implementar autenticación de 2 pasos. Donde se proporcione un toque de un 
+solo uso y con un tiempo de expiración  
+• Bloqueo después de 3 intentos fallidos  
+• Solicitud de cambio de contraseña periódica  
+• Registro y visualización en pantalla del último inicio de sesión realizado  
+• Tiempo definido de sesión. La sesión y/o tokens deberá n tener una duración 
+máxima de 10minutos  
+ 
+A08:2021 - Fallas en el Software y en la Integridad de los Datos Reporte de la seguridad y 
+reputación de las librerías instaladas (por ejemplo, implementando la herramienta Pip -audit 
+para proyectos en python)  
+ 
+A09:2021 - Fallas en el Registro y Monitoreo Deberán registrarse en un archivo de logs o en 
+base de datos los errores presentados en la aplicación. Los datos mínimos deberán ser el 
+error presentado y la fecha  
+
+• Deberán registrarse en un archivo de logs o en base de datos movimientos 
+críticos del sistema como cualquier cambio realizado en los usuarios  
+ 
+A10:2021 - Falsificación de Solicitudes del Lado del Servidor Deberá implementarse en los 
+formularios que no implementan peticiones asíncronas el uso del token de seguridad CSRF 
+TOKEN  
+• Deberá implementarse en el uso de peticiones asíncronas la configuración de 
+peticiones cruzadas CORS restringiendo las solicitudes únicamente al nombre de 
+dominio de la aplicación.  
+ 
+Recomendaciones.  
+• Recuerda agregar en estado y ciudad un select para que el usuario solo elija su estado 
+y filtre las ciudades por estado.  
+ 

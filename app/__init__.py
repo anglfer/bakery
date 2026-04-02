@@ -1,10 +1,14 @@
+import logging
+import os
+from logging.handlers import RotatingFileHandler
+
 from dotenv import load_dotenv
 from flask import Flask
 
 from app.admin import admin_bp
 from app.auth import auth_bp
 from app.catalog import catalog_bp
-from app.extensions import bcrypt, db, login_manager, migrate
+from app.extensions import bcrypt, csrf, db, login_manager, migrate
 from app.production import production_bp
 from app.sales import sales_bp
 from app.seed_data import seed_full_data
@@ -16,6 +20,7 @@ def create_app(config_object: str | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_object or get_config_path())
 
+    configure_logging(app)
     init_extensions(app)
     register_blueprints(app)
     register_cli_commands(app)
@@ -30,11 +35,41 @@ def create_app(config_object: str | None = None) -> Flask:
     return app
 
 
+def configure_logging(app: Flask) -> None:
+    os.makedirs(app.instance_path, exist_ok=True)
+    log_dir = os.path.join(app.instance_path, "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, "app.log")
+
+    handler_exists = any(
+        isinstance(handler, RotatingFileHandler)
+        and getattr(handler, "baseFilename", "") == log_file
+        for handler in app.logger.handlers
+    )
+    if handler_exists:
+        return
+
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=1_048_576,
+        backupCount=3,
+        encoding="utf-8",
+    )
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    )
+
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+
+
 def init_extensions(app: Flask) -> None:
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     bcrypt.init_app(app)
+    csrf.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Inicia sesión para continuar."
 

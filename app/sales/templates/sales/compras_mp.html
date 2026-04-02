@@ -2,33 +2,69 @@
 {% block title %}Compras MP{% endblock %}
 {% block content %}
 <section class="section">
-	<h2 class="mb-3">Compras de materia prima</h2>
+	{% set ns = namespace(total=0, pendientes=0, pagadas=0) %}
+	{% for c in compras %}
+		{% set ns.total = ns.total + c.total %}
+		{% if c.estado_pago == 'PAGADO' %}
+			{% set ns.pagadas = ns.pagadas + 1 %}
+		{% else %}
+			{% set ns.pendientes = ns.pendientes + 1 %}
+		{% endif %}
+	{% endfor %}
 
-	<div class="card p-3 mb-3">
-		<h3 class="mb-2">Registrar compra</h3>
-		<form method="post" class="grid-form">
-		<select name="id_proveedor" required>
-			<option value="">Proveedor</option>
-			{% for p in proveedores %}
-			<option value="{{ p.id_proveedor }}">{{ p.nombre_empresa }}</option>
-			{% endfor %}
-		</select>
-		<select name="id_materia" required>
-			<option value="">Materia prima</option>
-			{% for m in materias %}
-			<option value="{{ m.id_materia }}">{{ m.nombre }}</option>
-			{% endfor %}
-		</select>
-		<input type="number" step="0.0001" min="0.0001" name="cantidad_comprada" placeholder="Cantidad comprada" required />
-		<input type="number" step="0.01" min="0.01" name="precio_unitario" placeholder="Precio unitario" required />
-		<button type="submit">Registrar compra</button>
-		</form>
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de compras</p>
+		<h2 class="ops-hero-title">Compras de materia prima</h2>
+		<p class="ops-hero-text">Registra entradas de insumos y controla su pago a proveedores.</p>
 	</div>
 
- 	<div class="card p-3">
-		<h3 class="mb-2">Historial de compras</h3>
-		<div class="table-responsive">
-			<table>
+	<div class="ops-kpi-grid compact">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Compras registradas</p>
+			<p class="ops-kpi-value">{{ compras|length }}</p>
+			<p class="ops-kpi-sub">Histórico acumulado</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pendientes de pago</p>
+			<p class="ops-kpi-value">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">Requieren salida de efectivo</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Total comprado</p>
+			<p class="ops-kpi-value">${{ '%.2f'|format(ns.total) }}</p>
+			<p class="ops-kpi-sub">Monto histórico registrado</p>
+		</article>
+	</div>
+
+	<div class="ops-card d-flex flex-wrap justify-content-between align-items-center gap-3">
+		<div>
+			<h3 class="ops-card-title mb-1">Registro de compras</h3>
+			<p class="text-secondary mb-0 small">Usa una pantallita dedicada para capturar la compra completa.</p>
+		</div>
+		<button
+			type="button"
+			class="btn btn-sm"
+			data-bs-toggle="modal"
+			data-bs-target="#modalCompraCrear">
+			Registrar compra
+		</button>
+	</div>
+
+	<div class="ops-card">
+		<h3 class="ops-card-title">Historial de compras</h3>
+		<div class="ops-toolbar">
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input type="text" id="comprasSearch" placeholder="Buscar por proveedor o id" />
+			</div>
+			<select id="comprasEstadoFiltro" style="max-width: 220px">
+				<option value="TODOS">Todos los pagos</option>
+				<option value="PENDIENTE">Pendiente</option>
+				<option value="PAGADO">Pagado</option>
+			</select>
+		</div>
+		<div class="ops-table table-responsive">
+			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -41,13 +77,16 @@
 				</thead>
 				<tbody>
 					{% for c in compras %}
-					<tr>
+					<tr
+						data-row="compra"
+						data-label="{{ (c.id_compra|string ~ ' ' ~ c.proveedor.nombre_empresa)|lower }}"
+						data-estado="{{ c.estado_pago }}">
 						<td>{{ c.id_compra }}</td>
 						<td>{{ c.proveedor.nombre_empresa }}</td>
 						<td>{{ c.fecha.strftime('%Y-%m-%d') }}</td>
 						<td>${{ '%.2f'|format(c.total) }}</td>
 						<td>
-							<span class="badge {{ 'text-bg-success' if c.estado_pago == 'PAGADO' else 'text-bg-warning' }}">
+							<span class="ops-chip {{ 'success' if c.estado_pago == 'PAGADO' else 'warning' }}">
 								{{ c.estado_pago }}
 							</span>
 						</td>
@@ -55,9 +94,10 @@
 							<form method="post" action="{{ url_for('sales.pagar_compra_route', id_compra=c.id_compra) }}">
 								<button
 									type="submit"
-									class="btn btn-sm"
+									class="btn btn-sm btn-icon-sm"
+									title="Marcar compra como pagada"
 									{{ 'disabled' if c.estado_pago == 'PAGADO' else '' }}>
-									Marcar pagado
+									<i class="bi bi-cash-coin"></i>
 								</button>
 							</form>
 						</td>
@@ -71,5 +111,123 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalCompraCrear" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title">Registrar compra de materia prima</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" class="ops-grid p-3">
+					<select name="id_proveedor" required>
+						<option value="">Proveedor</option>
+						{% for p in proveedores %}
+						<option value="{{ p.id_proveedor }}">{{ p.nombre_empresa }}</option>
+						{% endfor %}
+					</select>
+
+					<div id="detalle-compra-container" class="d-grid gap-2" style="grid-column: 1 / -1">
+						<div class="row g-2 align-items-center detalle-compra-row">
+							<div class="col-md-5">
+								<select name="id_materia[]" class="form-select" required>
+									<option value="">Materia prima</option>
+									{% for m in materias %}
+									<option value="{{ m.id_materia }}">{{ m.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="col-md-3">
+								<input
+									type="number"
+									step="0.0001"
+									min="0.0001"
+									name="cantidad_comprada[]"
+									class="form-control"
+									placeholder="Cantidad"
+									required />
+							</div>
+							<div class="col-md-3">
+								<input
+									type="number"
+									step="0.01"
+									min="0"
+									name="precio_unitario[]"
+									class="form-control"
+									placeholder="Precio unitario"
+									required />
+							</div>
+							<div class="col-md-1">
+								<button
+									type="button"
+									class="btn btn-outline-danger w-100"
+									onclick="removeDetalleCompra(this)">
+									-
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div style="grid-column: 1 / -1" class="d-flex gap-2">
+						<button type="button" class="btn btn-outline-primary btn-sm" onclick="addDetalleCompra()">
+							Agregar renglón
+						</button>
+					</div>
+
+					<div class="d-flex justify-content-end gap-2" style="grid-column: 1 / -1">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit">Registrar compra</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	(function () {
+		const container = document.getElementById('detalle-compra-container');
+		const comprasSearchInput = document.getElementById('comprasSearch');
+		const comprasEstadoFiltro = document.getElementById('comprasEstadoFiltro');
+
+		function applyComprasFilters() {
+			const searchValue = String(comprasSearchInput?.value || '').toLowerCase().trim();
+			const estadoValue = String(comprasEstadoFiltro?.value || 'TODOS').toUpperCase();
+			document.querySelectorAll('tr[data-row="compra"]').forEach((tableRowElement) => {
+				const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
+				const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
+				const matchesSearch = rowLabel.includes(searchValue);
+				const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
+				tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+			});
+		}
+
+		if (comprasSearchInput) {
+			comprasSearchInput.addEventListener('input', applyComprasFilters);
+		}
+		if (comprasEstadoFiltro) {
+			comprasEstadoFiltro.addEventListener('change', applyComprasFilters);
+		}
+
+		globalThis.addDetalleCompra = function () {
+			if (!container) return;
+			const first = container.querySelector('.detalle-compra-row');
+			if (!first) return;
+			const clone = first.cloneNode(true);
+			clone.querySelectorAll('select').forEach((item) => (item.value = ''));
+			clone.querySelectorAll('input').forEach((item) => (item.value = ''));
+			container.appendChild(clone);
+		};
+
+		globalThis.removeDetalleCompra = function (button) {
+			if (!container) return;
+			const rows = container.querySelectorAll('.detalle-compra-row');
+			if (rows.length <= 1) return;
+			const row = button.closest('.detalle-compra-row');
+			if (row) row.remove();
+		};
+	})();
+</script>
 {% endblock %}

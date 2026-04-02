@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from app.extensions import db
 from app.models import (
@@ -25,18 +25,254 @@ from app.models import (
     utc_now,
 )
 
+TRANSICIONES_PEDIDO = {
+    "PENDIENTE": {"CONFIRMADO", "CANCELADO"},
+    "CONFIRMADO": {"PAGADO"},
+    "PAGADO": set(),
+    "ENTREGADO": set(),
+    "CANCELADO": set(),
+}
+
+TRANSICIONES_ORDEN = {
+    "PENDIENTE": {"EN_PROCESO", "CANCELADO"},
+    "EN_PROCESO": {"FINALIZADO"},
+    "FINALIZADO": set(),
+    "CANCELADO": set(),
+}
+
+MXN_QUANTIZE = Decimal("0.01")
+UNIT_COST_QUANTIZE = Decimal("0.0001")
+
+
+def _to_mxn(value: Decimal) -> Decimal:
+    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)
+
+
+def _to_unit_cost(value: Decimal) -> Decimal:
+    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)
+
+
+def _validar_transicion_estado(
+    *,
+    estado_actual: str,
+    estado_destino: str,
+    mapa_transiciones: dict[str, set[str]],
+    entidad: str,
+) -> None:
+    estados_permitidos = mapa_transiciones.get(estado_actual, set())
+    if estado_destino not in estados_permitidos:
+        raise ValueError(
+            f"Transicion invalida para {entidad}: {estado_actual} -> {estado_destino}"
+        )
+
+
+def _obtener_producto_bloqueado(id_producto: int) -> Producto | None:
+    return Producto.query.filter_by(id_producto=id_producto).with_for_update().first()
+
+
+def _obtener_materia_bloqueada(id_materia: int) -> MateriaPrima | None:
+    return MateriaPrima.query.filter_by(id_materia=id_materia).with_for_update().first()
+
+
+def _obtener_pedido_bloqueado(id_pedido: int) -> Pedido | None:
+    return Pedido.query.filter_by(id_pedido=id_pedido).with_for_update().first()
+
+
+def _obtener_orden_bloqueada(id_orden: int) -> OrdenProduccion | None:
+    return OrdenProduccion.query.filter_by(id_orden=id_orden).with_for_update().first()
+
+
+def _cantidad_libre_producto(producto: Producto) -> int:
+    disponible = int(producto.cantidad_disponible or 0)
+    reservada = int(producto.cantidad_reservada or 0)
+    return max(disponible - reservada, 0)
+
+
+def _actualizar_costo_unitario_materia_prima_desde_compra(
+    *,
+    materia: MateriaPrima,
+    cantidad_base_ingreso: Decimal,
+    precio_unitario_compra: Decimal,
+    factor_conversion: Decimal,
+) -> None:
+    if factor_conversion <= 0:
+        raise ValueError(
+            f"La materia prima '{materia.nombre}' tiene un factor de conversion invalido"
+        )
+
+    costo_unitario_nuevo = _to_unit_cost(precio_unitario_compra / factor_conversion)
+    stock_actual = Decimal(str(materia.cantidad_disponible))
+    costo_actual = Decimal(str(materia.costo_unitario))
+    stock_resultante = stock_actual + cantidad_base_ingreso
+
+    if stock_resultante <= 0:
+        materia.costo_unitario = costo_unitario_nuevo
+        return
+
+    costo_ponderado = (
+        (stock_actual * costo_actual) + (cantidad_base_ingreso * costo_unitario_nuevo)
+    ) / stock_resultante
+    materia.costo_unitario = _to_unit_cost(costo_ponderado)
+
+
+def _validar_disponibilidad_materia_prima_para_orden(
+    *, receta: Receta, cantidad_producir: int
+) -> None:
+    if receta.rendimiento_base <= 0:
+        raise ValueError("Rendimiento base invalido")
+
+    factor = Decimal(str(cantidad_producir)) / Decimal(str(receta.rendimiento_base))
+    for detalle in DetalleReceta.query.filter_by(id_receta=receta.id_receta).all():
+        materia = _obtener_materia_bloqueada(detalle.id_materia_prima)
+        if not materia or not materia.activa:
+            raise ValueError("Materia prima no disponible")
+
+        base = Decimal(str(detalle.cantidad_base)) * factor
+        merma_factor = Decimal("1") + (
+            Decimal(str(materia.porcentaje_merma)) / Decimal("100")
+        )
+        cantidad_real = base * merma_factor
+        disponible = Decimal(str(materia.cantidad_disponible))
+        if disponible < cantidad_real:
+            raise ValueError(f"Stock insuficiente para {materia.nombre}")
+
+
+def _validar_parametros_checkout(
+    *,
+    tipo_pago_pedido: str,
+    tipo_pago: str,
+    referencia_pago: str | None,
+) -> None:
+    if tipo_pago_pedido not in {"EN_LINEA", "CONTRA_ENTREGA"}:
+        raise ValueError("Tipo de pago invalido")
+    if tipo_pago not in {"EFECTIVO", "TARJETA"}:
+        raise ValueError("Tipo de pago invalido")
+    if tipo_pago_pedido == "EN_LINEA" and tipo_pago != "TARJETA":
+        raise ValueError("Los pedidos en linea solo permiten pago con tarjeta")
+    if tipo_pago_pedido == "EN_LINEA" and not referencia_pago:
+        raise ValueError("La referencia de pago es obligatoria para pagos en linea")
+
+
+def _reservar_inventario_para_pedido(
+    detalles_ordenados: list[DetalleCarrito],
+) -> dict[int, Producto]:
+    productos_bloqueados: dict[int, Producto] = {}
+    for detalle in detalles_ordenados:
+        producto = _obtener_producto_bloqueado(detalle.id_producto)
+        if not producto or not producto.activo:
+            raise ValueError("Producto no disponible")
+        if _cantidad_libre_producto(producto) < detalle.cantidad:
+            raise ValueError(f"Stock insuficiente para {producto.nombre}")
+        producto.cantidad_reservada = int(producto.cantidad_reservada or 0) + int(
+            detalle.cantidad
+        )
+        productos_bloqueados[producto.id_producto] = producto
+    return productos_bloqueados
+
+
+def _registrar_detalles_pedido(
+    *,
+    pedido: Pedido,
+    detalles_ordenados: list[DetalleCarrito],
+    productos_bloqueados: dict[int, Producto],
+) -> Decimal:
+    total = Decimal("0")
+    for detalle in detalles_ordenados:
+        producto = productos_bloqueados[detalle.id_producto]
+        subtotal = Decimal(str(producto.precio_venta)) * detalle.cantidad
+        db.session.add(
+            DetallePedido(
+                id_pedido=pedido.id_pedido,
+                id_producto=producto.id_producto,
+                cantidad=detalle.cantidad,
+                precio_unitario=producto.precio_venta,
+                subtotal=subtotal,
+            )
+        )
+        total += subtotal
+    return total
+
+
+def _confirmar_pedido(pedido: Pedido) -> None:
+    if pedido.tipo_pago == "EN_LINEA" and pedido.estado_pago != "PAGADO":
+        raise ValueError("Un pedido en linea debe estar pagado para poder confirmarse")
+    pedido.estado_pedido = "CONFIRMADO"
+
+
+def _marcar_pedido_como_pagado(
+    *, pedido: Pedido, referencia_pago: str | None = None
+) -> None:
+    if (
+        pedido.tipo_pago == "EN_LINEA"
+        and not pedido.referencia_pago
+        and referencia_pago
+    ):
+        pedido.referencia_pago = referencia_pago
+
+    pedido.estado_pago = "PAGADO"
+    pedido.estado_pedido = "PAGADO"
+    if not pedido.pago:
+        return
+
+    pedido.pago.estado_pago = "PAGADO"
+    if referencia_pago:
+        pedido.pago.referencia = referencia_pago
+    pedido.pago.fecha_pago = utc_now()
+
+
+def _cancelar_pedido_liberando_reserva(pedido: Pedido) -> None:
+    detalles_ordenados = sorted(
+        pedido.detalles,
+        key=lambda detalle_pedido: detalle_pedido.id_producto,
+    )
+    for detalle in detalles_ordenados:
+        producto = _obtener_producto_bloqueado(detalle.id_producto)
+        if not producto:
+            continue
+        reservada = int(producto.cantidad_reservada or 0)
+        liberar = min(reservada, int(detalle.cantidad))
+        producto.cantidad_reservada = reservada - liberar
+    pedido.estado_pedido = "CANCELADO"
+
 
 def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
+    if not detalles:
+        raise ValueError("La compra debe incluir al menos un detalle")
+
+    db.session.add(compra)
+    db.session.flush()
+
     total = Decimal("0")
+    ids_materia_impactadas: set[int] = set()
     for item in detalles:
-        materia = MateriaPrima.query.get(item["id_materia_prima"])
-        if not materia:
+        materia = _obtener_materia_bloqueada(item["id_materia_prima"])
+        if not materia or not materia.activa:
             raise ValueError("Materia prima no encontrada")
 
         cantidad_comprada = Decimal(str(item["cantidad_comprada"]))
         precio_unitario = Decimal(str(item["precio_unitario"]))
+        if cantidad_comprada <= 0:
+            raise ValueError("La cantidad comprada debe ser mayor a cero")
+        if precio_unitario < 0:
+            raise ValueError("El precio unitario no puede ser negativo")
+
+        factor_conversion = Decimal(str(materia.factor_conversion))
+        if factor_conversion <= 0:
+            raise ValueError(
+                f"La materia prima '{materia.nombre}' tiene un factor de conversion invalido"
+            )
+
         subtotal = cantidad_comprada * precio_unitario
-        cantidad_base = cantidad_comprada * Decimal(str(materia.factor_conversion))
+        cantidad_base = cantidad_comprada * factor_conversion
+        if cantidad_base <= 0:
+            raise ValueError("La cantidad convertida debe ser mayor a cero")
+
+        _actualizar_costo_unitario_materia_prima_desde_compra(
+            materia=materia,
+            cantidad_base_ingreso=cantidad_base,
+            precio_unitario_compra=precio_unitario,
+            factor_conversion=factor_conversion,
+        )
 
         detalle = DetalleCompra(
             id_materia_prima=materia.id_materia,
@@ -57,13 +293,16 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
             tipo="ENTRADA",
             cantidad=cantidad_base,
             id_usuario=compra.id_usuario_comprador,
-            referencia_id=f"COMPRA-{compra.id_compra or 'NEW'}",
+            referencia_id=f"COMPRA-{compra.id_compra}",
         )
         db.session.add(movimiento)
         total += subtotal
+        ids_materia_impactadas.add(materia.id_materia)
 
     compra.total = total
-    db.session.add(compra)
+    recalcular_costos_productos_afectados_por_materias(
+        ids_materia=list(ids_materia_impactadas)
+    )
     db.session.commit()
     return compra
 
@@ -73,6 +312,16 @@ def agregar_producto_a_carrito(
 ) -> None:
     if cantidad < 1 or cantidad > 5:
         raise ValueError("La cantidad por producto en carrito debe estar entre 1 y 5")
+
+    producto = Producto.query.get(id_producto)
+    if not producto or not producto.activo:
+        raise ValueError("Producto no disponible")
+
+    if _cantidad_libre_producto(producto) <= 0:
+        raise ValueError("Producto sin inventario disponible")
+
+    if cantidad > _cantidad_libre_producto(producto):
+        raise ValueError("La cantidad solicitada excede el inventario disponible")
 
     carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()
     if not carrito:
@@ -92,6 +341,8 @@ def agregar_producto_a_carrito(
         nueva_cantidad = detalle.cantidad + cantidad
         if nueva_cantidad > 5:
             raise ValueError("No puedes agregar mas de 5 unidades del mismo producto")
+        if nueva_cantidad > _cantidad_libre_producto(producto):
+            raise ValueError("La cantidad solicitada excede el inventario disponible")
         detalle.cantidad = nueva_cantidad
 
     db.session.commit()
@@ -105,7 +356,7 @@ def crear_venta_desde_carrito(id_usuario: int, pagado_en_linea: bool) -> Venta:
     venta = Venta(
         id_usuario_cliente=id_usuario,
         estado="EN_PROCESO_PRODUCCION",
-        pagado_en_linea=pagado_en_linea,
+        tipo_pago="TARJETA" if pagado_en_linea else "EFECTIVO",
         fecha=utc_now(),
     )
     db.session.add(venta)
@@ -117,12 +368,20 @@ def crear_venta_desde_carrito(id_usuario: int, pagado_en_linea: bool) -> Venta:
         if not producto or not producto.activo:
             raise ValueError("Producto no disponible")
         subtotal = Decimal(str(producto.precio_venta)) * detalle.cantidad
+        costo_unitario_produccion = _costo_unitario_produccion_para_venta(
+            producto=producto
+        )
+        utilidad_unitaria = _to_mxn(
+            Decimal(str(producto.precio_venta)) - costo_unitario_produccion
+        )
         db.session.add(
             DetalleVenta(
                 id_venta=venta.id_venta,
                 id_producto=producto.id_producto,
                 cantidad=detalle.cantidad,
                 precio_unitario=producto.precio_venta,
+                costo_unitario_produccion=costo_unitario_produccion,
+                utilidad_unitaria=utilidad_unitaria,
                 subtotal=subtotal,
             )
         )
@@ -146,59 +405,52 @@ def crear_pedido_desde_carrito(
     if not carrito or not carrito.detalles:
         raise ValueError("No hay productos en el carrito")
 
-    if tipo_pago_pedido not in {"EN_LINEA", "CONTRA_ENTREGA"}:
-        raise ValueError("Tipo de pago invalido")
+    _validar_parametros_checkout(
+        tipo_pago_pedido=tipo_pago_pedido,
+        tipo_pago=tipo_pago,
+        referencia_pago=referencia_pago,
+    )
 
-    if tipo_pago not in {"EFECTIVO", "TARJETA"}:
-        raise ValueError("Tipo de pago invalido")
-
-    if tipo_pago_pedido == "EN_LINEA" and not referencia_pago:
-        raise ValueError("La referencia de pago es obligatoria para pagos en linea")
-
-    # Validar stock al momento de generar pedido (sin descontar inventario aun)
-    for detalle in carrito.detalles:
-        producto = Producto.query.get(detalle.id_producto)
-        if not producto or not producto.activo:
-            raise ValueError("Producto no disponible")
-        if producto.cantidad_disponible < detalle.cantidad:
-            raise ValueError(f"Stock insuficiente para {producto.nombre}")
+    # Validar y reservar inventario al momento de generar pedido.
+    detalles_ordenados = sorted(
+        carrito.detalles,
+        key=lambda detalle_carrito: detalle_carrito.id_producto,
+    )
+    productos_bloqueados = _reservar_inventario_para_pedido(detalles_ordenados)
 
     pedido = Pedido(
         id_usuario_cliente=id_usuario,
         fecha_entrega=fecha_entrega,
         tipo_pago=tipo_pago_pedido,
-        estado_pedido="CONFIRMADO" if tipo_pago_pedido == "EN_LINEA" else "PENDIENTE",
-        estado_pago="PAGADO" if tipo_pago_pedido == "EN_LINEA" else "PENDIENTE",
+        estado_pedido="PENDIENTE",
+        estado_pago="PENDIENTE",
         referencia_pago=referencia_pago,
     )
     db.session.add(pedido)
     db.session.flush()
 
-    total = Decimal("0")
-    for detalle in carrito.detalles:
-        producto = Producto.query.get(detalle.id_producto)
-        subtotal = Decimal(str(producto.precio_venta)) * detalle.cantidad
-        db.session.add(
-            DetallePedido(
-                id_pedido=pedido.id_pedido,
-                id_producto=producto.id_producto,
-                cantidad=detalle.cantidad,
-                precio_unitario=producto.precio_venta,
-                subtotal=subtotal,
-            )
-        )
-        total += subtotal
+    total = _registrar_detalles_pedido(
+        pedido=pedido,
+        detalles_ordenados=detalles_ordenados,
+        productos_bloqueados=productos_bloqueados,
+    )
 
     pedido.total = total
+    estado_pago_inicial = "PAGADO" if tipo_pago_pedido == "EN_LINEA" else "PENDIENTE"
+    fecha_pago_inicial = utc_now() if estado_pago_inicial == "PAGADO" else None
     db.session.add(
         PagoPedido(
             id_pedido=pedido.id_pedido,
-            estado_pago=pedido.estado_pago,
+            estado_pago=estado_pago_inicial,
             tipo_pago=tipo_pago,
             referencia=referencia_pago,
-            fecha_pago=utc_now() if pedido.estado_pago == "PAGADO" else None,
+            fecha_pago=fecha_pago_inicial,
         )
     )
+
+    if tipo_pago_pedido == "EN_LINEA":
+        pedido.estado_pago = "PAGADO"
+        pedido.estado_pedido = "CONFIRMADO"
 
     DetalleCarrito.query.filter_by(id_carrito=carrito.id_carrito).delete()
     db.session.commit()
@@ -208,25 +460,40 @@ def crear_pedido_desde_carrito(
 def generar_venta_desde_pedido(
     *,
     id_pedido: int,
-    id_usuario_emite: int,
     requiere_ticket: bool,
 ) -> Venta:
-    pedido = Pedido.query.get(id_pedido)
+    pedido = _obtener_pedido_bloqueado(id_pedido)
     if not pedido:
         raise ValueError("Pedido no encontrado")
     if pedido.estado_pedido == "CANCELADO":
         raise ValueError("No se puede generar venta de un pedido cancelado")
-    if pedido.estado_pedido != "PAGADO":
-        raise ValueError("Solo pedidos PAGADOS pueden entregarse y generar venta")
+    if pedido.estado_pago != "PAGADO" or pedido.estado_pedido not in {
+        "CONFIRMADO",
+        "PAGADO",
+    }:
+        raise ValueError(
+            "Solo pedidos confirmados y pagados pueden entregarse y generar venta"
+        )
 
-    # Validar y descontar inventario al momento de entrega/venta
+    # Validar y descontar inventario al momento de entrega/venta.
+    detalles_ordenados = sorted(
+        pedido.detalles, key=lambda detalle_pedido: detalle_pedido.id_producto
+    )
+    productos_bloqueados: dict[int, Producto] = {}
     total = Decimal("0")
-    for d in pedido.detalles:
-        producto = Producto.query.get(d.id_producto)
+    for d in detalles_ordenados:
+        producto = _obtener_producto_bloqueado(d.id_producto)
         if not producto or not producto.activo:
             raise ValueError("Producto no disponible para entregar")
-        if producto.cantidad_disponible < d.cantidad:
+
+        disponible = int(producto.cantidad_disponible or 0)
+        reservada = int(producto.cantidad_reservada or 0)
+        libre = max(disponible - reservada, 0)
+        faltante_reserva = max(int(d.cantidad) - reservada, 0)
+        if libre < faltante_reserva:
             raise ValueError(f"Stock insuficiente para entregar {producto.nombre}")
+
+        productos_bloqueados[producto.id_producto] = producto
         total += Decimal(str(d.subtotal))
 
     venta = Venta(
@@ -245,15 +512,28 @@ def generar_venta_desde_pedido(
     db.session.add(venta)
     db.session.flush()
 
-    for d in pedido.detalles:
-        producto = Producto.query.get(d.id_producto)
-        producto.cantidad_disponible -= d.cantidad
+    for d in detalles_ordenados:
+        producto = productos_bloqueados[d.id_producto]
+        disponible = int(producto.cantidad_disponible or 0)
+        reservada = int(producto.cantidad_reservada or 0)
+        consumir_reserva = min(reservada, int(d.cantidad))
+        costo_unitario_produccion = _costo_unitario_produccion_para_venta(
+            producto=producto
+        )
+        utilidad_unitaria = _to_mxn(
+            Decimal(str(d.precio_unitario)) - costo_unitario_produccion
+        )
+
+        producto.cantidad_disponible = disponible - int(d.cantidad)
+        producto.cantidad_reservada = reservada - consumir_reserva
         db.session.add(
             DetalleVenta(
                 id_venta=venta.id_venta,
                 id_producto=producto.id_producto,
                 cantidad=d.cantidad,
                 precio_unitario=d.precio_unitario,
+                costo_unitario_produccion=costo_unitario_produccion,
+                utilidad_unitaria=utilidad_unitaria,
                 subtotal=d.subtotal,
             )
         )
@@ -273,7 +553,7 @@ def actualizar_estado_pedido(
     nuevo_estado: str,
     referencia_pago: str | None = None,
 ) -> Pedido:
-    pedido = Pedido.query.get(id_pedido)
+    pedido = _obtener_pedido_bloqueado(id_pedido)
     if not pedido:
         raise ValueError("Pedido no encontrado")
 
@@ -287,47 +567,38 @@ def actualizar_estado_pedido(
     }:
         raise ValueError("Estado invalido")
 
-    # Reglas de transicion basadas en el PDF
-    if nuevo_estado == "CANCELADO":
-        if pedido.estado_pedido != "PENDIENTE":
-            raise ValueError("Solo pedidos PENDIENTE pueden cancelarse")
-        pedido.estado_pedido = "CANCELADO"
-        db.session.commit()
-        return pedido
-
-    if nuevo_estado == "CONFIRMADO":
-        if pedido.estado_pedido not in {"PENDIENTE"}:
-            raise ValueError("Solo pedidos PENDIENTE pueden confirmarse")
-        # Para pedidos en linea, ya vienen confirmados al pagarse
-        pedido.estado_pedido = "CONFIRMADO"
-        db.session.commit()
-        return pedido
-
-    if nuevo_estado == "PAGADO":
-        if pedido.estado_pedido not in {"PENDIENTE", "CONFIRMADO"}:
-            raise ValueError(
-                "Solo pedidos PENDIENTE/CONFIRMADO pueden marcarse como pagados"
-            )
-        if (
-            pedido.tipo_pago == "EN_LINEA"
-            and not pedido.referencia_pago
-            and referencia_pago
-        ):
-            pedido.referencia_pago = referencia_pago
-        pedido.estado_pago = "PAGADO"
-        pedido.estado_pedido = "PAGADO"
-        if pedido.pago:
-            pedido.pago.estado_pago = "PAGADO"
-            if referencia_pago:
-                pedido.pago.referencia = referencia_pago
-            pedido.pago.fecha_pago = utc_now()
-        db.session.commit()
+    if pedido.estado_pedido == nuevo_estado:
         return pedido
 
     if nuevo_estado == "ENTREGADO":
         raise ValueError(
             "La entrega genera venta; usa el flujo de entrega para completarla"
         )
+
+    _validar_transicion_estado(
+        estado_actual=pedido.estado_pedido,
+        estado_destino=nuevo_estado,
+        mapa_transiciones=TRANSICIONES_PEDIDO,
+        entidad="pedido",
+    )
+
+    if nuevo_estado == "CANCELADO":
+        _cancelar_pedido_liberando_reserva(pedido)
+        db.session.commit()
+        return pedido
+
+    if nuevo_estado == "CONFIRMADO":
+        _confirmar_pedido(pedido)
+        db.session.commit()
+        return pedido
+
+    if nuevo_estado == "PAGADO":
+        _marcar_pedido_como_pagado(
+            pedido=pedido,
+            referencia_pago=referencia_pago,
+        )
+        db.session.commit()
+        return pedido
 
     pedido.estado_pedido = nuevo_estado
     db.session.commit()
@@ -370,26 +641,121 @@ def calcular_costo_producto(*, id_producto: int, cantidad: int) -> Decimal:
     )
 
 
+def recalcular_costo_y_precio_sugerido_producto(*, id_producto: int) -> Producto:
+    producto = _obtener_producto_bloqueado(id_producto)
+    if not producto:
+        raise ValueError("Producto no disponible")
+
+    costo_unitario = _to_mxn(calcular_costo_unitario_producto(id_producto=id_producto))
+    margen_objetivo = Decimal(str(producto.margen_objetivo_pct or Decimal("25")))
+    if margen_objetivo <= 0 or margen_objetivo >= 100:
+        raise ValueError("Margen objetivo invalido para calcular precio sugerido")
+
+    divisor = Decimal("1") - (margen_objetivo / Decimal("100"))
+    if divisor <= 0:
+        raise ValueError("No es posible calcular precio sugerido con ese margen")
+
+    precio_sugerido = _to_mxn(costo_unitario / divisor)
+    producto.costo_produccion_actual = costo_unitario
+    producto.precio_sugerido = precio_sugerido
+    producto.fecha_costo_actualizado = utc_now()
+    return producto
+
+
+def recalcular_costos_productos_afectados_por_materias(
+    *, ids_materia: list[int]
+) -> dict:
+    ids_materia_validas = sorted({int(m) for m in ids_materia if int(m) > 0})
+    if not ids_materia_validas:
+        return {"actualizados": 0, "errores": []}
+
+    productos_ids = (
+        db.session.query(Producto.id_producto)
+        .join(Receta, Receta.id_receta == Producto.id_receta)
+        .join(DetalleReceta, DetalleReceta.id_receta == Receta.id_receta)
+        .filter(Producto.activo.is_(True))
+        .filter(DetalleReceta.id_materia_prima.in_(ids_materia_validas))
+        .distinct()
+        .all()
+    )
+
+    errores: list[dict] = []
+    actualizados = 0
+    for (id_producto,) in productos_ids:
+        try:
+            recalcular_costo_y_precio_sugerido_producto(id_producto=id_producto)
+            actualizados += 1
+        except ValueError as exc:
+            errores.append(
+                {
+                    "id_producto": id_producto,
+                    "error": str(exc),
+                }
+            )
+
+    return {"actualizados": actualizados, "errores": errores}
+
+
+def _costo_unitario_produccion_para_venta(*, producto: Producto) -> Decimal:
+    costo_actual = Decimal(str(producto.costo_produccion_actual or 0))
+    if costo_actual > 0:
+        return _to_mxn(costo_actual)
+
+    try:
+        return _to_mxn(
+            calcular_costo_unitario_producto(id_producto=producto.id_producto)
+        )
+    except ValueError:
+        return Decimal("0.00")
+
+
 def crear_orden_produccion(
     id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int
 ) -> OrdenProduccion:
+    if cantidad <= 0:
+        raise ValueError("La cantidad a producir debe ser mayor a cero")
+
     solicitud = SolicitudProduccion.query.get(id_solicitud)
     if not solicitud:
         raise ValueError("Solicitud no encontrada")
     if solicitud.estado != "APROBADA":
         raise ValueError("Solo solicitudes aprobadas pueden generar orden")
 
+    orden_existente = (
+        OrdenProduccion.query.filter_by(id_solicitud=id_solicitud)
+        .filter(OrdenProduccion.estado != "CANCELADO")
+        .first()
+    )
+    if orden_existente:
+        raise ValueError(
+            "La solicitud ya tiene una orden de produccion activa o finalizada"
+        )
+
     receta = Receta.query.get(id_receta)
     if not receta or not receta.activa:
         raise ValueError("Receta activa no encontrada")
 
-    producto = Producto.query.get(solicitud.id_producto)
+    producto = _obtener_producto_bloqueado(solicitud.id_producto)
     if not producto or not producto.activo:
         raise ValueError("Producto no disponible para produccion")
     if not producto.id_receta:
         raise ValueError("El producto no tiene receta asignada")
     if int(producto.id_receta) != int(receta.id_receta):
-        raise ValueError("La receta seleccionada no corresponde al producto solicitado")
+        receta_actual_producto = Receta.query.get(producto.id_receta)
+        if (
+            not receta_actual_producto
+            or receta_actual_producto.nombre.strip().lower()
+            != receta.nombre.strip().lower()
+        ):
+            raise ValueError(
+                "La receta seleccionada no corresponde al producto solicitado"
+            )
+        producto.id_receta = receta.id_receta
+
+    _validar_disponibilidad_materia_prima_para_orden(
+        receta=receta,
+        cantidad_producir=cantidad,
+    )
 
     orden = OrdenProduccion(
         id_solicitud=id_solicitud,
@@ -405,11 +771,15 @@ def crear_orden_produccion(
 
 
 def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProduccion:
-    orden = OrdenProduccion.query.get(id_orden)
+    orden = _obtener_orden_bloqueada(id_orden)
     if not orden:
         raise ValueError("Orden no encontrada")
-    if orden.estado != "PENDIENTE":
-        raise ValueError("Solo se pueden iniciar ordenes pendientes")
+    _validar_transicion_estado(
+        estado_actual=orden.estado,
+        estado_destino="EN_PROCESO",
+        mapa_transiciones=TRANSICIONES_ORDEN,
+        entidad="orden de produccion",
+    )
 
     receta = Receta.query.get(orden.id_receta)
     if not receta or not receta.activa:
@@ -417,15 +787,13 @@ def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProducci
     if receta.rendimiento_base <= 0:
         raise ValueError("Rendimiento base invalido")
 
-    # Cantidad_real = cantidad_receta * factor * (1 + merma/100)
-    # factor = cantidad_a_producir / rendimiento_base
     factor = Decimal(str(orden.cantidad_producir)) / Decimal(
         str(receta.rendimiento_base)
     )
     costo_total_mxn = Decimal("0")
 
     for detalle in DetalleReceta.query.filter_by(id_receta=receta.id_receta).all():
-        materia = MateriaPrima.query.get(detalle.id_materia_prima)
+        materia = _obtener_materia_bloqueada(detalle.id_materia_prima)
         if not materia or not materia.activa:
             raise ValueError("Materia prima no disponible")
 
@@ -460,10 +828,108 @@ def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProducci
     return orden
 
 
+def finalizar_orden_produccion(*, id_orden: int) -> OrdenProduccion:
+    orden = _obtener_orden_bloqueada(id_orden)
+    if not orden:
+        raise ValueError("Orden no encontrada")
+
+    _validar_transicion_estado(
+        estado_actual=orden.estado,
+        estado_destino="FINALIZADO",
+        mapa_transiciones=TRANSICIONES_ORDEN,
+        entidad="orden de produccion",
+    )
+
+    producto = _obtener_producto_bloqueado(orden.id_producto)
+    if not producto or not producto.activo:
+        raise ValueError("No se encontro el producto asociado a la orden")
+
+    producto.cantidad_disponible = int(producto.cantidad_disponible or 0) + int(
+        orden.cantidad_producir
+    )
+    orden.estado = "FINALIZADO"
+    orden.fecha_fin = utc_now()
+    db.session.commit()
+    return orden
+
+
+def cancelar_orden_produccion(*, id_orden: int) -> OrdenProduccion:
+    orden = _obtener_orden_bloqueada(id_orden)
+    if not orden:
+        raise ValueError("Orden no encontrada")
+
+    _validar_transicion_estado(
+        estado_actual=orden.estado,
+        estado_destino="CANCELADO",
+        mapa_transiciones=TRANSICIONES_ORDEN,
+        entidad="orden de produccion",
+    )
+
+    orden.estado = "CANCELADO"
+    db.session.commit()
+    return orden
+
+
+def registrar_venta_mostrador(
+    *,
+    id_producto: int,
+    cantidad: int,
+    tipo_pago: str,
+    requiere_ticket: bool,
+    id_usuario_emite: int,
+) -> Venta:
+    if cantidad <= 0:
+        raise ValueError("La cantidad debe ser mayor a cero")
+    if cantidad > 5:
+        raise ValueError("No se permite vender mas de 5 unidades por producto")
+    if tipo_pago not in {"EFECTIVO", "TARJETA"}:
+        raise ValueError("Tipo de pago invalido")
+
+    producto = _obtener_producto_bloqueado(id_producto)
+    if not producto or not producto.activo:
+        raise ValueError("Producto no disponible para venta")
+    if _cantidad_libre_producto(producto) < cantidad:
+        raise ValueError("Stock insuficiente para completar la venta")
+
+    subtotal = Decimal(str(producto.precio_venta)) * cantidad
+    costo_unitario_produccion = _costo_unitario_produccion_para_venta(producto=producto)
+    venta = Venta(
+        id_usuario_cliente=id_usuario_emite,
+        total=subtotal,
+        estado="CONFIRMADO",
+        tipo_pago=tipo_pago,
+        requiere_ticket=requiere_ticket,
+    )
+    db.session.add(venta)
+    db.session.flush()
+
+    db.session.add(
+        DetalleVenta(
+            id_venta=venta.id_venta,
+            id_producto=producto.id_producto,
+            cantidad=cantidad,
+            precio_unitario=producto.precio_venta,
+            costo_unitario_produccion=costo_unitario_produccion,
+            utilidad_unitaria=_to_mxn(
+                Decimal(str(producto.precio_venta)) - costo_unitario_produccion
+            ),
+            subtotal=subtotal,
+        )
+    )
+    folio = f"SB-{venta.id_venta:06d}"
+    db.session.add(TicketVenta(id_venta=venta.id_venta, folio=folio))
+
+    producto.cantidad_disponible = int(producto.cantidad_disponible or 0) - cantidad
+    db.session.commit()
+    return venta
+
+
 def pagar_compra(id_compra: int, id_usuario: int) -> None:
     compra = Compra.query.get(id_compra)
     if not compra:
         raise ValueError("Compra no encontrada")
+    if compra.estado_pago == "PAGADO":
+        raise ValueError("La compra ya fue marcada como pagada")
     compra.estado_pago = "PAGADO"
 
     salida = SalidaEfectivo(
@@ -474,4 +940,7 @@ def pagar_compra(id_compra: int, id_usuario: int) -> None:
         referencia=f"COMPRA-{compra.id_compra}",
     )
     db.session.add(salida)
+    recalcular_costos_productos_afectados_por_materias(
+        ids_materia=[d.id_materia_prima for d in compra.detalles]
+    )
     db.session.commit()

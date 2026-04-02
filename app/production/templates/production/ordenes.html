@@ -2,33 +2,79 @@
 {% block title %}Ordenes{% endblock %}
 {% block content %}
 <section class="section">
-	<h2 class="mb-3">Ordenes de produccion</h2>
+	{% set ns = namespace(pendientes=0, en_proceso=0, finalizadas=0, canceladas=0) %}
+	{% for o in ordenes %}
+		{% if o.estado == 'PENDIENTE' %}
+			{% set ns.pendientes = ns.pendientes + 1 %}
+		{% elif o.estado == 'EN_PROCESO' %}
+			{% set ns.en_proceso = ns.en_proceso + 1 %}
+		{% elif o.estado == 'FINALIZADO' %}
+			{% set ns.finalizadas = ns.finalizadas + 1 %}
+		{% elif o.estado == 'CANCELADO' %}
+			{% set ns.canceladas = ns.canceladas + 1 %}
+		{% endif %}
+	{% endfor %}
 
-	<div class="card p-3 mb-3">
-		<h3 class="mb-2">Crear orden</h3>
-		<form method="post" class="grid-form">
-		<input type="hidden" name="action" value="crear" />
-		<select name="id_solicitud" required>
-			<option value="">Solicitud aprobada</option>
-			{% for s in solicitudes %}
-			<option value="{{ s.id_solicitud }}">#{{ s.id_solicitud }} - {{ s.producto.nombre }} ({{ s.cantidad }})</option>
-			{% endfor %}
-		</select>
-		<select name="id_receta" required>
-			<option value="">Receta activa</option>
-			{% for r in recetas %}
-			<option value="{{ r.id_receta }}">#{{ r.id_receta }} - {{ r.nombre }} v{{ r.version }}</option>
-			{% endfor %}
-		</select>
-		<input type="number" min="1" name="cantidad" placeholder="Cantidad a producir" required />
-		<button type="submit">Crear orden</button>
-		</form>
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de producción</p>
+		<h2 class="ops-hero-title">Órdenes de producción</h2>
+		<p class="ops-hero-text">Genera, inicia, finaliza y monitorea órdenes productivas.</p>
 	</div>
 
- 	<div class="card p-3">
-		<h3 class="mb-2">Historial de ordenes</h3>
-		<div class="table-responsive">
-			<table>
+	<div class="ops-kpi-grid compact">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Órdenes totales</p>
+			<p class="ops-kpi-value">{{ ordenes|length }}</p>
+			<p class="ops-kpi-sub">Histórico del módulo</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pendientes</p>
+			<p class="ops-kpi-value">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">Aún no iniciadas</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">En proceso</p>
+			<p class="ops-kpi-value">{{ ns.en_proceso }}</p>
+			<p class="ops-kpi-sub">Producción activa</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Finalizadas</p>
+			<p class="ops-kpi-value">{{ ns.finalizadas }}</p>
+			<p class="ops-kpi-sub">Listas para venta</p>
+		</article>
+	</div>
+
+	<div class="ops-card d-flex flex-wrap justify-content-between align-items-center gap-3">
+		<div>
+			<h3 class="ops-card-title mb-1">Crear orden</h3>
+			<p class="text-secondary mb-0 small">Genera la orden desde una pantallita separada.</p>
+		</div>
+		<button
+			type="button"
+			class="btn btn-sm"
+			data-bs-toggle="modal"
+			data-bs-target="#modalOrdenCrear">
+			Nueva orden
+		</button>
+	</div>
+
+	<div class="ops-card">
+		<h3 class="ops-card-title">Historial de órdenes</h3>
+		<div class="ops-toolbar">
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input type="text" id="ordenesSearch" placeholder="Buscar por id o producto" />
+			</div>
+			<select id="ordenesEstadoFiltro" style="max-width: 220px">
+				<option value="TODOS">Todos los estados</option>
+				<option value="PENDIENTE">Pendiente</option>
+				<option value="EN_PROCESO">En proceso</option>
+				<option value="FINALIZADO">Finalizado</option>
+				<option value="CANCELADO">Cancelado</option>
+			</select>
+		</div>
+		<div class="ops-table table-responsive">
+			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -41,38 +87,49 @@
 				</thead>
 				<tbody>
 					{% for o in ordenes %}
-					<tr>
+					<tr
+						data-row="orden"
+						data-label="{{ (o.id_orden|string ~ ' ' ~ o.producto.nombre)|lower }}"
+						data-estado="{{ o.estado }}">
 						<td>{{ o.id_orden }}</td>
 						<td>{{ o.producto.nombre }}</td>
 						<td>{{ o.cantidad_producir }}</td>
-						<td>{{ o.estado }}</td>
+						<td>
+							<span
+								class="ops-chip {{ 'warning' if o.estado == 'PENDIENTE' else 'success' if o.estado == 'FINALIZADO' else 'neutral' }}">
+								{{ o.estado }}
+							</span>
+						</td>
 						<td>${{ '%.2f'|format(o.costo_total) }}</td>
 						<td>
-							<form method="post" class="d-flex flex-wrap gap-2">
+							<form method="post" class="btn-action-group">
 								<input type="hidden" name="id_orden" value="{{ o.id_orden }}" />
 								<button
 									type="submit"
 									name="action"
 									value="iniciar"
-									class="btn btn-sm"
+									class="btn btn-sm btn-icon-sm"
+									title="Iniciar orden"
 									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
-									Iniciar
+									<i class="bi bi-play-fill"></i>
 								</button>
 								<button
 									type="submit"
 									name="action"
 									value="finalizar"
-									class="btn btn-sm"
+									class="btn btn-sm btn-icon-sm"
+									title="Finalizar orden"
 									{{ 'disabled' if o.estado != 'EN_PROCESO' else '' }}>
-									Finalizar
+									<i class="bi bi-check2-all"></i>
 								</button>
 								<button
 									type="submit"
 									name="action"
 									value="cancelar"
-									class="btn btn-sm btn-outline-dark"
+									class="btn btn-sm btn-outline-dark btn-icon-sm"
+									title="Cancelar orden"
 									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
-									Cancelar
+									<i class="bi bi-x-lg"></i>
 								</button>
 							</form>
 						</td>
@@ -86,5 +143,62 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalOrdenCrear" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title">Crear orden de producción</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" class="ops-grid p-3">
+					<input type="hidden" name="action" value="crear" />
+					<select name="id_solicitud" required>
+						<option value="">Solicitud aprobada</option>
+						{% for s in solicitudes %}
+						<option value="{{ s.id_solicitud }}">#{{ s.id_solicitud }} - {{ s.producto.nombre }} ({{ s.cantidad }})</option>
+						{% endfor %}
+					</select>
+					<select name="id_receta" required>
+						<option value="">Receta activa</option>
+						{% for r in recetas %}
+						<option value="{{ r.id_receta }}">#{{ r.id_receta }} - {{ r.nombre }} v{{ r.version }}</option>
+						{% endfor %}
+					</select>
+					<input type="number" min="1" name="cantidad" placeholder="Cantidad a producir" required />
+					<div class="d-flex justify-content-end gap-2" style="grid-column: 1 / -1">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit">Crear orden</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	const ordenesSearchInput = document.getElementById('ordenesSearch');
+	const ordenesEstadoFiltro = document.getElementById('ordenesEstadoFiltro');
+
+	function applyOrdenesFilters() {
+		const searchValue = String(ordenesSearchInput?.value || '').toLowerCase().trim();
+		const estadoValue = String(ordenesEstadoFiltro?.value || 'TODOS').toUpperCase();
+		document.querySelectorAll('tr[data-row="orden"]').forEach((tableRowElement) => {
+			const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
+			const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
+			const matchesSearch = rowLabel.includes(searchValue);
+			const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
+			tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+		});
+	}
+
+	if (ordenesSearchInput) {
+		ordenesSearchInput.addEventListener('input', applyOrdenesFilters);
+	}
+	if (ordenesEstadoFiltro) {
+		ordenesEstadoFiltro.addEventListener('change', applyOrdenesFilters);
+	}
+</script>
 {% endblock %}

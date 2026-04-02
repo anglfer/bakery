@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 
 from app.admin import admin_bp
 from app.common.passwords import is_password_insecure
-from app.common.security import require_permission
+from app.common.security import log_audit_event, require_permission
 from app.extensions import db
 from app.models import (
     DetalleVenta,
@@ -56,8 +56,9 @@ def _can_create_user() -> bool:
 @login_required
 @require_permission("Dashboard", "leer")
 def dashboard():
-    if not current_user.rol or current_user.rol.nombre != "Administrador":
-        flash("No tienes acceso al dashboard administrativo.", "danger")
+    role_name = current_user.rol.nombre if current_user.rol else ""
+    if role_name not in {"Administrador", "Ventas", "Produccion"}:
+        flash("No tienes acceso al dashboard.", "danger")
         return redirect(url_for("catalog.home"))
 
     fecha = utc_today()
@@ -66,6 +67,7 @@ def dashboard():
     numero_ventas = len(ventas_hoy)
 
     producto_mas_vendido = None
+    producto_mas_vendido_id = None
     if ventas_hoy:
         rows = (
             db.session.query(
@@ -78,7 +80,63 @@ def dashboard():
             .all()
         )
         if rows:
-            producto_mas_vendido = Producto.query.get(rows[0][0])
+            producto_mas_vendido_id = rows[0][0]
+            producto_mas_vendido = Producto.query.get(producto_mas_vendido_id)
+
+    ventas_por_hora = (
+        db.session.query(
+            db.func.hour(Venta.fecha).label("hora"),
+            db.func.sum(Venta.total).label("total"),
+            db.func.count(Venta.id_venta).label("transacciones"),
+        )
+        .filter(db.func.date(Venta.fecha) == fecha)
+        .group_by(db.func.hour(Venta.fecha))
+        .order_by(db.func.hour(Venta.fecha).asc())
+        .all()
+    )
+
+    ventas_recientes = (
+        db.session.query(
+            Venta.id_venta,
+            Venta.fecha,
+            Producto.nombre,
+            DetalleVenta.cantidad,
+            DetalleVenta.subtotal,
+        )
+        .join(DetalleVenta, DetalleVenta.id_venta == Venta.id_venta)
+        .join(Producto, Producto.id_producto == DetalleVenta.id_producto)
+        .filter(db.func.date(Venta.fecha) == fecha)
+        .order_by(Venta.fecha.desc(), Venta.id_venta.desc())
+        .limit(20)
+        .all()
+    )
+
+    presentaciones_mas_vendidas = (
+        db.session.query(
+            Producto.unidad_venta,
+            db.func.sum(DetalleVenta.cantidad).label("cantidad_total"),
+        )
+        .join(DetalleVenta, DetalleVenta.id_producto == Producto.id_producto)
+        .join(Venta, Venta.id_venta == DetalleVenta.id_venta)
+        .filter(db.func.date(Venta.fecha) == fecha)
+        .group_by(Producto.unidad_venta)
+        .order_by(db.func.sum(DetalleVenta.cantidad).desc())
+        .all()
+    )
+
+    historial_ventas_productos = (
+        db.session.query(
+            Venta.fecha,
+            Producto.nombre,
+            DetalleVenta.cantidad,
+        )
+        .join(DetalleVenta, DetalleVenta.id_venta == Venta.id_venta)
+        .join(Producto, Producto.id_producto == DetalleVenta.id_producto)
+        .filter(db.func.date(Venta.fecha) == fecha)
+        .order_by(Venta.fecha.desc(), Venta.id_venta.desc())
+        .limit(20)
+        .all()
+    )
 
     low_stock = (
         Producto.query.filter(
@@ -90,7 +148,9 @@ def dashboard():
     )
 
     pedidos_hoy = Pedido.query.filter(db.func.date(Pedido.fecha_pedido) == fecha).all()
-    pedidos_pendientes = len([p for p in pedidos_hoy if p.estado_pedido != "ENTREGADO"])
+    pedidos_pendientes = len(
+        [p for p in pedidos_hoy if p.estado_pedido in {"PENDIENTE", "CONFIRMADO"}]
+    )
 
     stats = {
         "total_ventas_hoy": total_ventas,
@@ -98,10 +158,20 @@ def dashboard():
         "producto_mas_vendido": (
             producto_mas_vendido.nombre if producto_mas_vendido else "Sin datos"
         ),
+        "producto_mas_vendido_id": producto_mas_vendido_id,
         "pedidos_pendientes": pedidos_pendientes,
         "productos_bajo_minimo": len(low_stock),
     }
-    return render_template("admin/dashboard.html", stats=stats, low_stock=low_stock)
+    return render_template(
+        "admin/dashboard.html",
+        role_name=role_name,
+        stats=stats,
+        low_stock=low_stock,
+        ventas_por_hora=ventas_por_hora,
+        ventas_recientes=ventas_recientes,
+        presentaciones_mas_vendidas=presentaciones_mas_vendidas,
+        historial_ventas_productos=historial_ventas_productos,
+    )
 
 
 @admin_bp.route("/usuarios", methods=["GET", "POST"])
@@ -158,6 +228,10 @@ def usuarios():
         db.session.add(persona)
         db.session.add(db_user)
         db.session.commit()
+        log_audit_event(
+            "USUARIO_CREADO",
+            f"id_usuario={db_user.id_usuario}; username={db_user.username}; id_rol={db_user.id_rol}",
+        )
         flash("Usuario creado correctamente.", "success")
         return redirect(url_for(USERS_ENDPOINT))
 
@@ -201,6 +275,10 @@ def editar_usuario(id_usuario: int):
         "direccion", user.persona.direccion
     ).strip()
     db.session.commit()
+    log_audit_event(
+        "USUARIO_EDITADO",
+        f"id_usuario={user.id_usuario}; username={user.username}; id_rol={user.id_rol}; activo={user.activo}",
+    )
     flash("Usuario actualizado.", "success")
     return redirect(url_for(USERS_ENDPOINT))
 
@@ -216,6 +294,10 @@ def desactivar_usuario(id_usuario: int):
 
     user.activo = False
     db.session.commit()
+    log_audit_event(
+        "USUARIO_DESACTIVADO",
+        f"id_usuario={user.id_usuario}; username={user.username}",
+    )
     flash("Usuario desactivado.", "success")
     return redirect(url_for(USERS_ENDPOINT))
 
@@ -237,6 +319,12 @@ def roles():
 
         db.session.add(Rol(nombre=nombre, descripcion=descripcion, es_base=False))
         db.session.commit()
+        role = Rol.query.filter_by(nombre=nombre).first()
+        if role:
+            log_audit_event(
+                "ROL_CREADO",
+                f"id_rol={role.id_rol}; nombre={role.nombre}",
+            )
         flash("Rol creado correctamente.", "success")
         return redirect(url_for(ROLES_ENDPOINT))
 
@@ -274,6 +362,10 @@ def editar_rol(id_rol: int):
     if role.nombre not in BASE_ROLES:
         role.activo = _to_bool(request.form.get("activo", "on"))
     db.session.commit()
+    log_audit_event(
+        "ROL_EDITADO",
+        f"id_rol={role.id_rol}; nombre={role.nombre}; activo={role.activo}",
+    )
     flash("Rol actualizado.", "success")
     return redirect(url_for(ROLES_ENDPOINT))
 
@@ -289,6 +381,10 @@ def desactivar_rol(id_rol: int):
 
     role.activo = False
     db.session.commit()
+    log_audit_event(
+        "ROL_DESACTIVADO",
+        f"id_rol={role.id_rol}; nombre={role.nombre}",
+    )
     flash("Rol desactivado.", "success")
     return redirect(url_for(ROLES_ENDPOINT))
 
@@ -304,6 +400,10 @@ def activar_rol(id_rol: int):
 
     role.activo = True
     db.session.commit()
+    log_audit_event(
+        "ROL_ACTIVADO",
+        f"id_rol={role.id_rol}; nombre={role.nombre}",
+    )
     flash("Rol activado.", "success")
     return redirect(url_for(ROLES_ENDPOINT))
 
@@ -313,8 +413,45 @@ def activar_rol(id_rol: int):
 @require_permission("Roles", "editar")
 def rol_permisos(id_rol: int):
     role = Rol.query.get_or_404(id_rol)
+    if role.nombre in BASE_ROLES:
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "mensaje": "No se pueden modificar permisos de roles base.",
+                }
+            ),
+            400,
+        )
+
     data = request.get_json(silent=True) or {}
     permisos_nuevos = data.get("permisos", [])
+
+    has_any_permission = any(
+        bool(item.get("leer"))
+        or bool(item.get("crear"))
+        or bool(item.get("editar"))
+        or bool(item.get("desactivar"))
+        for item in permisos_nuevos
+    )
+    permisos_activos = sum(
+        1
+        for item in permisos_nuevos
+        if bool(item.get("leer"))
+        or bool(item.get("crear"))
+        or bool(item.get("editar"))
+        or bool(item.get("desactivar"))
+    )
+    if not has_any_permission:
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "mensaje": "El rol debe tener al menos un permiso asignado.",
+                }
+            ),
+            400,
+        )
 
     Permiso.query.filter_by(id_rol=role.id_rol).delete()
 
@@ -339,6 +476,10 @@ def rol_permisos(id_rol: int):
         )
 
     db.session.commit()
+    log_audit_event(
+        "ROL_PERMISOS_ACTUALIZADOS",
+        f"id_rol={role.id_rol}; permisos_activos={permisos_activos}",
+    )
     return jsonify({"ok": True, "mensaje": "Permisos guardados correctamente."})
 
 
@@ -373,6 +514,12 @@ def proveedores():
             )
         )
         db.session.commit()
+        proveedor = Proveedor.query.filter_by(nombre_empresa=nombre).first()
+        if proveedor:
+            log_audit_event(
+                "PROVEEDOR_CREADO",
+                f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}",
+            )
         flash("Proveedor registrado.", "success")
         return redirect(url_for(SUPPLIERS_ENDPOINT))
 
@@ -401,6 +548,10 @@ def editar_proveedor(id_proveedor: int):
     proveedor.direccion = request.form.get("direccion", proveedor.direccion).strip()
     proveedor.activo = _to_bool(request.form.get("activo", "on"))
     db.session.commit()
+    log_audit_event(
+        "PROVEEDOR_EDITADO",
+        f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}; activo={proveedor.activo}",
+    )
     flash("Proveedor actualizado.", "success")
     return redirect(url_for(SUPPLIERS_ENDPOINT))
 
@@ -412,5 +563,9 @@ def desactivar_proveedor(id_proveedor: int):
     proveedor = Proveedor.query.get_or_404(id_proveedor)
     proveedor.activo = False
     db.session.commit()
+    log_audit_event(
+        "PROVEEDOR_DESACTIVADO",
+        f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}",
+    )
     flash("Proveedor desactivado.", "success")
     return redirect(url_for(SUPPLIERS_ENDPOINT))

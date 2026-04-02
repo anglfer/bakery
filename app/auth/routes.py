@@ -1,5 +1,8 @@
+import json
 import random
 import smtplib
+import urllib.parse
+import urllib.request
 from datetime import timedelta
 from email.message import EmailMessage
 
@@ -8,6 +11,7 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     session,
     url_for,
 )
@@ -15,6 +19,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 
 from app.auth import auth_bp
 from app.auth.forms import LoginForm, RegisterClientForm, Verify2FAForm
+from app.common.security import log_audit_event
 from app.extensions import db
 from app.models import BitacoraAcceso, Persona, Rol, Usuario, utc_now
 
@@ -25,12 +30,8 @@ LOGIN_ENDPOINT = "auth.login"
 
 def _resolve_home_by_role(usuario: Usuario) -> str:
     role_name = usuario.rol.nombre if usuario.rol else ""
-    if role_name == "Administrador":
+    if role_name in {"Administrador", "Ventas", "Produccion"}:
         return "admin.dashboard"
-    if role_name == "Ventas":
-        return "sales.ventas"
-    if role_name == "Produccion":
-        return "production.ordenes"
     return "catalog.home"
 
 
@@ -81,10 +82,43 @@ def _send_2fa_code_email(usuario: Usuario) -> bool:
         return False
 
 
+def _verify_recaptcha(token: str) -> bool:
+    if not token:
+        return False
+    secret = current_app.config.get("RECAPTCHA_PRIVATE_KEY", "")
+    if not secret:
+        return False
+    data = {"secret": secret, "response": token}
+    try:
+        data_encoded = urllib.parse.urlencode(data).encode()
+        with urllib.request.urlopen(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data=data_encoded,
+            timeout=10,
+        ) as resp:
+            result = json.loads(resp.read().decode())
+    except Exception:
+        return False
+
+    if current_app.config.get("RECAPTCHA_VERSION", "v2") == "v3":
+        score = float(result.get("score", 0.0))
+        threshold = float(current_app.config.get("RECAPTCHA_SCORE_THRESHOLD", 0.5))
+        return result.get("success", False) and score >= threshold
+
+    return result.get("success", False)
+
+
+def _redirect_authenticated_user():
+    usuario_actual = Usuario.query.get(int(current_user.get_id()))
+    if usuario_actual:
+        return redirect(url_for(_resolve_home_by_role(usuario_actual)))
+    return redirect(url_for("catalog.home"))
+
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("catalog.home"))
+        return _redirect_authenticated_user()
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -93,7 +127,12 @@ def login():
         ).first()
         if not usuario:
             flash("Credenciales invalidas", "danger")
-            return render_template(LOGIN_TEMPLATE, form=form, show_captcha=False)
+            return render_template(
+                LOGIN_TEMPLATE,
+                form=form,
+                show_captcha=True,
+                recaptcha_site_key=current_app.config.get("RECAPTCHA_PUBLIC_KEY", ""),
+            )
 
         needs_captcha = usuario.intentos_fallidos >= 3
         # For this version, ReCaptcha is disabled due to missing configuration
@@ -107,8 +146,24 @@ def login():
             _registrar_bitacora(usuario, False, "Usuario bloqueado")
             db.session.commit()
             return render_template(
-                LOGIN_TEMPLATE, form=form, show_captcha=needs_captcha
+                LOGIN_TEMPLATE,
+                form=form,
+                show_captcha=needs_captcha,
+                recaptcha_site_key=current_app.config.get("RECAPTCHA_PUBLIC_KEY", ""),
             )
+        # Verify reCAPTCHA if required
+        if needs_captcha:
+            captcha_token = request.form.get("g-recaptcha-response", "")
+            if not _verify_recaptcha(captcha_token):
+                flash("Por favor completa el reCAPTCHA", "danger")
+                return render_template(
+                    LOGIN_TEMPLATE,
+                    form=form,
+                    show_captcha=True,
+                    recaptcha_site_key=current_app.config.get(
+                        "RECAPTCHA_PUBLIC_KEY", ""
+                    ),
+                )
 
         if not usuario.check_password(form.password.data):
             usuario.register_failed_login()
@@ -119,6 +174,7 @@ def login():
                 LOGIN_TEMPLATE,
                 form=form,
                 show_captcha=usuario.intentos_fallidos >= 3,
+                recaptcha_site_key=current_app.config.get("RECAPTCHA_PUBLIC_KEY", ""),
             )
 
         usuario.reset_login_attempts()
@@ -134,7 +190,12 @@ def login():
             flash(f"Codigo 2FA temporal: {usuario.token_2fa}", "info")
         return redirect(url_for("auth.verify_2fa"))
 
-    return render_template(LOGIN_TEMPLATE, form=form, show_captcha=False)
+    return render_template(
+        LOGIN_TEMPLATE,
+        form=form,
+        show_captcha=True,
+        recaptcha_site_key=current_app.config.get("RECAPTCHA_PUBLIC_KEY", ""),
+    )
 
 
 @auth_bp.route("/verify-2fa", methods=["GET", "POST"])
@@ -212,6 +273,10 @@ def registro_cliente():
         db.session.add(persona)
         db.session.add(usuario)
         db.session.commit()
+        log_audit_event(
+            "CLIENTE_REGISTRADO",
+            f"id_usuario={usuario.id_usuario}; username={usuario.username}",
+        )
         flash("Cuenta creada correctamente. Inicia sesion.", "success")
         return redirect(url_for(LOGIN_ENDPOINT))
 

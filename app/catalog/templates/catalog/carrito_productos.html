@@ -257,6 +257,9 @@
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 				</div>
 				<form method="post" action="{{ url_for('catalog.checkout') }}" id="formConfirmar">
+					<input type="hidden" name="tipo_entrega" value="pickup" />
+					<input type="hidden" name="tipo_pago_pedido" value="EN_LINEA" />
+					<input type="hidden" name="tipo_pago" value="TARJETA" />
 					<div class="modal-body" style="padding: 1.5rem">
 						<div class="row g-3">
 							<div class="col-12">
@@ -275,6 +278,10 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									¿Cómo recibirás tu pedido? *
 								</label>
+								<div class="alert alert-warning py-2 mb-2" style="font-size: 0.75rem; border-radius: 10px">
+									<i class="bi bi-shop me-1"></i>
+									Por política de la sucursal, los pedidos son solo para recolección en tienda.
+								</div>
 								<div class="d-flex gap-2 flex-wrap mt-1">
 									<label
 										class="entrega-opt"
@@ -323,12 +330,13 @@
 											type="radio"
 											name="tipo_entrega"
 											value="delivery"
+											disabled
 											onchange="actualizarEntrega()"
 											style="accent-color: var(--sb-primary)" />
 										<div>
 											<i class="bi bi-truck me-1"></i>
 											<strong>Envío a domicilio</strong>
-											<div style="font-size: 0.7rem; color: #888">+$50.00 de envío</div>
+											<div style="font-size: 0.7rem; color: #888">No disponible</div>
 										</div>
 									</label>
 								</div>
@@ -365,6 +373,7 @@
 											name="metodo_pago"
 											value="tarjeta"
 											checked
+											disabled
 											onchange="actualizarPago()"
 											style="accent-color: var(--sb-primary)" />
 										<div>
@@ -509,7 +518,7 @@
 	</div>
 	{% endif %}
 </section>
-{% endblock %} {% block extra_js %}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
 	const SUBTOTAL = {{ "%.2f"|format(total) if total else 0 }};
 	const COSTO_ENV = 50.00;

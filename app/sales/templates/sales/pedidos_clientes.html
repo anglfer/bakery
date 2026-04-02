@@ -2,10 +2,14 @@
 {% block title %}Pedidos de Clientes{% endblock %}
 {% block content %}
 <section class="section">
-	<h2 class="mb-3">Gestion de pedidos de clientes</h2>
-	<div class="card p-3">
-		<div class="table-responsive">
-			<table>
+	<div class="ops-hero">
+		<p class="ops-meta mb-1">Panel de ventas</p>
+		<h2 class="ops-hero-title">Gestión de pedidos de clientes</h2>
+		<p class="ops-hero-text">Confirma estados y completa entregas con trazabilidad de pago.</p>
+	</div>
+	<div class="ops-card">
+		<div class="ops-table table-responsive">
+			<table class="table table-hover align-middle mb-0">
 		<thead>
 			<tr>
 				<th>ID Pedido</th>
@@ -26,36 +30,29 @@
 				<td>{{ p.fecha_pedido.strftime('%Y-%m-%d') }}</td>
 				<td>{{ p.fecha_entrega.strftime('%Y-%m-%d') }}</td>
 				<td>${{ '%.2f'|format(p.total) }}</td>
-				<td><span class="badge text-bg-secondary">{{ p.estado_pedido }}</span></td>
-				<td><span class="badge text-bg-light">{{ p.estado_pago }}</span></td>
+				<td><span class="ops-chip neutral">{{ p.estado_pedido }}</span></td>
 				<td>
-					<div class="d-flex flex-column gap-2" style="min-width: 220px;">
-						<form method="post" class="d-flex flex-column gap-2">
-							<input type="hidden" name="action" value="actualizar" />
-							<input type="hidden" name="id_pedido" value="{{ p.id_pedido }}" />
-							<select name="estado">
-								<option value="PENDIENTE" {{ 'selected' if p.estado_pedido == 'PENDIENTE' else '' }}>PENDIENTE</option>
-								<option value="CONFIRMADO" {{ 'selected' if p.estado_pedido == 'CONFIRMADO' else '' }}>CONFIRMADO</option>
-								<option value="PAGADO" {{ 'selected' if p.estado_pedido == 'PAGADO' else '' }}>PAGADO</option>
-								<option value="CANCELADO" {{ 'selected' if p.estado_pedido == 'CANCELADO' else '' }}>CANCELADO</option>
-							</select>
-							<input
-								type="text"
-								name="referencia_pago"
-								placeholder="Referencia pago (opcional)"
-								value="{{ p.referencia_pago or '' }}" />
-							<button type="submit" class="btn btn-sm">Guardar</button>
-						</form>
-
-						<form method="post" class="d-flex flex-column gap-2">
-							<input type="hidden" name="action" value="entregar" />
-							<input type="hidden" name="id_pedido" value="{{ p.id_pedido }}" />
-							<label class="small text-secondary d-flex align-items-center gap-2">
-								<input type="checkbox" name="requiere_ticket" />
-								Generar ticket (si el cliente lo solicita)
-							</label>
-							<button type="submit" class="btn btn-sm">Marcar como ENTREGADO</button>
-						</form>
+					<span class="ops-chip {{ 'success' if p.estado_pago == 'PAGADO' else 'warning' }}">
+						{{ p.estado_pago }}
+					</span>
+				</td>
+				<td>
+					<div class="d-flex flex-wrap gap-2" style="min-width: 220px;">
+						<button
+							type="button"
+							class="btn btn-sm btn-outline-primary js-actualizar-pedido"
+							data-id="{{ p.id_pedido }}"
+							data-estado="{{ p.estado_pedido }}"
+							data-referencia="{{ p.referencia_pago or '' }}">
+							Actualizar
+						</button>
+						<button
+							type="button"
+							class="btn btn-sm js-entregar-pedido"
+							data-id="{{ p.id_pedido }}"
+							{{ 'disabled' if p.estado_pedido == 'ENTREGADO' else '' }}>
+							Entregar
+						</button>
 					</div>
 				</td>
 			</tr>
@@ -68,5 +65,84 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalActualizarPedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title">Actualizar pedido</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" id="formActualizarPedido">
+					<input type="hidden" name="action" value="actualizar" />
+					<input type="hidden" name="id_pedido" id="actualizarPedidoId" />
+					<div class="modal-body">
+						<div class="ops-grid">
+							<select name="estado" id="actualizarPedidoEstado" required>
+								<option value="PENDIENTE">PENDIENTE</option>
+								<option value="CONFIRMADO">CONFIRMADO</option>
+								<option value="PAGADO">PAGADO</option>
+								<option value="CANCELADO">CANCELADO</option>
+							</select>
+							<input
+								type="text"
+								name="referencia_pago"
+								id="actualizarPedidoReferencia"
+								placeholder="Referencia pago (opcional)" />
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm">Guardar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalEntregarPedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header">
+					<h5 class="modal-title">Entregar pedido</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form method="post" id="formEntregarPedido">
+					<input type="hidden" name="action" value="entregar" />
+					<input type="hidden" name="id_pedido" id="entregarPedidoId" />
+					<div class="modal-body">
+						<label class="small text-secondary d-flex align-items-center gap-2">
+							<input type="checkbox" name="requiere_ticket" />
+							Generar ticket (si el cliente lo solicita)
+						</label>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm">Marcar como ENTREGADO</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	document.querySelectorAll('.js-actualizar-pedido').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			document.getElementById('actualizarPedidoId').value = buttonElement.dataset.id || '';
+			document.getElementById('actualizarPedidoEstado').value = buttonElement.dataset.estado || 'PENDIENTE';
+			document.getElementById('actualizarPedidoReferencia').value = buttonElement.dataset.referencia || '';
+			new bootstrap.Modal(document.getElementById('modalActualizarPedido')).show();
+		});
+	});
+
+	document.querySelectorAll('.js-entregar-pedido').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			document.getElementById('entregarPedidoId').value = buttonElement.dataset.id || '';
+			new bootstrap.Modal(document.getElementById('modalEntregarPedido')).show();
+		});
+	});
+</script>
 {% endblock %}

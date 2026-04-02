@@ -1,0 +1,2094 @@
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 1 de 63  
+ 
+UNIVERSIDAD TECNOLÓGICA DE LEÓN  
+Ingeniería en Desarrollo y Gestión de Software  
+ 
+SoftBakery  
+Documentación del Sistema de Gestión para Pastelería  
+ 
+MATERIA: Desarrollo Web Profesional  
+GRUPO: IDGS804  
+ 
+Integrantes del Equipo  
+Maythe Francella Balleza Solís  
+Ángel Fernando Oñate Reyes  
+Paola Estefania Rocha Munoz  
+Itzel Yutzil Sánchez López  
+Diego Ignacion Martínez Quintana  
+ 
+2025  
+LEÓN, GTO.  
+  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 2 de 63 Introducción  
+El presente documento corresponde a la documentación técnica y funcional del sistema SoftBakery, 
+una plataforma web de gestión integral diseñada para automatizar y optimizar las operaciones de 
+una pastelería. El sistema abarca módulos de inventario, produc ción, ventas, compras, pedidos en 
+línea y administración de usuarios.  
+Este documento está organizado en tres grandes secciones: Descripciones de Módulos, que detalla 
+los requisitos funcionales de cada componente del sistema; Diseños de Módulos, que muestra las 
+interfaces gráficas de usuario diseñadas; e Historias de Usuario,  que describen las funcionalidades 
+desde la perspectiva de cada tipo de usuario. Adicionalmente se incluye el Calendario de Actividades 
+del proyecto.  
+  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 3 de 63 1. Descripciones de Módulos  
+RF01 — Login / Autenticación  
+Campo  Descripción  
+ID RF01  
+Nombre  Login / Autenticación  
+Propósito  Garantizar que únicamente los usuarios autorizados (empleados y clientes) puedan acceder al 
+sistema SoftBakery mediante un mecanismo de autenticación seguro, controlado y trazable, 
+protegiendo la información de ventas, inventario y producción.  
+Público Objetivo  Empleados del negocio (Administrador, Ventas, Producción) y Clientes.  
+Descripción 
+General  El módulo de autenticación permite validar la identidad de los usuarios mediante nombre de 
+usuario y contraseña. Como medida  de seguridad, se implementa autenticación en dos factores 
+(2FA) mediante un código temporal enviado al correo electrónico del usuario. El sistema asigna 
+accesos y permisos según el rol del usuario.  
+Características del 
+Requerimiento  1.- Inicio de sesión:  Formulario con campos de usuario y contraseña, con validación de datos 
+obligatorios.  
+2.- Validación de credenciales:  Comparación segura mediante contraseñas cifradas (hash 
+con bcrypt) sin almacenamiento en texto plano.  
+3.- Autenticación en dos factores (2FA):  Generación de código OTP de 6 dígitos enviado al 
+correo del usuario con vigencia de 5 minutos.  
+4.- Control de intentos fallidos:  Bloqueo temporal tras 3 intentos fallidos e implementación 
+de CAPTCHA para prevenir accesos automatizados.  
+5.- Gestión de sesión:  Creación de sesión segura mediante cookies con expiración por 
+inactividad o cierre de sesión.  
+6.- Registro de actividad:  Almacenamiento de fecha y hora del último inicio de sesión, intentos 
+fallidos y eventos de autenticación.  
+7.- Asignación de roles:  Redirección automática según  rol (Administrador, Ventas, 
+Producción). Mensajes al usuario:  Mensajes de error genéricos sin exponer información 
+sensible.  
+8.- Seguridad:  Implementación de protección CSRF, validación de entradas y prevención de 
+ataques de fuerza bruta mediante limitación de peticiones.  
+Flujo del Proceso  1.- El usuario ingresa usuario y contraseña.  
+2.- El sistema valida las credenciales.  
+3.- Si son correctas, se genera un código de verificación (2FA).  
+4.- El código se envía al correo electrónico registrado.  
+5.- El usuario ingresa el código recibido.  
+6.- Si el código es válido y no ha expirado, se crea la sesión.  
+7.- El sistema redirige al usuario al módulo correspondiente según su rol.  
+Entradas  Ingresar nombre de usuario, contraseña, código de verificación (2FA).  
+Salidas  Acceso autorizado al sistema, creación de sesión activa, mensajes de error controlados en caso 
+de fallo.  
+Interacción con 
+otros módulos  Módulo de Usuarios (validación de credenciales y roles), Módulo de Seguridad (registro de logs, 
+control de accesos), Módulo de Ventas, Producción e Inventario (acceso según permisos del 
+usuario).  
+Reglas de Negocio  1.- Todo usuario debe autenticarse para acceder al sistema.  
+2.- El acceso se controla mediante roles (RBAC).  
+3.- Se permite un máximo de 3 intentos fallidos antes de bloquear temporalmente la cuenta.  
+4.- El código de verificación (2FA) tiene una vigencia de 5 minutos .  
+5.- Se registra el historial de accesos del usuario.  
+6.- Los usuarios inactivos o bloqueados no podrán iniciar sesión.  
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 4 de 63   
+ 
+ 
+HU-RF01 Login / Autenticación  
+HU-RF01 -01 Módulo: Gestión de Acceso (Login)  
+Historia de Usuario  Como empleado del sistema, quiero iniciar sesión con mi nombre de usuario y 
+contraseña, para acceder únicamente a las funciones que corresponden a mi rol.  
+Rol de Usuario  Empleado (Admin / Ventas / Producción)  
+Acción Deseada  Iniciar sesión con credenciales válidas (usuario y contraseña)  
+Beneficio / Resultado  Acceder de forma segura y controlada a las funciones del sistema según mi rol  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 5 de 63 Criterios de 
+Aceptación  1. El formulario incluye los campos 'Usuario' y 'Contraseña'.  
+2. Con credenciales correctas el sistema crea una sesión y redirige al Dashboard.  
+3. Con credenciales incorrectas se muestra un mensaje de error sin indicar cuál 
+campo falló.  
+4. Tras 3 intentos fallidos la cuenta se bloquea y aparece un CAPTCHA.  
+5. La contraseña debe tener mínimo 8 caracteres con mayúscula, minúscula, número 
+y carácter especial.  
+HU-RF01 -02 Módulo: Gestión de Acceso (Login)  
+Historia de Usuario  Como empleado, quiero completar un segundo factor de autenticación (2FA) con un 
+código temporal, para garantizar que mi acceso sea seguro incluso si alguien conoce 
+mi contraseña.  
+Rol de Usuario  Empleado (Admin / Ventas / Producción)  
+Acción Deseada  Ingresar un código temporal de un solo uso generado por el sistema  
+Beneficio / Resultado  Completar el acceso con un segundo nivel de seguridad que protege la cuenta  
+Criterios de 
+Aceptación  1. Después de validar usuario y contraseña, el sistema solicita un código temporal.  
+2. El código tiene vigencia de 60 segundos; al expirar se puede solicitar uno nuevo.  
+3. Con el código correcto el sistema completa la sesión.  
+4. Con código incorrecto o expirado el sistema muestra aviso y niega el acceso.  
+Caso de uso  
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 6 de 63 RF02 — Dashboard  
+Campo  Descripción  
+ID RF02  
+Nombre  Dashboard  
+Propósito  Proveer una vista general del sistema con los indicadores más importantes del día, permitiendo 
+a los usuarios tomar decisiones rápidas e informadas sobre ventas, inventario y producción en 
+la pastelería SoftBakery.  
+Público Objetivo  Administrador, Área de Ventas, Área de Producción  
+Descripción 
+General  El módulo Dashboard muestra información resumida y visual del comportamiento del negocio 
+en tiempo real o del día actual, incluyendo métricas clave de ventas, productos más vendidos 
+y actividad comercial. Facilita la toma de decisiones operativas mediante gráficos y tablas 
+dinámicas.  
+Características del 
+Requerimiento  1.- Visualización de KPIs:  Total de ventas del día, número de ventas registradas y producto 
+más vendido.  
+2.- Gráfica de ventas por hora:  Permite identificar horas pico de venta.  
+3.- Gráfica de productos más vendidos:  Representación en gráfico de barras.  
+4.- Gráfica de presentaciones más vendidas : Identificación de presentaciones con mayor 
+demanda.  
+5.- Tabla de ventas recientes:  Incluye hora, producto, presentación, cantidad y total.  
+6.- Actualización dinámica:  Información actualizada en cada carga del dashboard.  
+7.- Consulta de información por día específico.  
+8.- Acceso por rol:  Visualización de información según permisos del usuario.  
+9.- Mensajes claros:  En caso de no haber datos, mostrar mensajes informativos.  
+Flujo del Proceso  1.- El usuario inicia sesión.  
+2.- Accede al dashboard según su rol.  
+3.- El sistema consulta los datos del día en la base de datos.  
+4.- Se calculan los indicadores (ventas, productos, etc.).  
+5.- Se renderizan las gráficas y tablas.  
+6.- 6. El usuario visualiza la información para la toma de decisiones.  
+Entradas  Datos de ventas registradas (fecha, hora, producto, cantidad, precio), información de productos 
+y presentaciones.  
+Salidas  KPIs de ventas, gráficas estadísticas, tabla de ventas recientes, visualización de tendencias de 
+consumo.  
+Interacción con 
+otros módulos  Módulo de Ventas (fuente principal de datos), Módulo de Productos (información de productos 
+y presentaciones), Módulo de Producción (apoyo para decisiones de producción), Módulo de 
+Seguridad (control de acceso).  
+Reglas de Negocio  1.- El dashboard solo mostrará información del día actual por defecto.  
+2.- Los datos deben reflejar únicamente ventas confirmadas.  
+3.- El producto más vendido se calcula en función de la cantidad total vendida.  
+4.- La información se actualizará cada vez que se acceda al módulo.  
+5.- El acceso a la información dependerá del rol del usuario.  
+6.- En caso de no existir ventas, se mostrará información en cero o mensajes indicativos.  
+ 
+ 
+ 
+ 
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 7 de 63 Dashboard  
+HU-RF 02 – Dashboard  
+ 
+HU-RF 02 -02 Módulo: Dashboard  
+Historia de Usuario  Como empleado de ventas, quiero visualizar los productos con stock bajo 
+directamente desde el dashboard para anticiparme a los agotamientos y solicitar 
+producción a tiempo.  
+Rol de Usuario  Empleado de ventas  HU-RF 02 -01 Módulo: Dashboard  
+Historia de Usuario  Como administrador, quiero ver un panel principal con indicadores clave (ventas del 
+día, productos más vendidos) para que tomar decisiones rápidas sobre el negocio sin 
+necesidad de consultar múltiples módulos.  
+Rol de Usuario  Administrador  
+Acción Deseada  ver un panel principal con indicadores clave (ventas del día, productos más vendidos)  
+Beneficio / Resultado  tomar decisiones rápidas sobre el negocio sin necesidad de consultar múltiples 
+módulos  
+Criterios de 
+Aceptación  Solo roles autorizados acceden. Muestra ventas del día, productos y presentaciones 
+más vendidas.  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 8 de 63 Acción Deseada  visualizar los productos con stock bajo directamente desde el dashboard  
+Beneficio / Resultado  anticiparme a los agotamientos y solicitar producción a tiempo  
+Criterios de 
+Aceptación  Alerta visual cuando existencia_actual < stock_minimo.  
+ 
+HU-RF 02 -02 Módulo: Dashboard  
+Historia de Usuario  Como empleado de producció n, quiero visualizar en el dashboard qué productos y 
+presentaciones tienen mayor demanda para ajustar la producción de acuerdo con la 
+demanda observada.  
+Rol de Usuario  Empleado de producción  
+Acción Deseada  Visualizar en el dashboard los productos y presentaciones con mayor demanda.  
+Beneficio / Resultado  Planificar y ajustar la producción de manera eficiente para satisfacer la demanda y 
+evitar faltantes o sobreproducción.  
+Criterios de 
+Aceptación  El sistema debe mostrar en el dashboard un listado o gráfico de los productos y 
+presentaciones más solicitados, basado en la cantidad de pedidos registrados en el 
+sistema.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 9 de 63 RF03 — Gestión de Usuarios (Empleados)  
+Campo  Descripción  
+ID RF03  
+Nombre  Gestión de Usuarios (Empleados)  
+Propósito  Gestionar el ciclo de vida de los usuarios internos del sistema (empleados), permitiendo su 
+registro, consulta, actualización, desactivación y búsqueda, garantizando un control adecuado de 
+acceso y trazabilidad en el sistema SoftBakery.  
+Público Objetivo  Área de Administradores (único rol autorizado para gestionar usuarios).  
+Descripción 
+General  El módulo permite al administrador gestionar los usuarios internos del sistema mediante 
+operaciones CRUD (Crear, Leer, Actualizar y Desactivar). Los usuarios representan a los 
+empleados que interactúan con los módulos de ventas, producción e inventario, y su acceso está 
+controlado mediante roles.  
+Características del 
+Requerimiento  1.- Vista general: Visualización de lista de usuarios con información relevante.  
+2.- Registro de usuarios: Alta de nuevos empleados con validación de campos obligatorios ( 
+id_usuario, nombre_usuario, correo, password_hash, nombre, apellidos, teléfono, ciudad, 
+estado, id_rol, activo y fechas de registro).  
+3.- Contraseña segura: Validación de política de contraseñas (mínimo 8 caracteres, mayúscula, 
+minúscula, número y carácter especial) y almacenamiento mediante hash seguro.  
+4.- Edición de usuarios: Modificación de datos del usuario excepto el identificador (id_usuario). 
+Desactivación lógica: Cambio de estado de activo a inactivo sin eliminación física del registro. 
+Búsqueda de usuarios: Filtro por nombre o nombre de usuario.  
+5.- Gestión de roles: Asignación de roles (Administrador, Ventas, Producción).  
+6.- Validación de datos: Control de campos obligatorios y formatos correctos (correo, teléfono). 
+Mensajes al usuario: Confirmaciones y errores claros.  
+Flujo del Proceso  1.- El administrador accede al módulo de usuarios.  
+2.- Visualiza la lista de empleados registrados.  
+3.- Puede registrar un nuevo usuario ingresando los datos requeridos.  
+4.- El sistema valida la información y guarda el usuario.  
+5.- Puede editar información de usuarios existentes.  
+6.- Puede desactivar usuarios (sin eliminarlos).  
+7.- Puede buscar usuarios por nombre o usuario.  
+Entradas  Nombre de usuario, contraseña, correo,  nombre, apellidos, teléfono, ciudad, estado, rol, estado 
+(activo/inactivo).  
+Salidas  Lista de usuarios, confirmaciones de registro/edición/desactivación, mensajes de error 
+controlados.  
+Interacción con 
+otros módulos  Módulo de Login (autenticación), Módulo de Seguridad (control de acceso, logs), todos los 
+módulos operativos (Ventas, Producción, Inventario) para validación de permisos según rol.  
+Reglas de Negocio  1.- Solo el rol Administrador puede gestionar usuarios.  
+2.- El nombre de usuario debe ser único en el sistema.  
+3.- No se permite eliminar usuarios, solo desactivarlos.  
+4.- Un usuario inactivo no puede acceder al sistema.  
+5.- Todos los usuarios deben tener un rol asignado.  
+6.- La contraseña debe cumplir con la política de seguridad establecida.  
+7.- Se debe registrar la fecha de creación del usuario.  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 10 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 11 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 03 – Gestión de Usuarios ( Empleados ) 
+HU-RF 03 -01 Módulo: Gestión de Empleados  
+Historia de Usuario  Como administrador, quiero registrar nuevos empleados con su rol asignado para que 
+controlar quién tiene acceso al sistema y bajo qué permisos.  
+Rol de Usuario  Administrador  
+Acción Deseada  registrar nuevos empleados con su rol asignado  
+Beneficio / Resultado  controlar quién tiene acceso al sistema y bajo qué permisos  
+Criterios de 
+Aceptación  Campos obligatorios completos, contraseña con política de seguridad, rol válido 
+asignado.  
+HU-RF 03 -02 Módulo: Gestión de Empleados  
+Historia de Usuario  Como administrador, quiero modificar  los datos de  un empleado para mantener su 
+información actualizada dentro del sistema.  
+Rol de Usuario  Administrador  
+Acción Deseada  Editar la información de un empleado, como nombre, rol, contacto o estado dentro de 
+la empresa.  
+Beneficio / Resultado  Mantener la información del personal actualizada y garantizar una correcta gestión de 
+los empleados en el sistema.  
+Criterios de 
+Aceptación  El sistema debe permitir modificar los datos del empleado y guardar los cambios 
+correctamente  
+HU-RF 03 -02 Módulo: Gestión de Empleados  
+Historia de Usuario  Como administrador, quiero desactivar a un empleado que ya no trabaja en la 
+empresa para que revocar su acceso sin perder el historial de sus actividades en el 
+sistema.  
+Rol de Usuario  Administrador  
+Acción Deseada  desactivar a un empleado que ya no trabaja en la empresa  
+Beneficio / Resultado  revocar su acceso sin perder el historial de sus actividades en el sistema  
+Criterios de 
+Aceptación  Cambio de estado activo - inactivo. No se elimina físicamente el registro.  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 12 de 63 HU-RF 03 -03 Módulo: Gestión de Empleados  
+Historia de Usuario  Como administrador, quiero buscar empleados por nombre o nombre de usuario para 
+que localizar rápidamente a un empleado específico para modificar su información.  
+Rol de Usuario  Administrador  
+Acción Deseada  buscar empleados por nombre o nombre de usuario  
+Beneficio / Resultado  localizar rápidamente a un empleado específico para modificar su información  
+Criterios de 
+Aceptación  Búsqueda por nombre o nombre_usuario devuelve resultados en tiempo real.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 13 de 63 RF04 — Gestión de Roles  
+Campo  Descripción  
+ID RF04  
+Nombre  Gestión de Roles  
+Propósito  Definir, gestionar y controlar los permisos y accesos de los diferentes tipos de usuarios del 
+sistema SoftBakery, aplicando el principio de mínimo privilegio para garantizar la seguridad y 
+correcta operación del sistema.  
+Público Objetivo  Área de Administradores  
+Descripción 
+General  El módulo permite al administrador gestionar los roles del sistema mediante operaciones 
+CRUD, definiendo los permisos específicos sobre los distintos módulos (usuarios, ventas, 
+inventario, producción, etc.). Cada rol determina las acciones que un usuario p uede realizar 
+dentro del sistema.  
+Características del 
+Requerimiento  1.- CRUD de roles: Creación, consulta, actualización y desactivación lógica de roles.  
+2.- Campos del rol: id_rol, nombre_rol, descripción, estado_rol, fecha_creación, 
+fecha_actualización. Definición de permisos: Asignación de permisos por módulo y acción 
+(leer, crear, editar, desactivar).  
+3.- Roles base: Administrador (acceso total), Ventas (registro de ventas y consulta), 
+Producción (gestión de producción e inventario de materia prima).  
+4.- Restricción de roles base: Los roles Administrador, Ventas y Producción no pueden ser 
+desactivados.  
+5.- Creación de roles: Permite registrar nuevos roles con nombre y descripción únicos.  
+6.- Edición de roles: Permite modificar descripción y permisos, pero no el id_rol.  
+7.- Desactivación lógica: Cambio de estado a inactivo sin eliminación física.  
+8.- Validación de datos: Verificación de campos obligatorios y unicidad del nombre del rol.  
+9.- Mensajes al usuario: Confirmaciones y errores claros en español.  
+Flujo del Proceso  1.- El administrador accede al módulo de roles.  
+2.- Visualiza la lista de roles existentes.  
+3.- Puede crear un nuevo rol ingresando nombre y descripción.  
+4.- Define los permisos por módulo y acción.  
+5.- Puede editar roles existentes (excepto el id).  
+6.- Puede desactivar roles (excepto roles base).  
+7.- Los cambios se reflejan automáticamente en los accesos de los usuarios.  
+Entradas  Nombre del rol, descripción, permisos por módulo (leer, crear, editar, desactivar), estado del rol.  
+Salidas  Lista de roles, confirmaciones de registro/edición/desactivación, mensajes de error controlados.  
+Interacción con 
+otros módulos  Módulo de Usuarios (asignación de roles), Módulo de Login (validación de permisos), Módulo 
+de Seguridad (control de acceso RBAC), todos los módulos del sistema (restricción de acciones 
+según rol).  
+Reglas de Negocio  1.- Solo el administrador puede gestionar roles.  
+2.- El nombre del rol debe ser único.  
+3.- No se pueden eliminar roles, solo desactivarlos.  
+4.- Los roles base (Administrador, Ventas, Producción) no pueden ser desactivados.  
+5.- Todo usuario debe tener un rol asignado.  
+6.- Los permisos se asignan por módulo y tipo de acción.  
+7.- Los cambios en roles afectan inmediatamente los accesos de los usuarios asociados.  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 14 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 15 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 04 – Gestión de Roles y Permisos  
+HU-RF 04 -01 Módulo: Gestión de Roles y Permisos  
+Historia de Usuario  Como administrador, quiero asignar permisos específicos por módulo a cada rol del 
+sistema para que garantizar que cada empleado solo acceda a las funciones que le 
+corresponden (mínimo privilegio).  
+Rol de Usuario  Administrador  
+Acción Deseada  asignar permisos específicos por módulo a cada rol del sistema  
+Beneficio / Resultado  garantizar que cada empleado solo acceda a las funciones que le corresponden 
+(mínimo privilegio)  
+Criterios de 
+Aceptación  Permisos por módulo: leer, crear, editar, desactivar. Roles base no pueden 
+renombrarse ni eliminarse.  
+HU-RF04 -02 Módulo: Gestión de Roles y Permisos  
+Historia de Usuario  Como administrador, quiero editar la descripción y los permisos de un rol existente, 
+para adaptar los accesos a cambios en la operación del negocio.  
+Rol de Usuario  Administrador  
+Acción Deseada  Modificar la descripción y permisos de un rol existente  
+Beneficio / Resultado  Adaptar los niveles de acceso a los cambios en la operación del negocio  
+Criterios de 
+Aceptación  1. Se pueden modificar la descripción y los permisos del rol; no se puede modificar el 
+ID. 
+2. El cambio queda registrado en el módulo de auditoría.  
+HU-RF04 -03 Módulo: Gestión de Roles y Permisos  
+Historia de Usuario  Como administrador, quiero desactivar un rol que ya no se utiliza, para mantener 
+limpio y organizado el catálogo de roles del sistema.  
+Rol de Usuario  Administrador  
+Acción Deseada  Cambiar el estado de un rol a inactivo  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 16 de 63 Beneficio / Resultado  Mantener limpio y organizado el catálogo de roles del sistema  
+Criterios de 
+Aceptación  1. Al desactivar, el estado del rol cambia a inactivo.  
+2. El rol inactivo no puede asignarse a nuevos empleados.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 17 de 63 RF05 — Gestión de Proveedores  
+Campo  Descripción  
+ID RF05  
+Nombre  Gestión de Proveedores  
+Propósito  Administrar la información de los proveedores de materia prima, permitiendo su registro, 
+consulta, actualización y desactivación, garantizando la correcta gestión de abastecimiento en 
+el sistema SoftBakery.  
+Público Objetivo  Área de Administración  
+Descripción 
+General  El módulo permite gestionar los proveedores mediante operaciones CRUD, almacenando 
+información de contacto y ubicación. Los proveedores son utilizados en el proceso de compras 
+de materia prima, impactando directamente en el inventario del sistema.  
+Características del 
+Requerimiento  1.- CRUD de proveedores: Registro, consulta, actualización y desactivación lógica de 
+proveedores.Campos del proveedor: id_proveedor (automático), nombre_proveedor, 
+nombre_contacto, teléfono, correo, ciudad, estado, estado_proveedor (activo/inactivo), 
+fecha_reg istro.  
+2.- Validación de datos: Campos obligatorios y validación de formato para correo electrónico y 
+teléfono.  
+3.- Registro de proveedor: Alta de proveedores con validación de información completa.  
+4.- Edición de proveedor: Modificación de todos los campos excepto el identificador 
+(id_proveedor). Desactivación lógica: Cambio de estado a inactivo sin eliminación física del 
+registro.  
+5.- Búsqueda de proveedores: Consulta por nombre del proveedor.  
+6.- Mensajes al usuario: Confirmaciones y errores claros .  
+Flujo del Proceso  1.- El administrador accede al módulo de proveedores.  
+2.- Visualiza la lista de proveedores registrados.  
+3.- Puede registrar un nuevo proveedor ingresando los datos requeridos.  
+4.- El sistema valida la información y guarda el proveedor.  
+5.- Puede editar la información de proveedores existentes.  
+6.- Puede desactivar proveedores.  
+7.- 7. Puede buscar proveedores por nombre.  
+Entradas  Nombre del proveedor, nombre de contacto, teléfono, correo electrónico, ciudad, estado, estado 
+del proveedor.  
+Salidas  Lista de proveedores, confirmaciones de registro/edición/desactivación, mensajes de error 
+controlados.  
+Interacción con 
+otros módulos  Módulo de Compras (selección de proveedor), Módulo de Inventario (abastecimiento de materia 
+prima), Módulo de Seguridad (control de acceso) .  
+Reglas de Negocio  1.- Solo el área de administración puede gestionar proveedores.  
+2.- No se permite eliminar proveedores, solo desactivarlos.  
+3.- Un proveedor inactivo no podrá ser seleccionado en compras.  
+4.- Los campos marcados como obligatorios deben completarse para registrar un proveedor.  
+5.- El correo electrónico debe tener un formato válido.  
+6.- Se debe registrar la fecha de alta del proveedor.  
+ 
+ 
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 18 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 19 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 05 – Gestión de Proveedores  
+ 
+HU-RF05 -01 Módulo: Gestión de Proveedores  
+Historia de Usuario  Como administrador, quiero registrar proveedores de materia prima con sus datos de 
+contacto, para gestionar las compras y saber de quién se adquieren los insumos.  
+Rol de Usuario  Administrador  
+Acción Deseada  Registrar un nuevo proveedor con sus datos de contacto completos  
+Beneficio / Resultado  Gestionar las compras de insumos y mantener trazabilidad de los proveedores  
+Criterios de 
+Aceptación  1. Campos obligatorios: nombre del proveedor, contacto, teléfono, correo, ciudad y 
+estado.  
+2. El sistema valida el formato del correo y del teléfono antes de guardar.  
+3. El ID del proveedor se genera automáticamente y el estado inicial es 'activo'.  
+HU-RF05 -02 Módulo: Gestión de Proveedores  
+Historia de Usuario  Como administrador, quiero editar los datos de un proveedor o desactivarlo cuando 
+ya no se trabaje con él, para mantener el catálogo de proveedores actualizado.  
+Rol de Usuario  Administrador  
+Acción Deseada  Editar los datos de un proveedor o desactivarlo del sistema  
+Beneficio / Resultado  Mantener el catálogo de proveedores actualizado y sin registros obsoletos activos  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 20 de 63 Criterios de 
+Aceptación  1. Se pueden editar todos los campos excepto el ID del proveedor.  
+2. Al desactivar, el estado cambia a 'inactivo' sin eliminar el registro.  
+3. Se puede buscar un proveedor por nombre para localizarlo rápidamente.  
+ 
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 21 de 63 RF06 — Módulo Inventario de Materia Prima  
+Campo  Descripción  
+ID RF06  
+Nombre  Inventario  de Materia Prima  
+Propósito  Controlar las existencias de materia prima del sistema SoftBakery, gestionando unidades de 
+medida, conversiones de compra, porcentaje de merma y alertas de stock mínimo, garantizando 
+un control preciso del inventario para producción.  
+Público Objetivo  Área de Producción y Área de Administración  
+Descripción 
+General  El módulo permite gestionar las materias primas y controlar su inventario mediante conversiones 
+de unidades, registro de movimientos (entradas y salidas), aplicación de merma y generación de 
+alertas cuando el stock es bajo. Este módulo es fundamental para garantizar la disponibilidad de 
+insumos en la producción.  
+Características 
+del Requerimiento  1.- Gestión de materias primas (CRUD): Registro, consulta, actualización y desactivación lógica 
+de materias primas. Campos: id_materia_prima (automático), nombre, id_unidad_base, 
+id_unidad_compra, factor_conversion, porcentaje_merma, activo, created_at. Unidad es: La 
+unidad_base define cómo se controla el inventario (gramos, ml, etc.), y la unidad_compra 
+cómo se adquiere (bulto, litro, etc.).  
+2.- Control de existencias: Registro en inventario_materia_prima con cantidad_actual, 
+stock_minimo y fecha de actualización.  
+3.- Alertas de stock: Generación de alerta visual cuando cantidad_actual es menor que 
+stock_minimo.  
+4.- Conversión automática: Al registrar compras se convierte automáticamente a unidad base 
+usando factor_conversion.  
+5.- Registro de movimientos: Cada cambio se almacena como ENTRADA (compra), SALIDA 
+(producción) o AJUSTE (corrección).  
+6.- Aplicación de merma: Ajuste automático de cantidades requeridas en producción 
+considerando porcentaje de merma.  
+7.- Validación de datos: Campos obligatorios y valores numéricos válidos (factor, cantidades, 
+merma).  
+8.- Mensajes al usuario: Confirmaciones y errores claros.  
+Flujo del Proceso  1.- El usuario registra una materia prima con sus unidades y factor de conversión.  
+2.- Se inicializa su inventario con cantidad_actual y stock_minimo.  
+3.- Al registrar una compra, el sistema convierte la cantidad a unidad base y la suma al 
+inventario (ENTRADA).  
+4.- Al iniciar producción, se descuentan insumos considerando la merma (SALIDA).  
+5.- Se registran todos los movimientos en el historial.  
+6.- El sistema verifica si el stock es menor al mínimo y genera alerta.  
+7.- El usuario puede realizar ajustes manuales si es necesario.  
+Entradas  Nombre de materia prima, unidad base, unidad de compra, factor de conversión, porcentaje de 
+merma, cantidad comprada, stock mínimo.  
+Salidas  Cantidad actual de inventario, alertas de stock bajo, historial de movimientos, confirmaciones de 
+operaciones.  
+Interacción con 
+otros módulos  Módulo de Compras (entrada de materia prima), Módulo de Producción (consumo de insumos), 
+Módulo de Productos/Recetas (definición de cantidades), Módulo de Seguridad (control de 
+acceso) .  
+Reglas de 
+Negocio  1.- Toda materia prima debe tener unidad base y unidad de compra definidas.  
+2.- El factor de conversión debe ser mayor a cero.  
+3.- La cantidad actual no puede ser negativa.  
+4.- Al registrar compras se debe convertir automáticamente a unidad base.  
+5.- Toda salida de inventario debe estar asociada a producción o ajuste.  
+6.- La merma se aplica automáticamente al calcular insumos requeridos.  
+7.- Se debe generar alerta cuando el stock sea menor al mínimo.  
+8.- No se eliminan materias primas, solo se desactivan.  
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 22 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 23 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 24 de 63 HU-RF 06 – Inventario de Materia Prima  
+HU-RF06 -01 Módulo: Inventario de Materia Prima  
+Historia de Usuario  Como usuario de producción o administración, quiero registrar materias primas con 
+su unidad base, unidad de compra, factor de conversión y porcentaje de merma, para 
+controlar correctamente el inventario de insumos.  
+Rol de Usuario  Administrador  
+Acción Deseada  Registrar una nueva materia prima con sus unidades y factores de conversión  
+Beneficio / Resultado  Controlar el inventario de insumos con unidades consistentes y merma considerada  
+Criterios de 
+Aceptación  1. Se registra: nombre, unidad base, unidad de compra, factor de conversión y 
+porcentaje de merma.  
+2. El ID y la fecha de registro se generan automáticamente.  
+3. Se puede editar o desactivar la materia prima cuando deja de utilizarse.  
+ 
+HU-RF06 -02 Módulo: Inventario de Materia Prima  
+Historia de Usuario  Como usuario, quiero ver el stock actual de cada materia prima y recibir alertas 
+cuando esté por debajo del mínimo, para reabastecer a tiempo y evitar paros de 
+producción.  
+Rol de Usuario  Producción  
+Acción Deseada  Consultar el stock actual y recibir alertas de nivel mínimo de materia prima  
+Beneficio / Resultado  Reabastecer a tiempo y evitar interrupciones en la producción por falta de insumos  
+Criterios de 
+Aceptación  1. Se muestra la cantidad actual de cada materia prima en su unidad base.  
+2. Cuando la cantidad < stock mínimo se muestra una alerta visual en el sistema.  
+3. Cada cambio en el inventario (entrada, salida, ajuste) queda registrado con 
+trazabilidad.  
+HU-RF06 -03 Módulo: Inventario de Materia Prima  
+Historia de Usuario  Como sistema, quiero convertir automáticamente las unidades de compra a la unidad 
+base al registrar una compra, para mantener el inventario en una unidad de medida 
+consistente.  
+Rol de Usuario  Sistema  
+Acción Deseada  Convertir automáticamente unidades de compra a unidades base al registrar una 
+entrada  
+Beneficio / Resultado  Mantener el inventario en una unidad de medida consistente sin intervención manual  
+Criterios de 
+Aceptación  1. Al registrar una compra se calcula: cantidad_base = cantidad_comprada × 
+factor_conversión.  
+2. El inventario se incrementa en unidades base; se registra el movimiento tipo 
+ENTRADA.  
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 25 de 63 Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 26 de 63 RF07 — Módulo de Compras de Materia Prima  
+ 
+Campo  Descripción  
+ID RF07  
+Nombre  Compras  de Materia Prima  
+Propósito  Registrar y controlar las compras de materia prima realizadas a los proveedores, asegurando la 
+actualización automática del inventario y la trazabilidad de las operaciones en el sistema 
+SoftBakery.  
+Público Objetivo  Área de Administración  
+Descripción 
+General  El módulo permite registrar compras de materia prima mediante una estructura de cabecera y 
+detalle, donde cada compra puede incluir múltiples insumos. Al confirmar una compra, el 
+sistema realiza la conversión automática de unidades y actualiza el inventari o, registrando los 
+movimientos correspondientes.  
+Características del 
+Requerimiento  1.- Registro de compras (cabecera): id_compra (automático), id_proveedor, fecha, total 
+(calculado), estado_pago (pendiente/pagado), id_usuario. Detalle de compra: 
+id_compra_detalle, id_compra, id_materia_prima, id_unidad_compra, cantidad_comprada, 
+cantidad_bas e (calculada), precio_unitario, subtotal (calculado).  
+2.- Cálculos automáticos: subtotal = cantidad_comprada × precio_unitario; total = suma de 
+subtotales.  
+3.- Conversión de unidades: cálculo automático de cantidad_base usando factor_conversion 
+definido en la materia prima.  
+4.- Actualización de inventario: incremento de cantidad_actual  y registro de movimiento tipo 
+ENTRADA.  
+5.- Historial de compras: consulta de compras con proveedor, fecha, total y detalle.  
+6.- Gestión de pagos: actualización del estado de pago (pendiente/pagado) y vinculación con 
+módulo de salida de efectivo .  
+7.- Validación de datos: campos obligatorios, valores numéricos válidos y existencia de 
+proveedor activo.  
+8.- Mensajes al usuario: confirmaciones y errores claros.  
+Flujo del Proceso  1.- El usuario accede al módulo de compras.  
+2.- Selecciona un proveedor activo.  
+3.- Registra las materias primas, cantidades y precios.  
+4.- El sistema calcula subtotales y total automáticamente.  
+5.- Al guardar la compra, se realiza la conversión a unidad base.  
+6.- Se actualiza el inventario (ENTRADA).  
+7.- Se registra el movimiento en el historial.  
+8.- 8. El usuario puede actualizar el estado de pago posteriormente.  
+Entradas  Proveedor, materia prima, unidad de compra, cantidad comprada, precio unitario, usuario que 
+registra.  
+Salidas  Registro de compra, total calculado, actualización de inventario, historial de compras, estado de 
+pago.  
+Interacción con 
+otros módulos  Módulo de Proveedores (selección del proveedor), Módulo de Inventario (actualización de 
+existencias), Módulo de Usuarios (registro de responsable), Módulo de ventas (pago a 
+proveedor) .  
+Reglas de Negocio  1.- Solo se pueden registrar compras con proveedores activos.  
+2.- Toda compra debe tener al menos un detalle de materia prima.  
+3.- La conversión a unidad base es obligatoria al registrar la compra.  
+4.- El inventario debe actualizarse automáticamente al guardar la compra.  
+5.- No se permite eliminar compras registradas (solo consulta).  
+6.- El total de la compra se calcula automáticamente.  
+7.- El estado de pago puede cambiar de pendiente a pagado.  
+8.- Cada movimiento de inventario debe quedar registrado como ENTRADA.  
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 27 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 28 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 07 – Módulo de Compras de Materia Prima  
+HU-RF07 -01 Módulo: Compras de Materia Prima  
+Historia de Usuario  Como administrador, quiero registrar compras de materia prima a proveedores con 
+su detalle de productos y precios, para mantener actualizado el inventario y el control 
+de pagos.  
+Rol de Usuario  Administrador  
+Acción Deseada  Registrar una compra de materia prima con cabecera y detalle de insumos adquiridos  
+Beneficio / Resultado  Mantener actualizado el inventario de insumos y el control de pagos a proveedores  
+Criterios de 
+Aceptación  1. La cabecera incluye: proveedor, fecha, estado de pago y usuario que registra.  
+2. El detalle permite múltiples materias primas con cantidad, unidad y precio unitario.  
+3. El subtotal y total se calculan automáticamente.  
+4. Al guardar, el sistema convierte unidades, actualiza el inventario y registra el 
+movimiento ENTRADA.  
+HU-RF07 -02 Módulo: Compras de Materia Prima  
+Historia de Usuario  Como administrador, quiero consultar el historial de compras realizadas, para revisar 
+adquisiciones anteriores y verificar el detalle de cada una.  
+Rol de Usuario  Administrador  
+Acción Deseada  Consultar el historial de compras con su detalle de materias primas adquiridas  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 29 de 63 Beneficio / Resultado  Revisar adquisiciones anteriores y verificar el estado de pago de cada compra  
+Criterios de 
+Aceptación  1. Se lista: proveedor, fecha, total y estado de pago de cada compra.  
+2. Al seleccionar una compra se muestra el detalle de materias primas adquiridas.  
+HU-RF07 -03 Módulo: Compras de Materia Prima  
+Historia de Usuario  Como administrador, quiero marcar una compra como pagada para reflejar que el 
+proveedor fue liquidado y que el gasto quede registrado en el control financiero.  
+Rol de Usuario  Administrador  
+Acción Deseada  Actualizar el estado de pago de una compra de 'pendiente' a 'pagado'  
+Beneficio / Resultado  Reflejar el pago al proveedor y registrar automáticamente la salida de efectivo  
+Criterios de 
+Aceptación  1. Se puede cambiar el estado de pago de 'pendiente' a 'pagado'.  
+2. Al marcarse como pagado, el sistema genera un registro en el módulo de salidas 
+de efectivo.  
+Caso de uso 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 30 de 63 RF08 — Explosión de Materiales (Recetas)  
+Campo  Descripción  
+ID RF08  
+Nombre  Explosión de Materiales (Recetas)  
+Propósito  Definir y gestionar las recetas de los productos, especificando las materias primas y cantidades 
+necesarias, permitiendo calcular automáticamente los insumos requeridos durante la producción 
+en el sistema SoftBakery.  
+Público Objetivo  Área de Producción y Área de Administración  
+Descripción 
+General  El módulo permite crear y administrar recetas mediante una estructura de cabecera y detalle. 
+Cada receta define los insumos necesarios para elaborar un producto, permitiendo calcular 
+automáticamente el consumo de materia prima durante la producción, consid erando además 
+validaciones de disponibilidad e integración con inventario.  
+Características del 
+Requerimiento  1.- CRUD de recetas (cabecera): id_receta (automático), id_producto, versión, 
+rendimiento_base, activa (true/false), created_at. Detalle de receta: id_receta_detalle, 
+id_receta, id_materia_prima, cantidad_requerida (en unidad base).  
+2.- Explosión de materiales: Cálculo automático de insumos necesarios según la cantidad a 
+producir.  
+3.- Validación de disponibilidad: Verificación de existencia suficiente de materia prima antes de 
+iniciar producción.  
+4.- Versionamiento de recetas: Permite crear nuevas versiones al modificar ingredientes o 
+cantidades, manteniendo historial.  
+5.- Edición de recetas: Modificación de ingredientes y cantidades según necesidades. 
+Activación/desactivación: Control de recetas vigentes sin eliminación física.  
+6.- Validación de datos: Campos obligatorios y cantidades válidas.  
+7.- Mensajes al usuario: Confirmaciones y errores claros.  
+Flujo del Proceso  1. El usuario registra una receta para un producto.  
+2. Define las materias primas y cantidades requeridas.  
+3. Establece el rendimiento base (cantidad producida por receta).  
+4. Al iniciar producción, el sistema calcula los insumos necesarios según la cantidad solicitada.  
+5. El sistema valida la disponibilidad en inventario.  
+6. Si hay suficiente materia prima, se permite continuar con la producción.  
+7. Si no, se muestra alerta de faltantes.  
+8. El usuario puede actualizar la receta o crear una nueva versión.  
+Entradas  Producto, materias primas, cantidades requeridas, rendimiento base, versión de receta.  
+Salidas  Lista de recetas, cálculo de insumos necesarios, validación de disponibilidad, historial de 
+versiones.  
+Interacción con 
+otros módulos  Módulo de Inventario (validación y consumo de insumos), Módulo de Producción (ejecución de 
+órdenes), Módulo de Productos (relación con productos finales), Módulo de Seguridad (control 
+de acceso).  
+Reglas de Negocio  Toda receta debe estar asociada a un producto.  
+Las cantidades de materia prima deben definirse en unidad base.  
+El sistema debe validar disponibilidad antes de producir.  
+Una receta puede tener múltiples versiones, pero solo una activa.  
+No se eliminan recetas, solo se desactivan.  
+El rendimiento base define la cantidad de producto generado.  
+Toda producción debe basarse en una receta activa.  
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 31 de 63  
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 32 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 33 de 63 HU-RF 08 – Explosión de Materiales (Recetas)  
+ 
+HU-RF08 -01 Módulo: Recetas (Explosión de Materiales)  
+Historia de Usuario  Como usuario de producción, quiero registrar las recetas de cada producto indicando 
+sus ingredientes y cantidades, para que el sistema calcule los insumos necesarios 
+durante la producción.  
+Rol de Usuario  Producción / Administrador  
+Acción Deseada  Registrar una receta con sus ingredientes, cantidades y rendimiento base  
+Beneficio / Resultado  Permitir al sistema calcular automáticamente los insumos necesarios al producir  
+Criterios de 
+Aceptación  1. La receta incluye: producto, versión, rendimiento base y estado (activo/inactivo).  
+2. El detalle registra cada materia prima con la cantidad requerida en unidad base.  
+3. El ID de receta y la fecha se generan automáticamente.  
+HU-RF08 -02 Módulo: Recetas (Explosión de Materiales)  
+Historia de Usuario  Como usuario, quiero editar una receta y que el sistema genere una nueva versión 
+automáticamente ante cambios importantes, para conservar el historial de versiones 
+anteriores.  
+Rol de Usuario  Producción / Administrador  
+Acción Deseada  Editar ingredientes o cantidades de una receta y generar una nueva versión  
+Beneficio / Resultado  Mantener el historial de versiones de las recetas para trazabilidad y control  
+Criterios de 
+Aceptación  1. Se pueden modificar ingredientes y cantidades de una receta existente.  
+2. Cambios significativos generan automáticamente una nueva versión de la receta.  
+3. Se puede consultar el historial de versiones y activar o desactivar una receta.  
+ 
+Caso de u so 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 34 de 63 RF09 — Módulo de Producción  
+Campo  Descripción  
+ID RF09  
+Nombre  Producción  
+Propósito  Planificar, ejecutar y controlar órdenes de producción, asegurando el consumo correcto de 
+materia prima (incluyendo merma) y la generación de productos terminados disponibles para la 
+venta en el sistema SoftBakery.  
+Público Objetivo  Área de Producción (gestión completa) y Área de Ventas (consulta en modo lectura).  
+Descripción 
+General  El módulo permite gestionar órdenes de producción basadas en recetas, controlando el ciclo 
+completo desde la planificación hasta la finalización. Durante la ejecución se descuenta 
+automáticamente la materia prima del inventario y, al finalizar, se incremen ta el inventario de 
+productos terminados.  
+Características del 
+Requerimiento  1.- Creación de órdenes: id_orden (automático), id_receta, id_producto, cantidad_producir, 
+fecha_inicio, fecha_fin, costo_produccion (calculado), observaciones, id_usuario. Estados 
+de la orden: PENDIENTE, EN_PROCESO, FINALIZADO, CANCELADO.  
+2.- Validación previa: La receta debe estar activa y debe existir suficiente materia prima en 
+inventario.  
+3.- Consumo de insumos: Al iniciar (EN_PROCESO), se descuenta materia prima aplicando 
+merma. Fórmula de consumo: cantidad_real = cantidad_receta × cantidad_producir × (1 + 
+porcentaje_merma / 100).  
+4.- Generación de producto terminado: Al finalizar, se incrementa el inventario de productos 
+disponibles para venta.  
+5.- Restricción de cancelación: Solo se puede cancelar en estado PENDIENTE.  
+6.- Consulta de órdenes: Visualización de producto, cantidad, estado, fechas y detalles.  
+7.- Detalle de producción: Visualización de materias primas utilizadas y cantidades 
+consumidas. Mensajes al usuario: Confirmaciones y errores claros.  
+Flujo del Proceso  1.- El usuario crea una orden de producción.  
+2.- El sistema valida receta activa y disponibilidad de insumos.  
+3.- La orden queda en estado PENDIENTE.  
+4.- Al iniciar, cambia a EN_PROCESO y se descuentan los insumos aplicando merma.  
+5.- Se registran movimientos de inventario tipo SALIDA.  
+6.- Al finalizar, cambia a FINALIZADO.  
+7.- Se incrementa el inventario de producto terminado.  
+8.- 8. La orden queda disponible para consulta.  
+Entradas  Receta, producto, cantidad a producir, usuario responsable, observaciones.  
+Salidas  Orden de producción registrada, consumo de materia prima, incremento de producto terminado, 
+historial de órdenes.  
+Interacción con 
+otros módulos  Módulo de Recetas (explosión de materiales), Módulo de Inventario (descuento de insumos), 
+Módulo de Productos (producto terminado), Módulo de Ventas (consulta de disponibilidad) .  
+Reglas de Negocio  1.- Solo se puede producir con recetas activas.  
+2.- Se debe validar disponibilidad de materia prima antes de iniciar producción.  
+3.- La materia prima se descuenta al iniciar la producción.  
+4.- La merma se aplica automáticamente en el cálculo de consumo.  
+5.- Solo se puede cancelar una orden en estado PENDIENTE.  
+6.- Al finalizar la producción, se incrementa el inventario de productos terminados.  
+7.- Toda producción debe quedar registrada para trazabilidad.  
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 35 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 36 de 63 HU-RF 09 – Módulo de Producción  
+ 
+HU-RF09 -01 Módulo: Módulo de Producción  
+Historia de Usuario  Como usuario de producción, quiero crear órdenes de producción indicando el 
+producto, la receta y la cantidad a elaborar, para planificar y ejecutar la fabricación de 
+pasteles.  
+Rol de Usuario  Producción  
+Acción Deseada  Crear una orden de producción indicando producto, receta y cantidad a producir  
+Beneficio / Resultado  Planificar la fabricación de pasteles con validación de insumos y receta activa  
+Criterios de 
+Aceptación  1. Se selecciona producto, receta activa y cantidad a producir.  
+2. El sistema verifica que exista receta activa y suficiente materia prima antes de 
+guardar.  
+3. El estado inicial de la orden es 'PENDIENTE'.  
+HU-RF09 -02 Módulo: Módulo de Producción  
+Historia de Usuario  Como usuario de producción, quiero cambiar el estado de una orden para iniciarla o 
+finalizarla, para que el sistema actualice automáticamente el inventario de materia 
+prima y de producto terminado.  
+Rol de Usuario  Producción  
+Acción Deseada  Cambiar el estado de la orden a EN_PROCESO o FINALIZADO  
+Beneficio / Resultado  Actualizar automáticamente el inventario al iniciar y finalizar la producción  
+Criterios de 
+Aceptación  1. Al pasar a EN_PROCESO el sistema descuenta la materia prima aplicando el 
+porcentaje de merma.  
+2. Al pasar a FINALIZADO el sistema incrementa el inventario de producto 
+terminado.  
+3. Una orden en EN_PROCESO no puede cancelarse.  
+ 
+HU-RF09 -03 Módulo: Módulo de Producción  
+Historia de Usuario  Como usuario, quiero consultar el listado de órdenes de producción con su estado 
+actual, para conocer el avance de la fabricación en curso.  
+Rol de Usuario  Producción / Ventas (lectura)  
+Acción Deseada  Consultar el listado de órdenes de producción y su estado  
+Beneficio / Resultado  Conocer el estado actual de la fabricación para coordinar entregas y ventas  
+Criterios de 
+Aceptación  1. Se muestra: producto, receta, cantidad, estado, fecha de inicio y fecha de fin.  
+2. El área de ventas puede consultar las órdenes en modo solo lectura.  
+ 
+ 
+ 
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 37 de 63 Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 38 de 63 RF10 - Módulo de Solicitud de Producción  
+Campo  Descripción  
+ID RF10  
+Nombre  Solicitud de Producción  
+Propósito  Permitir que el área de ventas registre solicitudes de producción adicional y que el área de 
+producción las revise, apruebe o rechace, facilitando la coordinación entre la demanda comercial 
+y la capacidad productiva en SoftBakery.  
+Público Objetivo  Área de Ventas (solicitantes) y Área de Producción (autorizadores).  
+Descripción 
+General  El módulo permite gestionar solicitudes de producción generadas por el área de ventas cuando se 
+requiere mayor disponibilidad de productos. Las solicitudes son evaluadas por el área de 
+producción, quien decide si se aprueban o rechazan. En caso de aprobaci ón, la solicitud puede 
+utilizarse como base para generar una orden de producción, manteniendo trazabilidad.  
+Características 
+del Requerimiento  1.- Registro de solicitudes:  id_solicitud (automático), id_producto, cantidad_solicitada, 
+fecha_solicitud (automática), id_usuario_solicitante, estado_solicitud 
+(pendiente/aprobada/rechazada), observaciones.  
+2.- Estados de solicitud:  PENDIENTE, APROBADA, RECHAZADA.  
+3.- Consulta de solicitudes:  Visualización y filtrado por estado.  
+4.- Validación de datos:  Campos obligatorios y cantidades válidas.  
+5.- Gestión de aprobación:  El área de producción puede aprobar o rechazar solicitudes.  
+6.- Trazabilidad:  Al aprobar una solicitud, se puede generar una orden de producción vinculada 
+mediante id_solicitud.  
+7.- Control de edición:  Las solicitudes solo pueden modificarse en estado PENDIENTE.  
+8.- Mensajes al usuario:  Confirmaciones y errores claros.  
+Flujo del Proceso  1. El área de ventas registra una solicitud de producción.  
+2. El sistema guarda la solicitud en estado PENDIENTE.  
+3. El área de producción revisa la solicitud.  
+4. Puede aprobar o rechazar la solicitud.  
+5. Si se aprueba, se puede generar una orden de producción vinculada.  
+6. La solicitud queda registrada para consulta y seguimiento.  
+Entradas  Producto, cantidad solicitada, usuario solicitante, observaciones.  
+Salidas  Solicitud registrada, estado de la solicitud, historial de solicitudes, vinculación con órdenes de 
+producción.  
+Interacción con 
+otros módulos  Módulo de Producción (creación de órdenes), , Módulo de Usuarios (identificación del solicitante), 
+Dashboard (indicadores de demanda).  
+Reglas de 
+Negocio  1.- Solo el área de ventas puede generar solicitudes.  
+2.- Solo el área de producción puede aprobar o rechazar solicitudes.  
+3.- Las solicitudes deben iniciar en estado PENDIENTE.  
+4.- Una solicitud aprobada puede generar una orden de producción.  
+5.- Las solicitudes rechazadas no generan producción.  
+6.- Solo se pueden modificar solicitudes en estado PENDIENTE.  
+7.- Todas las solicitudes deben quedar registradas para trazabilidad.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 39 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 40 de 63 HU-RF 10 – Solicitud de Producción  
+ 
+HU-RF10 -01 Módulo : Solicitudes de Producción  
+Historia de Usuario  Como usuario de ventas, quiero registrar solicitudes de producción adicional cuando 
+el inventario de un producto está bajo, para evitar quedarnos sin stock durante la 
+jornada de venta.  
+Rol de Usuario  Ventas  
+Acción Deseada  Registrar una solicitud de producción indicando producto, cantidad y observaciones  
+Beneficio / Resultado  Evitar quedarse sin stock durante la jornada al alertar al área de producción  
+Criterios de 
+Aceptación  1. Se registra: producto, cantidad solicitada y observaciones opcionales.  
+2. La fecha, ID y estado inicial 'pendiente' se asignan automáticamente.  
+HU-RF10 -02 Módulo: Solicitudes de Producción  
+Historia de Usuario  Como usuario de producción, quiero revisar las solicitudes pendientes y aprobarlas o 
+rechazarlas, para gestionar la carga de trabajo de producción de forma ordenada.  
+Rol de Usuario  Producción  
+Acción Deseada  Revisar solicitudes pendientes y aprobarlas o rechazarlas  
+Beneficio / Resultado  Gestionar la carga de producción de forma ordenada respondiendo a la demanda de 
+ventas  
+Criterios de 
+Aceptación  1. Las solicitudes se pueden filtrar por estado: pendiente, aprobada o rechazada.  
+2. Al resolver se registra: estado, fecha de resolución y usuario que decidió.  
+3. Una solicitud aprobada puede convertirse en una orden de producción.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 41 de 63 RF11 — Módulo Inventario y Producto Terminado  
+Campo  Descripción  
+ID RF11  
+Nombre  Inventario y Producto Terminado  
+Propósito  Administrar el catálogo de productos terminados y controlar el inventario disponible para su 
+venta, asegurando la disponibilidad, control y actualización automática de existencias en el 
+sistema SoftBakery.  
+Público Objetivo  Área de Ventas y Área de Administración  
+Descripción 
+General  El módulo permite gestionar los productos terminados mediante un catálogo y controlar su 
+inventario disponible. Los productos son generados por el módulo de producción y consumidos 
+por el módulo de ventas, garantizando la sincronización entre producción, i nventario y 
+comercialización.  
+Características del 
+Requerimiento  1.- Gestión de catálogo (CRUD):  Registro, consulta, actualización y desactivación lógica de 
+productos.  
+2.- Campos del producto:  id_producto (automático), nombre, descripción, precio_venta, 
+unidad_venta, imagen, activo, created_at.  
+3.- Desactivación lógica:  Los productos no se eliminan, solo se marcan como inactivos.  
+4.- Control de inventario:  Registro en tabla inventario_producto con id_producto, 
+cantidad_actual, stock_minimo, updated_at.  
+5.- Alertas de stock:  Generación de alerta visual cuando cantidad_actual es menor que 
+stock_minimo.  
+6.- Actualización automática:  Incremento del inventario al finalizar producción y decremento al 
+registrar ventas.  
+7.- Edición de productos:  Modificación de datos del catálogo excepto el identificador 
+(id_producto). Validación de datos:  Campos obligatorios (nombre, precio, unidad) y valores 
+válidos.  
+8.- Mensajes al usuario:  Confirmaciones y errores claros.  
+Flujo del Proceso  1.- El administrador registra productos en el sistema.  
+2.- Se inicializa su inventario con cantidad_actual y stock_minimo.  
+3.- Al finalizar una orden de producción, el sistema incrementa el inventario automáticamente.  
+4.- El área de ventas consulta los productos disponibles.  
+5.- Al registrar una venta, el sistema descuenta del inventario.  
+6.- El sistema verifica el stock mínimo y genera alertas si es necesario.  
+7.- 7. El usuario puede actualizar la información del producto.  
+Entradas  Nombre del producto, descripción, precio de venta, unidad de venta, imagen, stock mínimo.  
+Salidas  Catálogo de productos, inventario actualizado, alertas de stock bajo, confirmaciones de 
+operaciones.  
+Interacción con 
+otros módulos  Módulo de Producción (incremento de inventario), Módulo de Ventas (decremento de 
+inventario), Módulo de Recetas (relación producto -receta), Dashboard (indicadores de 
+productos vendidos).  
+Reglas de Negocio  1.- Todo producto debe tener nombre, precio y unidad de venta.  
+2.- No se eliminan productos, solo se desactivan.  
+3.- El inventario se incrementa únicamente mediante producción.  
+4.- El inventario se reduce únicamente mediante ventas.  
+5.- Se debe generar alerta cuando el stock sea menor al mínimo.  
+6.- Un producto inactivo no puede ser vendido.  
+7.- La cantidad disponible no puede ser negativa.  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 42 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 43 de 63  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 11 – Catálogo e Inventario  de Productos  Terminados.  
+HU-RF11 -01 Módulo: Inventario de Producto Terminado  
+Historia de Usuario  Como usuario, quiero gestionar el catálogo de productos terminados registrando 
+nombre, precio, unidad de venta e imagen, para mantener actualizada la oferta de la 
+pastelería.  
+Rol de Usuario  Ventas / Administrador  
+Acción Deseada  Crear, editar o desactivar un producto terminado en el catálogo  
+Beneficio / Resultado  Mantener actualizada la oferta de productos disponibles para su venta  
+Criterios de 
+Aceptación  1. Se puede crear, editar y desactivar productos.  
+2. Campos: nombre, descripción, precio de venta, unidad de venta e imagen.  
+3. Un producto inactivo no se muestra para venta ni en el catálogo de clientes.  
+HU-RF11 -02 Módulo: Inventario de Producto Terminado  
+Historia de Usuario  Como usuario, quiero ver el stock disponible de cada producto terminado y recibir 
+alertas de reposición, para saber cuándo solicitar más producción antes de 
+quedarnos sin existencias.  
+Rol de Usuario  Ventas / Administrador  
+Acción Deseada  Consultar el inventario de productos terminados y sus alertas de stock mínimo  
+Beneficio / Resultado  Solicitar producción a tiempo y evitar ventas perdidas por falta de existencias  
+Criterios de 
+Aceptación  1. Se muestra: nombre, precio, cantidad disponible, stock mínimo y estado.  
+2. Si cantidad_actual < stock_mínimo se muestra una alerta visual.  
+3. El inventario se actualiza automáticamente al registrar ventas o finalizar 
+producción.  
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 44 de 63 Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 45 de 63 RF12 — Costo y Utilidad de Producto  
+Campo  Descripción  
+ID RF12  
+Nombre  Costo y Utilidad de Producto  
+Propósito  Calcular el costo de producción de cada producto terminado y estimar su utilidad, permitiendo 
+al área de administración tomar decisiones informadas sobre precios y rentabilidad en el 
+sistema SoftBakery.  
+Público Objetivo  Área de Administración  
+Descripción General  El módulo permite calcular el costo total de producción de un producto a partir de su receta, 
+considerando las cantidades de materia prima, su costo unitario y el porcentaje de merma. A 
+partir de este costo, se calcula la utilidad y el porcentaje de gananc ia del producto.  
+Características del 
+Requerimiento  1.- Cálculo de costo por ingrediente:  Se calcula el costo de cada materia prima considerando 
+cantidad requerida, costo unitario y merma aplicada.  
+2.- Fórmula de costo real:  cantidad_real = cantidad_requerida × (1 + porcentaje_merma / 
+100). Costo por ingrediente:  costo_ingrediente = cantidad_real × costo_unitario.  
+3.- Costo total de producción:  Suma de los costos de todos los ingredientes de la receta.  
+4.- Cálculo de utilidad:  utilidad = precio_venta − costo_produccion.  
+5.- Porcentaje de utilidad:  porcentaje_utilidad = (utilidad / precio_venta) × 100.  
+6.- Consulta de costos:  Visualización del costo y utilidad por producto.  
+7.- Actualización dinámica:  Recalcula automáticamente cuando cambian precios de materia 
+prima o receta.  
+8.- Validación de datos: Verifica que existan costos definidos para materias primas.  
+9.- Mensajes al usuario:  Resultados claros y comprensibles.  
+Flujo del Proceso  1.- El sistema obtiene la receta del producto.  
+2.- Recupera las materias primas y sus cantidades.  
+3.- Aplica la merma para calcular la cantidad real.  
+4.- Calcula el costo de cada ingrediente.  
+5.- Suma los costos para obtener el costo total de producción.  
+6.- Obtiene el precio de venta del producto.  
+7.- Calcula la utilidad y el porcentaje de ganancia.  
+8.- Muestra los resultados al usuario.  
+Entradas  Receta del producto, cantidades de materia prima, porcentaje de merma, costo unitario de 
+insumos, precio de venta.  
+Salidas  Costo de producción, utilidad por producto, porcentaje de utilidad, desglose de costos por 
+ingrediente.  
+Interacción con 
+otros módulos  Módulo de Recetas (cantidades), Módulo de Inventario (costos de materia prima), Módulo de 
+Productos (precio de venta), Dashboard (indicadores financieros).  
+Reglas de Negocio  1.- Todo producto debe tener una receta asociada.  
+2.- Se debe aplicar el porcentaje de merma en el cálculo de costos.  
+3.- El costo total es la suma de todos los ingredientes.  
+4.- La utilidad depende del precio de venta definido.  
+5.- El porcentaje de utilidad se calcula respecto al precio de venta.  
+6.- Si no existe costo de materia prima, no se puede calcular el costo del producto.  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 46 de 63 HU-RF 1 2 – Costo y Utilidad de Producto  
+HU-RF12 -01 Módulo: Costo y Utilidad de Producto  
+Historia de Usuario  Como administrador, quiero ver el costo de producción, la utilidad y el margen de 
+cada producto, para tomar decisiones fundamentadas sobre precios y rentabilidad 
+del negocio.  
+Rol de Usuario  Administrador  
+Acción Deseada  Consultar el costo de producción, utilidad unitaria y porcentaje de margen por 
+producto  
+Beneficio / Resultado  Tomar decisiones fundamentadas sobre precios y rentabilidad del negocio  
+Criterios de 
+Aceptación  1. El costo se calcula sumando el costo de cada ingrediente de la receta incluyendo 
+merma.  
+2. Se calcula utilidad unitaria = precio_venta − costo_producción.  
+3. Se muestra porcentaje_utilidad = (utilidad_unitaria / precio_venta) × 100.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 47 de 63 RF13— Módulo de Ventas  
+Campo  Descripción  
+ID RF13  
+Nombre  Ventas  
+Propósito  Registrar y controlar las ventas de productos terminados, generar tickets, actualizar el 
+inventario y consolidar la información necesaria para el control financiero diario en el sistema 
+SoftBakery.  
+Público Objetivo  Área de Ventas y Área de Administración  
+Descripción 
+General  El módulo permite registrar ventas mediante una estructura de cabecera y detalle, generando 
+tickets cuando se requiere, actualizando automáticamente el inventario de productos 
+terminados y consolidando la información para el cálculo de corte de ventas, sal idas de 
+efectivo y utilidad diaria.  
+Características del 
+Requerimiento  1.- Registro de ventas (cabecera):  fecha, total (calculado), tipo_pago (efectivo/tarjeta), 
+requiere_ticket (booleano), estado, id_usuario.  
+2.- Detalle de venta:  producto, cantidad, precio_unitario, subtotal (calculado).  
+3.- Cálculos automáticos:  subtotal = cantidad × precio_unitario; total = suma de subtotales.  
+4.- Actualización de inventario:  Disminución automática del inventario de productos 
+terminados al registrar la venta.  
+5.- Generación de ticket:  Si requiere_ticket = TRUE, se genera con folio único, nombre del 
+negocio, fecha e id_venta; siempre se almacena en base de datos aunque la impresión 
+sea opcional.  
+6.- Corte de ventas diario:  Registro en corte_ventas con fecha_corte, total_ventas_dia, 
+total_transacciones, total_efectivo, total_tarjeta, total_salidas, utilidad_dia, id_usuario.  
+7.- Registro de salidas de efectivo:  Registro de pagos a proveedores con fecha, concepto, 
+monto, referencia_tipo, referencia_id, id_usuario.  
+8.- Cálculo de utilidad diaria:  utilidad = total_ventas_dia − total_salidas − costo_produccion. 
+Consulta de ventas:  Visualización de historial de ventas y detalles.  
+9.- Mensajes al usuario:  Confirmaciones y errores claros.  
+Flujo del Proceso  1. El usuario registra una venta seleccionando productos.  
+2. El sistema calcula subtotales y total automáticamente.  
+3. Se confirma la venta y se registra en la base de datos.  
+4. Se descuenta el inventario de productos terminados.  
+5. Si se requiere, se genera el ticket con folio único.  
+6. Se registran las transacciones del día.  
+7. Al finalizar la jornada, se genera el corte de ventas.  
+8. Se calculan salidas de efectivo y utilidad diaria.  
+Entradas  Productos, cantidades, tipo de pago, usuario, indicador de ticket, datos de salidas de efectivo.  
+Salidas  Venta registrada, ticket generado, inventario actualizado, corte de ventas diario, utilidad diaria.  
+Interacción con 
+otros módulos  Módulo de Productos Terminados (descuento de inventario), Módulo de Producción 
+(disponibilidad de productos), Módulo de Compras (pagos a proveedores), Módulo de Costos 
+(cálculo de utilidad), Dashboard (indicadores de ventas).  
+Reglas de Negocio  1.- Solo se pueden vender productos activos y con inventario disponible.  
+2.- El inventario se descuenta automáticamente al registrar una venta.  
+3.- Toda venta debe tener al menos un producto.  
+4.- El ticket se genera solo si el cliente lo solicita, pero siempre se guarda en BD.  
+5.- El corte de ventas debe consolidar todas las transacciones del día.  
+6.- Las salidas de efectivo deben registrarse correctamente para calcular la utilidad.  
+7.- La utilidad diaria se calcula restando ventas, salidas y costos de producción.  
+8.- No se eliminan ventas, solo se consultan para trazabilidad.  
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 48 de 63  
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 49 de 63  
+HU-RF 13 – Módulo de Ventas  
+HU-RF13 -01 Módulo: Módulo de Ventas  
+Historia de Usuario  Como usuario de ventas, quiero registrar cada venta con sus productos, cantidades y 
+tipo de pago, para controlar los ingresos y actualizar el inventario automáticamente.  
+Rol de Usuario  Ventas / Administrador  
+Acción Deseada  Registrar una venta con su detalle de productos y tipo de pago  
+Beneficio / Resultado  Controlar los ingresos del negocio y actualizar el inventario de producto terminado  
+Criterios de 
+Aceptación  1. La venta incluye: fecha, tipo de pago (efectivo/tarjeta), si requiere ticket y usuario.  
+2. El detalle incluye: producto, cantidad, precio unitario y subtotal por producto.  
+3. El total se calcula automáticamente; al guardar se decrementa el inventario.  
+HU-RF13 -02 Módulo: Módulo de Ventas  
+Historia de Usuario  Como usuario de ventas, quiero generar un ticket  de compra cuando el cliente lo 
+solicite, para entregar un comprobante formal de la transacción realizada.  
+Rol de Usuario  Ventas / Administrador  
+Acción Deseada  Generar el registro del ticket  de venta cuando el cliente lo requiera  
+Beneficio / Resultado  Entregar un comprobante formal de la transacción y mantener el registro en el 
+sistema  
+Criterios de 
+Aceptación  1. Si 'requiere_ticket ' es verdadero, el sistema genera automáticamente el ticket.  
+2. El ticket incluye: folio único, nombre del negocio, fecha y relación con la venta.  
+3. La impresión es opcional, pero el registro siempre se guarda en la base de datos.  
+HU-RF13 -03 Módulo: Módulo de Ventas  
+Historia de Usuario  Como administrador, quiero generar el corte de caja al final del día, para conocer los 
+totales de ventas, salidas de efectivo y la utilidad diaria del negocio.  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 50 de 63 Rol de Usuario  Administrador  
+Acción Deseada  Generar el corte de ventas diario con totales de ventas, salidas y utilidad  
+Beneficio / Resultado  Conocer la utilidad diaria y el resumen financiero del día para la toma de decisiones  
+Criterios de 
+Aceptación  1. El corte registra: fecha, total ventas, número de transacciones, total efectivo, total 
+tarjeta, salidas y utilidad.  
+2. Utilidad = total_ventas − total_salidas − costo_producción.  
+3. Solo usuarios autorizados pueden generar el corte.  
+HU-RF13 -04 Módulo: Módulo de Ventas  
+Historia de Usuario  Como administrador, quiero registrar salidas de efectivo como pagos a proveedores 
+u otros gastos, para controlar el flujo de dinero del negocio.  
+Rol de Usuario  Administrador  
+Acción Deseada  Registrar una salida de efectivo indicando concepto, monto y referencia  
+Beneficio / Resultado  Controlar el flujo de dinero y asociar los gastos con el corte del día correspondiente  
+Criterios de 
+Aceptación  1. Se registra: fecha, concepto, monto, referencia (ej. COMPRA) y usuario.  
+2. Las salidas quedan vinculadas al corte del día correspondiente.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 51 de 63 RF14 — Gestión de Pedidos de Clientes  
+Campo  Descripción  
+ID RF14  
+Nombre  Gestión de Pedidos de Clientes  
+Propósito  Permitir al personal interno visualizar, confirmar y gestionar los pedidos realizados por los 
+clientes hasta su entrega final.  
+Público Objetivo  Área de Ventas y Área de Administración  
+Descripción 
+General  El módulo permite gestionar los pedidos generados por los clientes, desde su registro hasta su 
+entrega, incluyendo el seguimiento de estados y la integración con el módulo de ventas para 
+cerrar la operación.  
+Características del 
+Requerimiento  1.- Gestión de pedidos:  id_pedido (automático), id_cliente, fecha_pedido, fecha_entrega, 
+total_pedido (calculado), estado_pedid o 
+(pendiente/confirmado/pagado/entregado/cancelado).  
+2.- Visualización:  Lista de pedidos y detalle de productos solicitados.  
+3.- Cambio de estados:  Control del ciclo de vida del pedido.  
+4.- Integración con ventas:  Al marcar como entregado, se genera automáticamente una venta 
+en RF13.  
+5.- Actualización de inventario:  Se descuenta inventario al generar la venta.  
+6.- Mensajes claros al usuario.  
+Flujo del Proceso  1. El sistema recibe pedidos de clientes.  
+2. El personal visualiza pedidos.  
+3. Se confirma o gestiona el pedido.  
+4. Al entregar, se genera la venta automáticamente.  
+5. Se actualiza inventario.  
+Entradas  Cliente, productos, fecha entrega.  
+Salidas  Pedido registrado, estado actualizado, venta generada.  
+Interacción con 
+otros módulos  Módulo  de Ventas,  Módulo Inventario y Producto Terminado  y Clientes . 
+Reglas de Negocio  1.- Solo pedidos entregados generan venta.  
+2.- No se puede entregar sin confirmación previa.  
+3.- Se mantiene trazabilidad completa del pedido.  
+ 
+ 
+HU-RF 14 – Gestión de Pedidos de Clientes (Interno)  
+HU-RF14 -01 Módulo: Gestión de Pedidos (Interno)  
+Historia de Usuario  Como usuario interno, quiero visualizar y gestionar los pedidos realizados por los 
+clientes, para confirmarlos, coordinar su entrega y registrar la venta 
+automáticamente.  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 52 de 63 Rol de Usuario  Ventas / Administrador  
+Acción Deseada  Visualizar, gestionar y entregar los pedidos de clientes desde el panel interno  
+Beneficio / Resultado  Coordinar la entrega de pedidos y generar la venta en el sistema automáticamente  
+Criterios de 
+Aceptación  1. Se muestra el listado con: cliente, fecha de pedido, fecha de entrega, total y 
+estado.  
+2. Se puede ver el detalle de productos de cada pedido.  
+3. Al marcar como 'entregado' se genera automáticamente la venta y se descuenta el 
+inventario.  
+4. Los estados posibles son: pendiente, confirmado, pagado, entregado y cancelado.  
+Caso de uso 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 53 de 63 RF15 — Módulo de Cliente  
+Campo  Descripción  
+ID RF15  
+Nombre  Gestión de Clientes  
+Propósito  Permitir a los clientes registrarse en el sistema para realizar pedidos en línea . 
+Público Objetivo  Clientes  
+Descripción General  El módulo permite el registro, autenticación y gestión básica de clientes que interactúan 
+con el sistema para realizar pedidos.  
+Características del 
+Requerimiento  1.- Registro de clientes:  id_cliente, nombre, apellido, teléfono, usuario_cliente, 
+password_hash, fecha_registro, estado_cliente.  
+2.- Validación de usuario único.  
+3.- Contraseña segura:  mínimo 8 caracteres con mayúsculas, minúsculas, números y 
+símbolos.  
+4.- Activación/desactivación de cuentas.  
+5.- Mensajes claros al usuario.  
+Flujo del Proceso  1. Cliente se registra.  
+2. Sistema valida datos.  
+3. Se crea cuenta.  
+4. Cliente puede iniciar sesión y hacer pedidos.  
+Entradas  Datos personales y credenciales.  
+Salidas  Cuenta creada, acceso al sistema.  
+Interacción con otros 
+módulos  RF14 Pedidos, RF17 Carrito  
+Reglas de Negocio  1.- Usuario debe ser único.  
+2.- Contraseña segura obligatoria.  
+3.- Clientes inactivos no pueden comprar.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 54 de 63  
+HU-RF15 – Módulo de Cliente (Cuenta en Línea)  
+HU-RF15 -01 Módulo: Módulo de Cliente  
+Historia de Usuario  Como cliente, quiero crear una cuenta en la plataforma de la pastelería, para poder 
+realizar pedidos en línea y consultar el historial de mis compras.  
+Rol de Usuario  Cliente  
+Acción Deseada  Crear una cuenta de cliente con datos personales y credenciales de acceso  
+Beneficio / Resultado  Acceder a la plataforma para realizar pedidos en línea y consultar mis compras  
+Criterios de 
+Aceptación  1. Campos obligatorios: nombre, apellido, teléfono, nombre de usuario y contraseña.  
+2. El usuario debe ser único; si ya existe el sistema muestra un error.  
+3. La contraseña debe cumplir la política de seguridad.  
+HU-RF15 -02 Módulo: Módulo de Cliente  
+Historia de Usuario  Como cliente registrado, quiero iniciar sesión en la plataforma con mi usuario y 
+contraseña, para acceder a mi perfil, realizar pedidos y consultar mi historial.  
+Rol de Usuario  Cliente  
+Acción Deseada  Iniciar sesión en la plataforma de clientes con usuario y contraseña  
+Beneficio / Resultado  Acceder a la plataforma para realizar pedidos y consultar el historial de compras  
+Criterios de 
+Aceptación  1. El sistema valida las credenciales del cliente.  
+2. Con credenciales incorrectas se muestra un mensaje sin revelar cuál campo falló.  
+3. Con inicio exitoso el cliente es redirigido al catálogo de productos.  
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 55 de 63 Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 56 de 63 RF16 — Catálogo de Productos (Portal Cliente)  
+ 
+Campo  Descripción  
+ID RF16  
+Nombre  Catálogo de Productos  
+Propósito  Mostrar a los clientes los productos disponibles para su compra.  
+Público Objetivo  Clientes  
+Descripción General  Permite visualizar productos disponibles con su información básica, filtrando 
+únicamente aquellos activos y con existencia.  
+Características del 
+Requerimiento  Visualización de productos activos.   
+Campos:  imagen, nombre, descripción, precio, existencia.  
+Filtrado automático:  solo productos disponibles.  
+Flujo del Proceso  1. Cliente accede al catálogo.  
+2. Visualiza productos disponibles.  
+3. Selecciona productos.  
+Entradas  Consulta del cliente.  
+Salidas  Lista de productos disponibles.  
+Interacción con otros 
+módulos  RF11 Inventario Producto  terminado , RF17 Carrito  
+Reglas de Negocio  Solo productos activos y con stock se muestran.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HU-RF 16 – Catálogo de Productos (Portal Cliente)  
+HU-RF16 -01 Módulo: Catálogo de Productos (Cliente)  
+Historia de Usuario  Como cliente, quiero ver el catálogo de productos disponibles con imagen, nombre, 
+descripción y precio, para elegir qué deseo agregar a mi pedido.  
+Rol de Usuario  Cliente  
+Acción Deseada  Consultar el catálogo de productos activos con existencia disponible  
+Beneficio / Resultado  Elegir fácilmente los productos que deseo pedir con información completa y 
+actualizada  
+Criterios de 
+Aceptación  1. Solo se muestran productos activos con existencia disponible en inventario.  
+2. Se muestra: imagen, nombre, descripción, precio de venta y cantidad disponible.  
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 57 de 63 Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 58 de 63 RF17 — Carrito de Compras  
+Campo  Descripción  
+ID RF17  
+Nombre  Carrito de Compras  
+Propósito  Permitir al cliente seleccionar productos antes de confirmar su pedido.  
+Público Objetivo  Clientes  
+Descripción General  El módulo permite gestionar los productos seleccionados por el cliente antes de 
+generar un pedido formal.  
+Características del 
+Requerimiento  1.- Campos:  id_carrito, id_cliente, id_producto, cantidad, subtotal.  
+2.- Validación de stock:  no exceder existencia.  
+3.- CRUD del carrito:  agregar, editar y eliminar productos.  
+4.- Cálculos automáticos:  subtotal y total.  
+Flujo del Proceso  1. Cliente agrega productos.  
+2. Sistema valida stock.  
+3. Calcula total.  
+4. Cliente modifica o confirma.  
+Entradas  Productos y cantidades.  
+Salidas  Carrito actualizado, total calculado.  
+Interacción con otros 
+módulos  RF16 Catálogo, RF18 Pedido  
+Reglas de Negocio  1.- No se puede agregar más de lo disponible.  
+2.- Carrito pertenece a un cliente.  
+ 
+ 
+HU-RF 17 – Carrito de Compras  
+ 
+HU-RF17 -01 Módulo: Carrito de Compras  
+Historia de Usuario  Como cliente, quiero agregar productos al carrito y gestionar las cantidades antes de 
+confirmar mi pedido, para tener control sobre lo que voy a ordenar.  
+Rol de Usuario  Cliente  
+Acción Deseada  Agregar, ajustar cantidad y eliminar productos del carrito de compras  
+Beneficio / Resultado  Tener control total sobre los productos y cantidades antes de confirmar el pedido  
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 59 de 63 Criterios de 
+Aceptación  1. Se puede agregar un producto indicando la cantidad deseada.  
+2. El sistema verifica que la cantidad no supere la existencia disponible.  
+3. Se puede eliminar un producto del carrito antes de confirmar.  
+4. El subtotal y total del carrito se calculan automáticamente.  
+HU-RF17 -02 Módulo: Carrito de Compras  
+Historia de Usuario  Como cliente, quiero eliminar un producto de mi carrito antes de finalizar el pedido 
+para que corregir mi selección sin necesidad de cancelar todo el carrito.  
+Rol de Usuario  Cliente  
+Acción Deseada  eliminar un producto de mi carrito antes de finalizar el pedido  
+Beneficio / Resultado  corregir mi selección sin necesidad de cancelar todo el carrito  
+Criterios de 
+Aceptación  El producto se elimina del carrito_detalle sin afectar el inventario.  
+ 
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 60 de 63 RF18 — Generar Pedido  
+Campo  Descripción  
+ID RF18  
+Nombre  Generación de Pedido  
+Propósito  Permitir al cliente confirmar su carrito, generar un pedido formal y registrar el pago (en línea o 
+contra entrega), garantizando la trazabilidad del proceso desde la solicitud hasta su gestión 
+interna.  
+Público Objetivo  Clientes  
+Descripción 
+General  El módulo convierte el carrito de compras en un pedido formal, almacenando su detalle, 
+permitiendo su seguimiento y registrando la información de pago. El pedido puede ser pagado en 
+línea o contra entrega, manteniendo control del estado del pago y del pedi do. 
+Características 
+del 
+Requerimiento  Campos del pedido:  id_pedido (automático), id_cliente, fecha_pedido, total_pedido (calculado), 
+fecha_entrega, estado_pedido (pendiente/confirmado/pagado/entregado/cancelado).  
+Campos de pago:  estado_pago (pendiente/pagado), tipo_pago (en línea/contra entrega) .  
+Generación automática:  El pedido se crea a partir del carrito .  
+Detalle del pedido:  Se almacenan los productos, cantidades y subtotales.  
+Validación de stock:  Verifica disponibilidad antes de confirmar.  
+Gestión de pago:  Si el pago es en línea, el estado_pago puede cambiar a pagado; si es contra 
+entrega, permanece pendiente hasta confirmación manual.  
+Consulta de pedidos:  El cliente puede visualizar sus pedidos y estados.  
+Cancelación:  Solo disponible si el estado_pedido es pendiente.  
+Mensajes al usuario:  Confirmaciones y errores claros.  
+Flujo del 
+Proceso  1. El cliente revisa su carrito (RF17).  
+2. Selecciona tipo de pago (en línea o contra entrega).  
+3. Confirma el pedido.  
+4. El sistema valida stock y genera el pedido en estado PENDIENTE.  
+5. Se guarda el detalle del pedido.  
+6. Si el pago es en línea, se registra la referencia y se actualiza estado_pago a PAGADO.  
+7. Si es contra entrega, el estado_pago queda en PENDIENTE.  
+8. El pedido pasa a gestión interna (RF14).  
+Entradas  Carrito, cliente, fecha de entrega, tipo de pago, referencia de pago (opcional).  
+Salidas  Pedido generado, estado del pedido, estado del pago, historial de pedidos.  
+Interacción con 
+otros módulos  RF17 Carrito de Compras, RF14 Gestión de Pedidos, RF13 Ventas, RF11 Inventario de 
+Productos.  
+Reglas de 
+Negocio  Todo pedido debe generarse a partir de un carrito con al menos un producto. El pedido inicia en 
+estado PENDIENTE. El estado_pago inicia como PENDIENTE. Solo pedidos pendientes pueden 
+cancelarse. Si el pago es en línea, debe registrarse una referencia de pa go. Si el pago es contra 
+entrega, el pago se confirma al momento de la entrega. El stock debe validarse antes de generar 
+el pedido. Todos los pedidos deben quedar registrados para trazabilidad.  
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 61 de 63 HU-RF 18 – Generar Pedido  
+HU-RF18 -01 Módulo: Generar Pedido  
+Historia de Usuario  Como cliente, quiero confirmar mi carrito y generar un pedido formal indicando la 
+fecha de entrega deseada, para que el negocio prepare mis productos a tiempo . 
+Rol de Usuario  Cliente  
+Acción Deseada  Confirmar el carrito y generar un pedido formal con fecha de entrega  
+Beneficio / Resultado  Asegurar que el negocio reciba y prepare el pedido para la fecha de entrega indicada  
+Criterios de 
+Aceptación  1. El cliente indica la fecha de entrega deseada al confirmar.  
+2. Al confirmar, el sistema genera el pedido con el detalle del carrito.  
+3. El total se calcula automáticamente; el pedido inicia en estado 'pendiente'.  
+4. Se puede cancelar el pedido si aún está en estado 'pendiente'.  
+HU-RF18 -02 Módulo: Generar Pedido  
+Historia de Usuario  Como cliente, quiero consultar el historial completo de todos mis pedidos realizados 
+con su estado actual para que hacer seguimiento de mis compras y verificar si un 
+pedido ya fue conformado, entregado o cancelado . 
+Rol de Usuario  Cliente  
+Acción Deseada  consultar el historial completo de todos mis pedidos realizados con su estado actual  
+Beneficio / Resultado  hacer seguimiento de mis compras y verificar si un pedido ya fue entregado  
+Criterios de 
+Aceptación  Muestra fecha, productos, cantidades, total y estado de cada pedido.  
+Caso de uso  
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 62 de 63  
+3. Historias de Usuario Resumen de Módulos del Sistema  
+ID Módulo  Roles Involucrados  # 
+Historias  
+HU-
+RF01  Login / Autenticación  Empleado, Administrador  2 
+HU-
+RF02  Dashboard  Administrador, Empleado de ventas  2 
+HU-
+RF03  Gestión de Empleados  Administrador  3 
+HU-
+RF04  Gestión de Roles y Permisos  Administrador  2 
+HU-
+RF05  Gestión de Proveedores  Administrador  2 
+HU-
+RF06  Inventario de Materia Prima  Administrador   3 
+HU-
+RF07  Módulo de Compras de Materia 
+Prima  Empleado Administrador  3 
+HU-
+RF08  Explosión de Materiales (Recetas)  Empleado de producción  2 
+HU-
+RF09  Módulo de Producción  Empleado de producción, Empleado de 
+ventas  3 
+HU-
+RF10  Solicitud de Producción  Empleado de ventas, Empleado de 
+producción  2 
+HU-
+RF11  Catálogo y Gestión de Productos  Administrador, Empleado de ventas  2 
+HU-
+RF12  Costo y Utilidad de Producto  Administrador  1 
+HU-
+RF13  Módulo de Ventas  Empleado de ventas, Administrador  3 
+HU-
+RF14  Gestión de Pedidos de Clientes 
+(Interno)  Empleado de ventas  1 
+HU-
+RF15  Módulo de Cliente (Cuenta en Línea)  Cliente  2 
+HU-
+RF16  Catálogo de Productos (Portal 
+Cliente)  Cliente  1 
+HU-
+RF17  Carrito de Compras  Cliente  2 
+HU-
+RF18  Generar Pedido  Cliente  2 
+HU-
+RF19  Historial de Pedidos  Cliente  1 
+ 
+ 
+
+SoftBakery  — Documentación del Sistema de Gestión para Pastelería  
+Página 63 de 63 4. Calendario de Actividades  
+  A continuación,  se muestra el calendario de actividades planificado para el desarrollo del sistema 
+SoftBakery.  
+ 
+ 
+ 
+ 
