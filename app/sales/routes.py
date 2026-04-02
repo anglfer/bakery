@@ -449,7 +449,11 @@ def compras_mp():
 
         proveedor = Proveedor.query.get(id_proveedor)
         if not proveedor or not proveedor.activo:
-            flash("Proveedor invalido o inactivo.", "danger")
+            flash(
+                "Proveedor invalido o inactivo. "
+                "Solo puedes comprar a proveedores activos.",
+                "danger",
+            )
             return redirect(url_for("sales.compras_mp"))
 
         for detalle_compra in detalles_compra:

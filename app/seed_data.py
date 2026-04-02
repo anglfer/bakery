@@ -308,32 +308,44 @@ def _seed_suppliers() -> None:
     suppliers = [
         (
             "Harinera del Norte",
+            "Roberto Sanchez",
             "4772001000",
             "harinera@proveedor.local",
+            "Leon",
+            "Guanajuato",
             "Parque Industrial 1",
         ),
         (
             "Lacteos Premium SA",
+            "Claudia Rios",
             "4772002000",
             "lacteos@proveedor.local",
+            "Silao",
+            "Guanajuato",
             "Zona Sur 23",
         ),
         (
             "Insumos Reposteria MX",
+            "Miguel Herrera",
             "4772003000",
             "insumos@proveedor.local",
+            "Irapuato",
+            "Guanajuato",
             "Av. Comercio 300",
         ),
     ]
-    for nombre, telefono, correo, direccion in suppliers:
+    for nombre, contacto, telefono, correo, ciudad, estado, direccion in suppliers:
         exists = Proveedor.query.filter_by(nombre_empresa=nombre).first()
         if exists:
             continue
         db.session.add(
             Proveedor(
                 nombre_empresa=nombre,
+                nombre_contacto=contacto,
                 telefono=telefono,
                 correo=correo,
+                ciudad=ciudad,
+                estado=estado,
                 direccion=direccion,
                 activo=True,
             )

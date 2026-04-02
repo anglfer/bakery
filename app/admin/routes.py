@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from decimal import Decimal
 
 from flask import flash, jsonify, redirect, render_template, request, url_for
@@ -27,6 +28,8 @@ BASE_ROLES = {"Administrador", "Ventas", "Produccion"}
 USERS_ENDPOINT = "admin.usuarios"
 ROLES_ENDPOINT = "admin.roles"
 SUPPLIERS_ENDPOINT = "admin.proveedores"
+SUPPLIER_PHONE_RE = re.compile(r"^[0-9\s\-\(\)\+]+$")
+SUPPLIER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
 
 def _to_bool(value: str | None) -> bool:
@@ -50,6 +53,70 @@ def _can_create_user() -> bool:
         .first()
     )
     return bool(permission and permission.escritura)
+
+
+def _can_create_supplier() -> bool:
+    permission = (
+        Permiso.query.join(Permiso.modulo)
+        .filter(
+            Permiso.id_rol == current_user.id_rol,
+            Permiso.modulo.has(nombre="Proveedores"),
+        )
+        .first()
+    )
+    return bool(permission and permission.escritura)
+
+
+def _normalize_phone_digits(telefono: str) -> str:
+    return re.sub(r"\D", "", telefono)
+
+
+def _is_valid_mx_phone(telefono: str) -> bool:
+    if not SUPPLIER_PHONE_RE.fullmatch(telefono):
+        return False
+
+    digitos = _normalize_phone_digits(telefono)
+    if len(digitos) == 10:
+        return True
+    return len(digitos) == 12 and digitos.startswith("52")
+
+
+def _validate_supplier_payload(
+    *,
+    nombre_proveedor: str,
+    nombre_contacto: str,
+    telefono: str,
+    correo: str,
+    ciudad: str,
+    estado: str,
+    direccion: str,
+) -> str | None:
+    if not all(
+        [
+            nombre_proveedor,
+            nombre_contacto,
+            telefono,
+            correo,
+            ciudad,
+            estado,
+            direccion,
+        ]
+    ):
+        return (
+            "Completa los campos obligatorios: proveedor, contacto, telefono, "
+            "correo, ciudad, estado y direccion."
+        )
+
+    if not SUPPLIER_EMAIL_RE.fullmatch(correo):
+        return "El correo electronico del proveedor " "no tiene un formato valido."
+
+    if not _is_valid_mx_phone(telefono):
+        return (
+            "El telefono debe tener formato de Mexico valido: 10 digitos "
+            "(ej. 477 123 4567) o +52 con 10 digitos."
+        )
+
+    return None
 
 
 @admin_bp.route("/dashboard")
@@ -488,27 +555,55 @@ def rol_permisos(id_rol: int):
 @require_permission("Proveedores", "leer")
 def proveedores():
     if request.method == "POST":
-        nombre = request.form.get("nombre_empresa", "").strip()
+        if not _can_create_supplier():
+            flash("No tienes permiso para registrar proveedores.", "danger")
+            return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+        nombre = (
+            request.form.get("nombre_proveedor", "").strip()
+            or request.form.get("nombre_empresa", "").strip()
+        )
+        nombre_contacto = request.form.get("nombre_contacto", "").strip()
         telefono = request.form.get("telefono", "").strip()
         correo = request.form.get("correo", "").strip().lower()
+        ciudad = request.form.get("ciudad", "").strip()
+        estado = request.form.get("estado", "").strip()
         direccion = request.form.get("direccion", "").strip()
-        if not all([nombre, telefono, correo, direccion]):
-            flash("Completa todos los campos del proveedor.", "warning")
+        error_message = _validate_supplier_payload(
+            nombre_proveedor=nombre,
+            nombre_contacto=nombre_contacto,
+            telefono=telefono,
+            correo=correo,
+            ciudad=ciudad,
+            estado=estado,
+            direccion=direccion,
+        )
+        if error_message:
+            flash(error_message, "warning")
             return redirect(url_for(SUPPLIERS_ENDPOINT))
 
-        if "@" not in correo or "." not in correo:
-            flash("El correo del proveedor no tiene un formato valido.", "warning")
-            return redirect(url_for(SUPPLIERS_ENDPOINT))
-
-        if Proveedor.query.filter_by(nombre_empresa=nombre).first():
+        proveedor_existente = Proveedor.query.filter(
+            db.func.lower(Proveedor.nombre_empresa) == nombre.lower()
+        ).first()
+        if proveedor_existente:
             flash("Ya existe un proveedor con ese nombre.", "danger")
+            return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+        correo_existente = Proveedor.query.filter(
+            db.func.lower(Proveedor.correo) == correo.lower()
+        ).first()
+        if correo_existente:
+            flash("El correo ya esta registrado en otro proveedor.", "danger")
             return redirect(url_for(SUPPLIERS_ENDPOINT))
 
         db.session.add(
             Proveedor(
                 nombre_empresa=nombre,
+                nombre_contacto=nombre_contacto,
                 telefono=telefono,
                 correo=correo,
+                ciudad=ciudad,
+                estado=estado,
                 direccion=direccion,
                 activo=True,
             )
@@ -540,13 +635,59 @@ def proveedores():
 @require_permission("Proveedores", "editar")
 def editar_proveedor(id_proveedor: int):
     proveedor = Proveedor.query.get_or_404(id_proveedor)
-    proveedor.nombre_empresa = request.form.get(
-        "nombre_empresa", proveedor.nombre_empresa
+
+    nombre = (
+        request.form.get("nombre_proveedor", "").strip()
+        or request.form.get("nombre_empresa", proveedor.nombre_empresa).strip()
+    )
+    nombre_contacto = request.form.get(
+        "nombre_contacto", proveedor.nombre_contacto
     ).strip()
-    proveedor.telefono = request.form.get("telefono", proveedor.telefono).strip()
-    proveedor.correo = request.form.get("correo", proveedor.correo).strip().lower()
-    proveedor.direccion = request.form.get("direccion", proveedor.direccion).strip()
-    proveedor.activo = _to_bool(request.form.get("activo", "on"))
+    telefono = request.form.get("telefono", proveedor.telefono).strip()
+    correo = request.form.get("correo", proveedor.correo).strip().lower()
+    ciudad = request.form.get("ciudad", proveedor.ciudad).strip()
+    estado = request.form.get("estado", proveedor.estado).strip()
+    direccion = request.form.get("direccion", proveedor.direccion).strip()
+
+    error_message = _validate_supplier_payload(
+        nombre_proveedor=nombre,
+        nombre_contacto=nombre_contacto,
+        telefono=telefono,
+        correo=correo,
+        ciudad=ciudad,
+        estado=estado,
+        direccion=direccion,
+    )
+    if error_message:
+        flash(error_message, "warning")
+        return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+    proveedor_existente = Proveedor.query.filter(
+        db.func.lower(Proveedor.nombre_empresa) == nombre.lower(),
+        Proveedor.id_proveedor != proveedor.id_proveedor,
+    ).first()
+    if proveedor_existente:
+        flash("Ya existe un proveedor con ese nombre.", "danger")
+        return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+    correo_existente = Proveedor.query.filter(
+        db.func.lower(Proveedor.correo) == correo.lower(),
+        Proveedor.id_proveedor != proveedor.id_proveedor,
+    ).first()
+    if correo_existente:
+        flash("El correo ya esta registrado en otro proveedor.", "danger")
+        return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+    proveedor.nombre_empresa = nombre
+    proveedor.nombre_contacto = nombre_contacto
+    proveedor.telefono = telefono
+    proveedor.correo = correo
+    proveedor.ciudad = ciudad
+    proveedor.estado = estado
+    proveedor.direccion = direccion
+    if "activo" in request.form:
+        proveedor.activo = _to_bool(request.form.get("activo", "off"))
+
     db.session.commit()
     log_audit_event(
         "PROVEEDOR_EDITADO",
@@ -568,4 +709,19 @@ def desactivar_proveedor(id_proveedor: int):
         f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}",
     )
     flash("Proveedor desactivado.", "success")
+    return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+
+@admin_bp.post("/proveedores/<int:id_proveedor>/activar")
+@login_required
+@require_permission("Proveedores", "editar")
+def activar_proveedor(id_proveedor: int):
+    proveedor = Proveedor.query.get_or_404(id_proveedor)
+    proveedor.activo = True
+    db.session.commit()
+    log_audit_event(
+        "PROVEEDOR_ACTIVADO",
+        f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}",
+    )
+    flash("Proveedor activado.", "success")
     return redirect(url_for(SUPPLIERS_ENDPOINT))

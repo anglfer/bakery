@@ -155,11 +155,28 @@ class Proveedor(TimestampMixin, db.Model):
 
     id_proveedor = db.Column(db.Integer, primary_key=True)
     nombre_empresa = db.Column(db.String(120), unique=True, nullable=False)
+    nombre_contacto = db.Column(db.String(120), nullable=False)
     telefono = db.Column(db.String(30), nullable=False)
     correo = db.Column(db.String(120), unique=True, nullable=False)
+    ciudad = db.Column(db.String(120), nullable=False)
+    estado = db.Column(db.String(120), nullable=False)
     direccion = db.Column(db.String(255), nullable=False)
     activo = db.Column(db.Boolean, default=True, nullable=False)
     fecha_alta = db.Column(db.DateTime, default=utc_now, nullable=False)
+
+    @property
+    def nombre_proveedor(self) -> str:
+        return self.nombre_empresa
+
+    @property
+    def estado_proveedor(self) -> str:
+        return "activo" if self.activo else "inactivo"
+
+    @property
+    def id_proveedor_formateado(self) -> str:
+        if not self.id_proveedor:
+            return "PROV-000"
+        return f"PROV-{self.id_proveedor:03d}"
 
 
 class UnidadMedida(db.Model):

@@ -1,82 +1,67 @@
-{% extends "base_template.html" %}
-{% block title %}Proveedores{% endblock %}
-{% block content %}
+{% extends "base_template.html" %} {% block title %}Proveedores{% endblock %} {% block content %}
 <section class="section">
-	{% set total_proveedores = proveedores|length %}
-	{% set proveedores_activos = proveedores|selectattr('activo')|list|length %}
-	{% set proveedores_inactivos = total_proveedores - proveedores_activos %}
-
-	<div class="ops-hero">
+	<div class="ops-card mb-3">
 		<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
 			<div>
-				<p class="ops-meta mb-1">Panel administrativo</p>
-				<h2 class="ops-hero-title">Gestión de proveedores</h2>
-				<p class="ops-hero-text">Administra el catálogo de proveedores activos e inactivos.</p>
+				<h3 class="ops-card-title mb-1">Proveedores de materia prima</h3>
+				<p class="ops-hero-text">Administra los proveedores registrados en el sistema</p>
 			</div>
+		</div>
+
+		<div class="ops-toolbar mb-0 mt-3">
+			<form method="get" class="ops-input-wrap d-flex gap-2">
+				<i class="bi bi-search"></i>
+				<input
+					type="text"
+					name="q"
+					value="{{ q or '' }}"
+					placeholder="Buscar por nombre de proveedor..." />
+				<button type="submit" class="btn btn-sm">Buscar</button>
+			</form>
+			<button
+				type="button"
+				class="btn btn-sm"
+				data-bs-toggle="modal"
+				data-bs-target="#modalProveedorCrear">
+				<i class="bi bi-plus-lg me-1"></i>
+				Agregar proveedor
+			</button>
 		</div>
 	</div>
 
-	<div class="ops-kpi-grid compact">
-		<article class="ops-kpi">
-			<p class="ops-kpi-label">Total proveedores</p>
-			<p class="ops-kpi-value">{{ total_proveedores }}</p>
-			<p class="ops-kpi-sub">Registros acumulados</p>
-		</article>
-		<article class="ops-kpi">
-			<p class="ops-kpi-label">Activos</p>
-			<p class="ops-kpi-value">{{ proveedores_activos }}</p>
-			<p class="ops-kpi-sub">Disponibles para compras</p>
-		</article>
-		<article class="ops-kpi">
-			<p class="ops-kpi-label">Inactivos</p>
-			<p class="ops-kpi-value">{{ proveedores_inactivos }}</p>
-			<p class="ops-kpi-sub">Solo consulta histórica</p>
-		</article>
-	</div>
-
-	<div class="ops-toolbar">
-		<form method="get" class="ops-input-wrap d-flex gap-2">
-			<i class="bi bi-search"></i>
-			<input type="text" name="q" value="{{ q or '' }}" placeholder="Buscar proveedor por nombre" />
-			<button type="submit" class="btn btn-sm">Buscar</button>
-		</form>
-		<button
-			type="button"
-			class="btn btn-sm"
-			data-bs-toggle="modal"
-			data-bs-target="#modalProveedorCrear">
-			<i class="bi bi-plus-lg me-1"></i>Nuevo proveedor
-		</button>
-	</div>
-
 	<div class="ops-card">
-		<h3 class="ops-card-title">Listado de proveedores</h3>
 		<div class="ops-table table-responsive">
 			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>Empresa</th>
-						<th>Correo</th>
+						<th>Nombre proveedor</th>
+						<th>Nombre contacto</th>
 						<th>Telefono</th>
-						<th>Direccion</th>
-						<th>Activo</th>
+						<th>Correo electrónico</th>
+						<th>Dirección</th>
+						<th>Ciudad / Estado</th>
+						<th>Estado</th>
+						<th>Fecha registro</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for p in proveedores %}
 					<tr>
-						<td>{{ p.id_proveedor }}</td>
+						<td>{{ p.id_proveedor_formateado }}</td>
 						<td>{{ p.nombre_empresa }}</td>
-						<td>{{ p.correo }}</td>
+						<td>{{ p.nombre_contacto }}</td>
 						<td>{{ p.telefono }}</td>
+						<td>{{ p.correo }}</td>
 						<td>{{ p.direccion }}</td>
+						<td>{{ p.ciudad }}, {{ p.estado }}</td>
 						<td>
 							<span class="ops-chip {{ 'success' if p.activo else 'neutral' }}">
 								{{ 'Activo' if p.activo else 'Inactivo' }}
 							</span>
 						</td>
+						<td>{{ p.fecha_alta.strftime('%d/%m/%Y') if p.fecha_alta else '-' }}</td>
 						<td>
 							<div class="btn-action-group" style="min-width: 120px">
 								<button
@@ -84,28 +69,48 @@
 									class="btn btn-sm btn-outline-primary btn-icon-sm js-editar-proveedor"
 									title="Editar proveedor"
 									data-id="{{ p.id_proveedor }}"
-									data-nombre="{{ p.nombre_empresa }}"
+									data-nombre-proveedor="{{ p.nombre_empresa }}"
+									data-nombre-contacto="{{ p.nombre_contacto }}"
 									data-correo="{{ p.correo }}"
 									data-telefono="{{ p.telefono }}"
 									data-direccion="{{ p.direccion }}"
-									data-activo="{{ '1' if p.activo else '0' }}">
+									data-ciudad="{{ p.ciudad }}"
+									data-estado="{{ p.estado }}">
 									<i class="bi bi-pencil-fill"></i>
 								</button>
-								<form method="post" action="{{ url_for('admin.desactivar_proveedor', id_proveedor=p.id_proveedor) }}">
-									<button
-										type="submit"
-										class="btn btn-sm btn-outline-dark btn-icon-sm"
-										title="Desactivar proveedor"
-										{{ 'disabled' if not p.activo else '' }}>
-										<i class="bi bi-slash-circle-fill"></i>
-									</button>
-								</form>
+								{% if p.activo %}
+								<button
+									type="button"
+									class="btn btn-sm btn-outline-dark btn-icon-sm js-desactivar-proveedor"
+									title="Desactivar proveedor"
+									data-id="{{ p.id_proveedor }}"
+									data-nombre="{{ p.nombre_empresa }}">
+									<i class="bi bi-slash-circle-fill"></i>
+								</button>
+								<form
+									method="post"
+									id="formDesactivarProveedor{{ p.id_proveedor }}"
+									action="{{ url_for('admin.desactivar_proveedor', id_proveedor=p.id_proveedor) }}"></form>
+								{% else %}
+								<button
+									type="button"
+									class="btn btn-sm btn-outline-success btn-icon-sm js-activar-proveedor"
+									title="Activar proveedor"
+									data-id="{{ p.id_proveedor }}"
+									data-nombre="{{ p.nombre_empresa }}">
+									<i class="bi bi-check-circle-fill"></i>
+								</button>
+								<form
+									method="post"
+									id="formActivarProveedor{{ p.id_proveedor }}"
+									action="{{ url_for('admin.activar_proveedor', id_proveedor=p.id_proveedor) }}"></form>
+								{% endif %}
 							</div>
 						</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="7">No hay proveedores para mostrar.</td>
+						<td colspan="10">No hay proveedores para mostrar.</td>
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -116,22 +121,67 @@
 	<div class="modal fade" id="modalProveedorCrear" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Registrar proveedor</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title">
+						<i class="bi bi-truck me-2"></i>
+						Agregar proveedor
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"></button>
 				</div>
 				<form method="post">
 					<div class="modal-body">
-						<div class="ops-grid">
-							<input type="text" name="nombre_empresa" placeholder="Empresa" required />
-							<input type="email" name="correo" placeholder="Correo" required />
-							<input type="text" name="telefono" placeholder="Telefono" required />
-							<input type="text" name="direccion" placeholder="Direccion" required />
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Nombre del proveedor *</label>
+								<input
+									type="text"
+									name="nombre_proveedor"
+									placeholder="Ej. Harinera del Centro"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Nombre de contacto *</label>
+								<input
+									type="text"
+									name="nombre_contacto"
+									placeholder="Ej. Roberto Sánchez"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono *</label>
+								<input type="text" name="telefono" placeholder="477 123 4567" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Correo electrónico *</label>
+								<input type="email" name="correo" placeholder="contacto@proveedor.com" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ciudad *</label>
+								<input type="text" name="ciudad" placeholder="León" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Estado *</label>
+								<input type="text" name="estado" placeholder="Guanajuato" required />
+							</div>
+							<div class="col-12">
+								<label class="form-label">Dirección *</label>
+								<input
+									type="text"
+									name="direccion"
+									placeholder="Blvd. Delta 505, Col. San José"
+									required />
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Registrar proveedor</button>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-sm">Guardar</button>
 					</div>
 				</form>
 			</div>
@@ -141,46 +191,189 @@
 	<div class="modal fade" id="modalProveedorEditar" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Editar proveedor</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title">
+						<i class="bi bi-pencil-fill me-2"></i>
+						Modificar proveedor
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"></button>
 				</div>
 				<form method="post" id="formEditarProveedor">
 					<div class="modal-body">
-						<div class="ops-grid">
-							<input type="text" name="nombre_empresa" id="editarProveedorNombre" required />
-							<input type="email" name="correo" id="editarProveedorCorreo" required />
-							<input type="text" name="telefono" id="editarProveedorTelefono" required />
-							<input type="text" name="direccion" id="editarProveedorDireccion" required />
-						</div>
-						<div class="form-check mt-3">
-							<input class="form-check-input" type="checkbox" name="activo" id="editarProveedorActivo" />
-							<label class="form-check-label" for="editarProveedorActivo">Activo</label>
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Nombre del proveedor *</label>
+								<input type="text" name="nombre_proveedor" id="editarProveedorNombre" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Nombre de contacto *</label>
+								<input type="text" name="nombre_contacto" id="editarProveedorContacto" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono *</label>
+								<input type="text" name="telefono" id="editarProveedorTelefono" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Correo electrónico *</label>
+								<input type="email" name="correo" id="editarProveedorCorreo" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ciudad *</label>
+								<input type="text" name="ciudad" id="editarProveedorCiudad" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Estado *</label>
+								<input type="text" name="estado" id="editarProveedorEstado" required />
+							</div>
+							<div class="col-12">
+								<label class="form-label">Dirección *</label>
+								<input type="text" name="direccion" id="editarProveedorDireccion" required />
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Guardar cambios</button>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-sm">Guardar</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
-</section>
-{% endblock %}
 
-{% block scripts %}
+	<div class="modal fade" id="modalProveedorDesactivar" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-sm modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<div
+						style="
+							width: 60px;
+							height: 60px;
+							border-radius: 50%;
+							background: #fff8e1;
+							color: #e65100;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							font-size: 1.6rem;
+							margin: 0 auto 1rem;
+						">
+						<i class="bi bi-truck"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1.05rem">
+						¿Desactivar proveedor?
+					</h5>
+					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoDesactivarProveedor"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-sm" id="btnConfirmarDesactivarProveedor">
+						<i class="bi bi-check-lg me-1"></i>
+						Confirmar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalProveedorActivar" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-sm modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<div
+						style="
+							width: 60px;
+							height: 60px;
+							border-radius: 50%;
+							background: #e8f5e9;
+							color: #2e7d32;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							font-size: 1.6rem;
+							margin: 0 auto 1rem;
+						">
+						<i class="bi bi-truck"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1.05rem">
+						¿Activar proveedor?
+					</h5>
+					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoActivarProveedor"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-sm" id="btnConfirmarActivarProveedor">
+						<i class="bi bi-check-lg me-1"></i>
+						Confirmar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %} {% block scripts %}
 <script>
+	let proveedorDesactivarId = null;
+	let proveedorActivarId = null;
+
 	document.querySelectorAll('.js-editar-proveedor').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
-			document.getElementById('formEditarProveedor').action = `/admin/proveedores/${buttonElement.dataset.id}/editar`;
-			document.getElementById('editarProveedorNombre').value = buttonElement.dataset.nombre || '';
+			document.getElementById('formEditarProveedor').action =
+				`/admin/proveedores/${buttonElement.dataset.id}/editar`;
+			document.getElementById('editarProveedorNombre').value =
+				buttonElement.dataset.nombreProveedor || '';
+			document.getElementById('editarProveedorContacto').value =
+				buttonElement.dataset.nombreContacto || '';
 			document.getElementById('editarProveedorCorreo').value = buttonElement.dataset.correo || '';
-			document.getElementById('editarProveedorTelefono').value = buttonElement.dataset.telefono || '';
-			document.getElementById('editarProveedorDireccion').value = buttonElement.dataset.direccion || '';
-			document.getElementById('editarProveedorActivo').checked = buttonElement.dataset.activo === '1';
+			document.getElementById('editarProveedorTelefono').value =
+				buttonElement.dataset.telefono || '';
+			document.getElementById('editarProveedorCiudad').value = buttonElement.dataset.ciudad || '';
+			document.getElementById('editarProveedorEstado').value = buttonElement.dataset.estado || '';
+			document.getElementById('editarProveedorDireccion').value =
+				buttonElement.dataset.direccion || '';
 			new bootstrap.Modal(document.getElementById('modalProveedorEditar')).show();
 		});
+	});
+
+	document.querySelectorAll('.js-desactivar-proveedor').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			proveedorDesactivarId = buttonElement.dataset.id;
+			document.getElementById('textoDesactivarProveedor').innerHTML =
+				`El proveedor <strong>${buttonElement.dataset.nombre}</strong> pasará a estado <em>inactivo</em>. No se eliminará el registro.`;
+			new bootstrap.Modal(document.getElementById('modalProveedorDesactivar')).show();
+		});
+	});
+
+	document.querySelectorAll('.js-activar-proveedor').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			proveedorActivarId = buttonElement.dataset.id;
+			document.getElementById('textoActivarProveedor').innerHTML =
+				`El proveedor <strong>${buttonElement.dataset.nombre}</strong> pasará a estado <em>activo</em>.`;
+			new bootstrap.Modal(document.getElementById('modalProveedorActivar')).show();
+		});
+	});
+
+	document.getElementById('btnConfirmarDesactivarProveedor').addEventListener('click', () => {
+		if (!proveedorDesactivarId) {
+			return;
+		}
+		document.getElementById(`formDesactivarProveedor${proveedorDesactivarId}`).submit();
+	});
+
+	document.getElementById('btnConfirmarActivarProveedor').addEventListener('click', () => {
+		if (!proveedorActivarId) {
+			return;
+		}
+		document.getElementById(`formActivarProveedor${proveedorActivarId}`).submit();
 	});
 </script>
 {% endblock %}
