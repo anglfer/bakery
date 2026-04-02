@@ -3089,7 +3089,39 @@
         "documentation": {}
     },
     {
+        "label": "ROUND_HALF_UP",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
         "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "InvalidOperation",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "ROUND_HALF_UP",
         "importPath": "decimal",
         "description": "decimal",
         "isExtraImport": true,
@@ -3121,15 +3153,7 @@
         "documentation": {}
     },
     {
-        "label": "InvalidOperation",
-        "importPath": "decimal",
-        "description": "decimal",
-        "isExtraImport": true,
-        "detail": "decimal",
-        "documentation": {}
-    },
-    {
-        "label": "Decimal",
+        "label": "ROUND_HALF_UP",
         "importPath": "decimal",
         "description": "decimal",
         "isExtraImport": true,
@@ -3714,11 +3738,12 @@
         "documentation": {}
     },
     {
-        "label": "EmailMessage",
-        "importPath": "email.message",
-        "description": "email.message",
+        "label": "urllib.parse",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "email.message",
+        "importPath": "urllib.parse",
+        "description": "urllib.parse",
+        "detail": "urllib.parse",
         "documentation": {}
     },
     {
@@ -3731,12 +3756,11 @@
         "documentation": {}
     },
     {
-        "label": "urllib.parse",
-        "kind": 6,
+        "label": "EmailMessage",
+        "importPath": "email.message",
+        "description": "email.message",
         "isExtraImport": true,
-        "importPath": "urllib.parse",
-        "description": "urllib.parse",
-        "detail": "urllib.parse",
+        "detail": "email.message",
         "documentation": {}
     },
     {
@@ -3876,6 +3900,30 @@
         "documentation": {}
     },
     {
+        "label": "calcular_costo_unitario_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "recalcular_costo_y_precio_sugerido_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "recalcular_costos_productos_afectados_por_materias",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "production_bp",
         "importPath": "app.production",
         "description": "app.production",
@@ -3962,6 +4010,14 @@
         "description": "config.development",
         "isExtraImport": true,
         "detail": "config.development",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -7308,7 +7364,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def dashboard():\n    if not current_user.rol or current_user.rol.nombre != \"Administrador\":\n        flash(\"No tienes acceso al dashboard administrativo.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    fecha = utc_today()\n    ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n    total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n    numero_ventas = len(ventas_hoy)\n    producto_mas_vendido = None\n    if ventas_hoy:",
+        "peekOfCode": "def dashboard():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        flash(\"No tienes acceso al dashboard.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    fecha = utc_today()\n    ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n    total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n    numero_ventas = len(ventas_hoy)\n    producto_mas_vendido = None",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7488,7 +7544,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def login():\n    if current_user.is_authenticated:\n        return redirect(url_for(\"catalog.home\"))\n    form = LoginForm()\n    if form.validate_on_submit():\n        usuario = Usuario.query.filter_by(\n            username=form.username.data.strip(), activo=True\n        ).first()\n        if not usuario:\n            flash(\"Credenciales invalidas\", \"danger\")",
+        "peekOfCode": "def login():\n    if current_user.is_authenticated:\n        return _redirect_authenticated_user()\n    form = LoginForm()\n    if form.validate_on_submit():\n        usuario = Usuario.query.filter_by(\n            username=form.username.data.strip(), activo=True\n        ).first()\n        if not usuario:\n            flash(\"Credenciales invalidas\", \"danger\")",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7524,7 +7580,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "LOGIN_TEMPLATE = \"auth/login.html\"\nREGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":",
+        "peekOfCode": "LOGIN_TEMPLATE = \"auth/login.html\"\nREGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7533,7 +7589,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "REGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":\n        return \"production.ordenes\"",
+        "peekOfCode": "REGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None\n) -> None:",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7542,7 +7598,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "LOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name == \"Administrador\":\n        return \"admin.dashboard\"\n    if role_name == \"Ventas\":\n        return \"sales.ventas\"\n    if role_name == \"Produccion\":\n        return \"production.ordenes\"\n    return \"catalog.home\"",
+        "peekOfCode": "LOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None\n) -> None:\n    db.session.add(",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7659,7 +7715,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:\n    if not detalles:\n        raise ValueError(\"La compra debe incluir al menos un detalle\")\n    db.session.add(compra)\n    db.session.flush()\n    total = Decimal(\"0\")\n    for item in detalles:\n        materia = _obtener_materia_bloqueada(item[\"id_materia_prima\"])\n        if not materia or not materia.activa:\n            raise ValueError(\"Materia prima no encontrada\")",
+        "peekOfCode": "def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:\n    if not detalles:\n        raise ValueError(\"La compra debe incluir al menos un detalle\")\n    db.session.add(compra)\n    db.session.flush()\n    total = Decimal(\"0\")\n    ids_materia_impactadas: set[int] = set()\n    for item in detalles:\n        materia = _obtener_materia_bloqueada(item[\"id_materia_prima\"])\n        if not materia or not materia.activa:",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7722,7 +7778,25 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def calcular_costo_producto(*, id_producto: int, cantidad: int) -> Decimal:\n    if cantidad <= 0:\n        return Decimal(\"0\")\n    return calcular_costo_unitario_producto(id_producto=id_producto) * Decimal(\n        str(cantidad)\n    )\ndef crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    solicitud = SolicitudProduccion.query.get(id_solicitud)",
+        "peekOfCode": "def calcular_costo_producto(*, id_producto: int, cantidad: int) -> Decimal:\n    if cantidad <= 0:\n        return Decimal(\"0\")\n    return calcular_costo_unitario_producto(id_producto=id_producto) * Decimal(\n        str(cantidad)\n    )\ndef recalcular_costo_y_precio_sugerido_producto(*, id_producto: int) -> Producto:\n    producto = _obtener_producto_bloqueado(id_producto)\n    if not producto:\n        raise ValueError(\"Producto no disponible\")",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "recalcular_costo_y_precio_sugerido_producto",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def recalcular_costo_y_precio_sugerido_producto(*, id_producto: int) -> Producto:\n    producto = _obtener_producto_bloqueado(id_producto)\n    if not producto:\n        raise ValueError(\"Producto no disponible\")\n    costo_unitario = _to_mxn(calcular_costo_unitario_producto(id_producto=id_producto))\n    margen_objetivo = Decimal(str(producto.margen_objetivo_pct or Decimal(\"25\")))\n    if margen_objetivo <= 0 or margen_objetivo >= 100:\n        raise ValueError(\"Margen objetivo invalido para calcular precio sugerido\")\n    divisor = Decimal(\"1\") - (margen_objetivo / Decimal(\"100\"))\n    if divisor <= 0:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "recalcular_costos_productos_afectados_por_materias",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def recalcular_costos_productos_afectados_por_materias(\n    *, ids_materia: list[int]\n) -> dict:\n    ids_materia_validas = sorted({int(m) for m in ids_materia if int(m) > 0})\n    if not ids_materia_validas:\n        return {\"actualizados\": 0, \"errores\": []}\n    productos_ids = (\n        db.session.query(Producto.id_producto)\n        .join(Receta, Receta.id_receta == Producto.id_receta)\n        .join(DetalleReceta, DetalleReceta.id_receta == Receta.id_receta)",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7731,7 +7805,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    solicitud = SolicitudProduccion.query.get(id_solicitud)\n    if not solicitud:\n        raise ValueError(\"Solicitud no encontrada\")\n    if solicitud.estado != \"APROBADA\":\n        raise ValueError(\"Solo solicitudes aprobadas pueden generar orden\")\n    receta = Receta.query.get(id_receta)\n    if not receta or not receta.activa:",
+        "peekOfCode": "def crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    if cantidad <= 0:\n        raise ValueError(\"La cantidad a producir debe ser mayor a cero\")\n    solicitud = SolicitudProduccion.query.get(id_solicitud)\n    if not solicitud:\n        raise ValueError(\"Solicitud no encontrada\")\n    if solicitud.estado != \"APROBADA\":\n        raise ValueError(\"Solo solicitudes aprobadas pueden generar orden\")",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7776,7 +7850,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def pagar_compra(id_compra: int, id_usuario: int) -> None:\n    compra = Compra.query.get(id_compra)\n    if not compra:\n        raise ValueError(\"Compra no encontrada\")\n    compra.estado_pago = \"PAGADO\"\n    salida = SalidaEfectivo(\n        concepto=f\"Pago compra {compra.id_compra}\",\n        monto=compra.total,\n        tipo=\"COMPRA_MATERIA_PRIMA\",\n        id_usuario=id_usuario,",
+        "peekOfCode": "def pagar_compra(id_compra: int, id_usuario: int) -> None:\n    compra = Compra.query.get(id_compra)\n    if not compra:\n        raise ValueError(\"Compra no encontrada\")\n    if compra.estado_pago == \"PAGADO\":\n        raise ValueError(\"La compra ya fue marcada como pagada\")\n    compra.estado_pago = \"PAGADO\"\n    salida = SalidaEfectivo(\n        concepto=f\"Pago compra {compra.id_compra}\",\n        monto=compra.total,",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7785,7 +7859,7 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "TRANSICIONES_PEDIDO = {\n    \"PENDIENTE\": {\"CONFIRMADO\", \"PAGADO\", \"CANCELADO\"},\n    \"CONFIRMADO\": {\"PAGADO\"},\n    \"PAGADO\": set(),\n    \"ENTREGADO\": set(),\n    \"CANCELADO\": set(),\n}\nTRANSICIONES_ORDEN = {\n    \"PENDIENTE\": {\"EN_PROCESO\", \"CANCELADO\"},\n    \"EN_PROCESO\": {\"FINALIZADO\"},",
+        "peekOfCode": "TRANSICIONES_PEDIDO = {\n    \"PENDIENTE\": {\"CONFIRMADO\", \"CANCELADO\"},\n    \"CONFIRMADO\": {\"PAGADO\"},\n    \"PAGADO\": set(),\n    \"ENTREGADO\": set(),\n    \"CANCELADO\": set(),\n}\nTRANSICIONES_ORDEN = {\n    \"PENDIENTE\": {\"EN_PROCESO\", \"CANCELADO\"},\n    \"EN_PROCESO\": {\"FINALIZADO\"},",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7794,7 +7868,25 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "TRANSICIONES_ORDEN = {\n    \"PENDIENTE\": {\"EN_PROCESO\", \"CANCELADO\"},\n    \"EN_PROCESO\": {\"FINALIZADO\"},\n    \"FINALIZADO\": set(),\n    \"CANCELADO\": set(),\n}\ndef _validar_transicion_estado(\n    *,\n    estado_actual: str,\n    estado_destino: str,",
+        "peekOfCode": "TRANSICIONES_ORDEN = {\n    \"PENDIENTE\": {\"EN_PROCESO\", \"CANCELADO\"},\n    \"EN_PROCESO\": {\"FINALIZADO\"},\n    \"FINALIZADO\": set(),\n    \"CANCELADO\": set(),\n}\nMXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "MXN_QUANTIZE",
+        "kind": 5,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _validar_transicion_estado(\n    *,\n    estado_actual: str,\n    estado_destino: str,",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "UNIT_COST_QUANTIZE",
+        "kind": 5,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "UNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _validar_transicion_estado(\n    *,\n    estado_actual: str,\n    estado_destino: str,\n    mapa_transiciones: dict[str, set[str]],",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7947,7 +8039,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def cortes():\n    if request.method == \"POST\":\n        fecha = utc_today()\n        ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n        total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n        numero_ventas = len(ventas_hoy)\n        costo_produccion = Decimal(\"0\")\n        for v in ventas_hoy:\n            for d in v.detalles:\n                try:",
+        "peekOfCode": "def cortes():\n    if request.method == \"POST\":\n        fecha = utc_today()\n        ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n        total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n        numero_ventas = len(ventas_hoy)\n        costo_produccion = Decimal(\"0\")\n        for v in ventas_hoy:\n            for d in v.detalles:\n                if d.costo_unitario_produccion is not None:",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8226,7 +8318,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class DetalleVenta(db.Model):\n    __tablename__ = \"detalle_venta\"\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(db.Integer, db.ForeignKey(\"venta.id_venta\"), nullable=False)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad = db.Column(db.Integer, nullable=False)\n    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)\n    subtotal = db.Column(db.Numeric(12, 2), nullable=False)\n    venta = db.relationship(\"Venta\", back_populates=\"detalles\")\n    producto = db.relationship(\"Producto\")",
+        "peekOfCode": "class DetalleVenta(db.Model):\n    __tablename__ = \"detalle_venta\"\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(db.Integer, db.ForeignKey(\"venta.id_venta\"), nullable=False)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad = db.Column(db.Integer, nullable=False)\n    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)\n    costo_unitario_produccion = db.Column(db.Numeric(12, 2), nullable=True)\n    utilidad_unitaria = db.Column(db.Numeric(12, 2), nullable=True)\n    subtotal = db.Column(db.Numeric(12, 2), nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8406,7 +8498,7 @@
         "kind": 2,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)\n    _seed_customer_flow(users)\n    _seed_access_logs(users)",
+        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_product_costing()\n    _seed_production_flow(users)\n    _seed_customer_flow(users)",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8415,7 +8507,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_ADMIN = \"Administrador\"\nROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()",
+        "peekOfCode": "ROLE_ADMIN = \"Administrador\"\nROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8424,7 +8516,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()",
+        "peekOfCode": "ROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8433,7 +8525,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()",
+        "peekOfCode": "ROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8442,7 +8534,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()",
+        "peekOfCode": "ROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8451,7 +8543,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()",
+        "peekOfCode": "MP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8460,7 +8552,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)",
+        "peekOfCode": "MP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8469,7 +8561,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)",
+        "peekOfCode": "MP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8478,7 +8570,25 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_HUEVO = \"Huevo Fresco\"\ndef seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_production_flow(users)\n    _seed_customer_flow(users)",
+        "peekOfCode": "MP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "PRODUCTO_PASTEL_CHOCOLATE",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "PRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _resolver_costo_unitario_para_snapshot(producto: Producto) -> Decimal:",
+        "detail": "app.seed_data",
+        "documentation": {}
+    },
+    {
+        "label": "MXN_QUANTIZE",
+        "kind": 5,
+        "importPath": "app.seed_data",
+        "description": "app.seed_data",
+        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _resolver_costo_unitario_para_snapshot(producto: Producto) -> Decimal:\n    costo_actual = Decimal(str(producto.costo_produccion_actual or 0))",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8642,6 +8752,60 @@
         "description": "migrations.versions.a1c2d3e4f5a6_add_producto_reservas_and_constraints",
         "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"cantidad_reservada\",\n                sa.Integer(),\n                nullable=False,\n                server_default=\"0\",\n            )",
         "detail": "migrations.versions.a1c2d3e4f5a6_add_producto_reservas_and_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,\n                server_default=\"0\",\n            )\n        )",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "def downgrade():\n    with op.batch_alter_table(\"detalle_venta\", schema=None) as batch_op:\n        batch_op.drop_column(\"utilidad_unitaria\")\n        batch_op.drop_column(\"costo_unitario_produccion\")\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.drop_constraint(\n            \"ck_producto_precio_sugerido_no_negativo\",\n            type_=\"check\",\n        )\n        batch_op.drop_constraint(",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "revision = \"b2d4f6a8c0e1\"\ndown_revision = \"a1c2d3e4f5a6\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "down_revision = \"a1c2d3e4f5a6\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,\n                server_default=\"0\",",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,\n                server_default=\"0\",\n            )",
+        "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
         "documentation": {}
     },
     {

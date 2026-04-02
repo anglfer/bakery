@@ -104,6 +104,7 @@ def _asegurar_snapshots_historicos_venta(venta: Venta) -> Decimal:
 def seed_full_data() -> None:
     _seed_roles_modules_permissions()
     users = _seed_people_and_users()
+    _seed_measurement_units_metadata()
     _seed_suppliers()
     _seed_raw_materials()
     _seed_recipes()
@@ -350,6 +351,28 @@ def _seed_suppliers() -> None:
                 activo=True,
             )
         )
+    db.session.flush()
+
+
+def _seed_measurement_units_metadata() -> None:
+    unit_specs = {
+        "kg": ("Kilogramo", "MASA", Decimal("1000")),
+        "g": ("Gramo", "MASA", Decimal("1")),
+        "l": ("Litro", "VOLUMEN", Decimal("1000")),
+        "ml": ("Mililitro", "VOLUMEN", Decimal("1")),
+        "pza": ("Pieza", "CONTEO", Decimal("1")),
+        "cos": ("Costal", "MASA", Decimal("25000")),
+    }
+
+    for unit in UnidadMedida.query.all():
+        spec = unit_specs.get(unit.abreviatura)
+        if not spec:
+            continue
+        nombre, dimension, factor_base = spec
+        unit.nombre = nombre
+        unit.dimension = dimension
+        unit.factor_base = factor_base
+
     db.session.flush()
 
 

@@ -4,7 +4,7 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from flask_login import UserMixin
-from sqlalchemy import CheckConstraint, UniqueConstraint
+from sqlalchemy import CheckConstraint, Index, UniqueConstraint, inspect, text
 
 from app.extensions import bcrypt, db, login_manager
 
@@ -181,10 +181,17 @@ class Proveedor(TimestampMixin, db.Model):
 
 class UnidadMedida(db.Model):
     __tablename__ = "unidad_medida"
+    __table_args__ = (
+        CheckConstraint(
+            "factor_base > 0", name="ck_unidad_medida_factor_base_positivo"
+        ),
+    )
 
     id_unidad = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(80), unique=True, nullable=False)
     abreviatura = db.Column(db.String(20), unique=True, nullable=False)
+    dimension = db.Column(db.String(20), default="CONTEO", nullable=False)
+    factor_base = db.Column(db.Numeric(12, 4), default=1, nullable=False)
 
 
 class MateriaPrima(TimestampMixin, db.Model):
@@ -214,9 +221,28 @@ class MateriaPrima(TimestampMixin, db.Model):
     unidad_base = db.relationship("UnidadMedida", foreign_keys=[id_unidad_base])
     unidad_compra = db.relationship("UnidadMedida", foreign_keys=[id_unidad_compra])
 
+    @property
+    def esta_bajo_minimo(self) -> bool:
+        return Decimal(str(self.cantidad_disponible)) < Decimal(str(self.stock_minimo))
+
+    @property
+    def estado_stock(self) -> str:
+        if not self.activa:
+            return "INACTIVA"
+        if self.esta_bajo_minimo:
+            return "CRITICO"
+        minimo = Decimal(str(self.stock_minimo))
+        if minimo > 0 and Decimal(str(self.cantidad_disponible)) < (minimo * Decimal("1.5")):
+            return "BAJO"
+        return "OK"
+
 
 class MovimientoInventarioMP(db.Model):
     __tablename__ = "movimiento_inventario_mp"
+    __table_args__ = (
+        CheckConstraint("cantidad > 0", name="ck_movimiento_mp_cantidad_positiva"),
+        Index("ix_movimiento_mp_materia_fecha", "id_materia_prima", "fecha"),
+    )
 
     id_movimiento = db.Column(db.Integer, primary_key=True)
     id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)
@@ -631,17 +657,101 @@ def seed_base_catalog_data() -> None:
             db.session.add(Modulo(nombre=nombre))
 
     unidades_base = (
-        ("Kilogramo", "kg"),
-        ("Gramo", "g"),
-        ("Litro", "l"),
-        ("Mililitro", "ml"),
-        ("Pieza", "pza"),
-        ("Costal", "cos"),
+        ("Kilogramo", "kg", "MASA", Decimal("1000")),
+        ("Gramo", "g", "MASA", Decimal("1")),
+        ("Litro", "l", "VOLUMEN", Decimal("1000")),
+        ("Mililitro", "ml", "VOLUMEN", Decimal("1")),
+        ("Pieza", "pza", "CONTEO", Decimal("1")),
+        ("Costal", "cos", "MASA", Decimal("25000")),
     )
-    for nombre, abreviatura in unidades_base:
-        exists = UnidadMedida.query.filter_by(abreviatura=abreviatura).first()
-        if not exists:
-            db.session.add(UnidadMedida(nombre=nombre, abreviatura=abreviatura))
+
+    inspector = inspect(db.engine)
+    columnas_unidad = {
+        column["name"] for column in inspector.get_columns("unidad_medida")
+    }
+    tiene_dimension_y_factor = {
+        "dimension",
+        "factor_base",
+    }.issubset(columnas_unidad)
+
+    for nombre, abreviatura, dimension, factor_base in unidades_base:
+        existente = db.session.execute(
+            text(
+                """
+                SELECT id_unidad
+                FROM unidad_medida
+                WHERE abreviatura = :abreviatura
+                LIMIT 1
+                """
+            ),
+            {"abreviatura": abreviatura},
+        ).first()
+
+        if not existente:
+            if tiene_dimension_y_factor:
+                db.session.execute(
+                    text(
+                        """
+                        INSERT INTO unidad_medida
+                            (nombre, abreviatura, dimension, factor_base)
+                        VALUES
+                            (:nombre, :abreviatura, :dimension, :factor_base)
+                        """
+                    ),
+                    {
+                        "nombre": nombre,
+                        "abreviatura": abreviatura,
+                        "dimension": dimension,
+                        "factor_base": factor_base,
+                    },
+                )
+            else:
+                db.session.execute(
+                    text(
+                        """
+                        INSERT INTO unidad_medida (nombre, abreviatura)
+                        VALUES (:nombre, :abreviatura)
+                        """
+                    ),
+                    {
+                        "nombre": nombre,
+                        "abreviatura": abreviatura,
+                    },
+                )
+            continue
+
+        if tiene_dimension_y_factor:
+            db.session.execute(
+                text(
+                    """
+                    UPDATE unidad_medida
+                    SET nombre = :nombre,
+                        dimension = :dimension,
+                        factor_base = :factor_base
+                    WHERE abreviatura = :abreviatura
+                    """
+                ),
+                {
+                    "nombre": nombre,
+                    "dimension": dimension,
+                    "factor_base": factor_base,
+                    "abreviatura": abreviatura,
+                },
+            )
+        else:
+            db.session.execute(
+                text(
+                    """
+                    UPDATE unidad_medida
+                    SET nombre = :nombre
+                    WHERE abreviatura = :abreviatura
+                    """
+                ),
+                {
+                    "nombre": nombre,
+                    "abreviatura": abreviatura,
+                },
+            )
 
     productos_base = (
         (

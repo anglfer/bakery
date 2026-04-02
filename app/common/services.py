@@ -21,6 +21,7 @@ from app.models import (
     SalidaEfectivo,
     SolicitudProduccion,
     TicketVenta,
+    UnidadMedida,
     Venta,
     utc_now,
 )
@@ -72,6 +73,27 @@ def _obtener_producto_bloqueado(id_producto: int) -> Producto | None:
 
 def _obtener_materia_bloqueada(id_materia: int) -> MateriaPrima | None:
     return MateriaPrima.query.filter_by(id_materia=id_materia).with_for_update().first()
+
+
+def _inferir_factor_conversion_por_unidades(
+    *, id_unidad_base: int, id_unidad_compra: int
+) -> Decimal | None:
+    unidad_base = UnidadMedida.query.get(id_unidad_base)
+    unidad_compra = UnidadMedida.query.get(id_unidad_compra)
+    if not unidad_base or not unidad_compra:
+        return None
+
+    dimension_base = (unidad_base.dimension or "CONTEO").upper()
+    dimension_compra = (unidad_compra.dimension or "CONTEO").upper()
+    if dimension_base != dimension_compra:
+        return None
+
+    factor_base = Decimal(str(unidad_base.factor_base or 0))
+    factor_compra = Decimal(str(unidad_compra.factor_base or 0))
+    if factor_base <= 0 or factor_compra <= 0:
+        return None
+
+    return factor_compra / factor_base
 
 
 def _obtener_pedido_bloqueado(id_pedido: int) -> Pedido | None:
@@ -135,6 +157,31 @@ def _validar_disponibilidad_materia_prima_para_orden(
         disponible = Decimal(str(materia.cantidad_disponible))
         if disponible < cantidad_real:
             raise ValueError(f"Stock insuficiente para {materia.nombre}")
+
+
+def _obtener_consumo_materias_para_orden(
+    *,
+    receta: Receta,
+    cantidad_producir: int,
+) -> list[tuple[MateriaPrima, Decimal]]:
+    if receta.rendimiento_base <= 0:
+        raise ValueError("Rendimiento base invalido")
+
+    factor = Decimal(str(cantidad_producir)) / Decimal(str(receta.rendimiento_base))
+    consumos: list[tuple[MateriaPrima, Decimal]] = []
+    for detalle in DetalleReceta.query.filter_by(id_receta=receta.id_receta).all():
+        materia = _obtener_materia_bloqueada(detalle.id_materia_prima)
+        if not materia or not materia.activa:
+            raise ValueError("Materia prima no disponible")
+
+        base = Decimal(str(detalle.cantidad_base)) * factor
+        merma_factor = Decimal("1") + (
+            Decimal(str(materia.porcentaje_merma)) / Decimal("100")
+        )
+        cantidad_real = base * merma_factor
+        consumos.append((materia, cantidad_real))
+
+    return consumos
 
 
 def _validar_parametros_checkout(
@@ -305,6 +352,144 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
     )
     db.session.commit()
     return compra
+
+
+def crear_materia_prima(
+    *,
+    nombre: str,
+    id_unidad_base: int,
+    id_unidad_compra: int,
+    factor_conversion: Decimal,
+    porcentaje_merma: Decimal,
+    stock_minimo: Decimal,
+    cantidad_inicial: Decimal,
+    id_usuario: int,
+) -> MateriaPrima:
+    nombre_limpio = (nombre or "").strip()
+    if not nombre_limpio:
+        raise ValueError("El nombre de la materia prima es obligatorio")
+    if id_unidad_base <= 0 or id_unidad_compra <= 0:
+        raise ValueError("Debes seleccionar unidad base y unidad de compra")
+    if factor_conversion <= 0:
+        factor_inferido = _inferir_factor_conversion_por_unidades(
+            id_unidad_base=id_unidad_base,
+            id_unidad_compra=id_unidad_compra,
+        )
+        if not factor_inferido or factor_inferido <= 0:
+            raise ValueError("El factor de conversion debe ser mayor a cero")
+        factor_conversion = factor_inferido
+    if porcentaje_merma < 0:
+        raise ValueError("El porcentaje de merma no puede ser negativo")
+    if stock_minimo < 0 or cantidad_inicial < 0:
+        raise ValueError("Las cantidades de inventario no pueden ser negativas")
+
+    existente = MateriaPrima.query.filter(
+        db.func.lower(MateriaPrima.nombre) == nombre_limpio.lower()
+    ).first()
+    if existente:
+        raise ValueError("Ya existe una materia prima con ese nombre")
+
+    materia = MateriaPrima(
+        nombre=nombre_limpio,
+        id_unidad_base=id_unidad_base,
+        id_unidad_compra=id_unidad_compra,
+        factor_conversion=factor_conversion,
+        porcentaje_merma=porcentaje_merma,
+        stock_minimo=stock_minimo,
+        cantidad_disponible=cantidad_inicial,
+        activa=True,
+    )
+    db.session.add(materia)
+    db.session.flush()
+
+    if cantidad_inicial > 0:
+        db.session.add(
+            MovimientoInventarioMP(
+                id_materia_prima=materia.id_materia,
+                tipo="ENTRADA",
+                cantidad=cantidad_inicial,
+                id_usuario=id_usuario,
+                referencia_id=f"ALTA-MP-{materia.id_materia}",
+            )
+        )
+
+    db.session.commit()
+    return materia
+
+
+def actualizar_materia_prima(
+    *,
+    id_materia: int,
+    nombre: str,
+    id_unidad_base: int,
+    id_unidad_compra: int,
+    factor_conversion: Decimal,
+    porcentaje_merma: Decimal,
+    stock_minimo: Decimal,
+) -> MateriaPrima:
+    materia = _obtener_materia_bloqueada(id_materia)
+    if not materia:
+        raise ValueError("Materia prima no encontrada")
+
+    nombre_limpio = (nombre or "").strip()
+    if not nombre_limpio:
+        raise ValueError("El nombre de la materia prima es obligatorio")
+    if id_unidad_base <= 0 or id_unidad_compra <= 0:
+        raise ValueError("Debes seleccionar unidad base y unidad de compra")
+    if factor_conversion <= 0:
+        factor_inferido = _inferir_factor_conversion_por_unidades(
+            id_unidad_base=id_unidad_base,
+            id_unidad_compra=id_unidad_compra,
+        )
+        if not factor_inferido or factor_inferido <= 0:
+            raise ValueError("El factor de conversion debe ser mayor a cero")
+        factor_conversion = factor_inferido
+    if porcentaje_merma < 0:
+        raise ValueError("El porcentaje de merma no puede ser negativo")
+    if stock_minimo < 0:
+        raise ValueError("El stock minimo no puede ser negativo")
+
+    duplicado = MateriaPrima.query.filter(
+        db.func.lower(MateriaPrima.nombre) == nombre_limpio.lower(),
+        MateriaPrima.id_materia != materia.id_materia,
+    ).first()
+    if duplicado:
+        raise ValueError("Ya existe una materia prima con ese nombre")
+
+    materia.nombre = nombre_limpio
+    materia.id_unidad_base = id_unidad_base
+    materia.id_unidad_compra = id_unidad_compra
+    materia.factor_conversion = factor_conversion
+    materia.porcentaje_merma = porcentaje_merma
+    materia.stock_minimo = stock_minimo
+
+    recalcular_costos_productos_afectados_por_materias(ids_materia=[materia.id_materia])
+    db.session.commit()
+    return materia
+
+
+def desactivar_materia_prima(*, id_materia: int) -> MateriaPrima:
+    materia = _obtener_materia_bloqueada(id_materia)
+    if not materia:
+        raise ValueError("Materia prima no encontrada")
+    if not materia.activa:
+        return materia
+
+    uso_en_receta_activa = (
+        db.session.query(DetalleReceta.id_detalle)
+        .join(Receta, Receta.id_receta == DetalleReceta.id_receta)
+        .filter(DetalleReceta.id_materia_prima == materia.id_materia)
+        .filter(Receta.activa.is_(True))
+        .first()
+    )
+    if uso_en_receta_activa:
+        raise ValueError(
+            "No se puede desactivar: la materia prima esta en recetas activas"
+        )
+
+    materia.activa = False
+    db.session.commit()
+    return materia
 
 
 def agregar_producto_a_carrito(
@@ -770,7 +955,7 @@ def crear_orden_produccion(
     return orden
 
 
-def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProduccion:
+def iniciar_orden_produccion(*, id_orden: int) -> OrdenProduccion:
     orden = _obtener_orden_bloqueada(id_orden)
     if not orden:
         raise ValueError("Orden no encontrada")
@@ -787,48 +972,23 @@ def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProducci
     if receta.rendimiento_base <= 0:
         raise ValueError("Rendimiento base invalido")
 
-    factor = Decimal(str(orden.cantidad_producir)) / Decimal(
-        str(receta.rendimiento_base)
-    )
-    costo_total_mxn = Decimal("0")
-
-    for detalle in DetalleReceta.query.filter_by(id_receta=receta.id_receta).all():
-        materia = _obtener_materia_bloqueada(detalle.id_materia_prima)
-        if not materia or not materia.activa:
-            raise ValueError("Materia prima no disponible")
-
-        base = Decimal(str(detalle.cantidad_base)) * factor
-        merma_factor = Decimal("1") + (
-            Decimal(str(materia.porcentaje_merma)) / Decimal("100")
-        )
-        real = base * merma_factor
-
+    for materia, cantidad_real in _obtener_consumo_materias_para_orden(
+        receta=receta,
+        cantidad_producir=orden.cantidad_producir,
+    ):
         disponible = Decimal(str(materia.cantidad_disponible))
-        if disponible < real:
+        if disponible < cantidad_real:
             raise ValueError(f"Stock insuficiente para {materia.nombre}")
-
-        materia.cantidad_disponible = disponible - real
-        db.session.add(
-            MovimientoInventarioMP(
-                id_materia_prima=materia.id_materia,
-                tipo="SALIDA",
-                cantidad=real,
-                id_usuario=id_usuario,
-                referencia_id=f"ORD-{orden.id_orden}",
-            )
-        )
-
-        costo_unit = Decimal(str(materia.costo_unitario))
-        costo_total_mxn += real * costo_unit
 
     orden.estado = "EN_PROCESO"
     orden.fecha_inicio = utc_now()
-    orden.costo_total = costo_total_mxn
     db.session.commit()
     return orden
 
 
-def finalizar_orden_produccion(*, id_orden: int) -> OrdenProduccion:
+def finalizar_orden_produccion(
+    *, id_orden: int, id_usuario: int | None = None
+) -> OrdenProduccion:
     orden = _obtener_orden_bloqueada(id_orden)
     if not orden:
         raise ValueError("Orden no encontrada")
@@ -844,11 +1004,39 @@ def finalizar_orden_produccion(*, id_orden: int) -> OrdenProduccion:
     if not producto or not producto.activo:
         raise ValueError("No se encontro el producto asociado a la orden")
 
+    receta = Receta.query.get(orden.id_receta)
+    if not receta or not receta.activa:
+        raise ValueError("Receta activa no encontrada")
+
+    costo_total_mxn = Decimal("0")
+    usuario_movimiento = id_usuario or orden.id_usuario_responsable
+    for materia, cantidad_real in _obtener_consumo_materias_para_orden(
+        receta=receta,
+        cantidad_producir=orden.cantidad_producir,
+    ):
+        disponible = Decimal(str(materia.cantidad_disponible))
+        if disponible < cantidad_real:
+            raise ValueError(f"Stock insuficiente para {materia.nombre}")
+
+        materia.cantidad_disponible = disponible - cantidad_real
+        db.session.add(
+            MovimientoInventarioMP(
+                id_materia_prima=materia.id_materia,
+                tipo="SALIDA",
+                cantidad=cantidad_real,
+                id_usuario=usuario_movimiento,
+                referencia_id=f"ORD-{orden.id_orden}",
+            )
+        )
+        costo_unit = Decimal(str(materia.costo_unitario))
+        costo_total_mxn += cantidad_real * costo_unit
+
     producto.cantidad_disponible = int(producto.cantidad_disponible or 0) + int(
         orden.cantidad_producir
     )
     orden.estado = "FINALIZADO"
     orden.fecha_fin = utc_now()
+    orden.costo_total = _to_mxn(costo_total_mxn)
     db.session.commit()
     return orden
 

@@ -19,3 +19,5 @@
 2026-04-01 21:57:33,184 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_solicitud=3; id_receta=1; cantidad=4
 2026-04-01 21:58:22,455 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3
 2026-04-01 21:58:50,757 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_producto=1; cantidad=4
+2026-04-02 15:02:48,313 INFO AUDIT|evento=PROVEEDOR_DESACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401
+2026-04-02 15:02:51,805 INFO AUDIT|evento=PROVEEDOR_ACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401

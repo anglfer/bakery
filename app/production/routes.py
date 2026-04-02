@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.common.security import log_audit_event, require_permission
 from app.common.services import (
+    actualizar_materia_prima,
     cancelar_orden_produccion,
+    crear_materia_prima,
     crear_orden_produccion,
+    desactivar_materia_prima,
     finalizar_orden_produccion,
     iniciar_orden_produccion,
 )
@@ -46,23 +49,86 @@ def _int(value: str, default: int = 0) -> int:
 def inventario_mp():
     if request.method == "POST":
         action = request.form.get("action", "")
+        if action == "crear":
+            try:
+                materia = crear_materia_prima(
+                    nombre=request.form.get("nombre", ""),
+                    id_unidad_base=_int(request.form.get("id_unidad_base", "0")),
+                    id_unidad_compra=_int(request.form.get("id_unidad_compra", "0")),
+                    factor_conversion=_decimal(
+                        request.form.get("factor_conversion", "0")
+                    ),
+                    porcentaje_merma=_decimal(
+                        request.form.get("porcentaje_merma", "0")
+                    ),
+                    stock_minimo=_decimal(request.form.get("stock_minimo", "0")),
+                    cantidad_inicial=_decimal(
+                        request.form.get("cantidad_inicial", "0")
+                    ),
+                    id_usuario=current_user.id_usuario,
+                )
+                log_audit_event(
+                    "INVENTARIO_MP_CREAR",
+                    f"id_materia={materia.id_materia}; nombre={materia.nombre}",
+                )
+                flash("Materia prima registrada correctamente.", "success")
+            except ValueError as exc:
+                flash(str(exc), "danger")
+            return redirect(url_for("production.inventario_mp"))
+
+        if action == "editar":
+            id_materia = _int(request.form.get("id_materia", "0"))
+            try:
+                materia = actualizar_materia_prima(
+                    id_materia=id_materia,
+                    nombre=request.form.get("nombre", ""),
+                    id_unidad_base=_int(request.form.get("id_unidad_base", "0")),
+                    id_unidad_compra=_int(request.form.get("id_unidad_compra", "0")),
+                    factor_conversion=_decimal(
+                        request.form.get("factor_conversion", "0")
+                    ),
+                    porcentaje_merma=_decimal(
+                        request.form.get("porcentaje_merma", "0")
+                    ),
+                    stock_minimo=_decimal(request.form.get("stock_minimo", "0")),
+                )
+                log_audit_event(
+                    "INVENTARIO_MP_EDITAR",
+                    f"id_materia={materia.id_materia}; nombre={materia.nombre}",
+                )
+                flash("Materia prima actualizada.", "success")
+            except ValueError as exc:
+                flash(str(exc), "danger")
+            return redirect(url_for("production.inventario_mp"))
+
+        if action == "desactivar":
+            id_materia = _int(request.form.get("id_materia", "0"))
+            try:
+                materia = desactivar_materia_prima(id_materia=id_materia)
+                log_audit_event(
+                    "INVENTARIO_MP_DESACTIVAR",
+                    f"id_materia={materia.id_materia}; nombre={materia.nombre}",
+                )
+                flash("Materia prima desactivada.", "success")
+            except ValueError as exc:
+                flash(str(exc), "danger")
+            return redirect(url_for("production.inventario_mp"))
+
         if action == "ajuste":
             id_materia = _int(request.form.get("id_materia", "0"))
             cantidad = _decimal(request.form.get("cantidad", "0"))
             tipo = request.form.get("tipo", "AJUSTE").strip().upper()
+            referencia_id = (request.form.get("referencia_id") or "").strip()
             if tipo not in {"ENTRADA", "SALIDA", "AJUSTE"}:
                 flash("Tipo de movimiento invalido.", "danger")
                 return redirect(url_for("production.inventario_mp"))
 
-            if tipo == "ENTRADA":
-                flash(
-                    "Las entradas de materia prima solo pueden registrarse desde compras.",
-                    "danger",
-                )
-                return redirect(url_for("production.inventario_mp"))
-
             if cantidad <= 0:
                 flash("La cantidad del movimiento debe ser mayor a cero.", "danger")
+                return redirect(url_for("production.inventario_mp"))
+
+            if not referencia_id:
+                flash("Debes indicar una referencia o motivo del movimiento.", "danger")
                 return redirect(url_for("production.inventario_mp"))
 
             materia = MateriaPrima.query.get(id_materia)
@@ -72,7 +138,9 @@ def inventario_mp():
 
             disponible = Decimal(str(materia.cantidad_disponible))
             nueva_cantidad = disponible
-            if tipo in {"SALIDA", "AJUSTE"}:
+            if tipo == "ENTRADA":
+                nueva_cantidad = disponible + cantidad
+            elif tipo in {"SALIDA", "AJUSTE"}:
                 nueva_cantidad = disponible - cantidad
 
             if nueva_cantidad < 0:
@@ -86,18 +154,19 @@ def inventario_mp():
                     tipo=tipo,
                     cantidad=cantidad,
                     id_usuario=current_user.id_usuario,
-                    referencia_id="AJUSTE-MANUAL",
+                    referencia_id=referencia_id,
                 )
             )
             db.session.commit()
             log_audit_event(
                 "INVENTARIO_MP_AJUSTE",
-                f"id_materia={materia.id_materia}; tipo={tipo}; cantidad={cantidad}",
+                f"id_materia={materia.id_materia}; tipo={tipo}; cantidad={cantidad}; referencia={referencia_id}",
             )
             flash("Movimiento registrado.", "success")
             return redirect(url_for("production.inventario_mp"))
 
     materias = MateriaPrima.query.order_by(MateriaPrima.nombre.asc()).all()
+    unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()
     movimientos = (
         MovimientoInventarioMP.query.order_by(
             MovimientoInventarioMP.id_movimiento.desc()
@@ -105,11 +174,130 @@ def inventario_mp():
         .limit(15)
         .all()
     )
+
+    resumen_stock = {"critico": 0, "bajo": 0, "ok": 0}
+    alertas_stock = []
+    for materia in materias:
+        if not materia.activa:
+            continue
+
+        estado = (materia.estado_stock or "OK").upper()
+        if estado == "CRITICO":
+            resumen_stock["critico"] += 1
+            alertas_stock.append(
+                {
+                    "nombre": materia.nombre,
+                    "cantidad": Decimal(str(materia.cantidad_disponible)),
+                    "stock_minimo": Decimal(str(materia.stock_minimo)),
+                    "unidad": materia.unidad_base.abreviatura,
+                }
+            )
+            continue
+
+        if estado == "BAJO":
+            resumen_stock["bajo"] += 1
+            continue
+
+        resumen_stock["ok"] += 1
+
     return render_template(
         "production/inventario_mp.html",
         materias=materias,
+        unidades=unidades,
+        unidades_meta=[
+            {
+                "id_unidad": unidad.id_unidad,
+                "abreviatura": unidad.abreviatura,
+                "dimension": (unidad.dimension or "CONTEO").upper(),
+                "factor_base": float(unidad.factor_base),
+            }
+            for unidad in unidades
+        ],
         movimientos=movimientos,
+        resumen_stock=resumen_stock,
+        alertas_stock=alertas_stock,
     )
+
+
+@production_bp.get("/api/materia-prima/<int:id_materia>")
+@login_required
+@require_permission("Inventario MP", "leer")
+def api_materia_prima(id_materia: int):
+    materia = MateriaPrima.query.get_or_404(id_materia)
+    return jsonify(
+        {
+            "id_materia": materia.id_materia,
+            "nombre": materia.nombre,
+            "id_unidad_base": materia.id_unidad_base,
+            "id_unidad_compra": materia.id_unidad_compra,
+            "unidad_base": {
+                "id_unidad": materia.unidad_base.id_unidad,
+                "abreviatura": materia.unidad_base.abreviatura,
+            },
+            "unidad_compra": {
+                "id_unidad": materia.unidad_compra.id_unidad,
+                "abreviatura": materia.unidad_compra.abreviatura,
+            },
+            "factor_conversion": float(materia.factor_conversion),
+            "porcentaje_merma": float(materia.porcentaje_merma),
+            "stock_minimo": float(materia.stock_minimo),
+            "cantidad_disponible": float(materia.cantidad_disponible),
+            "activa": bool(materia.activa),
+            "estado_stock": materia.estado_stock,
+        }
+    )
+
+
+@production_bp.get("/api/materia-prima/<int:id_materia>/movimientos")
+@login_required
+@require_permission("Inventario MP", "leer")
+def api_movimientos_materia_prima(id_materia: int):
+    materia = MateriaPrima.query.get_or_404(id_materia)
+    movimientos = (
+        MovimientoInventarioMP.query.filter_by(id_materia_prima=id_materia)
+        .order_by(MovimientoInventarioMP.id_movimiento.desc())
+        .limit(100)
+        .all()
+    )
+    data = [
+        {
+            "id_movimiento": mv.id_movimiento,
+            "tipo": mv.tipo,
+            "cantidad": float(mv.cantidad),
+            "fecha_movimiento": mv.fecha.isoformat(),
+            "referencia_id": mv.referencia_id or "-",
+            "nombre": materia.nombre,
+            "unidad": materia.unidad_base.abreviatura,
+        }
+        for mv in movimientos
+    ]
+    return jsonify({"data": data})
+
+
+@production_bp.get("/api/movimientos-inventario")
+@login_required
+@require_permission("Inventario MP", "leer")
+def api_movimientos_inventario():
+    movimientos = (
+        MovimientoInventarioMP.query.order_by(
+            MovimientoInventarioMP.id_movimiento.desc()
+        )
+        .limit(150)
+        .all()
+    )
+    data = [
+        {
+            "id_movimiento": mv.id_movimiento,
+            "tipo": mv.tipo,
+            "cantidad": float(mv.cantidad),
+            "fecha_movimiento": mv.fecha.isoformat(),
+            "referencia_id": mv.referencia_id or "-",
+            "nombre": mv.materia_prima.nombre,
+            "unidad": mv.materia_prima.unidad_base.abreviatura,
+        }
+        for mv in movimientos
+    ]
+    return jsonify({"data": data})
 
 
 @production_bp.route("/recetas", methods=["GET", "POST"])
@@ -300,27 +488,30 @@ def ordenes():
             try:
                 iniciar_orden_produccion(
                     id_orden=orden.id_orden,
-                    id_usuario=current_user.id_usuario,
                 )
                 log_audit_event(
                     "ORDEN_PRODUCCION_INICIADA",
                     f"id_orden={orden.id_orden}",
                 )
-                flash(
-                    "Orden iniciada. Insumos descontados y costo calculado.", "success"
-                )
+                flash("Orden iniciada correctamente.", "success")
             except ValueError as exc:
                 flash(str(exc), "danger")
             return redirect(url_for("production.ordenes"))
 
         if action == "finalizar":
             try:
-                orden_actualizada = finalizar_orden_produccion(id_orden=orden.id_orden)
+                orden_actualizada = finalizar_orden_produccion(
+                    id_orden=orden.id_orden,
+                    id_usuario=current_user.id_usuario,
+                )
                 log_audit_event(
                     "ORDEN_PRODUCCION_FINALIZADA",
                     f"id_orden={orden_actualizada.id_orden}; id_producto={orden_actualizada.id_producto}; cantidad={orden_actualizada.cantidad_producir}",
                 )
-                flash("Orden finalizada y stock actualizado.", "success")
+                flash(
+                    "Orden finalizada. Se descontaron insumos y se actualizo el stock de producto.",
+                    "success",
+                )
             except ValueError as exc:
                 flash(str(exc), "warning")
             return redirect(url_for("production.ordenes"))

@@ -1,29 +1,48 @@
-{% extends "base_template.html" %} {% block title %}Inventario MP{% endblock %} {% block content %}
-<section class="section">
-	{% set ns = namespace(stock_bajo=0) %} {% for m in materias %} {% if m.cantidad_disponible <
-	m.stock_minimo %} {% set ns.stock_bajo = ns.stock_bajo + 1 %} {% endif %} {% endfor %}
+{% extends "base_template.html" %}
+{% block title %}Inventario MP{% endblock %}
 
+{% block content %}
+<section class="section">
 	<div class="ops-hero">
 		<p class="ops-meta mb-1">Panel de producción</p>
 		<h2 class="ops-hero-title">Inventario de materia prima</h2>
-		<p class="ops-hero-text">Consulta existencias, mínimos y movimientos recientes de insumos.</p>
+		<p class="ops-hero-text">
+			Controla existencias, mínimos, conversiones y movimientos con trazabilidad completa.
+		</p>
 	</div>
+
+	{% if alertas_stock %}
+	<div class="ops-alert-stock mb-3" role="alert">
+		<div class="ops-alert-stock-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+		<div>
+			<p class="ops-alert-stock-title mb-1">
+				{{ alertas_stock|length }} materias primas bajo stock mínimo
+			</p>
+			<p class="ops-alert-stock-text mb-0">
+				{% for alerta in alertas_stock %}
+					{{ alerta.nombre }} ({{ alerta.cantidad }} {{ alerta.unidad }} / mín. {{ alerta.stock_minimo }} {{ alerta.unidad }}){% if not loop.last %} · {% endif %}
+				{% endfor %}
+				— Solicita una compra o ajuste de inventario.
+			</p>
+		</div>
+	</div>
+	{% endif %}
 
 	<div class="ops-kpi-grid compact">
 		<article class="ops-kpi">
-			<p class="ops-kpi-label">Total materias</p>
-			<p class="ops-kpi-value">{{ materias|length }}</p>
-			<p class="ops-kpi-sub">Insumos registrados</p>
+			<p class="ops-kpi-label">Stock crítico</p>
+			<p class="ops-kpi-value text-danger">{{ resumen_stock.critico }}</p>
+			<p class="ops-kpi-sub">Debajo del mínimo</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Stock bajo</p>
-			<p class="ops-kpi-value">{{ ns.stock_bajo }}</p>
-			<p class="ops-kpi-sub">Por debajo del mínimo</p>
+			<p class="ops-kpi-value" style="color: #c05a1a">{{ resumen_stock.bajo }}</p>
+			<p class="ops-kpi-sub">Por debajo del 150% del mínimo</p>
 		</article>
 		<article class="ops-kpi">
-			<p class="ops-kpi-label">Movimientos recientes</p>
-			<p class="ops-kpi-value">{{ movimientos|length }}</p>
-			<p class="ops-kpi-sub">Últimos registros</p>
+			<p class="ops-kpi-label">Stock suficiente</p>
+			<p class="ops-kpi-value text-success">{{ resumen_stock.ok }}</p>
+			<p class="ops-kpi-sub">Niveles óptimos</p>
 		</article>
 	</div>
 
@@ -32,156 +51,654 @@
 			<i class="bi bi-search"></i>
 			<input type="text" id="inventarioSearch" placeholder="Buscar materia prima" />
 		</div>
-	</div>
-
-	<div class="ops-card d-flex flex-wrap justify-content-between align-items-center gap-3">
-		<div>
-			<h3 class="ops-card-title mb-1">Ajustes de inventario</h3>
-			<p class="text-secondary mb-0 small">
-				Registra salidas o ajustes en una pantallita separada.
-			</p>
-		</div>
-		<button
-			type="button"
-			class="btn btn-sm"
-			data-bs-toggle="modal"
-			data-bs-target="#modalInventarioAjuste">
-			Registrar ajuste manual
+		<select id="filtroEstado" class="form-select form-select-sm" style="max-width: 170px">
+			<option value="todos">Todos los estados</option>
+			<option value="activa">Activas</option>
+			<option value="inactiva">Inactivas</option>
+		</select>
+		<select id="filtroStock" class="form-select form-select-sm" style="max-width: 160px">
+			<option value="todos">Todo el stock</option>
+			<option value="critico">Crítico</option>
+			<option value="bajo">Bajo</option>
+			<option value="ok">OK</option>
+		</select>
+		<button type="button" class="btn btn-outline-secondary btn-sm" id="btnHistorialGlobal">
+			<i class="bi bi-clock-history me-1"></i>Movimientos
+		</button>
+		<button type="button" class="btn btn-sm" id="btnNuevaMateria">
+			<i class="bi bi-plus-lg me-1"></i>Nueva materia prima
 		</button>
 	</div>
 
 	<div class="ops-card">
-		<h3 class="ops-card-title">Estado actual de materias primas</h3>
+		<div class="d-flex align-items-center justify-content-between mb-2">
+			<h3 class="ops-card-title mb-0">Materias primas</h3>
+			<span class="ops-chip neutral" id="tablaCount">{{ materias|length }} registros</span>
+		</div>
 		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
+			<table class="table table-hover align-middle mb-0" id="tablaMaterias">
 				<thead>
 					<tr>
-						<th>Materia prima</th>
+						<th>Nombre</th>
 						<th>Unidad base</th>
-						<th>Disponible</th>
-						<th>Minimo</th>
+						<th>Unidad compra</th>
+						<th>Factor conv.</th>
+						<th>Merma %</th>
+						<th>Existencia actual</th>
+						<th>Stock mínimo</th>
+						<th>Estado stock</th>
+						<th>Estado</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for m in materias %}
+					{% set stock_estado = (m.estado_stock or 'OK')|lower %}
 					<tr
 						data-row="materia"
-						data-label="{{ (m.nombre ~ ' ' ~ m.unidad_base.abreviatura)|lower }}">
-						<td>{{ m.nombre }}</td>
-						<td>{{ m.unidad_base.abreviatura }}</td>
-						<td>{{ m.cantidad_disponible }}</td>
+						data-id="{{ m.id_materia }}"
+						data-label="{{ (m.nombre ~ ' ' ~ m.unidad_base.abreviatura ~ ' ' ~ m.unidad_compra.abreviatura)|lower }}"
+						data-estado="{{ 'activa' if m.activa else 'inactiva' }}"
+						data-stock="{{ stock_estado }}"
+						data-nombre="{{ m.nombre }}"
+						data-cantidad="{{ m.cantidad_disponible }}"
+						data-unidad="{{ m.unidad_base.abreviatura }}">
+						<td class="fw-semibold">{{ m.nombre }}</td>
+						<td><span class="ops-chip neutral">{{ m.unidad_base.abreviatura }}</span></td>
+						<td><span class="ops-chip neutral">{{ m.unidad_compra.abreviatura }}</span></td>
+						<td>x {{ m.factor_conversion }}</td>
+						<td>{{ m.porcentaje_merma }}%</td>
 						<td>
-							<span
-								class="ops-chip {{ 'warning' if m.cantidad_disponible < m.stock_minimo else 'success' }}">
-								{{ m.stock_minimo }}
+							<div class="ops-stock-cell">
+								<div class="ops-stock-bar">
+									<div class="ops-stock-bar-fill {{ stock_estado }}"></div>
+								</div>
+								<span class="ops-stock-number">{{ m.cantidad_disponible }} {{ m.unidad_base.abreviatura }}</span>
+							</div>
+						</td>
+						<td>{{ m.stock_minimo }} {{ m.unidad_base.abreviatura }}</td>
+						<td>
+							{% if stock_estado == 'critico' %}
+							<span class="ops-chip danger">Crítico</span>
+							{% elif stock_estado == 'bajo' %}
+							<span class="ops-chip warning">Bajo</span>
+							{% else %}
+							<span class="ops-chip success">OK</span>
+							{% endif %}
+						</td>
+						<td>
+							<span class="ops-chip {{ 'success' if m.activa else 'neutral' }}">
+								{{ 'Activa' if m.activa else 'Inactiva' }}
 							</span>
+						</td>
+						<td>
+							<div class="btn-action-group">
+								<button
+									type="button"
+									class="btn btn-outline-secondary btn-icon-sm btnEditar"
+									data-id="{{ m.id_materia }}"
+									title="Editar">
+									<i class="bi bi-pencil-fill"></i>
+								</button>
+								<button
+									type="button"
+									class="btn btn-outline-secondary btn-icon-sm btnAjustar"
+									data-id="{{ m.id_materia }}"
+									title="Ajuste inventario"
+									{{ 'disabled' if not m.activa else '' }}>
+									<i class="bi bi-arrow-left-right"></i>
+								</button>
+								<button
+									type="button"
+									class="btn btn-outline-secondary btn-icon-sm btnHistorial"
+									data-id="{{ m.id_materia }}"
+									title="Historial">
+									<i class="bi bi-clock-history"></i>
+								</button>
+								{% if m.activa %}
+								<button
+									type="button"
+									class="btn btn-outline-danger btn-icon-sm btnDesactivar"
+									data-id="{{ m.id_materia }}"
+									title="Desactivar">
+									<i class="bi bi-archive-fill"></i>
+								</button>
+								{% endif %}
+							</div>
 						</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="4">No hay materias primas registradas.</td>
+						<td colspan="10">No hay materias primas registradas.</td>
 					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
 		</div>
 	</div>
+</section>
 
-	<div class="ops-card">
-		<h3 class="ops-card-title">Últimos movimientos</h3>
-		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Materia</th>
-						<th>Tipo</th>
-						<th>Cantidad</th>
-						<th>Referencia</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for mv in movimientos %}
-					<tr>
-						<td>{{ mv.id_movimiento }}</td>
-						<td>{{ mv.materia_prima.nombre }}</td>
-						<td>
-							<span
-								class="ops-chip {{ 'danger' if mv.tipo in ['SALIDA', 'AJUSTE'] else 'success' }}">
-								{{ mv.tipo }}
-							</span>
-						</td>
-						<td>{{ mv.cantidad }}</td>
-						<td>{{ mv.referencia_id or '-' }}</td>
-					</tr>
-					{% else %}
-					<tr>
-						<td colspan="5">No hay movimientos para mostrar.</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<div class="modal fade" id="modalInventarioAjuste" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Registrar ajuste manual</h5>
-					<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<form method="post">
-					<input type="hidden" name="action" value="ajuste" />
-					<div class="modal-body">
+<div class="modal fade" id="modalMateriaPrima" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalMateriaTitulo">Nueva materia prima</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<form method="post" id="formMateriaPrima">
+				<input type="hidden" name="action" id="mpAction" value="crear" />
+				<input type="hidden" name="id_materia" id="mpIdMateria" value="" />
+				<div class="modal-body">
+					<div class="mp-form-block">
+						<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Datos generales</p>
 						<div class="ops-grid">
-							<select name="id_materia" required>
-								<option value="">Materia prima</option>
-								{% for m in materias %}
-								<option value="{{ m.id_materia }}">{{ m.nombre }}</option>
-								{% endfor %}
-							</select>
-							<select name="tipo" required>
-								<option value="SALIDA">SALIDA</option>
-								<option value="AJUSTE">AJUSTE</option>
-							</select>
+							<div class="mp-field-full">
+								<label for="mpNombre" class="form-label fw-semibold">Nombre *</label>
+								<input
+									type="text"
+									name="nombre"
+									id="mpNombre"
+									placeholder="Ej. Harina de trigo"
+									required />
+								<small class="text-muted">Nombre único. No se permiten duplicados.</small>
+							</div>
+						</div>
+					</div>
+
+					<div class="mp-form-block">
+						<p class="ops-meta mb-2">
+							<i class="bi bi-arrow-left-right me-1"></i>Unidades y conversión automática
+						</p>
+						<div class="ops-grid mp-grid-3">
+							<div>
+								<label for="mpUnidadBase" class="form-label fw-semibold">Unidad base *</label>
+								<select name="id_unidad_base" id="mpUnidadBase" required>
+									<option value="">Seleccionar...</option>
+									{% for u in unidades %}
+									<option value="{{ u.id_unidad }}">{{ u.nombre }} ({{ u.abreviatura }})</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div>
+								<label for="mpUnidadCompra" class="form-label fw-semibold">Unidad de compra *</label>
+								<select name="id_unidad_compra" id="mpUnidadCompra" required>
+									<option value="">Seleccionar...</option>
+									{% for u in unidades %}
+									<option value="{{ u.id_unidad }}">{{ u.nombre }} ({{ u.abreviatura }})</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div>
+								<label for="mpFactor" class="form-label fw-semibold">Factor de conversión *</label>
+								<input
+									type="number"
+									step="0.0001"
+									min="0.0001"
+									name="factor_conversion"
+									id="mpFactor"
+									placeholder="Ej. 25000"
+									required />
+								<small class="text-muted">Se autocompleta según unidades seleccionadas.</small>
+							</div>
+						</div>
+						<div class="ops-chip neutral mt-2" id="mpPreviewConversion">
+							Define unidades y factor para visualizar la conversión automática.
+						</div>
+					</div>
+
+					<div class="mp-form-block">
+						<p class="ops-meta mb-2"><i class="bi bi-percent me-1"></i>Merma y stock mínimo</p>
+						<div class="ops-grid mp-grid-3">
+							<div>
+								<label for="mpMerma" class="form-label fw-semibold">% Merma</label>
+								<input
+									type="number"
+									step="0.01"
+									min="0"
+									name="porcentaje_merma"
+									id="mpMerma"
+									value="0"
+									required />
+							</div>
+							<div>
+								<label for="mpStockMinimo" class="form-label fw-semibold">Stock mínimo</label>
+								<input
+									type="number"
+									step="0.0001"
+									min="0"
+									name="stock_minimo"
+									id="mpStockMinimo"
+									placeholder="0.00"
+									required />
+							</div>
+							<div>
+								<label for="mpCantidadInicial" class="form-label fw-semibold">Cantidad inicial</label>
+								<input
+									type="number"
+									step="0.0001"
+									min="0"
+									name="cantidad_inicial"
+									id="mpCantidadInicial"
+									value="0"
+									required />
+								<small class="text-muted" id="mpCantidadInicialHint">
+									Existencia de apertura en unidad base.
+								</small>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn btn-sm" id="mpSubmitLabel">
+						Guardar materia prima
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalInventarioAjuste" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalAjusteTitulo">Ajuste de inventario</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<form method="post" id="formAjuste">
+				<input type="hidden" name="action" value="ajuste" />
+				<input type="hidden" name="tipo" id="ajusteTipo" value="ENTRADA" />
+				<div class="modal-body">
+					<input type="hidden" name="id_materia" id="ajusteIdMateria" required />
+					<div class="mb-3">
+						<p class="mb-1 fw-semibold" id="ajusteMateriaNombre">Selecciona una materia prima</p>
+						<p class="text-muted mb-0" id="ajusteExistenciaTexto">Existencia actual: -</p>
+					</div>
+
+					<p class="form-label fw-semibold d-block mb-2">Tipo de movimiento *</p>
+					<div class="ops-grid mp-grid-3 mb-3">
+						<button type="button" class="btn btn-outline-secondary btnTipoAjuste active" data-tipo="ENTRADA">
+							<i class="bi bi-box-arrow-in-down me-1"></i>Entrada
+						</button>
+						<button type="button" class="btn btn-outline-secondary btnTipoAjuste" data-tipo="SALIDA">
+							<i class="bi bi-box-arrow-up me-1"></i>Salida
+						</button>
+						<button type="button" class="btn btn-outline-secondary btnTipoAjuste" data-tipo="AJUSTE">
+							<i class="bi bi-pencil-square me-1"></i>Ajuste
+						</button>
+					</div>
+
+					<div class="ops-grid mp-grid-2">
+						<div>
+							<label for="ajusteCantidad" class="form-label fw-semibold">
+								Cantidad <span id="ajusteUnidadLabel"></span>
+							</label>
 							<input
 								type="number"
 								step="0.0001"
 								min="0.0001"
 								name="cantidad"
-								placeholder="Cantidad"
+								id="ajusteCantidad"
+								placeholder="0.00"
+								required />
+						</div>
+						<div>
+							<label for="ajusteReferencia" class="form-label fw-semibold">Referencia / Motivo *</label>
+							<input
+								type="text"
+								name="referencia_id"
+								id="ajusteReferencia"
+								placeholder="Ej. Compra extra · Ajuste por conteo"
 								required />
 						</div>
 					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-							Cancelar
-						</button>
-						<button type="submit" class="btn btn-sm">Registrar movimiento</button>
-					</div>
-				</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn btn-sm">Registrar movimiento</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalHistorial" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header">
+				<h5 class="modal-title" id="historialTitulo">Historial de movimientos</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div class="ops-table table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Materia</th>
+								<th>Tipo</th>
+								<th>Cantidad</th>
+								<th>Fecha</th>
+								<th>Referencia</th>
+							</tr>
+						</thead>
+						<tbody id="historialBody"></tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
-</section>
-{% endblock %} {% block scripts %}
+</div>
+
+<div class="modal fade" id="modalDesactivar" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-sm modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header">
+				<h5 class="modal-title">Desactivar materia prima</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<form method="post" id="formDesactivar">
+				<input type="hidden" name="action" value="desactivar" />
+				<input type="hidden" name="id_materia" id="desactivarIdMateria" />
+				<div class="modal-body">
+					<p class="mb-0">
+						¿Deseas desactivar <strong id="desactivarNombreMateria"></strong>? El historial se conserva.
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn btn-sm">Confirmar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
+	const materiasData = JSON.parse(
+		'{{ materias|map(attribute="id_materia")|list|tojson|safe }}'
+	);
+	const unidadesMeta = JSON.parse('{{ unidades_meta|tojson|safe }}');
+	const unidadesMap = new Map(unidadesMeta.map((u) => [String(u.id_unidad), u]));
+	const modalMateria = new bootstrap.Modal(document.getElementById('modalMateriaPrima'));
+	const modalAjuste = new bootstrap.Modal(document.getElementById('modalInventarioAjuste'));
+	const modalHistorial = new bootstrap.Modal(document.getElementById('modalHistorial'));
+	const modalDesactivar = new bootstrap.Modal(document.getElementById('modalDesactivar'));
+
 	const inventarioSearchInput = document.getElementById('inventarioSearch');
-	if (inventarioSearchInput) {
-		inventarioSearchInput.addEventListener('input', (event) => {
-			const query = String(event.target.value || '')
-				.toLowerCase()
-				.trim();
-			document.querySelectorAll('tr[data-row="materia"]').forEach((tableRowElement) => {
-				const rowText = (tableRowElement.dataset.label || '').toLowerCase();
-				tableRowElement.style.display = rowText.includes(query) ? '' : 'none';
+	const filtroEstado = document.getElementById('filtroEstado');
+	const filtroStock = document.getElementById('filtroStock');
+	const mpCantidadInicial = document.getElementById('mpCantidadInicial');
+	const mpCantidadInicialHint = document.getElementById('mpCantidadInicialHint');
+	const mpPreviewConversion = document.getElementById('mpPreviewConversion');
+	const mpUnidadBase = document.getElementById('mpUnidadBase');
+	const mpUnidadCompra = document.getElementById('mpUnidadCompra');
+	const mpFactor = document.getElementById('mpFactor');
+
+	function getSelectedOptionLabel(selectNode) {
+		if (!selectNode || !selectNode.options) return '';
+		const selected = selectNode.options[selectNode.selectedIndex];
+		return selected ? selected.textContent : '';
+	}
+
+	function updateConversionPreview() {
+		if (!mpPreviewConversion) return;
+		const base = getSelectedOptionLabel(mpUnidadBase);
+		const compra = getSelectedOptionLabel(mpUnidadCompra);
+		const factor = Number(mpFactor?.value || 0);
+
+		if (!base || !compra || !factor || Number.isNaN(factor)) {
+			mpPreviewConversion.textContent =
+				'Define unidades y factor para visualizar la conversión automática.';
+			return;
+		}
+
+		mpPreviewConversion.textContent =
+			`Al registrar 1 ${compra}, el sistema sumará ${factor.toLocaleString()} ${base} al inventario.`;
+	}
+
+	function formatFactor(value) {
+		const numberValue = Number(value || 0);
+		if (!numberValue || Number.isNaN(numberValue)) return '';
+		return numberValue.toFixed(4).replace(/\.?(0+)$/, '');
+	}
+
+	function applyAutoFactorFromUnits(force = false) {
+		const unidadBase = unidadesMap.get(String(mpUnidadBase?.value || ''));
+		const unidadCompra = unidadesMap.get(String(mpUnidadCompra?.value || ''));
+
+		if (!unidadBase || !unidadCompra || !mpFactor) {
+			return;
+		}
+
+		if (unidadBase.dimension !== unidadCompra.dimension) {
+			if (force) {
+				mpFactor.value = '';
+				mpFactor.dataset.autofill = '1';
+			}
+			mpPreviewConversion.textContent =
+				'No se puede sugerir factor automático entre unidades de distinta dimensión.';
+			return;
+		}
+
+		const factorSugerido = Number(unidadCompra.factor_base) / Number(unidadBase.factor_base);
+		if (!factorSugerido || Number.isNaN(factorSugerido) || factorSugerido <= 0) {
+			return;
+		}
+
+		const isAutofill = mpFactor.dataset.autofill === '1';
+		const shouldApply = force || isAutofill || !String(mpFactor.value || '').trim();
+		if (shouldApply) {
+			mpFactor.value = formatFactor(factorSugerido);
+			mpFactor.dataset.autofill = '1';
+		}
+	}
+
+	function applyFilters() {
+		const query = String(inventarioSearchInput?.value || '').toLowerCase().trim();
+		const estado = String(filtroEstado?.value || 'todos');
+		const stock = String(filtroStock?.value || 'todos');
+		let visibleCount = 0;
+
+		document.querySelectorAll('tr[data-row="materia"]').forEach((row) => {
+			const rowText = (row.dataset.label || '').toLowerCase();
+			const rowEstado = row.dataset.estado || 'activa';
+			const rowStock = row.dataset.stock || 'ok';
+
+			const matchQuery = rowText.includes(query);
+			const matchEstado = estado === 'todos' || estado === rowEstado;
+			const matchStock = stock === 'todos' || stock === rowStock;
+
+			const visible = matchQuery && matchEstado && matchStock;
+			row.style.display = visible ? '' : 'none';
+			if (visible) visibleCount += 1;
+		});
+
+		const countNode = document.getElementById('tablaCount');
+		if (countNode) countNode.textContent = `${visibleCount} registros`;
+	}
+
+	inventarioSearchInput?.addEventListener('input', applyFilters);
+	filtroEstado?.addEventListener('change', applyFilters);
+	filtroStock?.addEventListener('change', applyFilters);
+
+	document.getElementById('btnNuevaMateria')?.addEventListener('click', () => {
+		document.getElementById('mpAction').value = 'crear';
+		document.getElementById('mpIdMateria').value = '';
+		document.getElementById('modalMateriaTitulo').textContent = 'Nueva materia prima';
+		document.getElementById('mpSubmitLabel').textContent = 'Guardar materia prima';
+		document.getElementById('formMateriaPrima')?.reset();
+		if (mpFactor) mpFactor.dataset.autofill = '1';
+		if (mpCantidadInicial) mpCantidadInicial.disabled = false;
+		if (mpCantidadInicialHint) {
+			mpCantidadInicialHint.textContent = 'Existencia de apertura en unidad base.';
+		}
+		updateConversionPreview();
+		modalMateria.show();
+	});
+
+	document.querySelectorAll('.btnEditar').forEach((button) => {
+		button.addEventListener('click', async () => {
+			const idMateria = button.dataset.id;
+			const response = await fetch(`/production/api/materia-prima/${idMateria}`);
+			if (!response.ok) return;
+			const materia = await response.json();
+
+			document.getElementById('mpAction').value = 'editar';
+			document.getElementById('mpIdMateria').value = String(materia.id_materia);
+			document.getElementById('modalMateriaTitulo').textContent = 'Editar materia prima';
+			document.getElementById('mpSubmitLabel').textContent = 'Guardar cambios';
+
+			document.getElementById('mpNombre').value = materia.nombre;
+			document.getElementById('mpUnidadBase').value = String(materia.id_unidad_base);
+			document.getElementById('mpUnidadCompra').value = String(materia.id_unidad_compra);
+			document.getElementById('mpFactor').value = materia.factor_conversion;
+			if (mpFactor) mpFactor.dataset.autofill = '0';
+			document.getElementById('mpMerma').value = materia.porcentaje_merma;
+			document.getElementById('mpStockMinimo').value = materia.stock_minimo;
+			document.getElementById('mpCantidadInicial').value = materia.cantidad_disponible;
+			if (mpCantidadInicial) mpCantidadInicial.disabled = true;
+			if (mpCantidadInicialHint) {
+				mpCantidadInicialHint.textContent =
+					'Para modificar existencias usa "Ajuste de inventario".';
+			}
+			updateConversionPreview();
+
+			modalMateria.show();
+		});
+	});
+
+	document.querySelectorAll('.btnAjustar').forEach((button) => {
+		button.addEventListener('click', () => {
+			const idMateria = button.dataset.id;
+			const row = button.closest('tr[data-row="materia"]');
+			const nombre = row?.dataset.nombre || 'Materia prima';
+			const cantidad = row?.dataset.cantidad || '-';
+			const unidad = row?.dataset.unidad || '';
+
+			document.getElementById('ajusteIdMateria').value = String(idMateria);
+			document.getElementById('modalAjusteTitulo').textContent = `Ajuste de inventario — ${nombre}`;
+			document.getElementById('ajusteMateriaNombre').textContent = nombre;
+			document.getElementById('ajusteExistenciaTexto').textContent =
+				`Existencia actual: ${cantidad} ${unidad}`;
+			document.getElementById('ajusteUnidadLabel').textContent = unidad
+				? `(${unidad})`
+				: '';
+
+			document.getElementById('ajusteTipo').value = 'ENTRADA';
+			document.querySelectorAll('.btnTipoAjuste').forEach((tipoBtn) => {
+				tipoBtn.classList.toggle('active', tipoBtn.dataset.tipo === 'ENTRADA');
+			});
+			modalAjuste.show();
+		});
+	});
+
+	document.querySelectorAll('.btnTipoAjuste').forEach((button) => {
+		button.addEventListener('click', () => {
+			const tipo = button.dataset.tipo || 'ENTRADA';
+			document.getElementById('ajusteTipo').value = tipo;
+			document.querySelectorAll('.btnTipoAjuste').forEach((btn) => {
+				btn.classList.toggle('active', btn === button);
 			});
 		});
+	});
+
+	async function loadHistorial(url, titulo) {
+		const body = document.getElementById('historialBody');
+		const titleNode = document.getElementById('historialTitulo');
+		if (titleNode) titleNode.textContent = titulo;
+		if (!body) return;
+		body.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
+
+		const response = await fetch(url);
+		if (!response.ok) {
+			body.innerHTML = '<tr><td colspan="6">No fue posible cargar el historial.</td></tr>';
+			return;
+		}
+		const payload = await response.json();
+		const rows = Array.isArray(payload.data) ? payload.data : [];
+		if (!rows.length) {
+			body.innerHTML = '<tr><td colspan="6">No hay movimientos para mostrar.</td></tr>';
+			return;
+		}
+
+		body.innerHTML = rows
+			.map((row) => {
+				let chipClass = 'warning';
+				if (row.tipo === 'ENTRADA') {
+					chipClass = 'success';
+				} else if (row.tipo === 'SALIDA') {
+					chipClass = 'danger';
+				}
+				const fecha = new Date(row.fecha_movimiento).toLocaleString();
+				return `<tr>
+					<td>${row.id_movimiento}</td>
+					<td>${row.nombre}</td>
+					<td><span class="ops-chip ${chipClass}">${row.tipo}</span></td>
+					<td>${row.cantidad} ${row.unidad}</td>
+					<td>${fecha}</td>
+					<td>${row.referencia_id || '-'}</td>
+				</tr>`;
+			})
+			.join('');
 	}
+
+	document.querySelectorAll('.btnHistorial').forEach((button) => {
+		button.addEventListener('click', async () => {
+			const idMateria = button.dataset.id;
+			await loadHistorial(
+				`/production/api/materia-prima/${idMateria}/movimientos`,
+				'Historial de movimientos'
+			);
+			modalHistorial.show();
+		});
+	});
+
+	document.getElementById('btnHistorialGlobal')?.addEventListener('click', async () => {
+		await loadHistorial('/production/api/movimientos-inventario', 'Movimientos globales');
+		modalHistorial.show();
+	});
+
+	document.querySelectorAll('.btnDesactivar').forEach((button) => {
+		button.addEventListener('click', async () => {
+			const row = button.closest('tr[data-row="materia"]');
+			const idMateria = button.dataset.id;
+			const nombre = row?.querySelector('td')?.textContent?.trim() || 'la materia prima';
+
+			document.getElementById('desactivarIdMateria').value = String(idMateria);
+			document.getElementById('desactivarNombreMateria').textContent = nombre;
+			modalDesactivar.show();
+		});
+	});
+
+	if (!Array.isArray(materiasData) || !materiasData.length) {
+		const btn = document.getElementById('btnHistorialGlobal');
+		if (btn) btn.disabled = true;
+	}
+
+	mpUnidadBase?.addEventListener('change', () => {
+		applyAutoFactorFromUnits(true);
+		updateConversionPreview();
+	});
+	mpUnidadCompra?.addEventListener('change', () => {
+		applyAutoFactorFromUnits(true);
+		updateConversionPreview();
+	});
+	mpFactor?.addEventListener('input', () => {
+		if (mpFactor) mpFactor.dataset.autofill = '0';
+		updateConversionPreview();
+	});
+	if (mpFactor) mpFactor.dataset.autofill = '1';
+	applyAutoFactorFromUnits(true);
+	updateConversionPreview();
 </script>
 {% endblock %}
