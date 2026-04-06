@@ -280,6 +280,102 @@ tr:last-child td {
 	font-size: 0.92rem;
 }
 
+.dashboard-shell {
+	position: relative;
+}
+
+.dashboard-hero {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	gap: 1rem;
+}
+
+.dashboard-date-filter {
+	min-width: 260px;
+	max-width: 320px;
+	padding: 0.65rem;
+	border-radius: 12px;
+	border: 1px solid #f0dfd8;
+	background: rgba(255, 255, 255, 0.75);
+}
+
+.dashboard-date-filter label {
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #7a5f57;
+}
+
+.dashboard-kpi {
+	border: 1px solid var(--sb-border);
+	border-radius: 16px;
+	padding: 1rem;
+	height: 100%;
+	background: #fff;
+	box-shadow: 0 10px 24px rgba(31, 20, 17, 0.06);
+	border-bottom-width: 4px;
+}
+
+.dashboard-kpi--accent-red {
+	border-bottom-color: #b94e48;
+}
+
+.dashboard-kpi--accent-blue {
+	border-bottom-color: #4f7fb4;
+}
+
+.dashboard-kpi--accent-green {
+	border-bottom-color: #4f9b69;
+}
+
+.dashboard-kpi--accent-warm {
+	border-bottom-color: #b08a5a;
+}
+
+.dashboard-kpi-label {
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #8d6f68;
+}
+
+.dashboard-kpi-value {
+	font-size: clamp(1.4rem, 2.2vw, 2rem);
+	font-weight: 800;
+	color: #2f1b16;
+}
+
+.dashboard-kpi-title {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #2f1b16;
+}
+
+.dashboard-kpi-sub {
+	font-size: 0.78rem;
+	color: #8d6f68;
+	margin-top: 0.3rem;
+}
+
+.dashboard-card {
+	height: 100%;
+	margin-bottom: 0;
+}
+
+.dashboard-chart-wrap {
+	position: relative;
+	min-height: 240px;
+}
+
+.dashboard-chart-wrap canvas {
+	width: 100% !important;
+	height: 100% !important;
+}
+
 .ops-meta {
 	font-size: 0.76rem;
 	font-weight: 700;
@@ -891,6 +987,15 @@ tr:last-child td {
 }
 
 @media (max-width: 992px) {
+	.dashboard-hero {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.dashboard-date-filter {
+		max-width: none;
+	}
+
 	.sales-grid-new,
 	.sales-grid-salidas,
 	.sales-grid-corte {

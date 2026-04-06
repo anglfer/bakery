@@ -534,6 +534,14 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "timedelta",
         "importPath": "datetime",
         "description": "datetime",
@@ -7844,7 +7852,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def dashboard():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        flash(\"No tienes acceso al dashboard.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    fecha = utc_today()\n    ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n    total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n    numero_ventas = len(ventas_hoy)\n    producto_mas_vendido = None",
+        "peekOfCode": "def dashboard():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in DASHBOARD_ALLOWED_ROLES:\n        flash(\"No tienes acceso al dashboard.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    fecha = _parse_dashboard_date(request.args.get(\"fecha\", \"\"))\n    ventas_hoy = (\n        Venta.query.filter(db.func.date(Venta.fecha) == fecha)\n        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))\n        .all()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7961,7 +7969,25 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "BASE_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:",
+        "peekOfCode": "BASE_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nDASHBOARD_ALLOWED_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nDASHBOARD_ESTADOS_CONFIRMADOS = {\"CONFIRMADO\", \"PAGADO\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "DASHBOARD_ALLOWED_ROLES",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "DASHBOARD_ALLOWED_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nDASHBOARD_ESTADOS_CONFIRMADOS = {\"CONFIRMADO\", \"PAGADO\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "DASHBOARD_ESTADOS_CONFIRMADOS",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "DASHBOARD_ESTADOS_CONFIRMADOS = {\"CONFIRMADO\", \"PAGADO\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7997,7 +8023,7 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "SUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:",
+        "peekOfCode": "SUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _parse_dashboard_date(value: str | None):",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -8006,7 +8032,7 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "SUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:\n    permission = (",
+        "peekOfCode": "SUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _parse_dashboard_date(value: str | None):\n    if not value:",
         "detail": "app.admin.routes",
         "documentation": {}
     },

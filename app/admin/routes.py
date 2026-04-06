@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import datetime
 from decimal import Decimal
 
 from flask import flash, jsonify, redirect, render_template, request, url_for
@@ -25,6 +26,8 @@ from app.models import (
 )
 
 BASE_ROLES = {"Administrador", "Ventas", "Produccion"}
+DASHBOARD_ALLOWED_ROLES = {"Administrador", "Ventas", "Produccion"}
+DASHBOARD_ESTADOS_CONFIRMADOS = {"CONFIRMADO", "PAGADO"}
 USERS_ENDPOINT = "admin.usuarios"
 ROLES_ENDPOINT = "admin.roles"
 SUPPLIERS_ENDPOINT = "admin.proveedores"
@@ -41,6 +44,15 @@ def _parse_int(value: str, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+def _parse_dashboard_date(value: str | None):
+    if not value:
+        return utc_today()
+    try:
+        return datetime.strptime(value.strip(), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return utc_today()
 
 
 def _can_create_user() -> bool:
@@ -124,31 +136,44 @@ def _validate_supplier_payload(
 @require_permission("Dashboard", "leer")
 def dashboard():
     role_name = current_user.rol.nombre if current_user.rol else ""
-    if role_name not in {"Administrador", "Ventas", "Produccion"}:
+    if role_name not in DASHBOARD_ALLOWED_ROLES:
         flash("No tienes acceso al dashboard.", "danger")
         return redirect(url_for("catalog.home"))
 
-    fecha = utc_today()
-    ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()
+    fecha = _parse_dashboard_date(request.args.get("fecha", ""))
+    ventas_hoy = (
+        Venta.query.filter(db.func.date(Venta.fecha) == fecha)
+        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))
+        .all()
+    )
     total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)
     numero_ventas = len(ventas_hoy)
 
-    producto_mas_vendido = None
-    producto_mas_vendido_id = None
-    if ventas_hoy:
-        rows = (
-            db.session.query(
-                DetalleVenta.id_producto, db.func.sum(DetalleVenta.cantidad)
-            )
-            .join(Venta, Venta.id_venta == DetalleVenta.id_venta)
-            .filter(db.func.date(Venta.fecha) == fecha)
-            .group_by(DetalleVenta.id_producto)
-            .order_by(db.func.sum(DetalleVenta.cantidad).desc())
-            .all()
+    productos_mas_vendidos = (
+        db.session.query(
+            Producto.nombre.label("producto"),
+            db.func.sum(DetalleVenta.cantidad).label("cantidad_total"),
         )
-        if rows:
-            producto_mas_vendido_id = rows[0][0]
-            producto_mas_vendido = Producto.query.get(producto_mas_vendido_id)
+        .join(DetalleVenta, DetalleVenta.id_producto == Producto.id_producto)
+        .join(Venta, Venta.id_venta == DetalleVenta.id_venta)
+        .filter(db.func.date(Venta.fecha) == fecha)
+        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))
+        .group_by(Producto.id_producto, Producto.nombre)
+        .order_by(
+            db.func.sum(DetalleVenta.cantidad).desc(),
+            Producto.nombre.asc(),
+        )
+        .limit(8)
+        .all()
+    )
+
+    producto_mas_vendido = "Sin datos"
+    producto_mas_vendido_cantidad = 0
+    if productos_mas_vendidos:
+        producto_mas_vendido = productos_mas_vendidos[0].producto
+        producto_mas_vendido_cantidad = int(
+            productos_mas_vendidos[0].cantidad_total or 0
+        )
 
     ventas_por_hora = (
         db.session.query(
@@ -157,6 +182,7 @@ def dashboard():
             db.func.count(Venta.id_venta).label("transacciones"),
         )
         .filter(db.func.date(Venta.fecha) == fecha)
+        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))
         .group_by(db.func.hour(Venta.fecha))
         .order_by(db.func.hour(Venta.fecha).asc())
         .all()
@@ -164,15 +190,16 @@ def dashboard():
 
     ventas_recientes = (
         db.session.query(
-            Venta.id_venta,
             Venta.fecha,
-            Producto.nombre,
+            Producto.nombre.label("producto"),
+            Producto.unidad_venta.label("presentacion"),
             DetalleVenta.cantidad,
-            DetalleVenta.subtotal,
+            DetalleVenta.subtotal.label("total_linea"),
         )
         .join(DetalleVenta, DetalleVenta.id_venta == Venta.id_venta)
         .join(Producto, Producto.id_producto == DetalleVenta.id_producto)
         .filter(db.func.date(Venta.fecha) == fecha)
+        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))
         .order_by(Venta.fecha.desc(), Venta.id_venta.desc())
         .limit(20)
         .all()
@@ -180,28 +207,22 @@ def dashboard():
 
     presentaciones_mas_vendidas = (
         db.session.query(
-            Producto.unidad_venta,
+            db.func.coalesce(
+                Producto.unidad_venta,
+                "Sin presentación",
+            ).label("presentacion"),
             db.func.sum(DetalleVenta.cantidad).label("cantidad_total"),
         )
         .join(DetalleVenta, DetalleVenta.id_producto == Producto.id_producto)
         .join(Venta, Venta.id_venta == DetalleVenta.id_venta)
         .filter(db.func.date(Venta.fecha) == fecha)
-        .group_by(Producto.unidad_venta)
-        .order_by(db.func.sum(DetalleVenta.cantidad).desc())
-        .all()
-    )
-
-    historial_ventas_productos = (
-        db.session.query(
-            Venta.fecha,
-            Producto.nombre,
-            DetalleVenta.cantidad,
+        .filter(Venta.estado.in_(DASHBOARD_ESTADOS_CONFIRMADOS))
+        .group_by(db.func.coalesce(Producto.unidad_venta, "Sin presentación"))
+        .order_by(
+            db.func.sum(DetalleVenta.cantidad).desc(),
+            db.func.coalesce(Producto.unidad_venta, "Sin presentación").asc(),
         )
-        .join(DetalleVenta, DetalleVenta.id_venta == Venta.id_venta)
-        .join(Producto, Producto.id_producto == DetalleVenta.id_producto)
-        .filter(db.func.date(Venta.fecha) == fecha)
-        .order_by(Venta.fecha.desc(), Venta.id_venta.desc())
-        .limit(20)
+        .limit(8)
         .all()
     )
 
@@ -222,22 +243,49 @@ def dashboard():
     stats = {
         "total_ventas_hoy": total_ventas,
         "numero_ventas_hoy": numero_ventas,
-        "producto_mas_vendido": (
-            producto_mas_vendido.nombre if producto_mas_vendido else "Sin datos"
-        ),
-        "producto_mas_vendido_id": producto_mas_vendido_id,
+        "producto_mas_vendido": producto_mas_vendido,
+        "producto_mas_vendido_cantidad": producto_mas_vendido_cantidad,
         "pedidos_pendientes": pedidos_pendientes,
         "productos_bajo_minimo": len(low_stock),
     }
+
+    ventas_por_hora_chart = [
+        {
+            "hora": int(row.hora or 0),
+            "total": float(row.total or 0),
+            "transacciones": int(row.transacciones or 0),
+        }
+        for row in ventas_por_hora
+    ]
+    productos_mas_vendidos_chart = [
+        {
+            "nombre": row.producto,
+            "cantidad": int(row.cantidad_total or 0),
+        }
+        for row in productos_mas_vendidos
+    ]
+    presentaciones_mas_vendidas_chart = [
+        {
+            "nombre": row.presentacion,
+            "cantidad": int(row.cantidad_total or 0),
+        }
+        for row in presentaciones_mas_vendidas
+    ]
+
     return render_template(
         "admin/dashboard.html",
+        fecha_consulta=fecha,
+        fecha_consulta_iso=fecha.isoformat(),
         role_name=role_name,
         stats=stats,
         low_stock=low_stock,
         ventas_por_hora=ventas_por_hora,
+        productos_mas_vendidos=productos_mas_vendidos,
         ventas_recientes=ventas_recientes,
         presentaciones_mas_vendidas=presentaciones_mas_vendidas,
-        historial_ventas_productos=historial_ventas_productos,
+        ventas_por_hora_chart=ventas_por_hora_chart,
+        productos_mas_vendidos_chart=productos_mas_vendidos_chart,
+        presentaciones_mas_vendidas_chart=presentaciones_mas_vendidas_chart,
     )
 
 

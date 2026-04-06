@@ -1,239 +1,308 @@
-{% extends "base_template.html" %} {% block title %}Dashboard{% endblock %} {% block content %}
-<section class="container-fluid py-4">
-	<div class="ops-hero mb-4">
-		<p class="ops-meta mb-1">
-			<i class="bi bi-speedometer2 me-1"></i>
-			Panel de control
-		</p>
-		<h2 class="ops-hero-title">Dashboard {{ role_name }}</h2>
-		<p class="ops-hero-text">Información operativa y de demanda del día actual.</p>
+{% extends "base_template.html" %} {% block title %}Dashboard{% endblock %} {% block page_title
+%}Dashboard{% endblock %} {% block content %}
+<section class="container-fluid py-4 dashboard-shell">
+	<div class="ops-hero dashboard-hero mb-4">
+		<div>
+			<p class="ops-meta mb-1">
+				<i class="bi bi-speedometer2 me-1"></i>
+				Resumen operativo
+			</p>
+			<h2 class="ops-hero-title">Dashboard {{ role_name }}</h2>
+			<p class="ops-hero-text mb-0">
+				Vista diaria de ventas confirmadas, demanda de producto e inventario crítico.
+			</p>
+		</div>
+		<form class="dashboard-date-filter" method="get">
+			<label for="fecha" class="form-label mb-1">Consultar día</label>
+			<div class="d-flex gap-2 align-items-center">
+				<input
+					type="date"
+					id="fecha"
+					name="fecha"
+					value="{{ fecha_consulta_iso }}"
+					max="{{ fecha_consulta_iso }}"
+					class="form-control form-control-sm" />
+				<button type="submit" class="btn btn-sm btn-primary">
+					<i class="bi bi-funnel-fill me-1"></i>
+					Filtrar
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<div class="row g-3 mb-4">
+		<div class="col-12 col-md-6 col-xl-3">
+			<article class="dashboard-kpi dashboard-kpi--accent-red">
+				<p class="dashboard-kpi-label mb-1">Ventas del día</p>
+				<h3 class="dashboard-kpi-value mb-0">${{ '%.2f'|format(stats.total_ventas_hoy) }}</h3>
+			</article>
+		</div>
+		<div class="col-12 col-md-6 col-xl-3">
+			<article class="dashboard-kpi dashboard-kpi--accent-blue">
+				<p class="dashboard-kpi-label mb-1">Número de ventas</p>
+				<h3 class="dashboard-kpi-value mb-0">{{ stats.numero_ventas_hoy }}</h3>
+			</article>
+		</div>
+		<div class="col-12 col-md-6 col-xl-3">
+			<article class="dashboard-kpi dashboard-kpi--accent-green">
+				<p class="dashboard-kpi-label mb-1">Producto más vendido</p>
+				<h3 class="dashboard-kpi-title mb-0">{{ stats.producto_mas_vendido }}</h3>
+				<p class="dashboard-kpi-sub mb-0">{{ stats.producto_mas_vendido_cantidad }} unidades</p>
+			</article>
+		</div>
+		<div class="col-12 col-md-6 col-xl-3">
+			<article class="dashboard-kpi dashboard-kpi--accent-warm">
+				{% if role_name == "Administrador" %}
+				<p class="dashboard-kpi-label mb-1">Pedidos pendientes</p>
+				<h3 class="dashboard-kpi-value mb-0">{{ stats.pedidos_pendientes }}</h3>
+				{% else %}
+				<p class="dashboard-kpi-label mb-1">Productos con stock bajo</p>
+				<h3 class="dashboard-kpi-value mb-0">{{ stats.productos_bajo_minimo }}</h3>
+				{% endif %}
+			</article>
+		</div>
 	</div>
 
 	<div class="row g-4 mb-4">
-		<div class="col-12 col-sm-6 col-xl-3">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-body p-4">
-					<h6 class="text-muted text-uppercase fw-bold mb-2">Ventas de Hoy</h6>
-					<h3 class="display-6 fw-bold text-dark mb-0">
-						${{ '%.2f'|format(stats.total_ventas_hoy) }}
-					</h3>
+		<div class="col-12">
+			<div class="ops-card dashboard-card h-100">
+				<div class="d-flex justify-content-between align-items-center mb-2">
+					<h5 class="ops-card-title mb-0">Ventas del día por hora</h5>
+					<span class="ops-chip neutral">{{ fecha_consulta.strftime('%d/%m/%Y') }}</span>
+				</div>
+				{% if ventas_por_hora %}
+				<div class="dashboard-chart-wrap">
+					<canvas id="ventasPorHoraChart" height="100"></canvas>
+				</div>
+				{% else %}
+				<p class="text-muted mb-0">No hay ventas confirmadas para la fecha seleccionada.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div class="row g-4 mb-4">
+		<div class="col-12 col-xl-6">
+			<div class="ops-card dashboard-card h-100">
+				<h5 class="ops-card-title">Productos más vendidos</h5>
+				{% if productos_mas_vendidos %}
+				<div class="dashboard-chart-wrap">
+					<canvas id="productosMasVendidosChart" height="120"></canvas>
+				</div>
+				{% else %}
+				<p class="text-muted mb-0">Sin datos de demanda de productos para esta fecha.</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="col-12 col-xl-6">
+			<div class="ops-card dashboard-card h-100">
+				<h5 class="ops-card-title">Presentaciones más vendidas</h5>
+				{% if presentaciones_mas_vendidas %}
+				<div class="dashboard-chart-wrap">
+					<canvas id="presentacionesMasVendidasChart" height="120"></canvas>
+				</div>
+				{% else %}
+				<p class="text-muted mb-0">Sin datos de presentaciones para esta fecha.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div class="row g-4 mb-4">
+		<div class="col-12">
+			<div class="ops-card dashboard-card h-100">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h5 class="ops-card-title mb-0">Ventas recientes</h5>
+					<span class="ops-chip neutral">Últimos movimientos</span>
+				</div>
+				<div class="ops-table">
+					<table class="table table-sm align-middle mb-0">
+						<thead>
+							<tr>
+								<th>Hora</th>
+								<th>Producto</th>
+								<th>Presentación</th>
+								<th class="text-end">Cantidad</th>
+								<th class="text-end">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for row in ventas_recientes %}
+							<tr>
+								<td>{{ row.fecha.strftime('%H:%M') }}</td>
+								<td>{{ row.producto }}</td>
+								<td>{{ row.presentacion or 'Sin presentación' }}</td>
+								<td class="text-end">{{ row.cantidad }}</td>
+								<td class="text-end">${{ '%.2f'|format(row.total_linea) }}</td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="5" class="text-center text-muted py-3">
+									No se registran ventas recientes para la fecha consultada.
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
-		<div class="col-12 col-sm-6 col-xl-3">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-body p-4">
-					<h6 class="text-muted text-uppercase fw-bold mb-2">Número de Ventas</h6>
-					<h3 class="display-6 fw-bold text-dark mb-0">{{ stats.numero_ventas_hoy }}</h3>
-				</div>
-			</div>
-		</div>
-		<div class="col-12 col-sm-6 col-xl-3">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-body p-4">
-					<h6 class="text-muted text-uppercase fw-bold mb-2">Producto Más Vendido</h6>
-					<h3 class="h4 fw-bold text-dark mb-0">{{ stats.producto_mas_vendido }}</h3>
-				</div>
-			</div>
-		</div>
-		{% if role_name == "Administrador" %}
-		<div class="col-12 col-sm-6 col-xl-3">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-body p-4">
-					<h6 class="text-muted text-uppercase fw-bold mb-2">Pedidos Pendientes</h6>
-					<h3 class="display-6 fw-bold text-dark mb-0">{{ stats.pedidos_pendientes }}</h3>
-				</div>
-			</div>
-		</div>
-		{% endif %}
 	</div>
 
 	{% if role_name in ["Administrador", "Ventas"] %}
-	<div class="row g-4 mb-4">
-		<div class="col-12 col-xl-6">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-header bg-white border-0 pt-4 px-4">
-					<h5 class="fw-bold mb-0">Ventas por Hora</h5>
-				</div>
-				<div class="card-body px-4 pb-4">
-					<div class="table-responsive">
-						<table class="table table-sm align-middle mb-0">
-							<thead>
-								<tr>
-									<th>Hora</th>
-									<th class="text-end">Transacciones</th>
-									<th class="text-end">Total</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for row in ventas_por_hora %}
-								<tr>
-									<td>{{ "%02d"|format(row.hora) }}:00</td>
-									<td class="text-end">{{ row.transacciones }}</td>
-									<td class="text-end">${{ '%.2f'|format(row.total) }}</td>
-								</tr>
-								{% else %}
-								<tr>
-									<td colspan="3" class="text-center text-muted py-3">
-										Sin ventas registradas hoy.
-									</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-12 col-xl-6">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-header bg-white border-0 pt-4 px-4">
-					<h5 class="fw-bold mb-0">Ventas Recientes</h5>
-				</div>
-				<div class="card-body px-4 pb-4">
-					<div class="table-responsive">
-						<table class="table table-sm align-middle mb-0">
-							<thead>
-								<tr>
-									<th>Hora</th>
-									<th>Producto</th>
-									<th class="text-end">Cantidad</th>
-									<th class="text-end">Subtotal</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for row in ventas_recientes %}
-								<tr>
-									<td>{{ row.fecha.strftime('%H:%M') }}</td>
-									<td>{{ row.nombre }}</td>
-									<td class="text-end">{{ row.cantidad }}</td>
-									<td class="text-end">${{ '%.2f'|format(row.subtotal) }}</td>
-								</tr>
-								{% else %}
-								<tr>
-									<td colspan="4" class="text-center text-muted py-3">Sin ventas recientes hoy.</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	{% endif %} {% if role_name in ["Administrador", "Produccion"] %}
-	<div class="row g-4 mb-4">
-		<div class="col-12 col-xl-6">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-header bg-white border-0 pt-4 px-4">
-					<h5 class="fw-bold mb-0">Presentaciones Más Vendidas</h5>
-				</div>
-				<div class="card-body px-4 pb-4">
-					<div class="table-responsive">
-						<table class="table table-sm align-middle mb-0">
-							<thead>
-								<tr>
-									<th>Presentación</th>
-									<th class="text-end">Cantidad</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for row in presentaciones_mas_vendidas %}
-								<tr>
-									<td>{{ row.unidad_venta }}</td>
-									<td class="text-end">{{ row.cantidad_total }}</td>
-								</tr>
-								{% else %}
-								<tr>
-									<td colspan="2" class="text-center text-muted py-3">
-										Sin datos de presentaciones hoy.
-									</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-12 col-xl-6">
-			<div class="card border-0 shadow-sm rounded-4 h-100">
-				<div class="card-header bg-white border-0 pt-4 px-4">
-					<h5 class="fw-bold mb-0">Historial de Ventas (Productos y Cantidades)</h5>
-				</div>
-				<div class="card-body px-4 pb-4">
-					<div class="table-responsive">
-						<table class="table table-sm align-middle mb-0">
-							<thead>
-								<tr>
-									<th>Hora</th>
-									<th>Producto</th>
-									<th class="text-end">Cantidad</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for row in historial_ventas_productos %}
-								<tr>
-									<td>{{ row.fecha.strftime('%H:%M') }}</td>
-									<td>{{ row.nombre }}</td>
-									<td class="text-end">{{ row.cantidad }}</td>
-								</tr>
-								{% else %}
-								<tr>
-									<td colspan="3" class="text-center text-muted py-3">
-										Sin historial de ventas hoy.
-									</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	{% endif %} {% if role_name == "Administrador" %}
 	<div class="row">
 		<div class="col-12">
-			<div class="card border-0 shadow-sm rounded-4">
-				<div
-					class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-					<h5 class="fw-bold mb-0">Alertas de Reposición (Inventario)</h5>
+			<div class="ops-card dashboard-card h-100">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h5 class="ops-card-title mb-0">Alertas de reposición</h5>
 					<span class="badge bg-danger rounded-pill fs-6 px-3">
 						Bajo mínimo: {{ stats.productos_bajo_minimo }}
 					</span>
 				</div>
-				<div class="card-body px-4 pb-4">
-					<div class="table-responsive">
-						<table class="table table-sm align-middle mb-0">
-							<thead>
-								<tr>
-									<th>Producto</th>
-									<th class="text-end">Disponible</th>
-									<th class="text-end">Stock mínimo</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for p in low_stock %}
-								<tr>
-									<td>{{ p.nombre }}</td>
-									<td class="text-end">{{ p.cantidad_disponible }}</td>
-									<td class="text-end">{{ p.stock_minimo }}</td>
-								</tr>
-								{% else %}
-								<tr>
-									<td colspan="3" class="text-center text-muted py-3">Sin alertas de stock hoy.</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
+				<div class="ops-table">
+					<table class="table table-sm align-middle mb-0">
+						<thead>
+							<tr>
+								<th>Producto</th>
+								<th class="text-end">Disponible</th>
+								<th class="text-end">Stock mínimo</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for p in low_stock %}
+							<tr>
+								<td>{{ p.nombre }}</td>
+								<td class="text-end text-danger fw-bold">{{ p.cantidad_disponible }}</td>
+								<td class="text-end">{{ p.stock_minimo }}</td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="3" class="text-center text-muted py-3">
+									No hay productos por debajo del stock mínimo.
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
 	</div>
 	{% endif %}
 </section>
+{% endblock %} {% block scripts %} {{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script id="dashboardChartsData" type="application/json">
+	{{
+		{
+			"ventasPorHora": ventas_por_hora_chart,
+			"productosMasVendidos": productos_mas_vendidos_chart,
+			"presentacionesMasVendidas": presentaciones_mas_vendidas_chart,
+		}
+		| tojson
+	}}
+</script>
+<script>
+	const dashboardChartsDataElement = document.getElementById('dashboardChartsData');
+	const dashboardChartsData = dashboardChartsDataElement
+		? JSON.parse(dashboardChartsDataElement.textContent || '{}')
+		: {};
+	const ventasPorHora = dashboardChartsData.ventasPorHora || [];
+	const productosMasVendidos = dashboardChartsData.productosMasVendidos || [];
+	const presentacionesMasVendidas = dashboardChartsData.presentacionesMasVendidas || [];
+
+	if (ventasPorHora.length) {
+		const ctxVentas = document.getElementById('ventasPorHoraChart');
+		new Chart(ctxVentas, {
+			type: 'line',
+			data: {
+				labels: ventasPorHora.map((item) => `${String(item.hora).padStart(2, '0')}:00`),
+				datasets: [
+					{
+						label: 'Total vendido',
+						data: ventasPorHora.map((item) => item.total),
+						borderColor: '#9e3b3b',
+						backgroundColor: 'rgba(158, 59, 59, 0.16)',
+						fill: true,
+						tension: 0.35,
+						pointRadius: 4,
+						pointHoverRadius: 5,
+					},
+				],
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					legend: { display: false },
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						ticks: {
+							callback: (value) => `$${Number(value).toFixed(0)}`,
+						},
+					},
+				},
+			},
+		});
+	}
+
+	if (productosMasVendidos.length) {
+		const ctxProductos = document.getElementById('productosMasVendidosChart');
+		new Chart(ctxProductos, {
+			type: 'bar',
+			data: {
+				labels: productosMasVendidos.map((item) => item.nombre),
+				datasets: [
+					{
+						label: 'Unidades vendidas',
+						data: productosMasVendidos.map((item) => item.cantidad),
+						backgroundColor: '#b94e48',
+						borderRadius: 8,
+					},
+				],
+			},
+			options: {
+				indexAxis: 'y',
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					legend: { display: false },
+				},
+				scales: {
+					x: { beginAtZero: true },
+				},
+			},
+		});
+	}
+
+	if (presentacionesMasVendidas.length) {
+		const ctxPresentaciones = document.getElementById('presentacionesMasVendidasChart');
+		new Chart(ctxPresentaciones, {
+			type: 'bar',
+			data: {
+				labels: presentacionesMasVendidas.map((item) => item.nombre),
+				datasets: [
+					{
+						label: 'Unidades vendidas',
+						data: presentacionesMasVendidas.map((item) => item.cantidad),
+						backgroundColor: '#7a5d56',
+						borderRadius: 8,
+					},
+				],
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					legend: { display: false },
+				},
+				scales: {
+					y: { beginAtZero: true },
+				},
+			},
+		});
+	}
+</script>
 {% endblock %}
