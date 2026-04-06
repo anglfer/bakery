@@ -1,5 +1,6 @@
 import json
 import random
+import re
 import smtplib
 import urllib.parse
 import urllib.request
@@ -32,7 +33,21 @@ def _resolve_home_by_role(usuario: Usuario) -> str:
     role_name = usuario.rol.nombre if usuario.rol else ""
     if role_name in {"Administrador", "Ventas", "Produccion"}:
         return "admin.dashboard"
-    return "catalog.home"
+    return "catalog.catalogo"
+
+
+def _build_cliente_default_email(username: str) -> str:
+    base = f"{username.lower()}@cliente.softbakery.local"
+    email = base
+    suffix = 1
+    while Persona.query.filter_by(correo=email).first():
+        email = f"{username.lower()}+{suffix}@cliente.softbakery.local"
+        suffix += 1
+    return email
+
+
+def _is_valid_person_name(value: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'\-]{2,}", value or ""))
 
 
 def _registrar_bitacora(
@@ -239,33 +254,48 @@ def verify_2fa():
 def registro_cliente():
     form = RegisterClientForm()
     if form.validate_on_submit():
-        existe_user = Usuario.query.filter_by(
-            username=form.username.data.strip()
+        username = form.username.data.strip()
+        existe_user = Usuario.query.filter(
+            db.func.lower(Usuario.username) == username.lower()
         ).first()
         if existe_user:
-            flash("El nombre de usuario ya existe", "danger")
+            flash(
+                "El nombre de usuario ya existe. Elige uno diferente.",
+                "danger",
+            )
             return render_template(REGISTER_TEMPLATE, form=form)
 
-        existe_mail = Persona.query.filter_by(
-            correo=form.correo.data.strip().lower()
+        rol_cliente = Rol.query.filter_by(
+            nombre="Cliente",
+            activo=True,
         ).first()
-        if existe_mail:
-            flash("El correo ya esta registrado", "danger")
+        if not rol_cliente:
+            flash(
+                "No fue posible crear la cuenta: rol Cliente no configurado.",
+                "danger",
+            )
             return render_template(REGISTER_TEMPLATE, form=form)
 
-        rol_cliente = Rol.query.filter_by(nombre="Cliente").first()
+        nombre = form.nombre.data.strip()
+        apellidos = form.apellidos.data.strip()
+        telefono = form.telefono.data.strip()
+
+        if not (_is_valid_person_name(nombre) and _is_valid_person_name(apellidos)):
+            flash("Nombre o apellido invalido.", "danger")
+            return render_template(REGISTER_TEMPLATE, form=form)
+
         persona = Persona(
-            nombre=form.nombre.data.strip(),
-            apellidos=form.apellidos.data.strip(),
-            telefono=form.telefono.data.strip(),
-            correo=form.correo.data.strip().lower(),
-            direccion=form.direccion.data.strip(),
-            ciudad=form.ciudad.data.strip(),
+            nombre=nombre,
+            apellidos=apellidos,
+            telefono=telefono,
+            correo=_build_cliente_default_email(username),
+            direccion="No especificada",
+            ciudad="No especificada",
         )
         usuario = Usuario(
             persona=persona,
             id_rol=rol_cliente.id_rol,
-            username=form.username.data.strip(),
+            username=username,
             activo=True,
         )
         usuario.set_password(form.password.data)
@@ -277,10 +307,62 @@ def registro_cliente():
             "CLIENTE_REGISTRADO",
             f"id_usuario={usuario.id_usuario}; username={usuario.username}",
         )
-        flash("Cuenta creada correctamente. Inicia sesion.", "success")
+        flash(
+            "Cuenta creada correctamente. Ya puedes iniciar sesion.",
+            "success",
+        )
         return redirect(url_for(LOGIN_ENDPOINT))
 
     return render_template(REGISTER_TEMPLATE, form=form)
+
+
+@auth_bp.route("/mi-cuenta", methods=["GET", "POST"])
+@login_required
+def mi_cuenta():
+    usuario = Usuario.query.get_or_404(int(current_user.get_id()))
+    if not usuario.rol or usuario.rol.nombre != "Cliente":
+        flash("Esta seccion solo esta disponible para clientes.", "warning")
+        return redirect(url_for(_resolve_home_by_role(usuario)))
+
+    if not usuario.activo:
+        logout_user()
+        flash("Tu cuenta esta inactiva. Contacta a soporte.", "danger")
+        return redirect(url_for(LOGIN_ENDPOINT))
+
+    persona = usuario.persona
+    if request.method == "POST":
+        nombre = (request.form.get("nombre") or "").strip()
+        apellidos = (request.form.get("apellidos") or "").strip()
+        telefono = (request.form.get("telefono") or "").strip()
+        ciudad = (request.form.get("ciudad") or "").strip()
+        direccion = (request.form.get("direccion") or "").strip()
+
+        if not all([nombre, apellidos, telefono]):
+            flash("Nombre, apellido y telefono son obligatorios.", "warning")
+            return redirect(url_for("auth.mi_cuenta"))
+
+        if not (_is_valid_person_name(nombre) and _is_valid_person_name(apellidos)):
+            flash("Nombre o apellido invalido.", "warning")
+            return redirect(url_for("auth.mi_cuenta"))
+
+        if not re.fullmatch(r"[\d\s\-\+\(\)]{7,30}", telefono):
+            flash("Telefono invalido.", "warning")
+            return redirect(url_for("auth.mi_cuenta"))
+
+        persona.nombre = nombre
+        persona.apellidos = apellidos
+        persona.telefono = telefono
+        persona.ciudad = ciudad or "No especificada"
+        persona.direccion = direccion or "No especificada"
+        db.session.commit()
+        log_audit_event(
+            "CLIENTE_ACTUALIZA_DATOS",
+            f"id_usuario={usuario.id_usuario}; username={usuario.username}",
+        )
+        flash("Datos actualizados correctamente.", "success")
+        return redirect(url_for("auth.mi_cuenta"))
+
+    return render_template("auth/mi_cuenta.html", usuario=usuario)
 
 
 @auth_bp.route("/logout")

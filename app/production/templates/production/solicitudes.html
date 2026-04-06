@@ -1,9 +1,12 @@
 {% extends "base_template.html" %}
 {% block title %}Solicitudes{% endblock %}
+{% block page_title %}Módulo de Producción — Solicitudes{% endblock %}
+
 {% block content %}
 <section class="section">
-	{% set ns = namespace(pendientes=0, aprobadas=0, rechazadas=0) %}
+	{% set ns = namespace(total=0, pendientes=0, aprobadas=0, rechazadas=0) %}
 	{% for s in solicitudes %}
+		{% set ns.total = ns.total + 1 %}
 		{% if s.estado == 'PENDIENTE' %}
 			{% set ns.pendientes = ns.pendientes + 1 %}
 		{% elif s.estado == 'APROBADA' %}
@@ -15,156 +18,615 @@
 
 	<div class="ops-hero">
 		<p class="ops-meta mb-1">Panel de producción</p>
-		<h2 class="ops-hero-title">Solicitudes de producción</h2>
-		<p class="ops-hero-text">Revisa solicitudes del área de ventas y define su resolución.</p>
+		<h2 class="ops-hero-title">Solicitudes de Producción</h2>
+		<p class="ops-hero-text">
+			Revisa las solicitudes del área de ventas, decide su resolución y genera órdenes
+			de producción a partir de las aprobadas.
+		</p>
 	</div>
 
 	<div class="ops-kpi-grid compact">
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Solicitudes totales</p>
-			<p class="ops-kpi-value">{{ solicitudes|length }}</p>
-			<p class="ops-kpi-sub">Registros del tablero</p>
+			<p class="ops-kpi-value">{{ ns.total }}</p>
+			<p class="ops-kpi-sub">Histórico trazable</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Pendientes</p>
-			<p class="ops-kpi-value">{{ ns.pendientes }}</p>
-			<p class="ops-kpi-sub">Requieren resolución</p>
+			<p class="ops-kpi-value text-warning">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">Esperando decisión</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Aprobadas</p>
-			<p class="ops-kpi-value">{{ ns.aprobadas }}</p>
-			<p class="ops-kpi-sub">Listas para orden</p>
+			<p class="ops-kpi-value text-success">{{ ns.aprobadas }}</p>
+			<p class="ops-kpi-sub">Pueden convertirse en orden</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Rechazadas</p>
-			<p class="ops-kpi-value">{{ ns.rechazadas }}</p>
-			<p class="ops-kpi-sub">No autorizadas</p>
+			<p class="ops-kpi-value text-danger">{{ ns.rechazadas }}</p>
+			<p class="ops-kpi-sub">Sin impacto productivo</p>
 		</article>
 	</div>
 
+	<div class="prod-orders-info-banner">
+		<i class="bi bi-info-circle-fill"></i>
+		<div>
+			<strong>Gestión operativa</strong>
+			<div class="small">
+				{% if role_name == 'Produccion' %}
+				Estás como <strong>Producción</strong>. Puedes aprobar, rechazar y crear órdenes.
+				{% else %}
+				Estás como <strong>Administrador</strong>. Puedes revisar el flujo completo y
+				crear órdenes desde solicitudes aprobadas.
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
 	<div class="ops-card">
-		<h3 class="ops-card-title">Bandeja de solicitudes</h3>
-		<div class="ops-toolbar">
+		<div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+			<div>
+				<h3 class="ops-card-title mb-1">Bandeja de solicitudes</h3>
+				<p class="text-secondary mb-0 small">
+					Filtra por estado o busca por ID y producto. La trazabilidad queda guardada en
+					cada decisión.
+				</p>
+			</div>
+		</div>
+
+		<form method="get" class="ops-toolbar mt-3">
 			<div class="ops-input-wrap">
 				<i class="bi bi-search"></i>
-				<input type="text" id="solicitudesSearch" placeholder="Buscar por id o producto" />
+				<input
+					type="text"
+					name="q"
+					value="{{ busqueda or '' }}"
+					placeholder="Buscar por ID o producto" />
 			</div>
-			<select id="solicitudesEstadoFiltro" style="max-width: 220px">
-				<option value="TODOS">Todos los estados</option>
-				<option value="PENDIENTE">Pendiente</option>
-				<option value="APROBADA">Aprobada</option>
-				<option value="RECHAZADA">Rechazada</option>
+			<select name="estado" style="max-width: 190px">
+				<option value="TODOS" {{ 'selected' if estado_filtro == 'TODOS' else '' }}>
+					Todos los estados
+				</option>
+				<option value="PENDIENTE" {{ 'selected' if estado_filtro == 'PENDIENTE' else '' }}>
+					Pendiente
+				</option>
+				<option value="APROBADA" {{ 'selected' if estado_filtro == 'APROBADA' else '' }}>
+					Aprobada
+				</option>
+				<option value="RECHAZADA" {{ 'selected' if estado_filtro == 'RECHAZADA' else '' }}>
+					Rechazada
+				</option>
 			</select>
-		</div>
+			<button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+		</form>
+
 		<div class="ops-table table-responsive">
 			<table class="table table-hover align-middle mb-0">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Producto</th>
-				<th>Cantidad</th>
-				<th>Estado</th>
-				<th>Fecha</th>
-				<th>Resolver</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for s in solicitudes %}
-			<tr
-				data-row="solicitud"
-				data-label="{{ (s.id_solicitud|string ~ ' ' ~ s.producto.nombre)|lower }}"
-				data-estado="{{ s.estado }}">
-				<td>{{ s.id_solicitud }}</td>
-				<td>{{ s.producto.nombre }}</td>
-				<td>{{ s.cantidad }}</td>
-				<td>
-					<span
-						class="ops-chip {{ 'warning' if s.estado == 'PENDIENTE' else 'success' if s.estado == 'APROBADA' else 'danger' }}">
-						{{ s.estado }}
-					</span>
-				</td>
-				<td>{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
-				<td>
-					<button
-						type="button"
-						class="btn btn-sm btn-outline-primary btn-icon-sm js-resolver-solicitud"
-						title="Resolver solicitud"
-						data-id="{{ s.id_solicitud }}"
-						data-estado="{{ s.estado }}"
-						{{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
-						<i class="bi bi-check2-square"></i>
-					</button>
-				</td>
-			</tr>
-			{% else %}
-			<tr>
-				<td colspan="6">No hay solicitudes registradas.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Producto</th>
+						<th>Cant. solicitada</th>
+						<th>Stock actual</th>
+						<th>Solicitante</th>
+						<th>Fecha solicitud</th>
+						<th>Estado</th>
+						<th>Resuelto por</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in solicitudes %}
+					{% set producto = s.producto %}
+					{% set stock_actual = producto.cantidad_disponible if producto else 0 %}
+					{% set stock_minimo = producto.stock_minimo if producto else 0 %}
+					{% set ord_ns = namespace(vinculada=none) %}
+					{% for orden in s.ordenes %}
+						{% if not ord_ns.vinculada and orden.estado != 'CANCELADO' %}
+							{% set ord_ns.vinculada = orden %}
+						{% endif %}
+					{% endfor %}
+					{% set orden_vinculada = ord_ns.vinculada %}
+					<tr>
+						<td><strong class="text-primary">SOL-{{ '%03d'|format(s.id_solicitud) }}</strong></td>
+						<td>
+							<div class="d-flex align-items-center gap-2">
+								<div class="prod-orders-product-icon">
+									<i class="bi bi-send-fill"></i>
+								</div>
+								<div>
+									<div class="prod-orders-product-name">
+										{{ producto.nombre if producto else 'Producto' }}
+									</div>
+									<div class="prod-orders-product-sub">Solicitud de ventas</div>
+								</div>
+							</div>
+						</td>
+						<td><strong>{{ s.cantidad }} pzas</strong></td>
+						<td>
+							{% if stock_actual <= 0 %}
+								<span class="ops-chip danger">0 pzas</span>
+							{% elif stock_actual < stock_minimo %}
+								<span class="ops-chip warning">{{ stock_actual }} pzas ↓</span>
+							{% else %}
+								<span class="ops-chip success">{{ stock_actual }} pzas ✓</span>
+							{% endif %}
+						</td>
+						<td>
+							{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}
+						</td>
+						<td>{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
+						<td>
+							<span
+								class="ops-chip {{ 'warning' if s.estado == 'PENDIENTE' else 'success' if s.estado == 'APROBADA' else 'danger' }}">
+								{{ s.estado }}</span>
+						</td>
+						<td>
+							{% if s.usuario_resuelve and s.usuario_resuelve.persona %}
+								{{ s.usuario_resuelve.persona.nombre }}
+							{% elif s.usuario_resuelve %}
+								{{ s.usuario_resuelve.username }}
+							{% else %}
+								—
+							{% endif %}
+						</td>
+						<td>
+							<div class="btn-action-group">
+								<button
+									type="button"
+									class="btn btn-sm btn-outline-primary btn-icon-sm js-detalle-solicitud"
+									title="Ver detalle"
+									data-id="{{ s.id_solicitud }}"
+									data-producto-id="{{ producto.id_producto if producto else '' }}"
+									data-producto="{{ producto.nombre if producto else 'Producto' }}"
+									data-cantidad="{{ s.cantidad }}"
+									data-stock-actual="{{ stock_actual }}"
+									data-stock-minimo="{{ stock_minimo }}"
+									data-solicitante="{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}"
+									data-fecha="{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}"
+									data-estado="{{ s.estado }}"
+									data-resuelto-por="{{ s.usuario_resuelve.persona.nombre if s.usuario_resuelve and s.usuario_resuelve.persona else (s.usuario_resuelve.username if s.usuario_resuelve else '') }}"
+									data-fecha-resolucion="{{ s.fecha_resolucion.strftime('%Y-%m-%d') if s.fecha_resolucion else '' }}"
+									data-obs="{{ s.observaciones or '' }}"
+									data-obs-resolucion="{{ s.observaciones_resolucion or '' }}"
+									data-orden="{{ orden_vinculada.id_orden if orden_vinculada else '' }}">
+									<i class="bi bi-eye-fill"></i>
+								</button>
+								<button
+									type="button"
+									class="btn btn-sm btn-outline-warning btn-icon-sm js-resolver-solicitud"
+									title="Resolver solicitud"
+									data-id="{{ s.id_solicitud }}"
+									data-producto-id="{{ producto.id_producto if producto else '' }}"
+									data-producto="{{ producto.nombre if producto else 'Producto' }}"
+									data-cantidad="{{ s.cantidad }}"
+									data-solicitante="{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}"
+									data-fecha="{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}"
+									data-estado="{{ s.estado }}"
+									{{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
+									<i class="bi bi-check2-square"></i>
+								</button>
+								{% if s.estado == 'APROBADA' and not orden_vinculada %}
+									<button
+										type="button"
+										class="btn btn-sm btn-outline-success btn-icon-sm js-generar-orden"
+										title="Crear orden"
+										data-id="{{ s.id_solicitud }}"
+										data-producto-id="{{ producto.id_producto if producto else '' }}"
+										data-producto="{{ producto.nombre if producto else 'Producto' }}"
+										data-cantidad="{{ s.cantidad }}"
+										data-solicitante="{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}">
+										<i class="bi bi-diagram-3-fill"></i>
+									</button>
+								{% endif %}
+								{% if orden_vinculada %}
+									<span class="ops-chip neutral" title="Orden vinculada">
+										<i class="bi bi-link-45deg"></i>
+										ORD-{{ '%03d'|format(orden_vinculada.id_orden) }}
+									</span>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="9" class="text-center py-4">No hay solicitudes registradas.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
 			</table>
 		</div>
 	</div>
 
+	<div class="modal fade" id="modalDetalleSolicitud" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content prod-orders-modal-content">
+				<div class="modal-header prod-orders-modal-header">
+					<h5 class="modal-title fw-bold" id="detalleSolicitudTitle">
+						<i class="bi bi-eye-fill me-2"></i>
+						Detalle de solicitud
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<div class="modal-body prod-orders-modal-body">
+					<div class="prod-orders-section-card">
+						<div class="prod-orders-section-title">
+							<i class="bi bi-info-circle-fill"></i>
+							Información general
+						</div>
+						<div class="prod-orders-summary-grid" id="detalleSolicitudBody"></div>
+					</div>
+					<div class="prod-orders-section-card">
+						<div class="prod-orders-section-title">
+							<i class="bi bi-diagram-3-fill"></i>
+							Seguimiento del estado
+						</div>
+						<div id="detalleSolicitudTimeline"></div>
+					</div>
+					<div id="detalleSolicitudObs"></div>
+					<div id="detalleSolicitudOrden"></div>
+				</div>
+				<div class="modal-footer prod-orders-modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="modal fade" id="modalResolverSolicitud" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Resolver solicitud de producción</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		<div class="modal-dialog modal-md modal-dialog-centered">
+			<div class="modal-content prod-orders-modal-content">
+				<div class="modal-header prod-orders-modal-header">
+					<h5 class="modal-title fw-bold" id="resolverSolicitudTitle">
+						<i class="bi bi-check2-square me-2"></i>
+						Resolver solicitud
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 				</div>
 				<form method="post" id="formResolverSolicitud">
-					<div class="modal-body">
+					<div class="modal-body prod-orders-modal-body">
 						<input type="hidden" name="id_solicitud" id="resolverSolicitudId" />
+						<div class="prod-orders-section-card">
+							<div class="prod-orders-section-title">
+								<i class="bi bi-send-fill"></i>
+								Solicitud seleccionada
+							</div>
+							<div class="fw-bold" id="resolverSolicitudProducto">—</div>
+							<div class="small text-secondary" id="resolverSolicitudMeta"></div>
+						</div>
 						<div class="ops-grid">
-							<select name="estado" id="resolverSolicitudEstado" required>
-								<option value="APROBADA">Aprobar</option>
-								<option value="RECHAZADA">Rechazar</option>
-							</select>
-							<input type="text" name="observaciones" id="resolverSolicitudObs" placeholder="Observaciones" />
+							<div>
+								<label class="form-label fw-semibold" for="resolverSolicitudEstado">Estado</label>
+								<select name="estado" id="resolverSolicitudEstado" class="form-select" required>
+									<option value="APROBADA">Aprobar</option>
+									<option value="RECHAZADA">Rechazar</option>
+								</select>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="resolverSolicitudObs">
+									Observaciones de resolución
+								</label>
+								<input
+									id="resolverSolicitudObs"
+									type="text"
+									name="observaciones_resolucion"
+									class="form-control"
+									placeholder="Motivo o notas de la decisión..." />
+							</div>
+						</div>
+						<div class="prod-orders-info-banner mb-0 mt-3">
+							<i class="bi bi-info-circle-fill"></i>
+							<span>
+								Al aprobar, la solicitud queda disponible para generar una orden de producción.
+							</span>
 						</div>
 					</div>
-					<div class="modal-footer">
+					<div class="modal-footer prod-orders-modal-footer">
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Guardar</button>
+						<button type="submit" class="btn btn-primary">
+							Guardar resolución
+						</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalGenerarOrden" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content prod-orders-modal-content">
+				<div class="modal-header prod-orders-modal-header">
+					<h5 class="modal-title fw-bold">
+						<i class="bi bi-cpu-fill me-2"></i>
+						Generar Orden de Producción
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+				</div>
+				<form method="post" action="{{ url_for('production.ordenes') }}" id="formGenerarOrden">
+					<input type="hidden" name="action" value="crear" />
+					<input type="hidden" name="id_solicitud" id="ordenSolicitudId" />
+					<input type="hidden" name="id_producto" id="ordenProductoId" />
+					<div class="modal-body prod-orders-modal-body">
+						<div class="prod-orders-section-card">
+							<div class="prod-orders-section-title">
+								<i class="bi bi-link-45deg"></i>
+								Solicitud aprobada
+							</div>
+							<div class="fw-bold" id="ordenSolicitudProducto">—</div>
+							<div class="small text-secondary" id="ordenSolicitudMeta"></div>
+						</div>
+						<div class="prod-orders-section-card">
+							<div class="prod-orders-section-title">
+								<i class="bi bi-journal-richtext"></i>
+								Receta y cantidad
+							</div>
+							<div class="ops-grid">
+								<div>
+									<label class="form-label fw-semibold" for="ordenRecetaId">Receta activa</label>
+									<select name="id_receta" id="ordenRecetaId" class="form-select" required>
+										<option value="">Selecciona una solicitud primero...</option>
+									</select>
+									<div class="form-hint mt-1">Solo aparecen recetas activas del producto.</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold" for="ordenCantidad">Cantidad a producir</label>
+									<input
+										id="ordenCantidad"
+										type="number"
+										name="cantidad"
+										min="1"
+										step="1"
+										class="form-control"
+										required />
+									<div class="form-hint mt-1">Se prellenará con la cantidad solicitada.</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold" for="ordenObservaciones">Observaciones</label>
+									<input
+										id="ordenObservaciones"
+										type="text"
+										name="observaciones"
+										class="form-control"
+										placeholder="Referencia a solicitud o notas operativas..." />
+								</div>
+						</div>
+					</div>
+					<div class="prod-orders-info-banner mb-0">
+						<i class="bi bi-link-45deg"></i>
+						<span>
+							La orden se guardará vinculada a la solicitud mediante <code>id_solicitud</code>.
+						</span>
+					</div>
+					<div class="modal-footer prod-orders-modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-cpu-fill me-1"></i>
+							Crear orden
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script id="recetasPayload" type="application/json">{{ recetas_payload | tojson }}</script>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-	const solicitudesSearchInput = document.getElementById('solicitudesSearch');
-	const solicitudesEstadoFiltro = document.getElementById('solicitudesEstadoFiltro');
+	const detalleModal = new bootstrap.Modal(document.getElementById('modalDetalleSolicitud'));
+	const resolverModal = new bootstrap.Modal(document.getElementById('modalResolverSolicitud'));
+	const ordenModal = new bootstrap.Modal(document.getElementById('modalGenerarOrden'));
+	const recetasPayloadElement = document.getElementById('recetasPayload');
+	const recetasPorProducto = recetasPayloadElement
+		? JSON.parse(recetasPayloadElement.textContent || '[]')
+		: [];
 
-	function applySolicitudesFilters() {
-		const searchValue = String(solicitudesSearchInput?.value || '').toLowerCase().trim();
-		const estadoValue = String(solicitudesEstadoFiltro?.value || 'TODOS').toUpperCase();
-		document.querySelectorAll('tr[data-row="solicitud"]').forEach((tableRowElement) => {
-			const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
-			const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
-			const matchesSearch = rowLabel.includes(searchValue);
-			const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
-			tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+	function formatearNombrePersona(nombre, usuario) {
+		if (nombre) {
+			return nombre;
+		}
+		return usuario || '—';
+	}
+
+	function construirTimeline(item) {
+		let tituloResolucion = 'Resolución pendiente';
+		let claseResolucion = 'pending';
+		if (item.estado === 'RECHAZADA') {
+			tituloResolucion = 'Solicitud rechazada';
+			claseResolucion = 'rejected';
+		} else if (item.estado === 'APROBADA') {
+			tituloResolucion = 'Solicitud aprobada';
+			claseResolucion = 'done';
+		}
+
+		let claseOrden = 'pending';
+		if (item.orden) {
+			claseOrden = 'done';
+		}
+
+		const estados = [
+			{
+				titulo: 'Solicitud registrada',
+				subtitulo: `${item.fecha} · ${item.solicitante}`,
+				clase: 'done',
+			},
+			{
+				titulo: 'En revisión por producción',
+				subtitulo: 'Área de producción',
+				clase: item.estado === 'PENDIENTE' ? 'active' : 'done',
+			},
+			{
+				titulo: tituloResolucion,
+				subtitulo: item.fechaResolucion
+					? `${item.fechaResolucion} · ${item.resueltoPor || '—'}`
+					: 'Pendiente',
+				clase: claseResolucion,
+			},
+			{
+				titulo: item.orden ? `Orden generada: ORD-${String(item.orden).padStart(3, '0')}` : 'Orden de producción',
+				subtitulo: item.orden ? 'Vinculada a la solicitud' : 'Pendiente de generar',
+				clase: claseOrden,
+			},
+		];
+
+		return estados
+			.map(
+				(estado) => `
+					<div class="d-flex gap-3 mb-3">
+						<div class="flex-shrink-0 mt-1">
+							<span
+								style="display:inline-block;width:14px;height:14px;border-radius:999px;border:2px solid var(--sb-border);background:${colorParaEstado(estado.clase)};"></span>
+						</div>
+						<div>
+							<div class="fw-semibold">${estado.titulo}</div>
+							<div class="small text-secondary">${estado.subtitulo}</div>
+						</div>
+					</div>`,
+			)
+			.join('');
+	}
+
+	function recetasDeProducto(idProducto) {
+		return recetasPorProducto.filter((receta) => String(receta.id_producto) === String(idProducto));
+	}
+
+	function colorParaEstado(clase) {
+		if (clase === 'done') {
+			return 'var(--green)';
+		}
+		if (clase === 'active') {
+			return 'var(--sb-primary)';
+		}
+		if (clase === 'rejected') {
+			return 'var(--red)';
+		}
+		return '#fff';
+	}
+
+	document.querySelectorAll('.js-detalle-solicitud').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			const data = {
+				id: buttonElement.dataset.id || '',
+				producto: buttonElement.dataset.producto || 'Producto',
+				cantidad: buttonElement.dataset.cantidad || '—',
+				stockActual: buttonElement.dataset.stockActual || '0',
+				stockMinimo: buttonElement.dataset.stockMinimo || '0',
+				solicitante: buttonElement.dataset.solicitante || '—',
+				fecha: buttonElement.dataset.fecha || '—',
+				estado: buttonElement.dataset.estado || '—',
+				resueltoPor: buttonElement.dataset.resueltoPor || '—',
+				fechaResolucion: buttonElement.dataset.fechaResolucion || '',
+				obs: buttonElement.dataset.obs || '',
+				obsResolucion: buttonElement.dataset.obsResolucion || '',
+				orden: buttonElement.dataset.orden || '',
+			};
+
+			document.getElementById('detalleSolicitudTitle').innerHTML =
+				`<i class="bi bi-eye-fill me-2"></i>${data.producto} — SOL-${String(data.id).padStart(3, '0')}`;
+			document.getElementById('detalleSolicitudBody').innerHTML = `
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">ID solicitud</span>
+					<strong>SOL-${String(data.id).padStart(3, '0')}</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Producto</span>
+					<strong>${data.producto}</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Cantidad solicitada</span>
+					<strong>${data.cantidad} pzas</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Stock actual</span>
+					<strong>${data.stockActual} pzas</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Solicitante</span>
+					<strong>${data.solicitante}</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Fecha solicitud</span>
+					<strong>${data.fecha}</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Estado</span>
+					<strong>${data.estado}</strong>
+				</div>
+				<div class="prod-orders-summary-card">
+					<span class="prod-orders-summary-label">Resuelto por</span>
+					<strong>${data.resueltoPor}</strong>
+				</div>`;
+			document.getElementById('detalleSolicitudTimeline').innerHTML = construirTimeline(data);
+			document.getElementById('detalleSolicitudObs').innerHTML = data.obs
+				? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-chat-dots-fill"></i><span><strong>Observaciones de solicitud:</strong> ${data.obs}</span></div>`
+				: '';
+			document.getElementById('detalleSolicitudOrden').innerHTML = data.orden
+				? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-link-45deg"></i><span>Orden vinculada: <strong>ORD-${String(data.orden).padStart(3, '0')}</strong></span></div>`
+				: '';
+			if (data.fechaResolucion || data.obsResolucion) {
+				document.getElementById('detalleSolicitudObs').innerHTML += `
+					<div class="prod-orders-alert ${data.estado === 'RECHAZADA' ? 'danger' : 'success'} mt-3">
+						<i class="bi ${data.estado === 'RECHAZADA' ? 'bi-x-circle-fill' : 'bi-check-circle-fill'}"></i>
+						<div>
+							<strong>Resolución</strong>
+							<div class="small">${data.fechaResolucion || 'Sin fecha'} · ${data.obsResolucion || 'Sin observaciones'}</div>
+						</div>
+					</div>`;
+			}
+			detalleModal.show();
 		});
-	}
-
-	if (solicitudesSearchInput) {
-		solicitudesSearchInput.addEventListener('input', applySolicitudesFilters);
-	}
-	if (solicitudesEstadoFiltro) {
-		solicitudesEstadoFiltro.addEventListener('change', applySolicitudesFilters);
-	}
+	});
 
 	document.querySelectorAll('.js-resolver-solicitud').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
+			const producto = buttonElement.dataset.producto || 'Producto';
+			const cantidad = buttonElement.dataset.cantidad || '—';
+			const solicitante = buttonElement.dataset.solicitante || '—';
+			const fecha = buttonElement.dataset.fecha || '—';
+
 			document.getElementById('resolverSolicitudId').value = buttonElement.dataset.id || '';
+			document.getElementById('resolverSolicitudProducto').textContent = producto;
+			document.getElementById('resolverSolicitudMeta').textContent =
+				`SOL-${String(buttonElement.dataset.id || '').padStart(3, '0')} · ${cantidad} pzas · ${solicitante} · ${fecha}`;
 			document.getElementById('resolverSolicitudEstado').value = 'APROBADA';
 			document.getElementById('resolverSolicitudObs').value = '';
-			new bootstrap.Modal(document.getElementById('modalResolverSolicitud')).show();
+			resolverModal.show();
+		});
+	});
+
+	document.querySelectorAll('.js-generar-orden').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			const idProducto = buttonElement.dataset.productoId || '';
+			const recetas = recetasDeProducto(idProducto);
+			const producto = buttonElement.dataset.producto || 'Producto';
+			const cantidad = buttonElement.dataset.cantidad || '—';
+			const solicitante = buttonElement.dataset.solicitante || '—';
+			const idSolicitud = buttonElement.dataset.id || '';
+
+			document.getElementById('ordenSolicitudId').value = idSolicitud;
+			document.getElementById('ordenProductoId').value = idProducto;
+			document.getElementById('ordenSolicitudProducto').textContent = producto;
+			document.getElementById('ordenSolicitudMeta').textContent =
+				`SOL-${String(idSolicitud).padStart(3, '0')} · ${cantidad} pzas · ${solicitante}`;
+			document.getElementById('ordenCantidad').value = cantidad;
+			document.getElementById('ordenObservaciones').value = `Generada desde SOL-${String(idSolicitud).padStart(3, '0')}`;
+
+			const recipeSelect = document.getElementById('ordenRecetaId');
+			recipeSelect.innerHTML = '';
+			if (recetas.length === 0) {
+				recipeSelect.innerHTML = '<option value="">No hay receta activa para este producto</option>';
+			} else {
+				recipeSelect.innerHTML = recetas
+					.map((receta, index) => {
+						const label = `v${receta.version} · ${receta.nombre}`;
+						return `<option value="${receta.id_receta}" ${index === 0 ? 'selected' : ''}>${label}</option>`;
+					})
+					.join('');
+				}
+
+			ordenModal.show();
 		});
 	});
 </script>

@@ -1,536 +1,469 @@
 {% extends "base_template.html" %} {% block title %}Inventario y Producto Terminado{% endblock %} {%
-block content %}
-<div class="row mb-4 align-items-center">
-	<div class="col">
-		<div class="ops-hero mb-0">
-			<p class="ops-meta mb-1">Panel de ventas</p>
-			<h2 class="ops-hero-title">Almacén — Producto terminado</h2>
-			<p class="ops-hero-text">Gestiona catálogo, inventario disponible y alertas de reposición.</p>
+block page_title %}Producto terminado{% endblock %} {% block content %} {% set payload_map = {} %}
+{% for item in productos_payload %} {% set _ = payload_map.update({item.id_producto: item}) %} {%
+endfor %}
+
+<section class="product-shell">
+	<header class="product-hero">
+		<div>
+			<p class="ops-meta mb-2">Almacén · Producto terminado</p>
+			<h2 class="product-title">Inventario y Producto Terminado</h2>
+			<p class="product-lead mb-0">
+				Gestiona el catálogo, controla existencias y revisa alertas de stock bajo con un flujo
+				alineado a producción y ventas.
+			</p>
+		</div>
+		<div class="product-hero-aside text-end">
+			<div class="product-clock mb-2">
+				Último acceso: {{ utc_now().strftime('%d/%m/%Y — %I:%M %p') }}
+			</div>
+			{% if can_manage %}
+			<button type="button" class="btn btn-primary product-hero-action" id="btnNuevoProducto">
+				<i class="bi bi-plus-lg me-2"></i>
+				Nuevo producto
+			</button>
+			{% endif %}
+		</div>
+	</header>
+
+	{% if alertas_stock %}
+	<div class="product-alert" role="alert">
+		<div class="product-alert-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+		<div>
+			<p class="product-alert-title mb-1">{{ alertas_stock|length }} productos bajo stock mínimo</p>
+			<p class="product-alert-text mb-0">
+				{% for alerta in alertas_stock %} {{ alerta.nombre }} ({{ alerta.cantidad_disponible }} {{
+				alerta.unidad_venta }} / mín. {{ alerta.stock_minimo }} {{ alerta.unidad_venta }}){% if not
+				loop.last %} · {% endif %} {% endfor %}
+			</p>
 		</div>
 	</div>
-	<div class="col-auto">
-		<span class="text-secondary small">
-			Último acceso: {{ utc_now().strftime('%d/%m/%Y — %I:%M %p') }}
-		</span>
-	</div>
-</div>
+	{% endif %}
 
-<!-- Tabs de Navegación -->
-<ul class="nav nav-pills mb-4" id="pills-tab">
-	<li class="nav-item">
-		<button
-			class="nav-link active rounded-pill px-4 me-2"
-			id="pills-catalogo-tab"
-			data-bs-toggle="pill"
-			data-bs-target="#pills-catalogo"
-			type="button"
-			role="tab"
-			aria-controls="pills-catalogo"
-			aria-selected="true">
+	<div class="product-tabs">
+		<button type="button" class="product-tab active" data-view-target="catalogView">
 			<i class="bi bi-grid-fill me-2"></i>
 			Catálogo
 		</button>
-	</li>
-	<li class="nav-item">
-		<button
-			class="nav-link rounded-pill px-4"
-			id="pills-inventario-tab"
-			data-bs-toggle="pill"
-			data-bs-target="#pills-inventario"
-			type="button"
-			role="tab"
-			aria-controls="pills-inventario"
-			aria-selected="false">
+		<button type="button" class="product-tab" data-view-target="inventoryView">
 			<i class="bi bi-table me-2"></i>
 			Inventario
 		</button>
-	</li>
-</ul>
-
-<!-- Controles Principales -->
-<div class="card border-0 shadow-sm mb-4">
-	<div class="card-body p-3">
-		<div class="row g-3 align-items-center">
-			<div class="col-md-6">
-				<div class="input-group">
-					<span class="input-group-text bg-transparent border-end-0">
-						<i class="bi bi-search"></i>
-					</span>
-					<input
-						type="text"
-						class="form-control border-start-0 ps-0"
-						id="searchInput"
-						placeholder="Buscar producto..." />
-				</div>
-			</div>
-			<div class="col-md-auto ms-auto">
-				<select class="form-select w-auto d-inline-block me-2" id="filterStatus">
-					<option value="all">Todos</option>
-					<option value="active">Activos</option>
-					<option value="inactive">Inactivos</option>
-				</select>
-				<select class="form-select w-auto d-inline-block me-2" id="filterStock">
-					<option value="all">Todo el stock</option>
-					<option value="low">Stock bajo</option>
-					<option value="available">Disponible</option>
-				</select>
-				<button
-					type="button"
-					class="btn btn-primary px-4 rounded-pill"
-					data-bs-toggle="modal"
-					data-bs-target="#modalProducto"
-					onclick="resetForm()">
-					<i class="bi bi-heptagon-fill me-2"></i>
-					Nuevo producto
-				</button>
-			</div>
-		</div>
 	</div>
-</div>
 
-<div class="tab-content" id="pills-tabContent">
-	<!-- Vista Catálogo (Cards) -->
-	<div class="tab-pane fade show active" id="pills-catalogo" aria-labelledby="pills-catalogo-tab">
-		<div class="row g-4" id="catalogGrid">
+	<div class="product-toolbar">
+		<div class="ops-input-wrap product-search">
+			<i class="bi bi-search"></i>
+			<input type="text" id="searchInput" placeholder="Buscar producto..." />
+		</div>
+		<select id="filterStatus" class="form-select product-filter">
+			<option value="all">Todos</option>
+			<option value="active">Activos</option>
+			<option value="inactive">Inactivos</option>
+		</select>
+		<select id="filterStock" class="form-select product-filter">
+			<option value="all">Todo el stock</option>
+			<option value="low">Stock bajo</option>
+			<option value="available">Disponible</option>
+		</select>
+		{% if can_manage %}
+		<button
+			type="button"
+			class="btn btn-primary product-toolbar-action"
+			id="btnNuevoProductoToolbar">
+			<i class="bi bi-plus-lg me-2"></i>
+			Nuevo producto
+		</button>
+		{% endif %}
+	</div>
+
+	<div class="product-view" id="catalogView">
+		<div class="product-grid">
 			{% for p in productos %} {% set m = metricas_producto.get(p.id_producto, {}) %}
-			<div
-				class="col-md-6 col-lg-3 product-item"
+			<article
+				class="product-card"
+				data-product-item
 				data-status="{{ 'active' if p.activo else 'inactive' }}"
-				data-stock="{{ 'low' if p.cantidad_disponible < p.stock_minimo else 'available' }}"
+				data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
 				data-name="{{ p.nombre|lower }}">
-				<div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
-					<div class="card-body position-relative">
-						<!-- Badge Stock -->
-						{% if p.activo %} {% if p.cantidad_disponible < p.stock_minimo %}
-						<span class="position-absolute top-0 end-0 m-3 badge bg-warning text-dark rounded-pill">
-							<i class="bi bi-exclamation-triangle-fill me-1"></i>
-							Stock bajo
-						</span>
+				<div class="product-card-media">
+					{% if not p.activo %}
+					<span class="product-status-badge neutral">Inactivo</span>
+					{% elif p.esta_bajo_stock %}
+					<span class="product-status-badge warning">Stock bajo</span>
+					{% else %}
+					<span class="product-status-badge success">Disponible</span>
+					{% endif %}
+
+					<div class="product-emoji">
+						{% if p.imagen and p.imagen.startswith('img/') %}
+						<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}" />
+						{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
+						<img src="{{ p.imagen }}" alt="{{ p.nombre }}" />
 						{% else %}
-						<span
-							class="position-absolute top-0 end-0 m-3 badge bg-success-subtle text-success rounded-pill">
-							<i class="bi bi-check-circle-fill me-1"></i>
-							Disponible
-						</span>
-						{% endif %} {% else %}
-						<span class="position-absolute top-0 end-0 m-3 badge bg-secondary rounded-pill">
-							Inactivo
-						</span>
+						<span>{{ p.imagen or '🍰' }}</span>
 						{% endif %}
-
-						<div
-							class="text-center mb-3 mt-2 overflow-hidden rounded"
-							style="height: 150px; width: 100%">
-							{% if p.imagen and p.imagen.startswith('img/') %}
-							<img
-								src="{{ url_for('static', filename=p.imagen) }}"
-								alt="{{ p.nombre }}"
-								class="img-fluid h-100 w-100 object-fit-cover" />
-							{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
-							<img
-								src="{{ p.imagen }}"
-								alt="{{ p.nombre }}"
-								class="img-fluid h-100 w-100 object-fit-cover" />
-							{% else %}
-							<span
-								class="display-3 d-flex align-items-center justify-content-center h-100 bg-light">
-								{{ p.imagen or '🍞' }}
-							</span>
-							{% endif %}
-						</div>
-
-						<h5 class="card-title fw-bold text-truncate" title="{{ p.nombre }}">{{ p.nombre }}</h5>
-						<p class="card-text text-muted small text-truncate">
-							{{ p.descripcion or 'Sin descripción' }}
-						</p>
-
-						<div class="d-flex justify-content-between align-items-center mb-3">
-							<div>
-								<h4 class="mb-0 text-primary-emphasis fw-bold">
-									${{ '%.2f'|format(p.precio_venta) }}
-								</h4>
-								<small class="text-muted">/ {{ p.unidad_venta }}</small>
-								<div class="small text-muted mt-1">
-									Costo:
-									<strong>${{ '%.2f'|format(m.get('costo_unitario', 0)) }}</strong>
-								</div>
-								<div class="small text-muted">
-									Sugerido:
-									<strong>${{ '%.2f'|format(m.get('precio_sugerido', 0)) }}</strong>
-								</div>
-							</div>
-							{% if p.activo %}
-							<span
-								class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2">
-								Activo
-							</span>
-							{% else %}
-							<span
-								class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2">
-								Inactivo
-							</span>
-							{% endif %}
-						</div>
-
-						<div
-							class="d-flex justify-content-between align-items-center bg-light rounded p-2 mb-3">
-							<span class="small text-muted">Stock:</span>
-							<span class="fw-bold">{{ p.cantidad_disponible }}</span>
-							<span class="small text-muted mx-1">/</span>
-							<span class="small text-muted">Mín: {{ p.stock_minimo }}</span>
-						</div>
-
-						<div class="small mb-3">
-							Utilidad:
-							<strong>${{ '%.2f'|format(m.get('utilidad_unitaria', 0)) }}</strong>
-							<span
-								class="ops-chip {{ 'danger' if m.get('porcentaje_utilidad', 0) <= 0 else ('warning' if m.get('porcentaje_utilidad', 0) < 20 else 'success') }} ms-2">
-								{{ '%.2f'|format(m.get('porcentaje_utilidad', 0)) }}%
-							</span>
-						</div>
-
-						<div class="d-grid gap-2 d-md-flex justify-content-md-between">
-							<button
-								type="button"
-								class="btn btn-outline-primary btn-sm flex-grow-1 js-open-edit"
-								data-product-id="{{ p.id_producto }}">
-								<i class="bi bi-pencil-fill me-1"></i>
-								Editar
-							</button>
-							<!-- Placeholder buttons for future functionality -->
-							<button class="btn btn-outline-secondary btn-sm" disabled title="Ver detalles">
-								<i class="bi bi-eye-fill"></i>
-							</button>
-						</div>
 					</div>
 				</div>
-			</div>
+				<div class="product-card-body">
+					<div class="d-flex justify-content-between align-items-start gap-2">
+						<div>
+							<h3 class="product-name mb-1">{{ p.nombre }}</h3>
+							<p class="product-desc mb-0">{{ p.descripcion or 'Sin descripción' }}</p>
+						</div>
+						<div class="product-mini-pill">#{{ '%03d'|format(p.id_producto) }}</div>
+					</div>
+
+					<div class="product-price-row">
+						<div>
+							<div class="product-price">${{ '%.2f'|format(p.precio_venta) }}</div>
+							<div class="product-unit">/ {{ p.unidad_venta }}</div>
+						</div>
+						<div class="product-state {{ 'success' if p.activo else 'neutral' }}">
+							{{ 'Activo' if p.activo else 'Inactivo' }}
+						</div>
+					</div>
+
+					<div class="product-stock-line">
+						<span>Stock</span>
+						<strong>{{ p.cantidad_disponible }} / mín. {{ p.stock_minimo }}</strong>
+					</div>
+					<div class="product-stock-bar">
+						<div
+							class="product-stock-fill {{ 'warning' if p.esta_bajo_stock else 'success' }}"></div>
+					</div>
+
+					<div class="product-actions">
+						<button
+							type="button"
+							class="btn btn-soft-primary btn-sm btnVerProducto"
+							data-id="{{ p.id_producto }}">
+							<i class="bi bi-eye-fill me-1"></i>
+							Ver
+						</button>
+						<button
+							type="button"
+							class="btn btn-soft-secondary btn-sm btnMovimientosProducto"
+							data-id="{{ p.id_producto }}">
+							<i class="bi bi-arrow-left-right me-1"></i>
+							Movim.
+						</button>
+						{% if can_manage %}
+						<button
+							type="button"
+							class="btn btn-soft-secondary btn-sm btnEditarProducto"
+							data-id="{{ p.id_producto }}">
+							<i class="bi bi-pencil-fill me-1"></i>
+							Editar
+						</button>
+						{% if p.activo %}
+						<button
+							type="button"
+							class="btn btn-soft-danger btn-sm btnDesactivarProducto"
+							data-id="{{ p.id_producto }}">
+							<i class="bi bi-archive-fill me-1"></i>
+							Desactivar
+						</button>
+						{% endif %} {% endif %}
+					</div>
+				</div>
+			</article>
 			{% else %}
-			<div class="col-12 text-center py-5">
-				<i class="bi bi-box-seam display-1 text-muted opacity-25"></i>
-				<p class="mt-3 text-muted">No hay productos registrados.</p>
+			<div class="product-empty">
+				<i class="bi bi-bag-x display-5"></i>
+				<p class="mb-0">No hay productos registrados.</p>
 			</div>
 			{% endfor %}
 		</div>
 	</div>
 
-	<!-- Vista Inventario (Tabla) -->
-	<div class="tab-pane fade" id="pills-inventario" aria-labelledby="pills-inventario-tab">
-		<div class="card border-0 shadow-sm">
-			<div class="card-body p-0">
-				<div class="table-responsive">
-					<table class="table table-hover align-middle mb-0">
-						<thead class="bg-light">
-							<tr>
-								<th class="ps-4">ID</th>
-								<th>Producto</th>
-								<th>Precio Venta</th>
-								<th>Costo Prod.</th>
-								<th>Precio Sugerido</th>
-								<th>% Utilidad</th>
-								<th>Cant. Actual</th>
-								<th>Stock Mínimo</th>
-								<th>Estado Stock</th>
-								<th>Última Actualiz.</th>
-								<th>Estado</th>
-								<th class="text-end pe-4">Acciones</th>
-							</tr>
-						</thead>
-						<tbody id="inventoryTableBody">
-							{% for p in productos %} {% set m = metricas_producto.get(p.id_producto, {}) %}
-							<tr
-								class="product-row"
-								data-status="{{ 'active' if p.activo else 'inactive' }}"
-								data-stock="{{ 'low' if p.cantidad_disponible < p.stock_minimo else 'available' }}"
-								data-name="{{ p.nombre|lower }}">
-								<td class="ps-4 text-muted fw-mono">P-{{ '%03d'|format(p.id_producto) }}</td>
-								<td>
-									<div class="d-flex align-items-center">
-										<div
-											class="rounded p-1 me-3 border d-flex align-items-center justify-content-center bg-light"
-											style="width: 48px; height: 48px; overflow: hidden">
-											{% if p.imagen and p.imagen.startswith('img/') %}
-											<img
-												src="{{ url_for('static', filename=p.imagen) }}"
-												alt="{{ p.nombre }}"
-												class="w-100 h-100 object-fit-cover" />
-											{% elif p.imagen and (p.imagen.startswith('http') or
-											p.imagen.startswith('data:')) %}
-											<img
-												src="{{ p.imagen }}"
-												alt="{{ p.nombre }}"
-												class="w-100 h-100 object-fit-cover" />
-											{% else %}
-											<span class="fs-4">{{ p.imagen or '🍞' }}</span>
-											{% endif %}
-										</div>
-										<div>
-											<div class="fw-bold">{{ p.nombre }}</div>
-											<div class="small text-muted">{{ p.unidad_venta }}</div>
-										</div>
-									</div>
-								</td>
-								<td>${{ '%.2f'|format(p.precio_venta) }}</td>
-								<td>${{ '%.2f'|format(m.get('costo_unitario', 0)) }}</td>
-								<td>${{ '%.2f'|format(m.get('precio_sugerido', 0)) }}</td>
-								<td>
-									<span
-										class="ops-chip {{ 'danger' if m.get('porcentaje_utilidad', 0) <= 0 else ('warning' if m.get('porcentaje_utilidad', 0) < 20 else 'success') }}">
-										{{ '%.2f'|format(m.get('porcentaje_utilidad', 0)) }}%
-									</span>
-								</td>
-								<td class="fw-bold fs-5">
-									{{ p.cantidad_disponible }}
-									<span class="fs-6 fw-normal text-muted">{{ p.unidad_venta }}s</span>
-								</td>
-								<td>
-									{{ p.stock_minimo }}
-									<span class="small text-muted">{{ p.unidad_venta }}s</span>
-								</td>
-								<td>
-									{% if p.cantidad_disponible < p.stock_minimo %}
-									<span class="badge bg-warning text-dark">
-										<i class="bi bi-exclamation-triangle me-1"></i>
-										Stock bajo
-									</span>
+	<div class="product-view d-none" id="inventoryView">
+		<div class="product-table-wrap">
+			<table class="table align-middle mb-0">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Producto</th>
+						<th>Precio venta</th>
+						<th>Cant. actual</th>
+						<th>Stock mínimo</th>
+						<th>Estado stock</th>
+						<th>Última actualiz.</th>
+						<th>Estado</th>
+						<th class="text-end">Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for p in productos %}
+					<tr
+						class="product-row"
+						data-product-item
+						data-status="{{ 'active' if p.activo else 'inactive' }}"
+						data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
+						data-name="{{ p.nombre|lower }}">
+						<td class="text-muted">P-{{ '%03d'|format(p.id_producto) }}</td>
+						<td>
+							<div class="d-flex align-items-center gap-3">
+								<div class="table-emoji">
+									{% if p.imagen and p.imagen.startswith('img/') %}
+									<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}" />
+									{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:'))
+									%}
+									<img src="{{ p.imagen }}" alt="{{ p.nombre }}" />
 									{% else %}
-									<span class="badge bg-success-subtle text-success">
-										<i class="bi bi-check-circle me-1"></i>
-										Disponible
-									</span>
+									<span>{{ p.imagen or '🍰' }}</span>
 									{% endif %}
-								</td>
-								<td>
-									<small class="text-muted">
-										{{ p.fecha_actualizacion.strftime('%Y-%m-%d') if p.fecha_actualizacion else
-										'N/A' }}
-									</small>
-								</td>
-								<td>
-									{% if p.activo %}
-									<span class="badge bg-success-subtle text-success rounded-pill">Activo</span>
-									{% else %}
-									<span class="badge bg-secondary rounded-pill">Inactivo</span>
-									{% endif %}
-								</td>
-								<td class="text-end pe-4">
-									<button
-										type="button"
-										class="btn btn-sm btn-outline-primary js-open-edit"
-										data-product-id="{{ p.id_producto }}">
-										<i class="bi bi-pencil-fill"></i>
-									</button>
-								</td>
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
+								</div>
+								<div>
+									<div class="fw-semibold">{{ p.nombre }}</div>
+									<div class="small text-muted">{{ p.unidad_venta }}</div>
+								</div>
+							</div>
+						</td>
+						<td>${{ '%.2f'|format(p.precio_venta) }}</td>
+						<td class="fw-bold">{{ p.cantidad_disponible }}</td>
+						<td>{{ p.stock_minimo }}</td>
+						<td>
+							{% if p.esta_bajo_stock %}
+							<span class="product-state warning">Stock bajo</span>
+							{% else %}
+							<span class="product-state success">Disponible</span>
+							{% endif %}
+						</td>
+						<td>
+							<small class="text-muted">
+								{{ p.fecha_actualizacion.strftime('%d/%m/%Y') if p.fecha_actualizacion else 'N/A' }}
+							</small>
+						</td>
+						<td>
+							<span class="product-state {{ 'success' if p.activo else 'neutral' }}">
+								{{ 'Activo' if p.activo else 'Inactivo' }}
+							</span>
+						</td>
+						<td class="text-end">
+							<div class="product-actions justify-content-end">
+								<button
+									type="button"
+									class="btn btn-soft-primary btn-sm btnVerProducto"
+									data-id="{{ p.id_producto }}">
+									<i class="bi bi-eye-fill"></i>
+								</button>
+								<button
+									type="button"
+									class="btn btn-soft-secondary btn-sm btnMovimientosProducto"
+									data-id="{{ p.id_producto }}">
+									<i class="bi bi-arrow-left-right"></i>
+								</button>
+								{% if can_manage %}
+								<button
+									type="button"
+									class="btn btn-soft-secondary btn-sm btnEditarProducto"
+									data-id="{{ p.id_producto }}">
+									<i class="bi bi-pencil-fill"></i>
+								</button>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
-</div>
+</section>
 
-<!-- Modal Producto (Crear/Editar) -->
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered">
-		<div class="modal-content border-0 shadow">
-			<div class="modal-header bg-primary text-white">
-				<h5 class="modal-title fw-bold" id="modalTitle">Nuevo Producto</h5>
-				<button
-					type="button"
-					class="btn-close btn-close-white"
-					data-bs-dismiss="modal"
-					aria-label="Close"></button>
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content product-modal">
+			<div class="modal-header product-modal-header">
+				<div>
+					<p class="ops-meta mb-1" id="modalEyebrow">Nuevo producto</p>
+					<h5 class="modal-title mb-0" id="modalTitle">Nuevo producto terminado</h5>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
 			<form method="post" id="formProducto" enctype="multipart/form-data">
-				<div class="modal-body p-4 bg-light-subtle">
+				<div class="modal-body">
 					<input type="hidden" name="action" id="formAction" value="crear" />
 					<input type="hidden" name="id_producto" id="productId" />
-
-					<!-- Sección Datos del Producto -->
-					<h6 class="text-danger fw-bold border-bottom border-danger pb-2 mb-3">
-						<i class="bi bi-info-circle-fill me-2"></i>
-						DATOS DEL PRODUCTO
-					</h6>
-
-					<div class="row g-3 mb-4">
-						<div class="col-md-4">
-							<label for="nombre" class="form-label fw-bold small text-muted">
-								Nombre
-								<span class="text-danger">*</span>
-							</label>
-							<input
-								type="text"
-								class="form-control"
-								name="nombre"
-								id="nombre"
-								placeholder="Ej. Pastel de Chocolate"
-								required />
-						</div>
-						<div class="col-md-3">
-							<label for="precio_venta" class="form-label fw-bold small text-muted">
-								Precio de venta
-								<span class="text-danger">*</span>
-							</label>
-							<div class="input-group">
-								<span class="input-group-text">$</span>
-								<input
-									type="number"
-									step="0.01"
-									min="0"
-									class="form-control"
-									name="precio_venta"
-									id="precio_venta"
-									placeholder="0.00"
-									required />
-							</div>
-						</div>
-						<div class="col-md-2">
-							<label for="margen_objetivo_pct" class="form-label fw-bold small text-muted">
-								Margen %
-								<span class="text-danger">*</span>
-							</label>
-							<input
-								type="number"
-								step="0.01"
-								min="0.01"
-								max="99.99"
-								class="form-control"
-								name="margen_objetivo_pct"
-								id="margen_objetivo_pct"
-								value="25"
-								required />
-						</div>
-						<div class="col-md-3">
-							<label for="unidad_venta" class="form-label fw-bold small text-muted">
-								Unidad de venta
-								<span class="text-danger">*</span>
-							</label>
-							<select class="form-select" name="unidad_venta" id="unidad_venta">
-								<option value="Pieza">Pieza</option>
-								<option value="Kg">Kg</option>
-								<option value="Paquete">Paquete</option>
-								<option value="Litro">Litro</option>
-								<option value="Caja">Caja</option>
-							</select>
-						</div>
-						<div class="col-md-6">
-							<label for="id_receta" class="form-label fw-bold small text-muted">
-								Receta base
-								<span class="text-danger">*</span>
-							</label>
-							<select class="form-select" name="id_receta" id="id_receta" required>
-								<option value="">Selecciona una receta</option>
-								{% for r in recetas %}
-								<option value="{{ r.id_receta }}">{{ r.nombre }} v{{ r.version }}</option>
-								{% endfor %}
-							</select>
-						</div>
-						<div class="col-md-6">
-							<p class="form-label fw-bold small text-muted mb-2">Vista previa de costos</p>
-							<div class="row g-2">
-								<div class="col-md-4">
+					<div class="product-form-grid">
+						<div class="product-form-card">
+							<p class="ops-meta mb-3">
+								<i class="bi bi-info-circle-fill me-1"></i>
+								Datos del producto
+							</p>
+							<div class="form-grid form-grid-2">
+								<div class="field-span-2">
+									<label for="nombre" class="form-label fw-semibold">Nombre *</label>
 									<input
 										type="text"
 										class="form-control"
-										id="costo_produccion_actual"
-										placeholder="Costo"
-										readonly />
+										name="nombre"
+										id="nombre"
+										placeholder="Ej. Pastel de Chocolate"
+										required />
 								</div>
-								<div class="col-md-4">
+								<div>
+									<label for="precio_venta" class="form-label fw-semibold">Precio de venta *</label>
+									<div class="input-group">
+										<span class="input-group-text">$</span>
+										<input
+											type="number"
+											step="0.01"
+											min="0"
+											class="form-control"
+											name="precio_venta"
+											id="precio_venta"
+											placeholder="0.00"
+											required />
+									</div>
+								</div>
+								<div>
+									<label for="unidad_venta" class="form-label fw-semibold">Unidad de venta *</label>
+									<select class="form-select" name="unidad_venta" id="unidad_venta" required>
+										<option value="Pieza">Pieza</option>
+										<option value="Kg">Kg</option>
+										<option value="Paquete">Paquete</option>
+										<option value="Caja">Caja</option>
+										<option value="Litro">Litro</option>
+									</select>
+								</div>
+								<div class="field-span-2">
+									<label for="id_receta" class="form-label fw-semibold">Receta activa (RF08)</label>
+									<select class="form-select" name="id_receta" id="id_receta">
+										<option value="">Sin receta activa</option>
+									</select>
+									<small class="text-muted" id="recetaHelpText">
+										Asigna la receta activa del producto para cálculo de costo y precio sugerido.
+									</small>
+								</div>
+								<div>
+									<label for="margen_objetivo_pct" class="form-label fw-semibold">
+										Ganancia % (opcional)
+									</label>
+									<input
+										type="number"
+										step="0.01"
+										min="0.01"
+										max="99.99"
+										class="form-control"
+										name="margen_objetivo_pct"
+										id="margen_objetivo_pct"
+										value="25" />
+								</div>
+								<div class="field-span-2">
+									<label for="descripcion" class="form-label fw-semibold">Descripción</label>
+									<textarea
+										class="form-control"
+										name="descripcion"
+										id="descripcion"
+										rows="3"
+										placeholder="Descripción del producto (opcional)..."></textarea>
+								</div>
+								<div>
+									<label for="imagen_archivo" class="form-label fw-semibold">Imagen</label>
+									<input
+										type="file"
+										class="form-control"
+										name="imagen_archivo"
+										id="imagen_archivo"
+										accept="image/*" />
+								</div>
+								<div>
+									<label for="imagen" class="form-label fw-semibold">Emoji / URL</label>
 									<input
 										type="text"
 										class="form-control"
-										id="precio_sugerido_calc"
-										placeholder="Sugerido"
-										readonly />
+										name="imagen"
+										id="imagen"
+										placeholder="🍰 o URL imagen" />
 								</div>
-								<div class="col-md-4">
+								<div>
+									<label for="activo" class="form-label fw-semibold">Estado</label>
+									<select class="form-select" name="activo" id="activo">
+										<option value="on">Activo</option>
+										<option value="off">Inactivo</option>
+									</select>
+								</div>
+								<div class="field-span-2">
+									<div class="d-flex flex-wrap gap-2 align-items-center">
+										<small class="text-muted">
+											Costo prod.:
+											<strong id="costoRecetaVista">$0.00</strong>
+										</small>
+										<small class="text-muted">
+											Precio sugerido:
+											<strong id="precioSugeridoVista">$0.00</strong>
+										</small>
+										<button
+											type="button"
+											class="btn btn-soft-primary btn-sm"
+											id="btnAplicarSugerido">
+											Aplicar sugerido
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="product-form-card">
+							<p class="ops-meta mb-3">
+								<i class="bi bi-boxes me-1"></i>
+								Inventario
+							</p>
+							<div class="form-grid form-grid-2">
+								<div>
+									<label for="stock_inicial" class="form-label fw-semibold">
+										Stock inicial / actual
+									</label>
 									<input
-										type="text"
+										type="number"
+										step="1"
+										min="0"
 										class="form-control"
-										id="utilidad_unitaria_calc"
-										placeholder="Utilidad"
-										readonly />
+										name="stock_inicial"
+										id="stock_inicial"
+										value="0"
+										required />
+									<small class="text-muted">
+										Se actualiza automáticamente por producción y ventas.
+									</small>
+								</div>
+								<div>
+									<label for="stock_minimo" class="form-label fw-semibold">Stock mínimo *</label>
+									<input
+										type="number"
+										step="1"
+										min="0"
+										class="form-control"
+										name="stock_minimo"
+										id="stock_minimo"
+										value="10"
+										required />
+									<small class="text-muted">
+										Activa alerta visual cuando el inventario baje del mínimo.
+									</small>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-12">
-							<label for="descripcion" class="form-label fw-bold small text-muted">
-								Descripción
-							</label>
-							<textarea
-								class="form-control"
-								name="descripcion"
-								id="descripcion"
-								rows="2"
-								placeholder="Descripción del producto (opcional)..."></textarea>
-						</div>
-						<div class="col-md-6">
-							<label for="imagen_archivo" class="form-label fw-bold small text-muted">
-								Imagen / Emoji
-							</label>
-							<div class="input-group">
-								<input
-									type="file"
-									class="form-control"
-									name="imagen_archivo"
-									id="imagen_archivo"
-									accept="image/*" />
-							</div>
-							<div class="input-group mt-2">
-								<span class="input-group-text">o Emoji/URL</span>
-								<input
-									type="text"
-									class="form-control"
-									name="imagen"
-									id="imagen"
-									placeholder="🍞 o URL imagen" />
-							</div>
-							<div class="form-text">Sube una imagen o usa un emoji.</div>
-						</div>
-						<div class="col-md-6">
-							<label for="activo" class="form-label fw-bold small text-muted">Estado</label>
-							<div class="form-check form-switch mt-2">
-								<input class="form-check-input" type="checkbox" name="activo" id="activo" checked />
-								<label class="form-check-label" for="activo">Producto activo para venta</label>
-							</div>
-						</div>
-					</div>
 
-					<!-- Sección Inventario Inicial -->
-					<h6 class="text-danger fw-bold border-bottom border-danger pb-2 mb-3">
-						<i class="bi bi-boxes me-2"></i>
-						INVENTARIO (Parámetros)
-					</h6>
-
-					<div class="row g-3">
-						<div class="col-md-6">
-							<label for="stock_minimo" class="form-label fw-bold small text-muted">
-								Stock mínimo
-								<span class="text-danger">*</span>
-							</label>
-							<input
-								type="number"
-								min="0"
-								class="form-control"
-								name="stock_minimo"
-								id="stock_minimo"
-								value="0"
-								required />
-							<div class="form-text">
-								Alerta visual cuando baje de este nivel. (El stock inicial es 0 por defecto)
+						<div class="product-form-card product-preview-card">
+							<p class="ops-meta mb-3">
+								<i class="bi bi-image me-1"></i>
+								Vista previa
+							</p>
+							<div class="product-preview" id="productPreview">
+								<span>🍰</span>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="modal-footer bg-white">
-					<button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">
+				<div class="modal-footer product-modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-primary px-4">
-						<i class="bi bi-save-fill me-2"></i>
+					<button type="submit" class="btn btn-primary" id="btnGuardarProducto">
+						<i class="bi bi-check2-circle me-1"></i>
 						Guardar producto
 					</button>
 				</div>
@@ -539,137 +472,498 @@ block content %}
 	</div>
 </div>
 
-{% endblock %} {% block scripts %}
+<div class="modal fade" id="modalDetalleProducto" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content product-modal">
+			<div class="modal-header product-modal-header">
+				<div>
+					<p class="ops-meta mb-1">Detalle</p>
+					<h5 class="modal-title mb-0" id="detalleTitulo">Producto terminado</h5>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div class="product-detail-grid">
+					<div class="product-detail-hero" id="detalleEmoji">🍰</div>
+					<div>
+						<p class="product-detail-name mb-1" id="detalleNombre">—</p>
+						<p class="product-desc mb-3" id="detalleDescripcion">—</p>
+						<div class="detail-pill-row" id="detallePills"></div>
+					</div>
+				</div>
+				<div class="product-detail-grid mt-3">
+					<div class="product-detail-box">
+						<span>Precio</span>
+						<strong id="detallePrecio">$0.00</strong>
+					</div>
+					<div class="product-detail-box">
+						<span>Costo receta</span>
+						<strong id="detalleCosto">$0.00</strong>
+					</div>
+					<div class="product-detail-box">
+						<span>Stock actual</span>
+						<strong id="detalleStock">0</strong>
+					</div>
+					<div class="product-detail-box">
+						<span>Stock mínimo</span>
+						<strong id="detalleMinimo">0</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalMovimientosProducto" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content product-modal">
+			<div class="modal-header product-modal-header">
+				<div>
+					<p class="ops-meta mb-1">Historial</p>
+					<h5 class="modal-title mb-0" id="movimientosTitulo">Movimientos</h5>
+				</div>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div class="ops-table table-responsive product-movements-table">
+					<table class="table table-hover align-middle mb-0">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Tipo</th>
+								<th>Cantidad</th>
+								<th>Antes</th>
+								<th>Después</th>
+								<th>Fecha</th>
+								<th>Referencia</th>
+							</tr>
+						</thead>
+						<tbody id="movimientosBody"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form method="post" id="formDesactivarProducto" class="d-none">
+	<input type="hidden" name="action" value="editar" />
+	<input type="hidden" name="id_producto" id="desactivarIdProducto" />
+	<input type="hidden" name="nombre" id="desactivarNombre" />
+	<input type="hidden" name="descripcion" id="desactivarDescripcion" />
+	<input type="hidden" name="precio_venta" id="desactivarPrecio" />
+	<input type="hidden" name="unidad_venta" id="desactivarUnidad" />
+	<input type="hidden" name="stock_minimo" id="desactivarStockMinimo" />
+	<input type="hidden" name="activo" value="off" />
+</form>
+
 <script id="products-data" type="application/json">
-	[
-		{% for p in productos %}
-			{
-				"id": {{ p.id_producto|tojson }},
-				"nombre": {{ p.nombre|tojson }},
-				"descripcion": {{ (p.descripcion or '')|tojson }},
-				"precio": {{ p.precio_venta|float|tojson }},
-				"margen_objetivo_pct": {{ p.margen_objetivo_pct|float|tojson }},
-				"unidad": {{ p.unidad_venta|tojson }},
-				"id_receta": {{ p.id_receta|tojson }},
-				"stock_min": {{ p.stock_minimo|tojson }},
-				"activo": {{ p.activo|tojson }},
-				"imagen": {{ (p.imagen or '')|tojson }},
-				"costo_produccion_actual": {{ metricas_producto.get(p.id_producto, {}).get('costo_unitario', 0)|float|tojson }},
-				"precio_sugerido": {{ metricas_producto.get(p.id_producto, {}).get('precio_sugerido', 0)|float|tojson }},
-				"utilidad_unitaria": {{ metricas_producto.get(p.id_producto, {}).get('utilidad_unitaria', 0)|float|tojson }}
-			}{{ ',' if not loop.last else '' }}
-		{% endfor %}
-	]
+	{{ productos_payload|tojson }}
+</script>
+<script id="recipes-by-product-data" type="application/json">
+	{{ recetas_por_producto|tojson }}
 </script>
 <script>
-	const productsDataScript = document.getElementById('products-data');
-	const productsArray = productsDataScript ? JSON.parse(productsDataScript.textContent) : [];
+	const productsArray = JSON.parse(document.getElementById('products-data').textContent || '[]');
+	const recipesByProduct = JSON.parse(
+		document.getElementById('recipes-by-product-data').textContent || '{}'
+	);
 	const productsData = productsArray.reduce((accumulator, product) => {
-		accumulator[product.id] = product;
+		accumulator[product.id_producto] = product;
 		return accumulator;
 	}, {});
 
-	function resetForm() {
-		document.getElementById('formProducto').reset();
-		document.getElementById('formAction').value = 'crear';
-		document.getElementById('productId').value = '';
-		document.getElementById('modalTitle').textContent = 'Nuevo Producto';
-		document.getElementById('activo').checked = true;
-		document.getElementById('id_receta').value = '';
-		document.getElementById('margen_objetivo_pct').value = '25';
-		document.getElementById('costo_produccion_actual').value = '';
-		document.getElementById('precio_sugerido_calc').value = '';
-		document.getElementById('utilidad_unitaria_calc').value = '';
-	}
-
-	function recalcPricingPreview() {
-		const costo = Number(document.getElementById('costo_produccion_actual').value || 0);
-		const precio = Number(document.getElementById('precio_venta').value || 0);
-		const margen = Number(document.getElementById('margen_objetivo_pct').value || 0);
-
-		if (costo > 0 && margen > 0 && margen < 100) {
-			const sugerido = costo / (1 - margen / 100);
-			document.getElementById('precio_sugerido_calc').value = sugerido.toFixed(2);
+	function createModalController(modalElement) {
+		if (globalThis.bootstrap && globalThis.bootstrap.Modal) {
+			return new globalThis.bootstrap.Modal(modalElement);
 		}
 
-		document.getElementById('utilidad_unitaria_calc').value = (precio - costo).toFixed(2);
+		return {
+			show() {
+				modalElement.classList.add('show');
+				modalElement.style.display = 'block';
+				modalElement.removeAttribute('aria-hidden');
+				document.body.classList.add('modal-open');
+				if (!document.querySelector('.modal-backdrop')) {
+					const backdrop = document.createElement('div');
+					backdrop.className = 'modal-backdrop fade show';
+					backdrop.dataset.fallbackBackdrop = 'true';
+					document.body.appendChild(backdrop);
+				}
+			},
+			hide() {
+				modalElement.classList.remove('show');
+				modalElement.style.display = 'none';
+				modalElement.setAttribute('aria-hidden', 'true');
+				document.body.classList.remove('modal-open');
+				document
+					.querySelectorAll('[data-fallback-backdrop="true"]')
+					.forEach((node) => node.remove());
+			},
+		};
 	}
 
-	function openEditModal(id) {
-		const p = productsData[id];
-		if (!p) return;
+	const modalProducto = createModalController(document.getElementById('modalProducto'));
+	const modalDetalle = createModalController(document.getElementById('modalDetalleProducto'));
+	const modalMovimientos = createModalController(
+		document.getElementById('modalMovimientosProducto')
+	);
+	const modalControllers = {
+		modalProducto,
+		modalDetalleProducto: modalDetalle,
+		modalMovimientosProducto: modalMovimientos,
+	};
+	if (!globalThis.bootstrap || !globalThis.bootstrap.Modal) {
+		document.querySelectorAll('[data-bs-dismiss="modal"]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const modal = button.closest('.modal');
+				if (modal && modalControllers[modal.id]) {
+					modalControllers[modal.id].hide();
+				}
+			});
+		});
+	}
+	const formProducto = document.getElementById('formProducto');
+	const precioInput = document.getElementById('precio_venta');
+	const margenInput = document.getElementById('margen_objetivo_pct');
+	const previewBox = document.getElementById('productPreview');
+	const costoRecetaVista = document.getElementById('costoRecetaVista');
+	const precioSugeridoVista = document.getElementById('precioSugeridoVista');
+	const btnAplicarSugerido = document.getElementById('btnAplicarSugerido');
+	const stockInicialInput = document.getElementById('stock_inicial');
+	const recetaSelect = document.getElementById('id_receta');
+	const recetaHelpText = document.getElementById('recetaHelpText');
+	const productTitle = document.getElementById('modalTitle');
+	const modalEyebrow = document.getElementById('modalEyebrow');
+	let currentCost = 0;
+	let currentEditingProduct = null;
+
+	function money(value) {
+		return new Intl.NumberFormat('es-MX', {
+			style: 'currency',
+			currency: 'MXN',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(Number(value || 0));
+	}
+
+	function parseNumber(value) {
+		const parsed = Number(value || 0);
+		return Number.isFinite(parsed) ? parsed : 0;
+	}
+
+	function buildMediaMarkup(imagen, nombre) {
+		if (!imagen) {
+			return '<span>🍰</span>';
+		}
+		if (imagen.startsWith('img/')) {
+			return `<img src="/static/${imagen}" alt="${nombre}">`;
+		}
+		if (imagen.startsWith('http') || imagen.startsWith('data:')) {
+			return `<img src="${imagen}" alt="${nombre}">`;
+		}
+		return `<span>${imagen}</span>`;
+	}
+
+	function refreshPricingAid() {
+		const margen = parseNumber(margenInput?.value);
+		let sugerido = 0;
+		if (currentCost > 0 && margen > 0 && margen < 100) {
+			sugerido = currentCost / (1 - margen / 100);
+		}
+		if (costoRecetaVista) {
+			costoRecetaVista.textContent = money(currentCost);
+		}
+		if (precioSugeridoVista) {
+			precioSugeridoVista.textContent = money(sugerido);
+		}
+	}
+
+	function getRecipeListForProduct(productId) {
+		if (!productId) return [];
+		return recipesByProduct[String(productId)] || [];
+	}
+
+	function applyCurrentCostFromRecipe() {
+		const productCost = parseNumber(currentEditingProduct?.costo_produccion_actual || 0);
+		const selectedId = Number(recetaSelect?.value || 0);
+		if (!selectedId) {
+			currentCost = productCost;
+			refreshPricingAid();
+			return;
+		}
+
+		const recipes = getRecipeListForProduct(currentEditingProduct?.id_producto);
+		const selectedRecipe = recipes.find((recipe) => Number(recipe.id_receta) === selectedId);
+		currentCost = parseNumber(selectedRecipe?.costo_unitario || productCost);
+		refreshPricingAid();
+	}
+
+	function populateRecipeOptions(productId, selectedRecipeId = null) {
+		if (!recetaSelect) return;
+		recetaSelect.innerHTML = '<option value="">Sin receta activa</option>';
+
+		if (!productId) {
+			recetaSelect.value = '';
+			recetaSelect.disabled = true;
+			if (recetaHelpText) {
+				recetaHelpText.textContent =
+					'Primero crea el producto. Luego podrás asociar su receta activa.';
+			}
+			return;
+		}
+
+		const recipes = getRecipeListForProduct(productId);
+		recetaSelect.disabled = false;
+		if (!recipes.length) {
+			recetaSelect.value = '';
+			if (recetaHelpText) {
+				recetaHelpText.textContent =
+					'Este producto aún no tiene receta activa. Créala en el módulo Recetas (RF08).';
+			}
+			return;
+		}
+
+		recipes.forEach((recipe) => {
+			const option = document.createElement('option');
+			option.value = String(recipe.id_receta);
+			option.textContent = `v${recipe.version} · ${money(recipe.costo_unitario)} / ${recipe.unidad_produccion}`;
+			recetaSelect.appendChild(option);
+		});
+
+		if (selectedRecipeId) {
+			recetaSelect.value = String(selectedRecipeId);
+		}
+		if (!recetaSelect.value && recipes.length) {
+			recetaSelect.value = String(recipes[0].id_receta);
+		}
+		if (recetaHelpText) {
+			recetaHelpText.textContent =
+				'Receta vigente para cálculo automático de costo de producción y precio sugerido.';
+		}
+	}
+
+	function resetProductForm() {
+		formProducto.reset();
+		formProducto.action = '';
+		document.getElementById('formAction').value = 'crear';
+		document.getElementById('productId').value = '';
+		modalEyebrow.textContent = 'Nuevo producto';
+		productTitle.textContent = 'Nuevo producto terminado';
+		stockInicialInput.readOnly = false;
+		stockInicialInput.value = '0';
+		currentEditingProduct = null;
+		currentCost = 0;
+		if (margenInput) {
+			margenInput.value = '25';
+		}
+		populateRecipeOptions(null, null);
+		document.getElementById('activo').value = 'on';
+		previewBox.innerHTML = '<span>🍰</span>';
+		precioInput.value = '';
+		refreshPricingAid();
+	}
+
+	function openProductModal(productId) {
+		const product = productsData[productId];
+		if (!product) return;
+		currentEditingProduct = product;
 
 		document.getElementById('formAction').value = 'editar';
-		document.getElementById('productId').value = p.id;
-		document.getElementById('nombre').value = p.nombre;
-		document.getElementById('descripcion').value = p.descripcion;
-		document.getElementById('precio_venta').value = p.precio;
-		document.getElementById('margen_objetivo_pct').value = p.margen_objetivo_pct || 25;
-		document.getElementById('unidad_venta').value = p.unidad;
-		document.getElementById('id_receta').value = p.id_receta || '';
-		document.getElementById('stock_minimo').value = p.stock_min;
-		document.getElementById('imagen').value = p.imagen;
-		document.getElementById('activo').checked = p.activo;
-		document.getElementById('costo_produccion_actual').value = (
-			p.costo_produccion_actual || 0
-		).toFixed(2);
-		document.getElementById('precio_sugerido_calc').value = (p.precio_sugerido || 0).toFixed(2);
-		document.getElementById('utilidad_unitaria_calc').value = (p.utilidad_unitaria || 0).toFixed(2);
-		recalcPricingPreview();
-
-		document.getElementById('modalTitle').textContent = 'Editar Producto';
-
-		const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-		modal.show();
+		document.getElementById('productId').value = product.id_producto;
+		document.getElementById('nombre').value = product.nombre || '';
+		document.getElementById('descripcion').value = product.descripcion || '';
+		precioInput.value = parseNumber(product.precio_venta).toFixed(2);
+		if (margenInput) {
+			margenInput.value = parseNumber(product.margen_objetivo_pct || 25).toFixed(2);
+		}
+		currentCost = parseNumber(product.costo_produccion_actual || 0);
+		document.getElementById('unidad_venta').value = product.unidad_venta || 'Pieza';
+		document.getElementById('stock_minimo').value = product.stock_minimo ?? 0;
+		stockInicialInput.value = product.cantidad_disponible ?? 0;
+		stockInicialInput.readOnly = true;
+		document.getElementById('activo').value = product.activo ? 'on' : 'off';
+		document.getElementById('imagen').value = product.imagen || '';
+		populateRecipeOptions(product.id_producto, product.id_receta || null);
+		modalEyebrow.textContent = 'Editar producto';
+		productTitle.textContent = product.nombre;
+		previewBox.innerHTML = buildMediaMarkup(product.imagen, product.nombre);
+		applyCurrentCostFromRecipe();
+		refreshPricingAid();
+		modalProducto.show();
 	}
 
-	// Filtrado simple en JS
+	function openDetailModal(productId) {
+		const product = productsData[productId];
+		if (!product) return;
+		document.getElementById('detalleTitulo').textContent = product.nombre;
+		document.getElementById('detalleNombre').textContent = product.nombre;
+		document.getElementById('detalleDescripcion').textContent =
+			product.descripcion || 'Sin descripción';
+		document.getElementById('detallePrecio').textContent = money(product.precio_venta);
+		document.getElementById('detalleCosto').textContent = money(product.costo_produccion_actual);
+		document.getElementById('detalleStock').textContent = product.cantidad_disponible;
+		document.getElementById('detalleMinimo').textContent = product.stock_minimo;
+		document.getElementById('detalleEmoji').innerHTML = buildMediaMarkup(
+			product.imagen,
+			product.nombre
+		);
+		document.getElementById('detallePills').innerHTML = `
+			<span class="ops-chip ${product.activo ? 'success' : 'neutral'}">${product.activo ? 'Activo' : 'Inactivo'}</span>
+			<span class="ops-chip ${product.esta_bajo_stock ? 'warning' : 'success'}">${product.estado_stock}</span>
+		`;
+		modalDetalle.show();
+	}
+
+	async function openMovimientosModal(productId) {
+		const product = productsData[productId];
+		if (!product) return;
+		document.getElementById('movimientosTitulo').textContent = `Movimientos · ${product.nombre}`;
+		const body = document.getElementById('movimientosBody');
+		body.innerHTML =
+			'<tr><td colspan="7" class="text-center py-4 text-muted">Cargando...</td></tr>';
+		modalMovimientos.show();
+
+		try {
+			const response = await fetch(`/sales/producto-terminado/${productId}/movimientos`, {
+				headers: { Accept: 'application/json' },
+			});
+			const data = await response.json();
+			const movimientos = data.movimientos || [];
+			if (!movimientos.length) {
+				body.innerHTML =
+					'<tr><td colspan="7" class="text-center py-4 text-muted">Sin movimientos registrados.</td></tr>';
+				return;
+			}
+			body.innerHTML = movimientos
+				.map((movimiento) => {
+					let tipoClase = 'neutral';
+					if (movimiento.tipo === 'ENTRADA') {
+						tipoClase = 'success';
+					} else if (movimiento.tipo === 'SALIDA') {
+						tipoClase = 'warning';
+					}
+
+					return `
+				<tr>
+					<td class="text-muted">#${movimiento.id_movimiento}</td>
+					<td><span class="ops-chip ${tipoClase}">${movimiento.tipo}</span></td>
+					<td>${movimiento.cantidad}</td>
+					<td>${movimiento.stock_anterior}</td>
+					<td>${movimiento.stock_posterior}</td>
+					<td>${movimiento.fecha_texto || '-'}</td>
+					<td class="small text-muted">${movimiento.referencia_id || '-'}</td>
+				</tr>
+			`;
+				})
+				.join('');
+		} catch (error) {
+			console.error('Error al cargar movimientos de producto', error);
+			body.innerHTML =
+				'<tr><td colspan="7" class="text-center py-4 text-danger">No se pudieron cargar los movimientos.</td></tr>';
+		}
+	}
+
+	function applyFilters() {
+		const term = document.getElementById('searchInput').value.toLowerCase();
+		const status = document.getElementById('filterStatus').value;
+		const stock = document.getElementById('filterStock').value;
+		document.querySelectorAll('[data-product-item]').forEach((item) => {
+			const matchesSearch = item.dataset.name.includes(term);
+			const matchesStatus = status === 'all' || item.dataset.status === status;
+			const matchesStock = stock === 'all' || item.dataset.stock === stock;
+			item.classList.toggle('d-none', !(matchesSearch && matchesStatus && matchesStock));
+		});
+	}
+
+	function activateView(targetId) {
+		document.querySelectorAll('.product-tab').forEach((tab) => {
+			tab.classList.toggle('active', tab.dataset.viewTarget === targetId);
+		});
+		document.querySelectorAll('.product-view').forEach((view) => {
+			view.classList.toggle('d-none', view.id !== targetId);
+		});
+	}
+
+	function wireButton(button, handler) {
+		button.addEventListener('click', () => handler(Number(button.dataset.id || 0)));
+	}
+
+	document.querySelectorAll('.product-tab').forEach((tab) => {
+		tab.addEventListener('click', () => activateView(tab.dataset.viewTarget));
+	});
+
+	document
+		.querySelectorAll('.btnVerProducto')
+		.forEach((button) => wireButton(button, openDetailModal));
+	document
+		.querySelectorAll('.btnMovimientosProducto')
+		.forEach((button) => wireButton(button, openMovimientosModal));
+	document
+		.querySelectorAll('.btnEditarProducto')
+		.forEach((button) => wireButton(button, openProductModal));
+	document.querySelectorAll('.btnDesactivarProducto').forEach((button) => {
+		button.addEventListener('click', () => {
+			const product = productsData[Number(button.dataset.id || 0)];
+			if (!product) return;
+			if (!confirm(`¿Desactivar ${product.nombre}?`)) return;
+			document.getElementById('desactivarIdProducto').value = product.id_producto;
+			document.getElementById('desactivarNombre').value = product.nombre;
+			document.getElementById('desactivarDescripcion').value = product.descripcion || '';
+			document.getElementById('desactivarPrecio').value = product.precio_venta;
+			document.getElementById('desactivarUnidad').value = product.unidad_venta || 'Pieza';
+			document.getElementById('desactivarStockMinimo').value = product.stock_minimo || 0;
+			document.getElementById('formDesactivarProducto').submit();
+		});
+	});
+
+	if (document.getElementById('btnNuevoProducto')) {
+		document.getElementById('btnNuevoProducto').addEventListener('click', () => {
+			resetProductForm();
+			modalProducto.show();
+		});
+	}
+	if (document.getElementById('btnNuevoProductoToolbar')) {
+		document.getElementById('btnNuevoProductoToolbar').addEventListener('click', () => {
+			resetProductForm();
+			modalProducto.show();
+		});
+	}
+
+	if (margenInput) {
+		margenInput.addEventListener('input', refreshPricingAid);
+	}
+
+	if (btnAplicarSugerido) {
+		btnAplicarSugerido.addEventListener('click', () => {
+			const margen = parseNumber(margenInput?.value);
+			if (!(currentCost > 0 && margen > 0 && margen < 100)) {
+				return;
+			}
+			const sugerido = currentCost / (1 - margen / 100);
+			precioInput.value = sugerido.toFixed(2);
+		});
+	}
+
+	if (recetaSelect) {
+		recetaSelect.addEventListener('change', applyCurrentCostFromRecipe);
+	}
+
+	document.getElementById('imagen').addEventListener('input', () => {
+		const imagen = document.getElementById('imagen').value.trim();
+		if (!document.getElementById('imagen_archivo').files.length && imagen) {
+			previewBox.innerHTML = buildMediaMarkup(imagen, 'Vista previa');
+		}
+	});
+
 	const searchInput = document.getElementById('searchInput');
 	const filterStatus = document.getElementById('filterStatus');
 	const filterStock = document.getElementById('filterStock');
-
-	function applyFilters() {
-		const term = searchInput.value.toLowerCase();
-		const status = filterStatus.value;
-		const stock = filterStock.value;
-
-		const items = document.querySelectorAll('.product-item, .product-row'); // Select both cards and rows
-
-		items.forEach((item) => {
-			const name = item.dataset.name;
-			const itemStatus = item.dataset.status;
-			const itemStock = item.dataset.stock;
-
-			let matchesSearch = name.includes(term);
-			let matchesStatus = status === 'all' || status === itemStatus;
-			let matchesStock = stock === 'all' || stock === itemStock;
-
-			if (matchesSearch && matchesStatus && matchesStock) {
-				if (item.classList.contains('product-row')) {
-					item.style.display = ''; // Table row
-				} else {
-					item.parentElement.style.display = ''; // Grid column (wrapper of card needs hiding?) No, item is the col.
-					item.style.display = '';
-				}
-			} else {
-				item.style.display = 'none';
-			}
-		});
-	}
-
-	searchInput.addEventListener('keyup', applyFilters);
+	searchInput.addEventListener('input', applyFilters);
 	filterStatus.addEventListener('change', applyFilters);
 	filterStock.addEventListener('change', applyFilters);
-	document.getElementById('precio_venta').addEventListener('input', recalcPricingPreview);
-	document.getElementById('margen_objetivo_pct').addEventListener('input', recalcPricingPreview);
 
-	document.querySelectorAll('.js-open-edit').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			const productId = Number(buttonElement.dataset.productId || 0);
-			if (productId > 0) {
-				openEditModal(productId);
-			}
-		});
-	});
+	refreshPricingAid();
+	applyFilters();
 </script>
 {% endblock %}

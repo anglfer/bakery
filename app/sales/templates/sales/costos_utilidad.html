@@ -1,46 +1,172 @@
-{% extends "base_template.html" %} {% block title %}Cortes{% endblock %} {% block content %}
+{% extends "base_template.html" %}
+{% block title %}Comercial - Costos y Utilidad{% endblock %}
+{% block page_title %}Comercial — Costos y Utilidad{% endblock %}
+
+{% block content %}
 <section class="section">
 	<div class="ops-hero">
-		<p class="ops-meta mb-1">Panel financiero</p>
-		<h2 class="ops-hero-title">Costos y utilidad</h2>
-		<p class="ops-hero-text">Consulta margen por producto y genera el corte diario.</p>
-	</div>
-	<div class="ops-card">
-		<form method="post">
-			<button type="submit">Generar corte del dia</button>
-		</form>
+		<p class="ops-meta mb-1">RF12 · Área de Administración</p>
+		<h2 class="ops-hero-title">Costo y Utilidad de Producto</h2>
+		<p class="ops-hero-text">
+			Calcula automáticamente costo de producción por receta (incluyendo merma), utilidad
+			unitaria y margen para cada producto terminado.
+		</p>
 	</div>
 
-	{% if costos %}
+	<div class="ops-kpi-grid compact">
+		<div class="ops-kpi">
+			<p class="ops-kpi-label">Productos evaluados</p>
+			<p class="ops-kpi-value">{{ resumen.total_productos }}</p>
+			<p class="ops-kpi-sub">Con filtros aplicados</p>
+		</div>
+		<div class="ops-kpi">
+			<p class="ops-kpi-label">Calculables</p>
+			<p class="ops-kpi-value">{{ resumen.calculables }}</p>
+			<p class="ops-kpi-sub">Con receta y costos válidos</p>
+		</div>
+		<div class="ops-kpi">
+			<p class="ops-kpi-label">Incompletos</p>
+			<p class="ops-kpi-value">{{ resumen.incompletos }}</p>
+			<p class="ops-kpi-sub">Pendientes de corrección</p>
+		</div>
+		<div class="ops-kpi">
+			<p class="ops-kpi-label">Margen promedio</p>
+			<p class="ops-kpi-value">{{ '%.2f'|format(resumen.margen_promedio) }}%</p>
+			<p class="ops-kpi-sub">Solo productos calculables</p>
+		</div>
+	</div>
+
 	<div class="ops-card">
-		<h3 class="ops-card-title">Costo y utilidad por producto</h3>
+		<form method="get" class="ops-toolbar">
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input
+					type="search"
+					name="q"
+					placeholder="Buscar producto..."
+					value="{{ filtros.q }}" />
+			</div>
+			<select name="margen" style="max-width: 220px">
+				<option value="todos" {{ 'selected' if filtros.margen == 'todos' else '' }}>
+					Todos los márgenes
+				</option>
+				<option value="alto" {{ 'selected' if filtros.margen == 'alto' else '' }}>
+					Alta rentabilidad
+				</option>
+				<option value="medio" {{ 'selected' if filtros.margen == 'medio' else '' }}>
+					Rentabilidad media
+				</option>
+				<option value="bajo" {{ 'selected' if filtros.margen == 'bajo' else '' }}>
+					Rentabilidad baja
+				</option>
+				<option
+					value="sin_datos"
+					{{ 'selected' if filtros.margen == 'sin_datos' else '' }}>
+					Información incompleta
+				</option>
+			</select>
+			<select name="orden" style="max-width: 220px">
+				<option
+					value="margen_desc"
+					{{ 'selected' if filtros.orden == 'margen_desc' else '' }}>
+					Ordenar: mayor margen
+				</option>
+				<option value="margen_asc" {{ 'selected' if filtros.orden == 'margen_asc' else '' }}>
+					Ordenar: menor margen
+				</option>
+				<option
+					value="utilidad_desc"
+					{{ 'selected' if filtros.orden == 'utilidad_desc' else '' }}>
+					Ordenar: mayor utilidad
+				</option>
+				<option value="costo_desc" {{ 'selected' if filtros.orden == 'costo_desc' else '' }}>
+					Ordenar: mayor costo
+				</option>
+				<option value="nombre_asc" {{ 'selected' if filtros.orden == 'nombre_asc' else '' }}>
+					Ordenar: nombre A-Z
+				</option>
+			</select>
+			<button type="submit" class="btn btn-primary">
+				<i class="bi bi-funnel-fill me-1"></i>
+				Aplicar
+			</button>
+		</form>
+
 		<div class="ops-table table-responsive">
 			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>Producto</th>
-						<th>Precio venta</th>
-						<th>Margen objetivo</th>
+						<th>Receta</th>
+						<th>Rendimiento</th>
+						<th>Costo producción</th>
 						<th>Costo unitario</th>
-						<th>Precio sugerido</th>
-						<th>Utilidad unitaria</th>
-						<th>% utilidad</th>
+						<th>Precio venta</th>
+						<th>Utilidad unit.</th>
+						<th>Margen %</th>
+						<th>Rating</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for row in costos %}
 					<tr>
-						<td>{{ row.producto.nombre }}</td>
-						<td>${{ '%.2f'|format(row.producto.precio_venta) }}</td>
-						<td>{{ '%.2f'|format(row.margen_objetivo_pct) }}%</td>
-						<td>${{ '%.2f'|format(row.costo_unitario) }}</td>
-						<td>${{ '%.2f'|format(row.precio_sugerido) }}</td>
-						<td>${{ '%.2f'|format(row.utilidad_unitaria) }}</td>
 						<td>
-							<span
-								class="ops-chip {{ 'success' if row.porcentaje_utilidad >= 20 else 'warning' }}">
-								{{ '%.2f'|format(row.porcentaje_utilidad) }}%
+							<div class="fw-semibold">{{ row.producto.nombre }}</div>
+							<small class="text-muted">{{ row.codigo }}</small>
+						</td>
+						<td>
+							<div>{{ row.receta_nombre }}</div>
+							{% if row.receta_version %}
+							<small class="text-muted">v{{ row.receta_version }}</small>
+							{% endif %}
+						</td>
+						<td>
+							{{ '%.2f'|format(row.rendimiento_base) }}
+							<small class="text-muted">{{ row.unidad_produccion }}</small>
+						</td>
+						<td>
+							<strong>${{ '%.2f'|format(row.costo_produccion) }}</strong>
+							<small class="text-muted d-block">por lote base</small>
+						</td>
+						<td>${{ '%.2f'|format(row.costo_unitario) }}</td>
+						<td>${{ '%.2f'|format(row.precio_venta) }}</td>
+						<td class="fw-semibold text-success">
+							${{ '%.2f'|format(row.utilidad_unitaria) }}
+						</td>
+						<td>
+							<div class="ops-stock-cell">
+								<div class="ops-stock-bar">
+									<div
+										class="ops-stock-bar-fill {{ row.estado_margen.clave if row.es_calculable else 'inactiva' }}"
+										style="width: {{ [row.porcentaje_utilidad, 100] | min if row.es_calculable else 30 }}%"></div>
+								</div>
+								<span class="ops-stock-number">{{ '%.2f'|format(row.porcentaje_utilidad) }}%</span>
+							</div>
+						</td>
+						<td>
+							<span class="ops-chip {{ row.estado_margen.clase }}">
+								{{ row.estado_margen.etiqueta }}
 							</span>
+							{% if not row.es_calculable and row.mensajes %}
+							<small class="text-muted d-block mt-1">{{ row.mensajes[0] }}</small>
+							{% endif %}
+						</td>
+						<td>
+							<button
+								type="button"
+								class="btn btn-sm btn-outline-primary js-open-breakdown"
+								data-id-producto="{{ row.id_producto }}"
+								data-nombre="{{ row.producto.nombre }}">
+								<i class="bi bi-card-list me-1"></i>
+								Desglose
+							</button>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="10" class="text-center py-4 text-muted">
+							No se encontraron productos con los filtros actuales.
 						</td>
 					</tr>
 					{% endfor %}
@@ -48,17 +174,24 @@
 			</table>
 		</div>
 	</div>
-	{% endif %}
 
 	<div class="ops-card">
-		<h3 class="ops-card-title">Historial de cortes</h3>
+		<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+			<h3 class="ops-card-title mb-0">Historial de cortes diarios</h3>
+			<form method="post">
+				<button type="submit" class="btn btn-primary">
+					<i class="bi bi-calculator-fill me-1"></i>
+					Generar corte del día
+				</button>
+			</form>
+		</div>
 		<div class="ops-table table-responsive">
 			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>Fecha</th>
 						<th>Total ventas</th>
-						<th>Numero ventas</th>
+						<th>Número ventas</th>
 						<th>Total salidas</th>
 						<th>Utilidad</th>
 					</tr>
@@ -70,11 +203,13 @@
 						<td>${{ '%.2f'|format(c.total_ventas) }}</td>
 						<td>{{ c.numero_ventas }}</td>
 						<td>${{ '%.2f'|format(c.salida_efectivo_proveedores) }}</td>
-						<td>${{ '%.2f'|format(c.utilidad_diaria) }}</td>
+						<td class="fw-semibold">${{ '%.2f'|format(c.utilidad_diaria) }}</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="5">No hay cortes generados.</td>
+						<td colspan="5" class="text-center py-4 text-muted">
+							Aún no se han generado cortes diarios.
+						</td>
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -82,4 +217,184 @@
 		</div>
 	</div>
 </section>
+
+<div class="modal fade" id="costBreakdownModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable">
+		<div class="modal-content product-modal">
+			<div class="modal-header product-modal-header">
+				<h5 class="modal-title" id="costBreakdownTitle">Desglose de costos</h5>
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="modal"
+					aria-label="Cerrar"></button>
+			</div>
+			<div class="modal-body">
+				<div class="ops-kpi-grid compact mb-3" id="breakdownSummary"></div>
+				<div class="ops-card mb-3" id="breakdownMessages" style="display: none"></div>
+				<div class="ops-table table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead>
+							<tr>
+								<th>Ingrediente</th>
+								<th>Cantidad receta</th>
+								<th>Merma %</th>
+								<th>Cantidad real</th>
+								<th>Costo unitario MP</th>
+								<th>Costo ingrediente</th>
+							</tr>
+						</thead>
+						<tbody id="breakdownBody">
+							<tr>
+								<td colspan="6" class="text-center text-muted py-4">
+									Selecciona un producto para ver su desglose.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="mt-3 text-muted small">
+					<div><strong>Fórmula RF12:</strong> cantidad_real = cantidad_requerida × (1 + merma / 100)</div>
+					<div><strong>Costo ingrediente:</strong> costo_ingrediente = cantidad_real × costo_unitario</div>
+					<div><strong>Utilidad unitaria:</strong> utilidad = precio_venta − costo_unitario</div>
+					<div><strong>% utilidad:</strong> porcentaje_utilidad = (utilidad / precio_venta) × 100</div>
+				</div>
+			</div>
+			<div class="modal-footer product-modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	(() => {
+		const formatMoney = (value) => `$${Number(value || 0).toFixed(2)}`;
+		const formatNumber = (value, decimals = 2) => Number(value || 0).toFixed(decimals);
+		const breakdownModalEl = document.getElementById('costBreakdownModal');
+		const breakdownModal = breakdownModalEl ? new bootstrap.Modal(breakdownModalEl) : null;
+		const summaryEl = document.getElementById('breakdownSummary');
+		const bodyEl = document.getElementById('breakdownBody');
+		const titleEl = document.getElementById('costBreakdownTitle');
+		const messagesEl = document.getElementById('breakdownMessages');
+
+		const renderMessages = (messages) => {
+			if (!messagesEl) return;
+			if (!messages || !messages.length) {
+				messagesEl.style.display = 'none';
+				messagesEl.innerHTML = '';
+				return;
+			}
+			messagesEl.style.display = 'block';
+			messagesEl.innerHTML = `
+				<h6 class="mb-2">Validaciones detectadas</h6>
+				<ul class="mb-0">${messages.map((message) => `<li>${message}</li>`).join('')}</ul>
+			`;
+		};
+
+		const renderSummary = (data) => {
+			if (!summaryEl) return;
+			summaryEl.innerHTML = `
+				<div class="ops-kpi">
+					<p class="ops-kpi-label">Producto</p>
+					<p class="ops-kpi-value" style="font-size: 1.1rem">${data.producto}</p>
+					<p class="ops-kpi-sub">${data.codigo} · ${data.receta || 'Sin receta'}</p>
+				</div>
+				<div class="ops-kpi">
+					<p class="ops-kpi-label">Costo producción (lote)</p>
+					<p class="ops-kpi-value">${formatMoney(data.costo_produccion)}</p>
+					<p class="ops-kpi-sub">Rinde ${formatNumber(data.rendimiento_base)} ${data.unidad_produccion}</p>
+				</div>
+				<div class="ops-kpi">
+					<p class="ops-kpi-label">Costo unitario</p>
+					<p class="ops-kpi-value">${formatMoney(data.costo_unitario)}</p>
+					<p class="ops-kpi-sub">Precio venta ${formatMoney(data.precio_venta)}</p>
+				</div>
+				<div class="ops-kpi">
+					<p class="ops-kpi-label">Utilidad y margen</p>
+					<p class="ops-kpi-value">${formatMoney(data.utilidad_unitaria)}</p>
+					<p class="ops-kpi-sub">${formatNumber(data.porcentaje_utilidad)}% · ${data.estado_margen.etiqueta}</p>
+				</div>
+			`;
+		};
+
+		const renderIngredients = (ingredientes) => {
+			if (!bodyEl) return;
+			if (!ingredientes || !ingredientes.length) {
+				bodyEl.innerHTML = `
+					<tr>
+						<td colspan="6" class="text-center text-muted py-4">
+							No hay ingredientes disponibles para calcular.
+						</td>
+					</tr>
+				`;
+				return;
+			}
+
+			bodyEl.innerHTML = ingredientes
+				.map(
+					(item) => `
+						<tr>
+							<td>${item.materia}</td>
+							<td>${formatNumber(item.cantidad_requerida, 4)} ${item.unidad || ''}</td>
+							<td>${formatNumber(item.porcentaje_merma)}%</td>
+							<td>${formatNumber(item.cantidad_real, 4)} ${item.unidad || ''}</td>
+							<td>${formatMoney(item.costo_unitario)}</td>
+							<td class="fw-semibold">${formatMoney(item.costo_ingrediente)}</td>
+						</tr>
+					`
+				)
+				.join('');
+		};
+
+		const loadBreakdown = async (idProducto, nombre) => {
+			if (!breakdownModal) return;
+			titleEl.textContent = `Desglose de costos · ${nombre}`;
+			bodyEl.innerHTML = `
+				<tr>
+					<td colspan="6" class="text-center text-muted py-4">
+						Cargando desglose...
+					</td>
+				</tr>
+			`;
+			renderMessages([]);
+			breakdownModal.show();
+
+			try {
+				const response = await fetch(
+					`{{ url_for('sales.costos_utilidad_desglose', id_producto=0) }}`.replace('/0/', `/${idProducto}/`)
+				);
+				if (!response.ok) {
+					throw new Error('No fue posible recuperar el desglose.');
+				}
+				const data = await response.json();
+				renderSummary(data);
+				renderIngredients(data.ingredientes || []);
+				renderMessages(data.mensajes || []);
+			} catch (error) {
+				renderMessages([error.message || 'Error inesperado al cargar el desglose.']);
+				bodyEl.innerHTML = `
+					<tr>
+						<td colspan="6" class="text-center text-danger py-4">
+							No fue posible obtener el desglose en este momento.
+						</td>
+					</tr>
+				`;
+			}
+		};
+
+		document.querySelectorAll('.js-open-breakdown').forEach((button) => {
+			button.addEventListener('click', () => {
+				const idProducto = button.dataset.idProducto;
+				const nombre = button.dataset.nombre || 'Producto';
+				if (!idProducto) return;
+				loadBreakdown(idProducto, nombre);
+			});
+		});
+	})();
+</script>
 {% endblock %}

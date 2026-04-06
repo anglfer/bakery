@@ -1,27 +1,318 @@
-{% extends "base_template.html" %} {% block title %}Registro Cliente{% endblock %} {% block content
-%}
-<section class="section">
-	<div class="row justify-content-center">
-		<div class="col-xl-8 col-lg-10">
-			<div class="card p-4">
-				<h2 class="mb-3">Crear cuenta cliente</h2>
-				<form method="post" class="grid-form">
-					{{ form.hidden_tag() }}
-					<div>{{ form.nombre.label }} {{ form.nombre() }}</div>
-					<div>{{ form.apellidos.label }} {{ form.apellidos() }}</div>
-					<div>{{ form.telefono.label }} {{ form.telefono() }}</div>
-					<div>{{ form.correo.label }} {{ form.correo() }}</div>
-					<div>{{ form.direccion.label }} {{ form.direccion() }}</div>
-					<div>{{ form.ciudad.label }} {{ form.ciudad() }}</div>
-					<div>{{ form.username.label }} {{ form.username() }}</div>
-					<div>{{ form.password.label }} {{ form.password() }}</div>
-					<div>{{ form.recaptcha() }}</div>
-					<div class="d-flex align-items-end">{{ form.submit(class_='btn') }}</div>
-				</form>
-			</div>
+{% extends "base_template.html" %} {% block title %}Portal de Clientes · Crear cuenta{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+	<div class="login-container portal-auth-card">
+		<div class="text-center mb-3">
+			<i class="bi bi-cake2-fill logo-icon"></i>
+			<h2 class="login-title mt-1">SoftBakery</h2>
+			<p class="subtitle mb-0">Portal de Clientes</p>
 		</div>
+
+		<div class="tab-bar mb-4" role="tablist" aria-label="Acceso cliente">
+			<a class="tab-btn" href="{{ url_for('auth.login') }}">
+				<i class="bi bi-person-fill"></i>
+				Iniciar sesión
+			</a>
+			<a class="tab-btn active" href="{{ url_for('auth.registro_cliente') }}">
+				<i class="bi bi-person-plus-fill"></i>
+				Crear cuenta
+			</a>
+		</div>
+
+		<form method="post" id="registerForm" novalidate>
+			{{ form.hidden_tag() }}
+
+			<div class="row-fields mb-3">
+				<div>
+					<label class="form-label">
+						Nombre
+						<span class="req">*</span>
+					</label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-person"></i></span>
+						{{ form.nombre(class_='form-control', placeholder='Laura', id='nombre') }}
+					</div>
+					{% if form.nombre.errors %}
+					<div class="text-danger small mt-1">
+						{% for error in form.nombre.errors %}
+						<div>{{ error }}</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</div>
+				<div>
+					<label class="form-label">
+						Apellido
+						<span class="req">*</span>
+					</label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-person"></i></span>
+						{{ form.apellidos(class_='form-control', placeholder='Martínez', id='apellidos') }}
+					</div>
+					{% if form.apellidos.errors %}
+					<div class="text-danger small mt-1">
+						{% for error in form.apellidos.errors %}
+						<div>{{ error }}</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label">
+					Teléfono
+					<span class="req">*</span>
+				</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+					{{ form.telefono(class_='form-control', placeholder='477-100-0001', id='telefono') }}
+				</div>
+				{% if form.telefono.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.telefono.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label">
+					Usuario
+					<span class="req">*</span>
+				</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-at"></i></span>
+					{{ form.username(class_='form-control', placeholder='laura_martinez', id='username') }}
+				</div>
+				<div class="field-msg" id="usernameHelp" aria-live="polite"></div>
+				{% if form.username.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.username.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label">
+					Contraseña
+					<span class="req">*</span>
+				</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+					{{ form.password(class_='form-control mid', id='password', placeholder='Mínimo 8
+					caracteres', autocomplete='new-password') }}
+					<span class="toggle-password" data-target="password" role="button" tabindex="0">
+						<i class="bi bi-eye-slash"></i>
+					</span>
+				</div>
+				<div class="pwd-rules-title">Tu contraseña debe incluir:</div>
+				<div class="pwd-rules" id="passwordRules">
+					<div class="pwd-rule" data-rule="len">
+						<i class="bi bi-x-circle err-ic"></i>
+						<i class="bi bi-check-circle ok-ic"></i>
+						Mínimo 8 caracteres
+					</div>
+					<div class="pwd-rule" data-rule="upper">
+						<i class="bi bi-x-circle err-ic"></i>
+						<i class="bi bi-check-circle ok-ic"></i>
+						Al menos una mayúscula
+					</div>
+					<div class="pwd-rule" data-rule="lower">
+						<i class="bi bi-x-circle err-ic"></i>
+						<i class="bi bi-check-circle ok-ic"></i>
+						Al menos una minúscula
+					</div>
+					<div class="pwd-rule" data-rule="number">
+						<i class="bi bi-x-circle err-ic"></i>
+						<i class="bi bi-check-circle ok-ic"></i>
+						Al menos un número
+					</div>
+					<div class="pwd-rule" data-rule="special">
+						<i class="bi bi-x-circle err-ic"></i>
+						<i class="bi bi-check-circle ok-ic"></i>
+						Al menos un carácter especial
+					</div>
+				</div>
+				{% if form.password.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.password.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label">
+					Confirmar contraseña
+					<span class="req">*</span>
+				</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+					{{ form.confirm_password(class_='form-control mid', id='confirmPassword',
+					placeholder='Repite tu contraseña', autocomplete='new-password') }}
+					<span class="toggle-password" data-target="confirmPassword" role="button" tabindex="0">
+						<i class="bi bi-eye-slash"></i>
+					</span>
+				</div>
+				<div class="field-msg" id="confirmHelp" aria-live="polite"></div>
+				{% if form.confirm_password.errors %}
+				<div class="text-danger small mt-1">
+					{% for error in form.confirm_password.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+			</div>
+
+			{{ form.submit(class_='btn btn-login w-100', value='Crear mi cuenta') }}
+
+			<div class="divider">o</div>
+			<p class="text-center mb-0" style="font-size: 0.8rem; color: #888">
+				¿Ya tienes cuenta?
+				<a class="link fw-semibold" href="{{ url_for('auth.login') }}">Inicia sesión</a>
+			</p>
+			<p class="security-note">
+				<i class="bi bi-shield-check"></i>
+				Conexión segura · tus datos están protegidos
+			</p>
+		</form>
 	</div>
-</section>
+</div>
 {% endblock %} {% block scripts %}
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+	(function setupRegisterUX() {
+		const passwordInput = document.getElementById('password');
+		const confirmInput = document.getElementById('confirmPassword');
+		const usernameInput = document.getElementById('username');
+		const usernameHelp = document.getElementById('usernameHelp');
+		const confirmHelp = document.getElementById('confirmHelp');
+
+		const rules = {
+			len: (value) => value.length >= 8,
+			upper: (value) => /[A-Z]/.test(value),
+			lower: (value) => /[a-z]/.test(value),
+			number: (value) => /\d/.test(value),
+			special: (value) => /[^A-Za-z\d]/.test(value),
+		};
+
+		const setRuleState = (ruleName, ok) => {
+			const ruleEl = document.querySelector(`.pwd-rule[data-rule="${ruleName}"]`);
+			if (!ruleEl) {
+				return;
+			}
+			ruleEl.classList.toggle('ok', ok);
+		};
+
+		const passwordValid = () => {
+			const value = passwordInput ? passwordInput.value : '';
+			Object.entries(rules).forEach(([ruleName, validator]) => {
+				setRuleState(ruleName, validator(value));
+			});
+			return Object.values(rules).every((validator) => validator(value));
+		};
+
+		const validateConfirm = () => {
+			if (!confirmInput || !confirmHelp || !passwordInput) {
+				return;
+			}
+			if (!confirmInput.value) {
+				confirmHelp.textContent = '';
+				confirmHelp.className = 'field-msg';
+				return;
+			}
+
+			const ok = passwordInput.value === confirmInput.value && passwordValid();
+			confirmInput.classList.toggle('valid', ok);
+			confirmInput.classList.toggle('invalid', !ok);
+			confirmHelp.className = `field-msg ${ok ? 'ok' : 'err'}`;
+			confirmHelp.innerHTML = ok
+				? '<i class="bi bi-check-circle"></i>Las contraseñas coinciden'
+				: '<i class="bi bi-exclamation-circle"></i>Las contraseñas no coinciden';
+		};
+
+		if (passwordInput) {
+			passwordInput.addEventListener('input', () => {
+				passwordValid();
+				validateConfirm();
+			});
+			passwordInput.addEventListener('blur', passwordValid);
+		}
+
+		if (confirmInput) {
+			confirmInput.addEventListener('input', validateConfirm);
+			confirmInput.addEventListener('blur', validateConfirm);
+		}
+
+		if (usernameInput && usernameHelp) {
+			usernameInput.addEventListener('input', () => {
+				const value = usernameInput.value.trim();
+				if (!value) {
+					usernameHelp.className = 'field-msg';
+					usernameHelp.textContent = '';
+					usernameInput.classList.remove('valid', 'invalid');
+					return;
+				}
+
+				const formatOk = /^[a-zA-Z0-9_.]{4,60}$/.test(value);
+				usernameInput.classList.toggle('valid', formatOk);
+				usernameInput.classList.toggle('invalid', !formatOk);
+				usernameHelp.className = `field-msg ${formatOk ? 'ok' : 'err'}`;
+				usernameHelp.innerHTML = formatOk
+					? '<i class="bi bi-check-circle"></i>Formato de usuario válido'
+					: '<i class="bi bi-exclamation-circle"></i>' +
+						'Mín. 4 caracteres: letras, números, _ y .';
+			});
+		}
+
+		document.querySelectorAll('.toggle-password').forEach((trigger) => {
+			const target = trigger.getAttribute('data-target');
+			const input = target ? document.getElementById(target) : null;
+			if (!input) {
+				return;
+			}
+
+			const toggle = () => {
+				const show = input.type === 'password';
+				input.type = show ? 'text' : 'password';
+				trigger.innerHTML = show ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+			};
+
+			trigger.addEventListener('click', toggle);
+			trigger.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					toggle();
+				}
+			});
+		});
+
+		const formElement = document.getElementById('registerForm');
+		if (formElement) {
+			formElement.addEventListener('submit', (event) => {
+				const passwordOk = passwordValid();
+				const confirmOk =
+					confirmInput &&
+					passwordInput &&
+					confirmInput.value &&
+					passwordInput.value === confirmInput.value;
+				if (!passwordOk || !confirmOk) {
+					event.preventDefault();
+					if (confirmHelp) {
+						confirmHelp.className = 'field-msg err';
+						confirmHelp.innerHTML =
+							'<i class="bi bi-exclamation-circle"></i>Revisa la contraseña y la confirmación antes de continuar';
+					}
+				}
+			});
+		}
+
+		passwordValid();
+		validateConfirm();
+	})();
+</script>
 {% endblock %}

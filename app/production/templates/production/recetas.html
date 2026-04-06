@@ -1,339 +1,969 @@
-{% extends "base_template.html" %} {% block title %}Recetas{% endblock %} {% block content %}
-<section class="section">
-	<div class="ops-hero">
+{% extends "base_template.html" %} {% block title %}Recetas{% endblock %} {% block page_title
+%}Recetas{% endblock %} {% block content %}
+<section class="section recetas-page">
+	{% set ns = namespace(total=0, activas=0, inactivas=0, sin_stock=0) %} {% for receta in recetas %}
+	{% set ns.total = ns.total + 1 %} {% if receta.activa %} {% set ns.activas = ns.activas + 1 %} {%
+	else %} {% set ns.inactivas = ns.inactivas + 1 %} {% endif %} {% if not receta.puede_producir_base
+	%} {% set ns.sin_stock = ns.sin_stock + 1 %} {% endif %} {% endfor %}
+
+	<div class="ops-hero recetas-hero">
 		<p class="ops-meta mb-1">Panel de producción</p>
-		<h2 class="ops-hero-title">Recetas de producción</h2>
-		<p class="ops-hero-text">Gestiona versión activa, ingredientes y rendimiento base.</p>
+		<h2 class="ops-hero-title">Explosión de materiales</h2>
+		<p class="ops-hero-text">
+			Define recetas, versiona ingredientes y valida automáticamente el stock antes de producir.
+		</p>
 	</div>
 
-	<!-- Controles superiores: botón para abrir modal de nueva receta -->
-	<div class="card border-0 shadow-sm mb-4">
-		<div class="card-body p-3">
-			<div class="row g-3 align-items-center">
-				<div class="col">
-					<h3 class="mb-0">Recetas de producción</h3>
-					<p class="text-muted small mb-0">Gestiona recetas y explosión de materiales.</p>
-				</div>
-				<div class="col-auto ms-auto">
-					<button
-						type="button"
-						class="btn btn-primary px-4 rounded-pill"
-						data-bs-toggle="modal"
-						data-bs-target="#modalReceta"
-						onclick="resetRecetaForm()">
-						<i class="bi bi-plus me-2"></i>
-						Nueva receta
-					</button>
-				</div>
+	<div class="ops-kpi-grid compact">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Versiones registradas</p>
+			<p class="ops-kpi-value">{{ ns.total }}</p>
+			<p class="ops-kpi-sub">Cabeceras históricas</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Recetas activas</p>
+			<p class="ops-kpi-value text-success">{{ ns.activas }}</p>
+			<p class="ops-kpi-sub">Disponibles para producción</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Recetas inactivas</p>
+			<p class="ops-kpi-value text-secondary">{{ ns.inactivas }}</p>
+			<p class="ops-kpi-sub">Historial conservado</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Con faltantes</p>
+			<p class="ops-kpi-value text-danger">{{ ns.sin_stock }}</p>
+			<p class="ops-kpi-sub">No cubren lote base</p>
+		</article>
+	</div>
+
+	<div class="ops-card recetas-toolbar-card">
+		<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+			<div>
+				<h3 class="ops-card-title mb-1">Gestión de recetas</h3>
+				<p class="text-secondary mb-0 small">
+					Cada versión conserva trazabilidad, ingredientes y rendimiento base.
+				</p>
 			</div>
+			<button type="button" class="btn btn-sm" onclick="abrirRecetaNueva()">
+				<i class="bi bi-plus-lg me-1"></i>
+				Nueva receta
+			</button>
+		</div>
+
+		<div class="ops-toolbar receta-toolbar mt-3">
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input
+					type="text"
+					id="recipeSearch"
+					placeholder="Buscar por producto, versión o ingrediente" />
+			</div>
+			<select id="recipeStateFilter" class="form-select form-select-sm recipe-filter">
+				<option value="TODOS">Todos los estados</option>
+				<option value="ACTIVA">Activas</option>
+				<option value="INACTIVA">Inactivas</option>
+			</select>
+			<select id="recipeProductFilter" class="form-select form-select-sm recipe-filter">
+				<option value="TODOS">Todos los productos</option>
+				{% for producto in productos %}
+				<option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
+				{% endfor %}
+			</select>
 		</div>
 	</div>
 
-	<!-- Modal Receta (Crear/Editar) -->
-	<div class="modal fade" id="modalReceta" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title fw-bold" id="modalRecetaTitle">
-						<i class="bi bi-journal-plus me-2"></i>
-						Nueva Receta
-					</h5>
-					<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
-						aria-label="Close"></button>
+	<div class="recipes-grid" id="recipesGrid">
+		{% for receta in recetas %} {% set stock_estado = 'ok' if receta.puede_producir_base else
+		'critico' %}
+		<article
+			class="recipe-card"
+			data-row="receta"
+			data-label="{{ (receta.producto_nombre ~ ' ' ~ receta.nombre ~ ' v' ~ receta.version ~ ' ' ~ receta.categoria ~ ' ' ~ receta.descripcion)|lower }}"
+			data-estado="{{ 'ACTIVA' if receta.activa else 'INACTIVA' }}"
+			data-producto="{{ receta.id_producto }}"
+			data-stock="{{ stock_estado|upper }}">
+			<div class="recipe-card-top">
+				<div>
+					<p class="recipe-card-kicker">{{ receta.producto_nombre }}</p>
+					<h3 class="recipe-card-title">v{{ receta.version }}</h3>
 				</div>
-				<form method="post" id="form-receta" novalidate>
-					<div class="modal-body p-4 bg-light-subtle">
-						<div class="row g-3">
-							<div class="col-md-6">
-								<label for="id_producto" class="form-label">Producto asociado</label>
-								<select id="id_producto" name="id_producto" class="form-select" required>
-									<option value="">Selecciona producto</option>
-									{% for p in productos %}
-									<option value="{{ p.id_producto }}">{{ p.nombre }}</option>
-									{% endfor %}
-								</select>
-							</div>
+				<div class="recipe-badges">
+					<span class="ops-chip neutral">
+						{{ receta.rendimiento_base }} {{ receta.unidad_produccion }}
+					</span>
+					<span class="ops-chip {{ 'success' if receta.activa else 'neutral' }}">
+						{{ 'Activa' if receta.activa else 'Inactiva' }}
+					</span>
+				</div>
+			</div>
 
-							<div class="col-md-6">
-								<label for="nombre" class="form-label">Nombre de la receta</label>
-								<input
-									id="nombre"
-									type="text"
-									name="nombre"
-									class="form-control"
-									placeholder="Ej: Pastel de chocolate"
-									required />
-							</div>
+			<p class="recipe-card-subtitle">
+				{{ receta.categoria or 'Sin categoría' }} · Creada el {{ receta.fecha_creacion or '—' }}
+			</p>
 
-							<div class="col-md-3">
-								<label for="unidad_produccion" class="form-label">Unidad</label>
-								<select
-									id="unidad_produccion"
-									name="unidad_produccion"
-									class="form-select"
-									required>
-									<option value="">Selecciona unidad</option>
-									{% for u in unidades %}
-									<option value="{{ u.abreviatura }}" data-id="{{ u.id_unidad }}">
-										{{ u.nombre }} ({{ u.abreviatura }})
+			<div class="recipe-ingredients-list">
+				{% for detalle in receta.detalles[:4] %}
+				<div class="recipe-ingredient-line">
+					<span>{{ detalle.materia_nombre }}</span>
+					<strong>{{ detalle.cantidad_base }} {{ detalle.unidad_base }}</strong>
+				</div>
+				{% endfor %} {% if receta.detalles|length > 4 %}
+				<p class="recipe-ingredients-more">+{{ receta.detalles|length - 4 }} ingredientes más</p>
+				{% endif %}
+			</div>
+
+			<div class="recipe-stock-box {{ 'success' if receta.puede_producir_base else 'danger' }}">
+				<div class="recipe-stock-line">
+					<span class="recipe-stock-label">
+						<i class="bi bi-box-seam me-1"></i>
+						Stock para lote base
+					</span>
+					<strong>{{ 'Suficiente' if receta.puede_producir_base else 'Faltan insumos' }}</strong>
+				</div>
+				<p class="recipe-stock-note mb-0">
+					{{ receta.detalles|length }} materias primas · {{ receta.rendimiento_base }} {{
+					receta.unidad_produccion }} por lote
+				</p>
+			</div>
+
+			<div class="recipe-actions">
+				<button
+					type="button"
+					class="btn btn-outline-secondary btn-sm"
+					onclick="abrirDetalleReceta({{ receta.id_receta }})">
+					<i class="bi bi-eye me-1"></i>
+					Ver
+				</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary btn-sm"
+					onclick="abrirRecetaEdicion({{ receta.id_receta }})">
+					<i class="bi bi-pencil-fill me-1"></i>
+					Editar
+				</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary btn-sm"
+					onclick="abrirVersionesReceta({{ receta.id_producto }})">
+					<i class="bi bi-clock-history me-1"></i>
+					Versiones
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm {{ 'btn-outline-danger' if receta.activa else 'btn-outline-primary' }}"
+					data-toggle-url="{{ url_for('production.toggle_receta', id_receta=receta.id_receta) }}"
+					data-toggle-name="{{ receta.producto_nombre | e }}"
+					data-toggle-version="{{ receta.version }}"
+					data-toggle-active="{{ receta.activa | tojson }}">
+					<i class="bi {{ 'bi-toggle-on' if receta.activa else 'bi-toggle-off' }} me-1"></i>
+					{{ 'Desactivar' if receta.activa else 'Activar' }}
+				</button>
+			</div>
+		</article>
+		{% else %}
+		<div class="recipe-empty-state">
+			<i class="bi bi-journal-x"></i>
+			<h3>No hay recetas registradas</h3>
+			<p>Crea la primera versión para empezar a explotar materiales y validar stock.</p>
+			<button type="button" class="btn btn-sm" onclick="abrirRecetaNueva()">
+				<i class="bi bi-plus-lg me-1"></i>
+				Nueva receta
+			</button>
+		</div>
+		{% endfor %}
+	</div>
+</section>
+
+<div class="modal fade" id="modalReceta" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content recipe-modal-content">
+			<div class="modal-header recipe-modal-header">
+				<h5 class="modal-title fw-bold" id="modalRecetaTitle">
+					<i class="bi bi-journal-plus me-2"></i>
+					Nueva receta
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" action="{{ url_for('production.recetas') }}" id="form-receta" novalidate>
+				<input type="hidden" name="action" id="recetaAction" value="crear" />
+				<input type="hidden" name="id_receta_base" id="recetaBaseId" value="" />
+				<div class="modal-body recipe-modal-body">
+					<div class="recipe-header-panel">
+						<p class="ops-meta mb-2">
+							<i class="bi bi-journal-text me-1"></i>
+							Cabecera de receta
+						</p>
+						<div class="ops-grid recipe-header-grid">
+							<div>
+								<label class="form-label fw-semibold" for="recetaProducto">Producto *</label>
+								<select id="recetaProducto" name="id_producto" class="form-select" required>
+									<option value="">Seleccionar producto...</option>
+									{% for producto in productos %}
+									<option
+										value="{{ producto.id_producto }}"
+										data-next-version="{{ producto.siguiente_version }}"
+										data-recetas-count="{{ producto.recetas_count }}"
+										data-receta-activa="{{ producto.receta_activa_id or '' }}"
+										data-unidad-venta="{{ producto.unidad_venta }}">
+										{{ producto.nombre }}
 									</option>
 									{% endfor %}
 								</select>
 							</div>
-
-							<div class="col-md-3">
-								<label for="rendimiento" class="form-label">Rendimiento base</label>
+							<div>
+								<label class="form-label fw-semibold" for="recetaRendimiento">
+									Cantidad base *
+								</label>
 								<input
-									id="rendimiento"
 									type="number"
-									min="0.01"
 									step="0.01"
-									name="rendimiento"
-									class="form-control"
-									placeholder="Rendimiento"
+									min="0.01"
+									name="rendimiento_base"
+									id="recetaRendimiento"
+									placeholder="Ej. 12"
 									required />
+								<small class="text-muted d-block mt-1">
+									Piezas o porciones producidas por lote.
+								</small>
 							</div>
-
-							<div class="col-md-4">
-								<label for="categoria" class="form-label">Categoría</label>
+							<div>
+								<div class="form-label fw-semibold">Versión</div>
+								<div class="recipe-readonly-field" id="recetaVersionPreview">Auto</div>
+								<small class="text-muted d-block mt-1">
+									Se calcula automáticamente antes de guardar.
+								</small>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="recetaEstado">Estado</label>
+								<select id="recetaEstado" name="estado" class="form-select">
+									<option value="ACTIVA">Activa</option>
+									<option value="INACTIVA">Inactiva</option>
+								</select>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="recetaCreacion">Creación</label>
 								<input
-									id="categoria"
 									type="text"
+									id="recetaCreacion"
+									class="form-control"
+									value="Se genera al guardar"
+									readonly />
+							</div>
+						</div>
+					</div>
+
+					<div class="recipe-note-panel">
+						<i class="bi bi-info-circle-fill"></i>
+						<p>
+							Las cantidades de ingredientes deben expresarse en la unidad base de cada materia
+							prima. El sistema valida disponibilidad antes de guardar y antes de producir.
+						</p>
+					</div>
+
+					<div class="recipe-section-panel">
+						<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+							<div>
+								<p class="ops-meta mb-1">Ingredientes (en unidad base)</p>
+								<h6 class="mb-0">Explosión de materiales</h6>
+							</div>
+							<button
+								type="button"
+								class="btn btn-outline-primary btn-sm"
+								onclick="agregarIngrediente()">
+								<i class="bi bi-plus-lg me-1"></i>
+								Agregar ingrediente
+							</button>
+						</div>
+						<div id="ingredientesContainer" aria-live="polite">
+							<div class="recipe-ingredient-row">
+								<div class="recipe-ingredient-index">1</div>
+								<div class="recipe-ingredient-main">
+									<div class="form-label fw-semibold">Materia prima *</div>
+									<select name="id_materia_prima[]" class="form-select" required>
+										<option value="">Seleccionar...</option>
+										{% for materia in materias %}
+										<option
+											value="{{ materia.id_materia }}"
+											data-unidad="{{ materia.unidad_base.abreviatura }}"
+											data-stock="{{ materia.cantidad_disponible }}">
+											{{ materia.nombre }} ({{ materia.unidad_base.abreviatura }})
+										</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="recipe-ingredient-qty">
+									<div class="form-label fw-semibold">Cantidad requerida *</div>
+									<div class="input-group">
+										<input
+											type="number"
+											step="0.001"
+											min="0.001"
+											name="cantidad_receta[]"
+											class="form-control"
+											placeholder="0.000"
+											required />
+										<span class="input-group-text recipe-unit-suffix">u</span>
+									</div>
+								</div>
+								<div class="recipe-ingredient-action">
+									<div class="form-label fw-semibold d-block">&nbsp;</div>
+									<button
+										type="button"
+										class="btn btn-outline-danger btn-sm w-100"
+										onclick="quitarIngrediente(this)">
+										<i class="bi bi-x-lg"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="recipe-stock-preview mt-3" id="recipeStockPreview">
+							<i class="bi bi-shield-check me-1"></i>
+							Selecciona el producto y captura ingredientes para verificar disponibilidad.
+						</div>
+					</div>
+
+					<div class="recipe-section-panel">
+						<p class="ops-meta mb-2">Información adicional</p>
+						<div class="ops-grid recipe-extra-grid">
+							<div>
+								<label class="form-label fw-semibold" for="recetaCategoria">Categoría</label>
+								<input
+									type="text"
+									id="recetaCategoria"
 									name="categoria"
 									class="form-control"
-									placeholder="Ej: Pastelería" />
+									placeholder="Ej. Pastelería" />
 							</div>
-
-							<div class="col-md-8">
-								<label for="descripcion" class="form-label">Descripción corta</label>
+							<div>
+								<label class="form-label fw-semibold" for="recetaDescripcion">
+									Descripción corta
+								</label>
 								<textarea
-									id="descripcion"
+									id="recetaDescripcion"
 									name="descripcion"
 									class="form-control"
 									rows="2"
 									placeholder="Descripción breve visible en catálogo"></textarea>
 							</div>
-
-							<div class="col-12">
-								<div id="ingredientes-label" class="form-label">Ingredientes (en unidad base)</div>
-								<div
-									class="w-100 mt-2"
-									id="ingredientes-container"
-									aria-live="polite"
-									aria-labelledby="ingredientes-label">
-									<div class="row g-2 mb-2 ingrediente-row align-items-center">
-										<div class="col-md-7">
-											<select name="id_materia_prima[]" class="form-select" required>
-												<option value="">Seleccionar materia prima</option>
-												{% for m in materias %}
-												<option
-													value="{{ m.id_materia }}"
-													data-unidad="{{ m.unidad_base.abreviatura }}">
-													{{ m.nombre }} / {{ m.unidad_base.abreviatura }}
-												</option>
-												{% endfor %}
-											</select>
-										</div>
-										<div class="col-md-3">
-											<div class="input-group">
-												<input
-													type="number"
-													min="0.001"
-													step="0.001"
-													name="cantidad_receta[]"
-													class="form-control"
-													placeholder="Cantidad"
-													required />
-												<span class="input-group-text">u</span>
-											</div>
-										</div>
-										<div class="col-md-2 text-end">
-											<button
-												type="button"
-												class="btn btn-outline-danger btn-sm w-100"
-												onclick="quitarIngrediente(this)"
-												aria-label="Quitar ingrediente">
-												<i class="bi bi-x"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-								<div class="mt-2 d-flex gap-2">
-									<button
-										type="button"
-										class="btn btn-sm btn-outline-primary"
-										onclick="agregarIngrediente()">
-										<i class="bi bi-plus-lg me-1"></i>
-										Agregar ingrediente
-									</button>
-								</div>
-								<div class="form-text">
-									Define las cantidades en la unidad base de la materia prima. Convierte unidades
-									antes de guardar si es necesario.
-								</div>
-							</div>
 						</div>
 					</div>
-					<div class="modal-footer border-0">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-							Cancelar
-						</button>
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-check2 me-1"></i>
-							Crear receta
-						</button>
+				</div>
+				<div class="modal-footer border-0 recipe-modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-outline-primary" onclick="verificarStockReceta()">
+						<i class="bi bi-stack me-1"></i>
+						Verificar stock
+					</button>
+					<button type="submit" class="btn btn-primary" id="btnGuardarReceta">
+						<i class="bi bi-check2 me-1"></i>
+						Guardar receta
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalDetalleReceta" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content recipe-modal-content">
+			<div class="modal-header recipe-modal-header">
+				<h5 class="modal-title fw-bold" id="detalleRecetaTitle">
+					<i class="bi bi-eye me-2"></i>
+					Detalle de receta
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body recipe-modal-body">
+				<div class="recipe-detail-summary" id="detalleRecetaResumen"></div>
+				<div class="recipe-section-panel mt-3">
+					<div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+						<div>
+							<p class="ops-meta mb-1">Explosión de materiales</p>
+							<h6 class="mb-0">Ingredientes en unidad base</h6>
+						</div>
+						<span class="ops-chip neutral" id="detalleRecetaStockChip">—</span>
 					</div>
+					<div class="ops-table table-responsive">
+						<table class="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Materia prima</th>
+									<th>Unidad base</th>
+									<th>Cant. requerida</th>
+									<th>Stock actual</th>
+									<th>Disponibilidad</th>
+								</tr>
+							</thead>
+							<tbody id="detalleRecetaBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-0 recipe-modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalVersionesReceta" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content recipe-modal-content">
+			<div class="modal-header recipe-modal-header">
+				<h5 class="modal-title fw-bold" id="versionesRecetaTitle">
+					<i class="bi bi-clock-history me-2"></i>
+					Historial de versiones
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body recipe-modal-body">
+				<div class="recipe-version-list" id="versionesRecetaBody"></div>
+			</div>
+			<div class="modal-footer border-0 recipe-modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalToggleReceta" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-sm modal-dialog-centered">
+		<div class="modal-content recipe-confirm-card">
+			<div class="modal-body text-center py-4">
+				<div class="recipe-confirm-icon" id="toggleRecetaIcon">
+					<i class="bi bi-toggle-off"></i>
+				</div>
+				<h5 class="recipe-confirm-title" id="toggleRecetaTitle">¿Desactivar receta?</h5>
+				<p class="recipe-confirm-text" id="toggleRecetaText"></p>
+			</div>
+			<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+				<form method="post" id="formToggleReceta">
+					<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn btn-primary" id="toggleRecetaSubmit">Confirmar</button>
 				</form>
 			</div>
 		</div>
 	</div>
+</div>
 
-	<div class="card p-3">
-		<h3 class="mb-2">Recetas registradas</h3>
-		<div class="table-responsive">
-			<table class="table table-sm table-striped">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Nombre</th>
-						<th>Version</th>
-						<th>Rendimiento</th>
-						<th>Ingredientes</th>
-						<th>Activa</th>
-						<th>Accion</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for r in recetas %}
-					<tr>
-						<td>{{ r.id_receta }}</td>
-						<td>{{ r.nombre }}</td>
-						<td>v{{ r.version }}</td>
-						<td>{{ r.rendimiento_base }}</td>
-						<td>{{ r.detalles|length }}</td>
-						<td>{{ 'Si' if r.activa else 'No' }}</td>
-						<td>
-							<form
-								method="post"
-								action="{{ url_for('production.toggle_receta', id_receta=r.id_receta) }}">
-								<button type="submit" class="btn btn-sm">
-									{{ 'Desactivar' if r.activa else 'Activar' }}
-								</button>
-							</form>
-						</td>
-					</tr>
-					{% else %}
-					<tr>
-						<td colspan="7">No hay recetas registradas.</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-</section>
+<script id="datosRecetas" type="application/json">
+	{{ recetas | tojson }}
+</script>
+<script id="datosProductos" type="application/json">
+	{{ productos | tojson }}
+</script>
+<script id="datosHistorialRecetas" type="application/json">
+	{{ recetas_por_producto | tojson }}
+</script>
 {% endblock %} {% block scripts %}
 <script>
-	(function () {
-		const form = document.getElementById('form-receta');
-		const container = document.getElementById('ingredientes-container');
-		const productoSelect = document.getElementById('id_producto');
-		const nombreInput = document.getElementById('nombre');
+	const RECETAS = JSON.parse(document.getElementById('datosRecetas').textContent || '[]');
+	const PRODUCTOS = JSON.parse(document.getElementById('datosProductos').textContent || '[]');
+	const HISTORIAL = JSON.parse(
+		document.getElementById('datosHistorialRecetas').textContent || '{}'
+	);
+	const ingredientesContainer = document.getElementById('ingredientesContainer');
+	const RECETAS_MAP = new Map(RECETAS.map((receta) => [String(receta.id_receta), receta]));
+	const PRODUCTOS_MAP = new Map(
+		PRODUCTOS.map((producto) => [String(producto.id_producto), producto])
+	);
+	const INGREDIENT_TEMPLATE_HTML = ingredientesContainer
+		? ingredientesContainer.innerHTML.trim()
+		: '';
+	const modalReceta = new bootstrap.Modal(document.getElementById('modalReceta'));
+	const modalDetalleReceta = new bootstrap.Modal(document.getElementById('modalDetalleReceta'));
+	const modalVersionesReceta = new bootstrap.Modal(document.getElementById('modalVersionesReceta'));
+	const modalToggleReceta = new bootstrap.Modal(document.getElementById('modalToggleReceta'));
+	const formReceta = document.getElementById('form-receta');
+	const formToggleReceta = document.getElementById('formToggleReceta');
+	const recipeSearch = document.getElementById('recipeSearch');
+	const recipeStateFilter = document.getElementById('recipeStateFilter');
+	const recipeProductFilter = document.getElementById('recipeProductFilter');
+	const recetaProductoSelect = document.getElementById('recetaProducto');
+	const recetaRendimientoInput = document.getElementById('recetaRendimiento');
+	const recetaVersionPreview = document.getElementById('recetaVersionPreview');
+	const recetaCreacionInput = document.getElementById('recetaCreacion');
+	const recetaEstadoSelect = document.getElementById('recetaEstado');
+	const recetaCategoriaInput = document.getElementById('recetaCategoria');
+	const recetaDescripcionInput = document.getElementById('recetaDescripcion');
+	const recetaActionInput = document.getElementById('recetaAction');
+	const recetaBaseIdInput = document.getElementById('recetaBaseId');
+	const recipeStockPreview = document.getElementById('recipeStockPreview');
+	const detalleRecetaResumen = document.getElementById('detalleRecetaResumen');
+	const detalleRecetaBody = document.getElementById('detalleRecetaBody');
+	const detalleRecetaTitle = document.getElementById('detalleRecetaTitle');
+	const detalleRecetaStockChip = document.getElementById('detalleRecetaStockChip');
+	const versionesRecetaBody = document.getElementById('versionesRecetaBody');
+	const toggleRecetaTitle = document.getElementById('toggleRecetaTitle');
+	const toggleRecetaText = document.getElementById('toggleRecetaText');
+	const toggleRecetaIcon = document.getElementById('toggleRecetaIcon');
+	const toggleRecetaSubmit = document.getElementById('toggleRecetaSubmit');
 
-		// Añade una nueva fila de ingrediente clonando la primera
-		globalThis.agregarIngrediente = function () {
-			if (!container) return;
-			const firstRow = container.querySelector('.ingrediente-row');
-			if (!firstRow) return;
-			const clone = firstRow.cloneNode(true);
-			// Limpiar selects e inputs en el clone y restablecer sufijo unidad
-			clone.querySelectorAll('select').forEach((s) => (s.value = ''));
-			clone.querySelectorAll('input').forEach((i) => (i.value = ''));
-			const suffix = clone.querySelector('.input-group-text');
-			if (suffix) suffix.textContent = 'u';
-			container.appendChild(clone);
-			const sel = clone.querySelector('select');
-			if (sel) sel.focus();
-		};
+	function getSelectedOption(selectNode) {
+		if (!selectNode) return null;
+		return selectNode.options[selectNode.selectedIndex] || null;
+	}
 
-		// Quitar una fila de ingrediente, pero mantener al menos una
-		globalThis.quitarIngrediente = function (button) {
-			if (!container) return;
-			const rows = container.querySelectorAll('.ingrediente-row');
-			if (rows.length <= 1) return;
-			const row = button.closest('.ingrediente-row');
-			if (row) row.remove();
-		};
+	function getMateriaUnidad(selectNode) {
+		const selected = getSelectedOption(selectNode);
+		return selected ? selected.dataset.unidad || 'u' : 'u';
+	}
 
-		// Actualiza el sufijo de unidad al seleccionar materia prima
-		if (container) {
-			container.addEventListener('change', function (e) {
-				const target = e.target;
-				if (!target) return;
-				if (target.matches('select[name="id_materia_prima[]"]')) {
-					const unidad = target.selectedOptions[0]?.dataset?.unidad || 'u';
-					const row = target.closest('.ingrediente-row');
-					const suffix = row ? row.querySelector('.input-group-text') : null;
-					if (suffix) suffix.textContent = unidad;
-				}
-			});
+	function clearIngredientRows() {
+		if (!ingredientesContainer) return;
+		ingredientesContainer.innerHTML = '';
+	}
+
+	function validarFormularioReceta() {
+		if (!recetaProductoSelect || !recetaProductoSelect.value) {
+			return 'Debes seleccionar un producto para la receta.';
 		}
 
-		if (productoSelect && nombreInput) {
-			productoSelect.addEventListener('change', function () {
-				const nombreProducto = productoSelect.selectedOptions[0]?.textContent?.trim() || '';
-				nombreInput.value = nombreProducto;
-			});
+		const rendimiento = Number.parseFloat(recetaRendimientoInput?.value || '0');
+		if (Number.isNaN(rendimiento) || rendimiento <= 0) {
+			return 'El rendimiento base debe ser mayor a cero.';
 		}
 
-		// Reinicia el formulario y deja solo una fila de ingrediente limpia
-		globalThis.resetRecetaForm = function () {
-			if (!form || !container) return;
-			form.reset();
-			const rows = container.querySelectorAll('.ingrediente-row');
-			rows.forEach((r, idx) => {
-				if (idx === 0) {
-					r.querySelectorAll('select').forEach((s) => (s.value = ''));
-					r.querySelectorAll('input').forEach((i) => (i.value = ''));
-					const suffix = r.querySelector('.input-group-text');
-					if (suffix) suffix.textContent = 'u';
-				} else {
-					r.remove();
-				}
-			});
-		};
-
-		// Validación al enviar
-		if (form) {
-			form.addEventListener('submit', function (e) {
-				const selects = form.querySelectorAll('select[name="id_materia_prima[]"]');
-				const inputs = form.querySelectorAll('input[name="cantidad_receta[]"]');
-				for (let i = 0; i < selects.length; i++) {
-					const sel = selects[i];
-					const inp = inputs[i];
-					if (!sel || !sel.value) {
-						e.preventDefault();
-						sel.classList.add('is-invalid');
-						sel.focus();
-						return;
-					} else {
-						sel.classList.remove('is-invalid');
-					}
-					const val = Number.parseFloat(inp.value);
-					if (Number.isNaN(val) || val <= 0) {
-						e.preventDefault();
-						inp.classList.add('is-invalid');
-						inp.focus();
-						return;
-					} else {
-						inp.classList.remove('is-invalid');
-					}
-				}
-			});
+		const rows = ingredientesContainer
+			? ingredientesContainer.querySelectorAll('.recipe-ingredient-row')
+			: [];
+		if (!rows.length) {
+			return 'Debes registrar al menos un ingrediente.';
 		}
-	})();
+
+		const materias = new Set();
+		let ingredientesValidos = 0;
+		for (const row of rows) {
+			const select = row.querySelector('select[name="id_materia_prima[]"]');
+			const input = row.querySelector('input[name="cantidad_receta[]"]');
+			const idMateria = String(select?.value || '').trim();
+			const cantidad = Number.parseFloat(input?.value || '0');
+
+			if (!idMateria || Number.isNaN(cantidad) || cantidad <= 0) {
+				continue;
+			}
+
+			if (materias.has(idMateria)) {
+				return 'No puedes repetir la misma materia prima en una receta.';
+			}
+
+			materias.add(idMateria);
+			ingredientesValidos += 1;
+		}
+
+		if (!ingredientesValidos) {
+			return 'Debes registrar al menos un ingrediente con cantidad válida.';
+		}
+
+		return null;
+	}
+
+	function buildIngredientRow() {
+		const wrapper = document.createElement('div');
+		wrapper.innerHTML = INGREDIENT_TEMPLATE_HTML;
+		const row = wrapper.firstElementChild;
+		if (!row) return document.createElement('div');
+		const select = row.querySelector('select[name="id_materia_prima[]"]');
+		const input = row.querySelector('input[name="cantidad_receta[]"]');
+		if (select) select.value = '';
+		if (input) input.value = '';
+		const suffix = row.querySelector('.recipe-unit-suffix');
+		if (suffix) suffix.textContent = 'u';
+		return row;
+	}
+
+	function renumberIngredientRows() {
+		if (!ingredientesContainer) return;
+		const rows = ingredientesContainer.querySelectorAll('.recipe-ingredient-row');
+		rows.forEach((row, index) => {
+			const badge = row.querySelector('.recipe-ingredient-index');
+			if (badge) badge.textContent = String(index + 1);
+		});
+	}
+
+	function normalizeIngredientsForForm(detalles) {
+		clearIngredientRows();
+		if (!detalles || !detalles.length) {
+			ingredientesContainer.appendChild(buildIngredientRow());
+			renumberIngredientRows();
+			return;
+		}
+
+		detalles.forEach((detalle, index) => {
+			const row = buildIngredientRow();
+			ingredientesContainer.appendChild(row);
+		});
+		const rows = ingredientesContainer.querySelectorAll('.recipe-ingredient-row');
+		rows.forEach((row, index) => {
+			const detalle = detalles[index];
+			const select = row.querySelector('select[name="id_materia_prima[]"]');
+			const input = row.querySelector('input[name="cantidad_receta[]"]');
+			if (select) select.value = String(detalle.id_materia_prima);
+			if (input) input.value = String(detalle.cantidad_base);
+			const suffix = row.querySelector('.recipe-unit-suffix');
+			if (suffix) suffix.textContent = getMateriaUnidad(select);
+			const option = getSelectedOption(select);
+			row.dataset.available = option ? String(option.dataset.stock || '0') : '0';
+			if (select && input) addIngredientAvailabilityHint(row, select, input);
+		});
+		renumberIngredientRows();
+	}
+
+	function resetRecipeForm() {
+		if (!formReceta) return;
+		formReceta.reset();
+		recetaActionInput.value = 'crear';
+		recetaBaseIdInput.value = '';
+		recetaVersionPreview.textContent = 'Auto';
+		recetaCreacionInput.value = 'Se genera al guardar';
+		recetaEstadoSelect.value = 'ACTIVA';
+		recetaCategoriaInput.value = '';
+		recetaDescripcionInput.value = '';
+		recetaProductoSelect.value = '';
+		recetaRendimientoInput.value = '';
+		clearIngredientRows();
+		ingredientesContainer.appendChild(buildIngredientRow());
+		const initialRow = ingredientesContainer.querySelector('.recipe-ingredient-row');
+		if (initialRow) {
+			const initialSelect = initialRow.querySelector('select[name="id_materia_prima[]"]');
+			const initialInput = initialRow.querySelector('input[name="cantidad_receta[]"]');
+			if (initialSelect && initialInput)
+				addIngredientAvailabilityHint(initialRow, initialSelect, initialInput);
+		}
+		renumberIngredientRows();
+		updateVersionPreview();
+		updateRecipeStockPreview();
+	}
+
+	function updateVersionPreview() {
+		const selected = getSelectedOption(recetaProductoSelect);
+		if (!selected) {
+			recetaVersionPreview.textContent = 'Auto';
+			return;
+		}
+		const nextVersion = selected.dataset.nextVersion || '1';
+		const count = selected.dataset.recetasCount || '0';
+		const prefix = recetaActionInput.value === 'editar' ? 'Nueva versión' : 'Auto';
+		recetaVersionPreview.textContent = `${prefix} (v${nextVersion}) · Historial: ${count}`;
+	}
+
+	function updateRecipeStockPreview() {
+		if (!recipeStockPreview) return;
+		const rows = ingredientesContainer
+			? ingredientesContainer.querySelectorAll('.recipe-ingredient-row')
+			: [];
+		const selectedProduct = getSelectedOption(recetaProductoSelect);
+		if (!selectedProduct || !rows.length) {
+			recipeStockPreview.className = 'recipe-stock-preview';
+			recipeStockPreview.innerHTML =
+				'<i class="bi bi-shield-check me-1"></i>Selecciona un producto e ingredientes para verificar el stock.';
+			return;
+		}
+
+		const faltantes = [];
+		rows.forEach((row) => {
+			const select = row.querySelector('select[name="id_materia_prima[]"]');
+			const input = row.querySelector('input[name="cantidad_receta[]"]');
+			if (!select || !select.value || !input || !input.value) return;
+			const option = getSelectedOption(select);
+			const unidad = option ? option.dataset.unidad || 'u' : 'u';
+			const rowLabel = option ? option.textContent.trim() : 'Materia prima';
+			const cantidad = Number.parseFloat(input.value || '0');
+			const disponible = Number.parseFloat(option?.dataset.stock || row.dataset.available || '0');
+			if (Number.isNaN(cantidad) || cantidad <= 0) return;
+			if (!Number.isNaN(disponible) && disponible < cantidad) {
+				faltantes.push(`${rowLabel} (${cantidad.toLocaleString()} ${unidad} requeridos)`);
+			}
+		});
+
+		if (faltantes.length) {
+			recipeStockPreview.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>Faltan insumos: ${faltantes.join(' · ')}`;
+			recipeStockPreview.className = 'recipe-stock-preview danger';
+			return;
+		}
+
+		recipeStockPreview.innerHTML =
+			'<i class="bi bi-check-circle-fill me-1"></i>Validación preliminar lista. Puedes guardar o revisar la receta.';
+		recipeStockPreview.className = 'recipe-stock-preview success';
+	}
+
+	function fillRecipeForm(receta) {
+		if (!receta) return;
+		recetaActionInput.value = 'editar';
+		recetaBaseIdInput.value = String(receta.id_receta);
+		recetaProductoSelect.value = String(receta.id_producto);
+		recetaRendimientoInput.value = String(receta.rendimiento_base);
+		recetaEstadoSelect.value = receta.activa ? 'ACTIVA' : 'INACTIVA';
+		recetaCategoriaInput.value = receta.categoria || '';
+		recetaDescripcionInput.value = receta.descripcion || '';
+		recetaCreacionInput.value = receta.fecha_creacion || '—';
+		recetaVersionPreview.textContent = `Nueva versión (v${getSelectedOption(recetaProductoSelect)?.dataset.nextVersion || receta.version})`;
+		normalizeIngredientsForForm(receta.detalles || []);
+		updateVersionPreview();
+		updateRecipeStockPreview();
+	}
+
+	function abrirRecetaNueva() {
+		resetRecipeForm();
+		document.getElementById('modalRecetaTitle').innerHTML =
+			'<i class="bi bi-journal-plus me-2"></i>Nueva receta';
+		document.getElementById('btnGuardarReceta').innerHTML =
+			'<i class="bi bi-check2 me-1"></i>Guardar receta';
+		modalReceta.show();
+	}
+
+	function abrirRecetaEdicion(idReceta) {
+		const receta = RECETAS_MAP.get(String(idReceta));
+		if (!receta) return;
+		resetRecipeForm();
+		fillRecipeForm(receta);
+		document.getElementById('modalRecetaTitle').innerHTML =
+			'<i class="bi bi-pencil-fill me-2"></i>Editar receta';
+		document.getElementById('btnGuardarReceta').innerHTML =
+			'<i class="bi bi-check2 me-1"></i>Guardar nueva versión';
+		modalReceta.show();
+	}
+
+	function abrirDetalleReceta(idReceta) {
+		const receta = RECETAS_MAP.get(String(idReceta));
+		if (!receta) return;
+		detalleRecetaTitle.innerHTML = `<i class="bi bi-eye me-2"></i>${receta.producto_nombre} — v${receta.version}`;
+		detalleRecetaResumen.innerHTML = `
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Producto</span>
+				<strong>${receta.producto_nombre}</strong>
+			</div>
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Versión</span>
+				<strong>v${receta.version}</strong>
+			</div>
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Rendimiento base</span>
+				<strong>${receta.rendimiento_base} ${receta.unidad_produccion}</strong>
+			</div>
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Estado</span>
+				<strong>${receta.activa ? 'Activa' : 'Inactiva'}</strong>
+			</div>
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Creación</span>
+				<strong>${receta.fecha_creacion || '—'}</strong>
+			</div>
+			<div class="recipe-detail-card">
+				<span class="recipe-detail-label">Ingredientes</span>
+				<strong>${receta.detalles.length}</strong>
+			</div>
+		`;
+		detalleRecetaBody.innerHTML = '';
+		receta.detalles.forEach((detalle, index) => {
+			const row = document.createElement('tr');
+			row.innerHTML = `
+				<td>${index + 1}</td>
+				<td class="fw-semibold">${detalle.materia_nombre}</td>
+				<td><span class="ops-chip neutral">${detalle.unidad_base}</span></td>
+				<td>${detalle.cantidad_base} ${detalle.unidad_base}</td>
+				<td>${detalle.cantidad_disponible} ${detalle.unidad_base}</td>
+				<td>
+					<span class="ops-chip ${detalle.suficiente ? 'success' : 'danger'}">${detalle.suficiente ? 'Suficiente' : 'Insuficiente'}</span>
+				</td>
+			`;
+			detalleRecetaBody.appendChild(row);
+		});
+		detalleRecetaStockChip.className = `ops-chip ${receta.puede_producir_base ? 'success' : 'danger'}`;
+		detalleRecetaStockChip.textContent = receta.puede_producir_base
+			? 'Stock suficiente para lote base'
+			: 'Faltan insumos para lote base';
+		modalDetalleReceta.show();
+	}
+
+	function abrirVersionesReceta(idProducto) {
+		const historial = HISTORIAL[String(idProducto)] || [];
+		const producto = PRODUCTOS_MAP.get(String(idProducto));
+		versionesRecetaBody.innerHTML = '';
+		document.getElementById('versionesRecetaTitle').innerHTML =
+			`<i class="bi bi-clock-history me-2"></i>Historial de versiones — ${producto ? producto.nombre : 'Producto'}`;
+		if (!historial.length) {
+			versionesRecetaBody.innerHTML =
+				'<div class="recipe-empty-inline">No hay historial para este producto.</div>';
+			modalVersionesReceta.show();
+			return;
+		}
+
+		historial.forEach((version) => {
+			const item = document.createElement('button');
+			item.type = 'button';
+			item.className = 'recipe-version-item';
+			item.innerHTML = `
+				<div>
+					<p class="mb-1 fw-semibold">Versión v${version.version}</p>
+					<p class="mb-0 text-secondary small">Creada el ${version.fecha_creacion || '—'} · ${version.detalles_count} ingredientes</p>
+				</div>
+				<div class="d-flex align-items-center gap-2">
+					<span class="ops-chip ${version.activa ? 'success' : 'neutral'}">${version.activa ? 'Activa' : 'Inactiva'}</span>
+					<i class="bi bi-chevron-right"></i>
+				</div>
+			`;
+			item.addEventListener('click', () => abrirDetalleReceta(version.id_receta));
+			versionesRecetaBody.appendChild(item);
+		});
+		modalVersionesReceta.show();
+	}
+
+	function abrirToggleReceta(toggleUrl, nombreProducto, version, activa) {
+		formToggleReceta.action = toggleUrl;
+		toggleRecetaTitle.textContent = activa ? '¿Desactivar receta?' : '¿Activar receta?';
+		toggleRecetaText.textContent = `${nombreProducto} v${version} ${activa ? 'pasará a estado inactiva.' : 'volverá a estar disponible para producción.'}`;
+		toggleRecetaIcon.innerHTML = `<i class="bi ${activa ? 'bi-toggle-off' : 'bi-toggle-on'}"></i>`;
+		toggleRecetaSubmit.textContent = activa ? 'Desactivar' : 'Activar';
+		toggleRecetaSubmit.style.background = activa ? '#d66b1d' : '';
+		modalToggleReceta.show();
+	}
+
+	function verificarStockReceta() {
+		const filas = ingredientesContainer.querySelectorAll('.recipe-ingredient-row');
+		const faltantes = [];
+		filas.forEach((row) => {
+			const select = row.querySelector('select[name="id_materia_prima[]"]');
+			const input = row.querySelector('input[name="cantidad_receta[]"]');
+			if (!select || !select.value || !input || !input.value) return;
+			const option = getSelectedOption(select);
+			const unidad = option ? option.dataset.unidad || 'u' : 'u';
+			const nombre = option ? option.textContent.trim() : 'Materia prima';
+			const cantidad = Number.parseFloat(input.value);
+			const disponible = Number.parseFloat(row.dataset.available || '0');
+			if (Number.isNaN(cantidad) || cantidad <= 0) {
+				faltantes.push(`Cantidad inválida para ${nombre}`);
+				return;
+			}
+			if (!Number.isNaN(disponible) && disponible < cantidad) {
+				faltantes.push(
+					`${nombre}: faltan ${Math.max(cantidad - disponible, 0).toLocaleString()} ${unidad}`
+				);
+			}
+		});
+
+		if (!faltantes.length) {
+			recipeStockPreview.className = 'recipe-stock-preview success';
+			recipeStockPreview.innerHTML =
+				'<i class="bi bi-check-circle-fill me-1"></i>No se detectan faltantes en el lote actual.';
+			return;
+		}
+
+		recipeStockPreview.className = 'recipe-stock-preview danger';
+		recipeStockPreview.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>${faltantes.join(' · ')}`;
+	}
+
+	function addIngredientAvailabilityHint(row, select, input) {
+		const hint = document.createElement('div');
+		hint.className = 'recipe-ingredient-hint text-muted small mt-1';
+		hint.textContent = 'La disponibilidad se valida al cambiar la materia prima.';
+		row.appendChild(hint);
+		select.addEventListener('change', () => {
+			const option = getSelectedOption(select);
+			const suffix = row.querySelector('.recipe-unit-suffix');
+			if (suffix) suffix.textContent = option ? option.dataset.unidad || 'u' : 'u';
+			row.dataset.available = option ? String(option.dataset.stock || '0') : '0';
+			updateRecipeStockPreview();
+		});
+		input.addEventListener('input', updateRecipeStockPreview);
+	}
+
+	function agregarIngrediente() {
+		if (!ingredientesContainer) return;
+		const row = buildIngredientRow();
+		ingredientesContainer.appendChild(row);
+		renumberIngredientRows();
+		const select = row.querySelector('select[name="id_materia_prima[]"]');
+		const input = row.querySelector('input[name="cantidad_receta[]"]');
+		if (select && input) addIngredientAvailabilityHint(row, select, input);
+	}
+
+	function quitarIngrediente(button) {
+		if (!ingredientesContainer) return;
+		const rows = ingredientesContainer.querySelectorAll('.recipe-ingredient-row');
+		if (rows.length <= 1) return;
+		const row = button.closest('.recipe-ingredient-row');
+		if (row) row.remove();
+		renumberIngredientRows();
+		updateRecipeStockPreview();
+	}
+
+	function applyRecipeFilters() {
+		const query = String(recipeSearch?.value || '')
+			.toLowerCase()
+			.trim();
+		const stateValue = String(recipeStateFilter?.value || 'TODOS').toUpperCase();
+		const productValue = String(recipeProductFilter?.value || 'TODOS');
+		document.querySelectorAll('article[data-row="receta"]').forEach((card) => {
+			const label = String(card.dataset.label || '').toLowerCase();
+			const estado = String(card.dataset.estado || '').toUpperCase();
+			const producto = String(card.dataset.producto || '');
+			const matchesQuery = label.includes(query);
+			const matchesState = stateValue === 'TODOS' || stateValue === estado;
+			const matchesProduct = productValue === 'TODOS' || productValue === producto;
+			card.style.display = matchesQuery && matchesState && matchesProduct ? '' : 'none';
+		});
+	}
+
+	if (recipeSearch) recipeSearch.addEventListener('input', applyRecipeFilters);
+	if (recipeStateFilter) recipeStateFilter.addEventListener('change', applyRecipeFilters);
+	if (recipeProductFilter) recipeProductFilter.addEventListener('change', applyRecipeFilters);
+	if (recetaProductoSelect)
+		recetaProductoSelect.addEventListener('change', () => {
+			updateVersionPreview();
+			updateRecipeStockPreview();
+		});
+	if (recetaRendimientoInput)
+		recetaRendimientoInput.addEventListener('input', updateRecipeStockPreview);
+	if (formReceta) {
+		formReceta.addEventListener('submit', (event) => {
+			const error = validarFormularioReceta();
+			if (error) {
+				event.preventDefault();
+				recipeStockPreview.className = 'recipe-stock-preview danger';
+				recipeStockPreview.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>${error}`;
+				return;
+			}
+
+			const selected = getSelectedOption(recetaProductoSelect);
+			if (selected) {
+				const versionPreview = selected.dataset.nextVersion || '1';
+				recetaVersionPreview.textContent = `${recetaActionInput.value === 'editar' ? 'Nueva versión' : 'Auto'} (v${versionPreview})`;
+			}
+		});
+	}
+
+	document.querySelectorAll('[data-toggle-url]').forEach((button) => {
+		button.addEventListener('click', () => {
+			abrirToggleReceta(
+				button.dataset.toggleUrl || '',
+				button.dataset.toggleName || '',
+				Number(button.dataset.toggleVersion || '0'),
+				String(button.dataset.toggleActive || 'false') === 'true'
+			);
+		});
+	});
+
+	resetRecipeForm();
+	globalThis.agregarIngrediente = agregarIngrediente;
+	globalThis.quitarIngrediente = quitarIngrediente;
+	globalThis.resetRecetaForm = resetRecipeForm;
+	globalThis.abrirRecetaNueva = abrirRecetaNueva;
+	globalThis.abrirRecetaEdicion = abrirRecetaEdicion;
+	globalThis.abrirDetalleReceta = abrirDetalleReceta;
+	globalThis.abrirVersionesReceta = abrirVersionesReceta;
+	globalThis.abrirToggleReceta = abrirToggleReceta;
+	globalThis.verificarStockReceta = verificarStockReceta;
 </script>
 {% endblock %}

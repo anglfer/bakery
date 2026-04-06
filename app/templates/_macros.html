@@ -95,7 +95,9 @@ is_home else current_path.startswith(href) %}
 							{% endif %}
 							<li><hr class="dropdown-divider" /></li>
 							<li>
-								<a class="dropdown-item" href="#">
+								<a
+									class="dropdown-item"
+									href="{{ url_for('auth.mi_cuenta') if user.rol and user.rol.nombre == 'Cliente' else '#' }}">
 									<i class="bi bi-person-circle me-2"></i>
 									Mi perfil
 								</a>

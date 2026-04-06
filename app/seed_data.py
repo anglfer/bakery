@@ -131,7 +131,7 @@ def _seed_roles_modules_permissions() -> None:
             "Pedidos Clientes": (True, True, True, False),
             "Catalogo Web": (True, True, True, False),
             "Carrito": (True, True, True, True),
-            "Producto Terminado": (True, False, False, False),
+            "Producto Terminado": (True, True, True, False),
             "Compras MP": (True, True, True, False),
             "Costos y Utilidad": (True, False, False, False),
         },
@@ -449,14 +449,13 @@ def _seed_recipes() -> None:
         if not product:
             continue
 
-        # Receta model no contiene id_producto; ahora las recetas se crean
-        # por nombre/version y se asocian al producto via Producto.id_receta
         recipe = Receta.query.filter_by(
-            nombre=product.nombre,
+            id_producto=product.id_producto,
             version=1,
         ).first()
         if not recipe:
             recipe = Receta(
+                id_producto=product.id_producto,
                 nombre=product.nombre,
                 version=1,
                 rendimiento_base=12,
@@ -464,11 +463,13 @@ def _seed_recipes() -> None:
             )
             db.session.add(recipe)
             db.session.flush()
+        else:
+            recipe.id_producto = product.id_producto
 
-            # asociar la receta creada al producto
-            product.id_receta = recipe.id_receta
-            db.session.add(product)
-            db.session.flush()
+        # asociar la receta creada al producto
+        product.id_receta = recipe.id_receta
+        db.session.add(product)
+        db.session.flush()
 
         for material_name, amount in detail_rows:
             material = materials.get(material_name)
@@ -603,20 +604,22 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
         return
 
     if not SolicitudProduccion.query.first():
-        request = SolicitudProduccion(
+        approved_request = SolicitudProduccion(
             id_producto=product.id_producto,
             cantidad=24,
             estado="APROBADA",
             id_usuario_solicita=sales_user.id_usuario,
             id_usuario_resuelve=prod_user.id_usuario,
             observaciones="Stock bajo en mostrador.",
+            observaciones_resolucion="Se aprueba para cubrir demanda del día.",
+            fecha_resolucion=utc_now(),
         )
-        db.session.add(request)
+        db.session.add(approved_request)
         db.session.flush()
 
         db.session.add(
             OrdenProduccion(
-                id_solicitud=request.id_solicitud,
+                id_solicitud=approved_request.id_solicitud,
                 id_receta=recipe.id_receta,
                 id_producto=product.id_producto,
                 cantidad_producir=24,
@@ -627,6 +630,30 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
                 costo_total=_to_mxn(
                     _resolver_costo_unitario_para_snapshot(product) * Decimal("24")
                 ),
+            )
+        )
+
+        db.session.add(
+            SolicitudProduccion(
+                id_producto=product.id_producto,
+                cantidad=16,
+                estado="PENDIENTE",
+                id_usuario_solicita=sales_user.id_usuario,
+                observaciones=("Pedido para evento corporativo del fin de semana."),
+            )
+        )
+        db.session.add(
+            SolicitudProduccion(
+                id_producto=product.id_producto,
+                cantidad=12,
+                estado="RECHAZADA",
+                id_usuario_solicita=sales_user.id_usuario,
+                id_usuario_resuelve=prod_user.id_usuario,
+                observaciones=("Se agotó temporalmente la cobertura de insumos."),
+                observaciones_resolucion=(
+                    "Se programa reapertura cuando ingrese materia prima."
+                ),
+                fecha_resolucion=utc_now(),
             )
         )
 

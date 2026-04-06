@@ -558,6 +558,22 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
@@ -2009,14 +2025,6 @@
         "documentation": {}
     },
     {
-        "label": "RecaptchaField",
-        "importPath": "flask_wtf",
-        "description": "flask_wtf",
-        "isExtraImport": true,
-        "detail": "flask_wtf",
-        "documentation": {}
-    },
-    {
         "label": "FlaskForm",
         "importPath": "flask_wtf",
         "description": "flask_wtf",
@@ -2038,6 +2046,14 @@
         "description": "flask_wtf",
         "isExtraImport": true,
         "detail": "flask_wtf",
+        "documentation": {}
+    },
+    {
+        "label": "EmailField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
         "documentation": {}
     },
     {
@@ -2097,6 +2113,14 @@
         "documentation": {}
     },
     {
+        "label": "DecimalField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
         "label": "IntegerField",
         "importPath": "wtforms",
         "description": "wtforms",
@@ -2106,6 +2130,14 @@
     },
     {
         "label": "SelectField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "StringField",
         "importPath": "wtforms",
         "description": "wtforms",
         "isExtraImport": true,
@@ -2161,6 +2193,14 @@
         "documentation": {}
     },
     {
+        "label": "Email",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "Length",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
@@ -2169,7 +2209,23 @@
         "documentation": {}
     },
     {
+        "label": "Regexp",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "EqualTo",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -2218,6 +2274,14 @@
     },
     {
         "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Length",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -2481,6 +2545,14 @@
         "documentation": {}
     },
     {
+        "label": "Usuario",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "Modulo",
         "importPath": "app.models",
         "description": "app.models",
@@ -2529,6 +2601,14 @@
         "documentation": {}
     },
     {
+        "label": "DetalleOrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "DetallePedido",
         "importPath": "app.models",
         "description": "app.models",
@@ -2569,6 +2649,14 @@
         "documentation": {}
     },
     {
+        "label": "MovimientoInventarioProducto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "OrdenProduccion",
         "importPath": "app.models",
         "description": "app.models",
@@ -2586,6 +2674,14 @@
     },
     {
         "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PedidoEstadoHistorial",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -2633,6 +2729,14 @@
         "documentation": {}
     },
     {
+        "label": "UnidadMedida",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "Venta",
         "importPath": "app.models",
         "description": "app.models",
@@ -2642,6 +2746,14 @@
     },
     {
         "label": "utc_now",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleOrdenProduccion",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -2697,6 +2809,14 @@
         "documentation": {}
     },
     {
+        "label": "Modulo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "MovimientoInventarioMP",
         "importPath": "app.models",
         "description": "app.models",
@@ -2706,6 +2826,14 @@
     },
     {
         "label": "OrdenProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -2738,6 +2866,14 @@
     },
     {
         "label": "UnidadMedida",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "utc_now",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -2793,6 +2929,38 @@
         "documentation": {}
     },
     {
+        "label": "DetalleCompra",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetallePedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleReceta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "MateriaPrima",
         "importPath": "app.models",
         "description": "app.models",
@@ -2801,7 +2969,47 @@
         "documentation": {}
     },
     {
+        "label": "Modulo",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "MovimientoInventarioProducto",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "Pedido",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PedidoEstadoHistorial",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Permiso",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Persona",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -2842,6 +3050,22 @@
     },
     {
         "label": "SolicitudProduccion",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "TicketVenta",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Usuario",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -3090,6 +3314,14 @@
     },
     {
         "label": "ROUND_HALF_UP",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "Decimal",
         "importPath": "decimal",
         "description": "decimal",
         "isExtraImport": true,
@@ -3337,7 +3569,31 @@
         "documentation": {}
     },
     {
+        "label": "current_app",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "abort",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
         "importPath": "flask",
         "description": "flask",
         "isExtraImport": true,
@@ -3386,6 +3642,14 @@
     },
     {
         "label": "flash",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
         "importPath": "flask",
         "description": "flask",
         "isExtraImport": true,
@@ -3490,6 +3754,14 @@
     },
     {
         "label": "login_required",
+        "importPath": "flask_login",
+        "description": "flask_login",
+        "isExtraImport": true,
+        "detail": "flask_login",
+        "documentation": {}
+    },
+    {
+        "label": "logout_user",
         "importPath": "flask_login",
         "description": "flask_login",
         "isExtraImport": true,
@@ -3820,6 +4092,14 @@
         "documentation": {}
     },
     {
+        "label": "actualizar_materia_prima",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "cancelar_orden_produccion",
         "importPath": "app.common.services",
         "description": "app.common.services",
@@ -3828,7 +4108,23 @@
         "documentation": {}
     },
     {
+        "label": "crear_materia_prima",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "crear_orden_produccion",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "desactivar_materia_prima",
         "importPath": "app.common.services",
         "description": "app.common.services",
         "isExtraImport": true,
@@ -3852,6 +4148,14 @@
         "documentation": {}
     },
     {
+        "label": "recalcular_costo_y_precio_sugerido_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "actualizar_estado_pedido",
         "importPath": "app.common.services",
         "description": "app.common.services",
@@ -3861,6 +4165,22 @@
     },
     {
         "label": "calcular_costo_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "calcular_costo_unitario_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "cancelar_venta_mostrador",
         "importPath": "app.common.services",
         "description": "app.common.services",
         "isExtraImport": true,
@@ -3884,6 +4204,14 @@
         "documentation": {}
     },
     {
+        "label": "recalcular_costo_y_precio_sugerido_producto",
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "isExtraImport": true,
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "registrar_compra",
         "importPath": "app.common.services",
         "description": "app.common.services",
@@ -3892,7 +4220,7 @@
         "documentation": {}
     },
     {
-        "label": "registrar_venta_mostrador",
+        "label": "registrar_venta_mostrador_detallada",
         "importPath": "app.common.services",
         "description": "app.common.services",
         "isExtraImport": true,
@@ -3921,6 +4249,22 @@
         "description": "app.common.services",
         "isExtraImport": true,
         "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
         "documentation": {}
     },
     {
@@ -3997,7 +4341,31 @@
         "documentation": {}
     },
     {
+        "label": "Index",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "UniqueConstraint",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "inspect",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -4010,6 +4378,118 @@
         "description": "config.development",
         "isExtraImport": true,
         "detail": "config.development",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -7346,7 +7826,7 @@
         "kind": 6,
         "importPath": "app.admin.forms",
         "description": "app.admin.forms",
-        "peekOfCode": "class ProveedorForm(FlaskForm):\n    nombre_empresa = StringField(\"Nombre empresa\", validators=[DataRequired(), Length(max=120)])\n    submit = SubmitField(\"Guardar\")",
+        "peekOfCode": "class ProveedorForm(FlaskForm):\n    nombre_empresa = StringField(\n        \"Nombre proveedor\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    nombre_contacto = StringField(\n        \"Nombre contacto\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    telefono = StringField(",
         "detail": "app.admin.forms",
         "documentation": {}
     },
@@ -7445,7 +7925,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def proveedores():\n    if request.method == \"POST\":\n        nombre = request.form.get(\"nombre_empresa\", \"\").strip()\n        telefono = request.form.get(\"telefono\", \"\").strip()\n        correo = request.form.get(\"correo\", \"\").strip().lower()\n        direccion = request.form.get(\"direccion\", \"\").strip()\n        if not all([nombre, telefono, correo, direccion]):\n            flash(\"Completa todos los campos del proveedor.\", \"warning\")\n            return redirect(url_for(SUPPLIERS_ENDPOINT))\n        if \"@\" not in correo or \".\" not in correo:",
+        "peekOfCode": "def proveedores():\n    if request.method == \"POST\":\n        if not _can_create_supplier():\n            flash(\"No tienes permiso para registrar proveedores.\", \"danger\")\n            return redirect(url_for(SUPPLIERS_ENDPOINT))\n        nombre = (\n            request.form.get(\"nombre_proveedor\", \"\").strip()\n            or request.form.get(\"nombre_empresa\", \"\").strip()\n        )\n        nombre_contacto = request.form.get(\"nombre_contacto\", \"\").strip()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7454,7 +7934,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def editar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    proveedor.nombre_empresa = request.form.get(\n        \"nombre_empresa\", proveedor.nombre_empresa\n    ).strip()\n    proveedor.telefono = request.form.get(\"telefono\", proveedor.telefono).strip()\n    proveedor.correo = request.form.get(\"correo\", proveedor.correo).strip().lower()\n    proveedor.direccion = request.form.get(\"direccion\", proveedor.direccion).strip()\n    proveedor.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    db.session.commit()",
+        "peekOfCode": "def editar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    nombre = (\n        request.form.get(\"nombre_proveedor\", \"\").strip()\n        or request.form.get(\"nombre_empresa\", proveedor.nombre_empresa).strip()\n    )\n    nombre_contacto = request.form.get(\n        \"nombre_contacto\", proveedor.nombre_contacto\n    ).strip()\n    telefono = request.form.get(\"telefono\", proveedor.telefono).strip()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7468,11 +7948,20 @@
         "documentation": {}
     },
     {
+        "label": "activar_proveedor",
+        "kind": 2,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "def activar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    proveedor.activo = True\n    db.session.commit()\n    log_audit_event(\n        \"PROVEEDOR_ACTIVADO\",\n        f\"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}\",\n    )\n    flash(\"Proveedor activado.\", \"success\")\n    return redirect(url_for(SUPPLIERS_ENDPOINT))",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
         "label": "BASE_ROLES",
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "BASE_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):",
+        "peekOfCode": "BASE_ROLES = {\"Administrador\", \"Ventas\", \"Produccion\"}\nUSERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7481,7 +7970,7 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "USERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default",
+        "peekOfCode": "USERS_ENDPOINT = \"admin.usuarios\"\nROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7490,7 +7979,7 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "ROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:",
+        "peekOfCode": "ROLES_ENDPOINT = \"admin.roles\"\nSUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7499,7 +7988,25 @@
         "kind": 5,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "SUPPLIERS_ENDPOINT = \"admin.proveedores\"\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:\n    permission = (",
+        "peekOfCode": "SUPPLIERS_ENDPOINT = \"admin.proveedores\"\nSUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "SUPPLIER_PHONE_RE",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "SUPPLIER_PHONE_RE = re.compile(r\"^[0-9\\s\\-\\(\\)\\+]+$\")\nSUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:",
+        "detail": "app.admin.routes",
+        "documentation": {}
+    },
+    {
+        "label": "SUPPLIER_EMAIL_RE",
+        "kind": 5,
+        "importPath": "app.admin.routes",
+        "description": "app.admin.routes",
+        "peekOfCode": "SUPPLIER_EMAIL_RE = re.compile(r\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\")\ndef _to_bool(value: str | None) -> bool:\n    return str(value).strip().lower() in {\"1\", \"true\", \"on\", \"si\", \"yes\"}\ndef _parse_int(value: str, default: int = 0) -> int:\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default\ndef _can_create_user() -> bool:\n    permission = (",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7508,7 +8015,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\"Codigo\", validators=[DataRequired(), Length(min=6, max=6)])\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):",
+        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(), Length(min=6, max=6)],",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -7517,7 +8024,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\"Codigo\", validators=[DataRequired(), Length(min=6, max=6)])\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\"Nombre\", validators=[DataRequired(), Length(max=100)])\n    apellidos = StringField(\"Apellidos\", validators=[DataRequired(), Length(max=120)])\n    telefono = StringField(\"Telefono\", validators=[DataRequired(), Length(max=30)])\n    correo = StringField(\"Correo\", validators=[DataRequired(), Length(max=120)])\n    direccion = StringField(\"Direccion\", validators=[DataRequired(), Length(max=255)])\n    ciudad = StringField(\"Ciudad\", validators=[DataRequired(), Length(max=120)])",
+        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(), Length(min=6, max=6)],\n    )\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -7526,7 +8033,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class RegisterClientForm(FlaskForm):\n    nombre = StringField(\"Nombre\", validators=[DataRequired(), Length(max=100)])\n    apellidos = StringField(\"Apellidos\", validators=[DataRequired(), Length(max=120)])\n    telefono = StringField(\"Telefono\", validators=[DataRequired(), Length(max=30)])\n    correo = StringField(\"Correo\", validators=[DataRequired(), Length(max=120)])\n    direccion = StringField(\"Direccion\", validators=[DataRequired(), Length(max=255)])\n    ciudad = StringField(\"Ciudad\", validators=[DataRequired(), Length(max=120)])\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )",
+        "peekOfCode": "class RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],\n    )\n    apellidos = StringField(\n        \"Apellido\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    telefono = StringField(",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -7535,7 +8042,7 @@
         "kind": 5,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=\"Minimo 8 caracteres con mayuscula, minuscula, numero y caracter especial.\",\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")",
+        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=(\n        \"Minimo 8 caracteres con mayuscula, minuscula, \" \"numero y caracter especial.\"\n    ),\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -7562,7 +8069,16 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def registro_cliente():\n    form = RegisterClientForm()\n    if form.validate_on_submit():\n        existe_user = Usuario.query.filter_by(\n            username=form.username.data.strip()\n        ).first()\n        if existe_user:\n            flash(\"El nombre de usuario ya existe\", \"danger\")\n            return render_template(REGISTER_TEMPLATE, form=form)\n        existe_mail = Persona.query.filter_by(",
+        "peekOfCode": "def registro_cliente():\n    form = RegisterClientForm()\n    if form.validate_on_submit():\n        username = form.username.data.strip()\n        existe_user = Usuario.query.filter(\n            db.func.lower(Usuario.username) == username.lower()\n        ).first()\n        if existe_user:\n            flash(\n                \"El nombre de usuario ya existe. Elige uno diferente.\",",
+        "detail": "app.auth.routes",
+        "documentation": {}
+    },
+    {
+        "label": "mi_cuenta",
+        "kind": 2,
+        "importPath": "app.auth.routes",
+        "description": "app.auth.routes",
+        "peekOfCode": "def mi_cuenta():\n    usuario = Usuario.query.get_or_404(int(current_user.get_id()))\n    if not usuario.rol or usuario.rol.nombre != \"Cliente\":\n        flash(\"Esta seccion solo esta disponible para clientes.\", \"warning\")\n        return redirect(url_for(_resolve_home_by_role(usuario)))\n    if not usuario.activo:\n        logout_user()\n        flash(\"Tu cuenta esta inactiva. Contacta a soporte.\", \"danger\")\n        return redirect(url_for(LOGIN_ENDPOINT))\n    persona = usuario.persona",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7580,7 +8096,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "LOGIN_TEMPLATE = \"auth/login.html\"\nREGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None",
+        "peekOfCode": "LOGIN_TEMPLATE = \"auth/login.html\"\nREGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.catalogo\"\ndef _build_cliente_default_email(username: str) -> str:\n    base = f\"{username.lower()}@cliente.softbakery.local\"",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7589,7 +8105,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "REGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None\n) -> None:",
+        "peekOfCode": "REGISTER_TEMPLATE = \"auth/registro_cliente.html\"\nLOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.catalogo\"\ndef _build_cliente_default_email(username: str) -> str:\n    base = f\"{username.lower()}@cliente.softbakery.local\"\n    email = base",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7598,7 +8114,7 @@
         "kind": 5,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "LOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.home\"\ndef _registrar_bitacora(\n    usuario: Usuario, exitoso: bool, mensaje: str | None = None\n) -> None:\n    db.session.add(",
+        "peekOfCode": "LOGIN_ENDPOINT = \"auth.login\"\ndef _resolve_home_by_role(usuario: Usuario) -> str:\n    role_name = usuario.rol.nombre if usuario.rol else \"\"\n    if role_name in {\"Administrador\", \"Ventas\", \"Produccion\"}:\n        return \"admin.dashboard\"\n    return \"catalog.catalogo\"\ndef _build_cliente_default_email(username: str) -> str:\n    base = f\"{username.lower()}@cliente.softbakery.local\"\n    email = base\n    suffix = 1",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -7625,7 +8141,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def home():\n    destacados = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(Producto.cantidad_disponible.desc(), Producto.id_producto.asc())\n        .limit(6)\n        .all()\n    )",
+        "peekOfCode": "def home():\n    destacados = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(\n            Producto.cantidad_disponible.desc(),\n            Producto.id_producto.asc(),\n        )",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7634,7 +8150,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def catalogo():\n    productos = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(Producto.nombre.asc())\n        .all()\n    )\n    return render_template(\"catalog/catalogo_productos.html\", productos=productos)",
+        "peekOfCode": "def catalogo():\n    productos = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(Producto.nombre.asc())\n        .all()\n    )\n    return render_template(",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7643,7 +8159,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def carrito_agregar():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden usar el carrito web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    try:\n        id_producto = int(request.form.get(\"id_producto\", \"0\") or 0)\n        cantidad = int(request.form.get(\"cantidad\", \"1\") or 1)\n    except ValueError:\n        flash(\"Datos invalidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))",
+        "peekOfCode": "def carrito_agregar():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    try:\n        id_producto = int(request.form.get(\"id_producto\", \"0\") or 0)\n        cantidad = int(request.form.get(\"cantidad\", \"1\") or 1)\n    except ValueError:\n        flash(\"Datos invalidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7652,7 +8168,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def carrito():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden usar el carrito web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"\").strip().lower()\n        try:\n            id_detalle = int(request.form.get(\"id_detalle\", \"0\") or 0)\n        except ValueError:\n            id_detalle = 0",
+        "peekOfCode": "def carrito():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"\").strip().lower()\n        try:\n            id_detalle = int(request.form.get(\"id_detalle\", \"0\") or 0)\n        except ValueError:\n            id_detalle = 0",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7661,7 +8177,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def checkout():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden generar pedidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    fecha_entrega_raw = (request.form.get(\"fecha_entrega\") or \"\").strip()\n    tipo_entrega = (request.form.get(\"tipo_entrega\") or \"pickup\").strip().lower()\n    # Regla de negocio: pedidos web se pagan en linea con tarjeta y se recolectan en sucursal.\n    tipo_pago_pedido = \"EN_LINEA\"\n    tipo_pago = \"TARJETA\"\n    referencia = (request.form.get(\"referencia_pago\") or \"\").strip() or None",
+        "peekOfCode": "def checkout():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    fecha_entrega_raw = (request.form.get(\"fecha_entrega\") or \"\").strip()\n    tipo_entrega = (request.form.get(\"tipo_entrega\") or \"pickup\").strip().lower()\n    # Regla de negocio: pedidos web se pagan en linea con tarjeta\n    # y se recolectan en sucursal.\n    tipo_pago_pedido = \"EN_LINEA\"\n    tipo_pago = \"TARJETA\"",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7670,7 +8186,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def mis_pedidos():\n    if not current_user.rol or current_user.rol.nombre != \"Cliente\":\n        flash(\"Solo clientes pueden consultar pedidos web.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))\n    pedidos = (\n        Pedido.query.filter_by(id_usuario_cliente=current_user.id_usuario)\n        .order_by(Pedido.id_pedido.desc())\n        .all()\n    )\n    return render_template(\"catalog/mis_pedidos.html\", pedidos=pedidos)",
+        "peekOfCode": "def mis_pedidos():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    pedidos = (\n        Pedido.query.filter_by(id_usuario_cliente=current_user.id_usuario)\n        .order_by(Pedido.id_pedido.desc())\n        .all()\n    )\n    return render_template(\"catalog/mis_pedidos.html\", pedidos=pedidos)",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -7720,6 +8236,33 @@
         "documentation": {}
     },
     {
+        "label": "crear_materia_prima",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def crear_materia_prima(\n    *,\n    nombre: str,\n    id_unidad_base: int,\n    id_unidad_compra: int,\n    factor_conversion: Decimal,\n    porcentaje_merma: Decimal,\n    stock_minimo: Decimal,\n    cantidad_inicial: Decimal,\n    id_usuario: int,",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "actualizar_materia_prima",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def actualizar_materia_prima(\n    *,\n    id_materia: int,\n    nombre: str,\n    id_unidad_base: int,\n    id_unidad_compra: int,\n    factor_conversion: Decimal,\n    porcentaje_merma: Decimal,\n    stock_minimo: Decimal,\n) -> MateriaPrima:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "desactivar_materia_prima",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def desactivar_materia_prima(*, id_materia: int) -> MateriaPrima:\n    materia = _obtener_materia_bloqueada(id_materia)\n    if not materia:\n        raise ValueError(\"Materia prima no encontrada\")\n    if not materia.activa:\n        return materia\n    uso_en_receta_activa = (\n        db.session.query(DetalleReceta.id_detalle)\n        .join(Receta, Receta.id_receta == DetalleReceta.id_receta)\n        .filter(DetalleReceta.id_materia_prima == materia.id_materia)",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
         "label": "agregar_producto_a_carrito",
         "kind": 2,
         "importPath": "app.common.services",
@@ -7742,7 +8285,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def crear_pedido_desde_carrito(\n    *,\n    id_usuario: int,\n    fecha_entrega,\n    tipo_pago_pedido: str,\n    tipo_pago: str,\n    referencia_pago: str | None,\n) -> Pedido:\n    carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()\n    if not carrito or not carrito.detalles:",
+        "peekOfCode": "def crear_pedido_desde_carrito(\n    *,\n    id_usuario: int,\n    fecha_entrega,\n    tipo_pago_pedido: str,\n    tipo_pago: str,\n    referencia_pago: str | None,\n    id_usuario_accion: int | None = None,\n) -> Pedido:\n    carrito = Carrito.query.filter_by(id_usuario_cliente=id_usuario).first()",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7751,7 +8294,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def generar_venta_desde_pedido(\n    *,\n    id_pedido: int,\n    requiere_ticket: bool,\n) -> Venta:\n    pedido = _obtener_pedido_bloqueado(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")\n    if pedido.estado_pedido == \"CANCELADO\":\n        raise ValueError(\"No se puede generar venta de un pedido cancelado\")",
+        "peekOfCode": "def generar_venta_desde_pedido(\n    *,\n    id_pedido: int,\n    requiere_ticket: bool,\n    id_usuario_accion: int | None = None,\n) -> Venta:\n    pedido = _obtener_pedido_bloqueado(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")\n    if pedido.estado_pedido == \"CANCELADO\":",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7760,7 +8303,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def actualizar_estado_pedido(\n    *,\n    id_pedido: int,\n    nuevo_estado: str,\n    referencia_pago: str | None = None,\n) -> Pedido:\n    pedido = _obtener_pedido_bloqueado(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")\n    nuevo_estado = (nuevo_estado or \"\").strip().upper()",
+        "peekOfCode": "def actualizar_estado_pedido(\n    *,\n    id_pedido: int,\n    nuevo_estado: str,\n    referencia_pago: str | None = None,\n    id_usuario_accion: int | None = None,\n) -> Pedido:\n    pedido = _obtener_pedido_bloqueado(id_pedido)\n    if not pedido:\n        raise ValueError(\"Pedido no encontrado\")",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7805,7 +8348,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def crear_orden_produccion(\n    id_solicitud: int, id_receta: int, cantidad: int, id_usuario: int\n) -> OrdenProduccion:\n    if cantidad <= 0:\n        raise ValueError(\"La cantidad a producir debe ser mayor a cero\")\n    solicitud = SolicitudProduccion.query.get(id_solicitud)\n    if not solicitud:\n        raise ValueError(\"Solicitud no encontrada\")\n    if solicitud.estado != \"APROBADA\":\n        raise ValueError(\"Solo solicitudes aprobadas pueden generar orden\")",
+        "peekOfCode": "def crear_orden_produccion(\n    *,\n    id_receta: int,\n    cantidad: int,\n    id_usuario: int,\n    id_producto: int | None = None,\n    id_solicitud: int | None = None,\n    observaciones: str | None = None,\n) -> OrdenProduccion:\n    if cantidad <= 0:",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7814,7 +8357,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def iniciar_orden_produccion(*, id_orden: int, id_usuario: int) -> OrdenProduccion:\n    orden = _obtener_orden_bloqueada(id_orden)\n    if not orden:\n        raise ValueError(\"Orden no encontrada\")\n    _validar_transicion_estado(\n        estado_actual=orden.estado,\n        estado_destino=\"EN_PROCESO\",\n        mapa_transiciones=TRANSICIONES_ORDEN,\n        entidad=\"orden de produccion\",\n    )",
+        "peekOfCode": "def iniciar_orden_produccion(\n    *,\n    id_orden: int,\n    id_usuario: int | None = None,\n) -> OrdenProduccion:\n    orden = _obtener_orden_bloqueada(id_orden)\n    if not orden:\n        raise ValueError(\"Orden no encontrada\")\n    _validar_transicion_estado(\n        estado_actual=orden.estado,",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7823,7 +8366,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def finalizar_orden_produccion(*, id_orden: int) -> OrdenProduccion:\n    orden = _obtener_orden_bloqueada(id_orden)\n    if not orden:\n        raise ValueError(\"Orden no encontrada\")\n    _validar_transicion_estado(\n        estado_actual=orden.estado,\n        estado_destino=\"FINALIZADO\",\n        mapa_transiciones=TRANSICIONES_ORDEN,\n        entidad=\"orden de produccion\",\n    )",
+        "peekOfCode": "def finalizar_orden_produccion(\n    *, id_orden: int, id_usuario: int | None = None\n) -> OrdenProduccion:\n    orden = _obtener_orden_bloqueada(id_orden)\n    if not orden:\n        raise ValueError(\"Orden no encontrada\")\n    _validar_transicion_estado(\n        estado_actual=orden.estado,\n        estado_destino=\"FINALIZADO\",\n        mapa_transiciones=TRANSICIONES_ORDEN,",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7841,7 +8384,25 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def registrar_venta_mostrador(\n    *,\n    id_producto: int,\n    cantidad: int,\n    tipo_pago: str,\n    requiere_ticket: bool,\n    id_usuario_emite: int,\n) -> Venta:\n    if cantidad <= 0:\n        raise ValueError(\"La cantidad debe ser mayor a cero\")",
+        "peekOfCode": "def registrar_venta_mostrador(\n    *,\n    id_producto: int,\n    cantidad: int,\n    tipo_pago: str,\n    requiere_ticket: bool,\n    id_usuario_emite: int,\n) -> Venta:\n    return registrar_venta_mostrador_detallada(\n        items=[{\"id_producto\": id_producto, \"cantidad\": cantidad}],",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "registrar_venta_mostrador_detallada",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def registrar_venta_mostrador_detallada(\n    *,\n    items: list[dict],\n    tipo_pago: str,\n    requiere_ticket: bool,\n    id_usuario_emite: int,\n) -> Venta:\n    if tipo_pago not in {\"EFECTIVO\", \"TARJETA\"}:\n        raise ValueError(\"Tipo de pago invalido\")\n    if not items:",
+        "detail": "app.common.services",
+        "documentation": {}
+    },
+    {
+        "label": "cancelar_venta_mostrador",
+        "kind": 2,
+        "importPath": "app.common.services",
+        "description": "app.common.services",
+        "peekOfCode": "def cancelar_venta_mostrador(*, id_venta: int, id_usuario: int) -> Venta:\n    venta = Venta.query.filter_by(id_venta=id_venta).with_for_update().first()\n    if not venta:\n        raise ValueError(\"Venta no encontrada\")\n    if venta.estado == \"CANCELADO\":\n        return venta\n    if venta.estado != \"CONFIRMADO\":\n        raise ValueError(\"Solo se pueden cancelar ventas confirmadas\")\n    for detalle in venta.detalles:\n        producto = _obtener_producto_bloqueado(detalle.id_producto)",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7850,7 +8411,7 @@
         "kind": 2,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "def pagar_compra(id_compra: int, id_usuario: int) -> None:\n    compra = Compra.query.get(id_compra)\n    if not compra:\n        raise ValueError(\"Compra no encontrada\")\n    if compra.estado_pago == \"PAGADO\":\n        raise ValueError(\"La compra ya fue marcada como pagada\")\n    compra.estado_pago = \"PAGADO\"\n    salida = SalidaEfectivo(\n        concepto=f\"Pago compra {compra.id_compra}\",\n        monto=compra.total,",
+        "peekOfCode": "def pagar_compra(id_compra: int, id_usuario: int) -> None:\n    compra = Compra.query.get(id_compra)\n    if not compra:\n        raise ValueError(\"Compra no encontrada\")\n    if compra.estado_pago == \"PAGADO\":\n        raise ValueError(\"La compra ya fue marcada como pagada\")\n    compra.estado_pago = \"PAGADO\"\n    salida = SalidaEfectivo(\n        concepto=f\"Pago compra {compra.id_compra}\",\n        monto=_to_mxn(Decimal(str(compra.total or 0))),",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7877,7 +8438,7 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _validar_transicion_estado(\n    *,\n    estado_actual: str,\n    estado_destino: str,",
+        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _nombre_negocio_ticket() -> str:\n    nombre = current_app.config.get(\"BUSINESS_NAME\", \"SoftBakery\")\n    return str(nombre).strip() or \"SoftBakery\"\ndef _crear_ticket_venta(id_venta: int) -> None:",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7886,7 +8447,7 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "UNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _validar_transicion_estado(\n    *,\n    estado_actual: str,\n    estado_destino: str,\n    mapa_transiciones: dict[str, set[str]],",
+        "peekOfCode": "UNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _nombre_negocio_ticket() -> str:\n    nombre = current_app.config.get(\"BUSINESS_NAME\", \"SoftBakery\")\n    return str(nombre).strip() or \"SoftBakery\"\ndef _crear_ticket_venta(id_venta: int) -> None:\n    folio = f\"SB-{id_venta:06d}\"",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -7895,7 +8456,16 @@
         "kind": 6,
         "importPath": "app.production.forms",
         "description": "app.production.forms",
-        "peekOfCode": "class SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired()])\n    cantidad = IntegerField(\"Cantidad\", validators=[DataRequired(), NumberRange(min=1)])\n    submit = SubmitField(\"Enviar solicitud\")",
+        "peekOfCode": "class SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired()])\n    cantidad = IntegerField(\"Cantidad\", validators=[DataRequired(), NumberRange(min=1)])\n    submit = SubmitField(\"Enviar solicitud\")\nclass MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(min=2, max=120)],\n    )\n    id_unidad_base = SelectField(",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "MateriaPrimaForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(min=2, max=120)],\n    )\n    id_unidad_base = SelectField(\n        \"Unidad base\",\n        coerce=int,\n        validators=[DataRequired()],\n    )",
         "detail": "app.production.forms",
         "documentation": {}
     },
@@ -7904,7 +8474,7 @@
         "kind": 5,
         "importPath": "app.production.models",
         "description": "app.production.models",
-        "peekOfCode": "__all__ = [\"Receta\", \"DetalleReceta\", \"SolicitudProduccion\", \"OrdenProduccion\"]",
+        "peekOfCode": "__all__ = [\n    \"Receta\",\n    \"DetalleReceta\",\n    \"SolicitudProduccion\",\n    \"OrdenProduccion\",\n    \"DetalleOrdenProduccion\",\n]",
         "detail": "app.production.models",
         "documentation": {}
     },
@@ -7913,7 +8483,34 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def inventario_mp():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"ajuste\":\n            id_materia = _int(request.form.get(\"id_materia\", \"0\"))\n            cantidad = _decimal(request.form.get(\"cantidad\", \"0\"))\n            tipo = request.form.get(\"tipo\", \"AJUSTE\").strip().upper()\n            if tipo not in {\"ENTRADA\", \"SALIDA\", \"AJUSTE\"}:\n                flash(\"Tipo de movimiento invalido.\", \"danger\")\n                return redirect(url_for(\"production.inventario_mp\"))",
+        "peekOfCode": "def inventario_mp():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\":\n            try:\n                materia = crear_materia_prima(\n                    nombre=request.form.get(\"nombre\", \"\"),\n                    id_unidad_base=_int(request.form.get(\"id_unidad_base\", \"0\")),\n                    id_unidad_compra=_int(request.form.get(\"id_unidad_compra\", \"0\")),\n                    factor_conversion=_decimal(",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "api_materia_prima",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def api_materia_prima(id_materia: int):\n    materia = MateriaPrima.query.get_or_404(id_materia)\n    return jsonify(\n        {\n            \"id_materia\": materia.id_materia,\n            \"nombre\": materia.nombre,\n            \"id_unidad_base\": materia.id_unidad_base,\n            \"id_unidad_compra\": materia.id_unidad_compra,\n            \"unidad_base\": {\n                \"id_unidad\": materia.unidad_base.id_unidad,",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "api_movimientos_materia_prima",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def api_movimientos_materia_prima(id_materia: int):\n    materia = MateriaPrima.query.get_or_404(id_materia)\n    movimientos = (\n        MovimientoInventarioMP.query.filter_by(id_materia_prima=id_materia)\n        .order_by(MovimientoInventarioMP.id_movimiento.desc())\n        .limit(100)\n        .all()\n    )\n    data = [\n        {",
+        "detail": "app.production.routes",
+        "documentation": {}
+    },
+    {
+        "label": "api_movimientos_inventario",
+        "kind": 2,
+        "importPath": "app.production.routes",
+        "description": "app.production.routes",
+        "peekOfCode": "def api_movimientos_inventario():\n    movimientos = (\n        MovimientoInventarioMP.query.order_by(\n            MovimientoInventarioMP.id_movimiento.desc()\n        )\n        .limit(150)\n        .all()\n    )\n    data = [\n        {",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -7922,7 +8519,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def recetas():\n    if request.method == \"POST\":\n        nombre = (request.form.get(\"nombre\") or \"\").strip()\n        id_producto = _int(request.form.get(\"id_producto\", \"0\"))\n        rendimiento = _decimal(request.form.get(\"rendimiento\", \"0\"))\n        unidad_produccion = (request.form.get(\"unidad_produccion\") or \"pieza\").strip()\n        categoria = (request.form.get(\"categoria\") or \"\").strip() or None\n        descripcion = (request.form.get(\"descripcion\") or \"\").strip() or None\n        ids_materia = request.form.getlist(\"id_materia_prima[]\")\n        cantidades = request.form.getlist(\"cantidad_receta[]\")",
+        "peekOfCode": "def recetas():\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()\n        modulo = Modulo.query.filter_by(nombre=\"Recetas\").first()\n        permiso = (\n            Permiso.query.filter_by(\n                id_rol=current_user.id_rol,\n                id_modulo=modulo.id_modulo if modulo else None,\n            ).first()\n            if modulo",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -7931,7 +8528,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def toggle_receta(id_receta: int):\n    receta = Receta.query.get_or_404(id_receta)\n    if not receta.activa:\n        Receta.query.filter(\n            db.func.lower(Receta.nombre) == receta.nombre.lower(),\n            Receta.activa.is_(True),\n        ).update({\"activa\": False}, synchronize_session=False)\n    receta.activa = not receta.activa\n    db.session.commit()\n    log_audit_event(",
+        "peekOfCode": "def toggle_receta(id_receta: int):\n    receta = Receta.query.get_or_404(id_receta)\n    producto = Producto.query.get(receta.id_producto)\n    if not producto:\n        flash(\"No se encontro el producto asociado a la receta.\", \"warning\")\n        return redirect(url_for(\"production.recetas\"))\n    if receta.activa:\n        receta.activa = False\n        producto.id_receta = (\n            Receta.query.filter(",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -7949,7 +8546,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\"}:\n        flash(\"Solo el area de produccion puede gestionar solicitudes.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    if request.method == \"POST\":\n        id_solicitud = _int(request.form.get(\"id_solicitud\", \"0\"))\n        estado = request.form.get(\"estado\", \"PENDIENTE\").strip().upper()\n        solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)\n        if solicitud.estado != \"PENDIENTE\":",
+        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\"}:\n        flash(\"Solo el area de produccion puede gestionar solicitudes.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    if request.method == \"POST\":\n        id_solicitud = _int(request.form.get(\"id_solicitud\", \"0\"))\n        estado = request.form.get(\"estado\", \"PENDIENTE\").strip().upper()\n        solicitud = SolicitudProduccion.query.options(\n            selectinload(SolicitudProduccion.producto),",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -7976,7 +8573,16 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def producto_terminado():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        # Handle image upload\n        image_file = request.files.get(\"imagen_archivo\")\n        try:\n            image_path = _handle_image_upload(image_file)\n        except ValueError as exc:\n            flash(str(exc), \"warning\")\n            return redirect(url_for(\"sales.producto_terminado\"))",
+        "peekOfCode": "def producto_terminado():\n    can_manage = _can_manage_producto_terminado()\n    if request.method == \"POST\":\n        if not can_manage:\n            flash(\"No tienes permisos para modificar productos.\", \"warning\")\n            return redirect(url_for(\"sales.producto_terminado\"))\n        action = (request.form.get(\"action\") or \"\").strip().lower()\n        image_file = request.files.get(\"imagen_archivo\")\n        try:\n            image_path = _handle_image_upload(image_file)",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "producto_terminado_movimientos",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def producto_terminado_movimientos(id_producto: int):\n    producto = Producto.query.get_or_404(id_producto)\n    movimientos = (\n        MovimientoInventarioProducto.query.filter_by(id_producto=producto.id_producto)\n        .order_by(MovimientoInventarioProducto.id_movimiento.desc())\n        .limit(12)\n        .all()\n    )\n    return jsonify(\n        {",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -7985,7 +8591,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if request.method == \"POST\":\n        if role_name != \"Ventas\":\n            flash(\n                \"Solo el area de ventas puede registrar solicitudes de produccion.\",\n                \"danger\",\n            )\n            return redirect(url_for(\"sales.solicitudes\"))\n        id_producto = _int(request.form.get(\"id_producto\", \"0\"))",
+        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if request.method == \"POST\":\n        if role_name != \"Ventas\":\n            flash(\n                \"Solo el area de ventas puede registrar solicitudes de produccion.\",\n                \"danger\",\n            )\n            return redirect(url_for(\"sales.solicitudes\"))\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -7994,7 +8600,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def pedidos_clientes():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"actualizar\").strip().lower()\n        id_pedido = _int(request.form.get(\"id_pedido\", \"0\"))\n        if action == \"entregar\":\n            requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n            try:\n                venta = generar_venta_desde_pedido(\n                    id_pedido=id_pedido,\n                    requiere_ticket=requiere_ticket,",
+        "peekOfCode": "def pedidos_clientes():\n    estados_validos = {\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\"}\n    transiciones_permitidas = {\n        \"PENDIENTE\": [\"CONFIRMADO\", \"CANCELADO\"],\n        \"CONFIRMADO\": [\"PAGADO\"],\n        \"PAGADO\": [],\n        \"ENTREGADO\": [],\n        \"CANCELADO\": [],\n    }\n    if request.method == \"POST\":",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8003,7 +8609,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def ventas():\n    if request.method == \"POST\":\n        id_producto = _int(request.form.get(\"id_producto\", \"0\"))\n        cantidad = _int(request.form.get(\"cantidad\", \"1\"), 1)\n        tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n        requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n        try:\n            venta = registrar_venta_mostrador(\n                id_producto=id_producto,\n                cantidad=cantidad,",
+        "peekOfCode": "def ventas():\n    tab = (request.args.get(\"tab\") or \"nueva\").strip().lower()\n    if tab not in {\"nueva\", \"historial\", \"salidas\", \"corte\"}:\n        tab = \"nueva\"\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"registrar_venta\").strip().lower()\n        if action == \"registrar_venta\":\n            tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n            requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n            detalles_json = request.form.get(\"detalles_json\", \"\").strip()",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8012,7 +8618,16 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def compras_mp():\n    if request.method == \"POST\":\n        id_proveedor = _int(request.form.get(\"id_proveedor\", \"0\"))\n        materias_rows = request.form.getlist(\"id_materia[]\")\n        cantidades_rows = request.form.getlist(\"cantidad_comprada[]\")\n        precios_rows = request.form.getlist(\"precio_unitario[]\")\n        detalles_compra: list[dict] = []\n        if (\n            materias_rows\n            and cantidades_rows",
+        "peekOfCode": "def compras_mp():\n    if request.method == \"POST\":\n        id_proveedor = _int(request.form.get(\"id_proveedor\", \"0\"))\n        estado_pago_form = request.form.get(\"estado_pago\", \"PENDIENTE\").strip().upper()\n        if estado_pago_form not in {\"PENDIENTE\", \"PAGADO\"}:\n            flash(\"Estado de pago invalido.\", \"danger\")\n            return redirect(url_for(\"sales.compras_mp\"))\n        fecha_compra = _parse_fecha_compra(request.form.get(\"fecha\"))\n        materias_rows = request.form.getlist(\"id_materia[]\")\n        cantidades_rows = request.form.getlist(\"cantidad_comprada[]\")",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "compra_mp_detalle",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def compra_mp_detalle(id_compra: int):\n    compra = (\n        Compra.query.options(\n            selectinload(Compra.proveedor),\n            selectinload(Compra.comprador),\n            selectinload(Compra.detalles).selectinload(DetalleCompra.materia_prima),\n            selectinload(Compra.detalles).selectinload(DetalleCompra.unidad_compra),\n        )\n        .filter(Compra.id_compra == id_compra)\n        .first_or_404()",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8030,7 +8645,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def salidas():\n    if request.method == \"POST\":\n        concepto = request.form.get(\"concepto\", \"\").strip()\n        monto = _dec(request.form.get(\"monto\", \"0\"))\n        tipo = request.form.get(\"tipo\", \"OTRO\").strip().upper() or \"OTRO\"\n        if not concepto or monto <= 0:\n            flash(\"Concepto y monto valido son obligatorios.\", \"warning\")\n            return redirect(url_for(\"sales.salidas\"))\n        db.session.add(\n            SalidaEfectivo(",
+        "peekOfCode": "def salidas():\n    if request.method == \"POST\":\n        concepto = request.form.get(\"concepto\", \"\").strip()\n        monto = _dec(request.form.get(\"monto\", \"0\"))\n        tipo = request.form.get(\"tipo\", \"OTRO\").strip().upper() or \"OTRO\"\n        referencia_tipo = request.form.get(\"referencia_tipo\", \"MANUAL\").strip().upper()\n        referencia_id = _int(request.form.get(\"referencia_id\", \"0\"), 0)\n        if not concepto or monto <= 0:\n            flash(\"Concepto y monto valido son obligatorios.\", \"warning\")\n            return redirect(url_for(\"sales.salidas\"))",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8039,7 +8654,16 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def cortes():\n    if request.method == \"POST\":\n        fecha = utc_today()\n        ventas_hoy = Venta.query.filter(db.func.date(Venta.fecha) == fecha).all()\n        total_ventas = sum(Decimal(str(v.total)) for v in ventas_hoy)\n        numero_ventas = len(ventas_hoy)\n        costo_produccion = Decimal(\"0\")\n        for v in ventas_hoy:\n            for d in v.detalles:\n                if d.costo_unitario_produccion is not None:",
+        "peekOfCode": "def cortes():\n    if request.method == \"POST\":\n        _generar_corte_diario(current_user.id_usuario)\n        flash(\"Corte diario generado.\", \"success\")\n        return redirect(url_for(\"sales.cortes\"))\n    data = CorteDiario.query.order_by(CorteDiario.id_corte.desc()).all()\n    q = (request.args.get(\"q\") or \"\").strip().lower()\n    filtro_margen = (request.args.get(\"margen\") or \"todos\").strip().lower()\n    orden = (request.args.get(\"orden\") or \"margen_desc\").strip().lower()\n    contexto = _contexto_costos_utilidad(",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "costos_utilidad_desglose",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def costos_utilidad_desglose(id_producto: int):\n    producto = (\n        Producto.query.options(\n            selectinload(Producto.receta_base)\n            .selectinload(Receta.detalles)\n            .selectinload(DetalleReceta.materia_prima)\n            .selectinload(MateriaPrima.unidad_base)\n        )\n        .filter(Producto.id_producto == id_producto)\n        .first_or_404()",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8156,7 +8780,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class Proveedor(TimestampMixin, db.Model):\n    __tablename__ = \"proveedor\"\n    id_proveedor = db.Column(db.Integer, primary_key=True)\n    nombre_empresa = db.Column(db.String(120), unique=True, nullable=False)\n    telefono = db.Column(db.String(30), nullable=False)\n    correo = db.Column(db.String(120), unique=True, nullable=False)\n    direccion = db.Column(db.String(255), nullable=False)\n    activo = db.Column(db.Boolean, default=True, nullable=False)\n    fecha_alta = db.Column(db.DateTime, default=utc_now, nullable=False)\nclass UnidadMedida(db.Model):",
+        "peekOfCode": "class Proveedor(TimestampMixin, db.Model):\n    __tablename__ = \"proveedor\"\n    id_proveedor = db.Column(db.Integer, primary_key=True)\n    nombre_empresa = db.Column(db.String(120), unique=True, nullable=False)\n    nombre_contacto = db.Column(db.String(120), nullable=False)\n    telefono = db.Column(db.String(30), nullable=False)\n    correo = db.Column(db.String(120), unique=True, nullable=False)\n    ciudad = db.Column(db.String(120), nullable=False)\n    estado = db.Column(db.String(120), nullable=False)\n    direccion = db.Column(db.String(255), nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8165,7 +8789,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class UnidadMedida(db.Model):\n    __tablename__ = \"unidad_medida\"\n    id_unidad = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(80), unique=True, nullable=False)\n    abreviatura = db.Column(db.String(20), unique=True, nullable=False)\nclass MateriaPrima(TimestampMixin, db.Model):\n    __tablename__ = \"materia_prima\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad_disponible >= 0\", name=\"ck_mp_cantidad_no_negativa\"),\n        CheckConstraint(",
+        "peekOfCode": "class UnidadMedida(db.Model):\n    __tablename__ = \"unidad_medida\"\n    __table_args__ = (\n        CheckConstraint(\n            \"factor_base > 0\", name=\"ck_unidad_medida_factor_base_positivo\"\n        ),\n    )\n    id_unidad = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(80), unique=True, nullable=False)\n    abreviatura = db.Column(db.String(20), unique=True, nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8183,7 +8807,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class MovimientoInventarioMP(db.Model):\n    __tablename__ = \"movimiento_inventario_mp\"\n    id_movimiento = db.Column(db.Integer, primary_key=True)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)\n    tipo = db.Column(db.String(20), nullable=False)\n    cantidad = db.Column(db.Numeric(12, 4), nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    referencia_id = db.Column(db.String(50), nullable=True)\n    materia_prima = db.relationship(\"MateriaPrima\")",
+        "peekOfCode": "class MovimientoInventarioMP(db.Model):\n    __tablename__ = \"movimiento_inventario_mp\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad > 0\", name=\"ck_movimiento_mp_cantidad_positiva\"),\n        Index(\"ix_movimiento_mp_materia_fecha\", \"id_materia_prima\", \"fecha\"),\n    )\n    id_movimiento = db.Column(db.Integer, primary_key=True)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)\n    tipo = db.Column(db.String(20), nullable=False)\n    cantidad = db.Column(db.Numeric(12, 4), nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8215,11 +8839,20 @@
         "documentation": {}
     },
     {
+        "label": "MovimientoInventarioProducto",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class MovimientoInventarioProducto(TimestampMixin, db.Model):\n    __tablename__ = \"movimiento_inventario_producto\"\n    __table_args__ = (\n        CheckConstraint(\n            \"cantidad > 0\", name=\"ck_movimiento_producto_cantidad_positiva\"\n        ),\n        Index(\n            \"ix_movimiento_producto_producto_fecha\",\n            \"id_producto\",\n            \"fecha_creacion\",",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "Receta",
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class Receta(TimestampMixin, db.Model):\n    __tablename__ = \"receta\"\n    __table_args__ = (\n        UniqueConstraint(\"nombre\", \"version\", name=\"uq_receta_nombre_version\"),\n    )\n    id_receta = db.Column(db.Integer, primary_key=True)\n    nombre = db.Column(db.String(120), nullable=False)\n    descripcion = db.Column(db.String(255), nullable=True)\n    unidad_produccion = db.Column(db.String(50), default=\"pieza\", nullable=False)\n    categoria = db.Column(db.String(50), nullable=True)",
+        "peekOfCode": "class Receta(TimestampMixin, db.Model):\n    __tablename__ = \"receta\"\n    __table_args__ = (\n        CheckConstraint(\"version > 0\", name=\"ck_receta_version_positiva\"),\n        CheckConstraint(\"rendimiento_base > 0\", name=\"ck_receta_rendimiento_positivo\"),\n        UniqueConstraint(\"id_producto\", \"version\", name=\"uq_receta_producto_version\"),\n    )\n    id_receta = db.Column(db.Integer, primary_key=True)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    nombre = db.Column(db.String(120), nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8228,7 +8861,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class DetalleReceta(db.Model):\n    __tablename__ = \"detalle_receta\"\n    __table_args__ = (\n        CheckConstraint(\n            \"cantidad_base > 0\", name=\"ck_detalle_receta_cantidad_positiva\"\n        ),\n    )\n    id_detalle = db.Column(db.Integer, primary_key=True)\n    id_receta = db.Column(db.Integer, db.ForeignKey(\"receta.id_receta\"), nullable=False)\n    id_materia_prima = db.Column(db.Integer, db.ForeignKey(FK_MATERIA), nullable=False)",
+        "peekOfCode": "class DetalleReceta(db.Model):\n    __tablename__ = \"detalle_receta\"\n    __table_args__ = (\n        UniqueConstraint(\n            \"id_receta\",\n            \"id_materia_prima\",\n            name=\"uq_detalle_receta_materia\",\n        ),\n        CheckConstraint(\n            \"cantidad_base > 0\", name=\"ck_detalle_receta_cantidad_positiva\"",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8246,7 +8879,16 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class OrdenProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"orden_produccion\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad_producir > 0\", name=\"ck_orden_cantidad_positiva\"),\n    )\n    id_orden = db.Column(db.Integer, primary_key=True)\n    id_solicitud = db.Column(\n        db.Integer, db.ForeignKey(\"solicitud_produccion.id_solicitud\"), nullable=False\n    )\n    id_receta = db.Column(db.Integer, db.ForeignKey(\"receta.id_receta\"), nullable=False)",
+        "peekOfCode": "class OrdenProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"orden_produccion\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad_producir > 0\", name=\"ck_orden_cantidad_positiva\"),\n    )\n    id_orden = db.Column(db.Integer, primary_key=True)\n    id_solicitud = db.Column(\n        db.Integer,\n        db.ForeignKey(\"solicitud_produccion.id_solicitud\"),\n        nullable=True,",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "DetalleOrdenProduccion",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class DetalleOrdenProduccion(db.Model):\n    __tablename__ = \"detalle_orden_produccion\"\n    __table_args__ = (\n        UniqueConstraint(\n            \"id_orden\",\n            \"id_materia_prima\",\n            name=\"uq_detalle_orden_materia\",\n        ),\n        CheckConstraint(\n            \"cantidad_receta > 0\",",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8287,6 +8929,15 @@
         "documentation": {}
     },
     {
+        "label": "PedidoEstadoHistorial",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class PedidoEstadoHistorial(db.Model):\n    __tablename__ = \"pedido_estado_historial\"\n    __table_args__ = (\n        Index(\"ix_pedido_estado_historial_pedido_fecha\", \"id_pedido\", \"fecha_cambio\"),\n    )\n    id_historial = db.Column(db.Integer, primary_key=True)\n    id_pedido = db.Column(db.Integer, db.ForeignKey(\"pedido.id_pedido\"), nullable=False)\n    estado_anterior = db.Column(db.String(20), nullable=True)\n    estado_nuevo = db.Column(db.String(20), nullable=False)\n    detalle = db.Column(db.String(255), nullable=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "PagoPedido",
         "kind": 6,
         "importPath": "app.models",
@@ -8309,7 +8960,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class TicketVenta(db.Model):\n    __tablename__ = \"ticket_venta\"\n    id_ticket = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(\n        db.Integer, db.ForeignKey(\"venta.id_venta\"), unique=True, nullable=False\n    )\n    folio = db.Column(db.String(30), unique=True, nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    venta = db.relationship(\"Venta\")\nclass DetalleVenta(db.Model):",
+        "peekOfCode": "class TicketVenta(db.Model):\n    __tablename__ = \"ticket_venta\"\n    id_ticket = db.Column(db.Integer, primary_key=True)\n    id_venta = db.Column(\n        db.Integer, db.ForeignKey(\"venta.id_venta\"), unique=True, nullable=False\n    )\n    folio = db.Column(db.String(30), unique=True, nullable=False)\n    nombre_negocio = db.Column(db.String(120), default=\"SoftBakery\", nullable=False)\n    fecha = db.Column(db.DateTime, default=utc_now, nullable=False)\n    venta = db.relationship(\"Venta\")",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8327,7 +8978,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class SalidaEfectivo(TimestampMixin, db.Model):\n    __tablename__ = \"salida_efectivo\"\n    id_salida = db.Column(db.Integer, primary_key=True)\n    concepto = db.Column(db.String(150), nullable=False)\n    monto = db.Column(db.Numeric(12, 2), nullable=False)\n    tipo = db.Column(db.String(50), nullable=False)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    referencia = db.Column(db.String(80), nullable=True)\nclass CorteDiario(TimestampMixin, db.Model):\n    __tablename__ = \"corte_diario\"",
+        "peekOfCode": "class SalidaEfectivo(TimestampMixin, db.Model):\n    __tablename__ = \"salida_efectivo\"\n    id_salida = db.Column(db.Integer, primary_key=True)\n    concepto = db.Column(db.String(150), nullable=False)\n    monto = db.Column(db.Numeric(12, 2), nullable=False)\n    tipo = db.Column(db.String(50), nullable=False)\n    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)\n    referencia = db.Column(db.String(80), nullable=True)\n    referencia_tipo = db.Column(db.String(50), nullable=True)\n    referencia_id = db.Column(db.Integer, nullable=True)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8336,7 +8987,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class CorteDiario(TimestampMixin, db.Model):\n    __tablename__ = \"corte_diario\"\n    id_corte = db.Column(db.Integer, primary_key=True)\n    fecha = db.Column(db.Date, default=utc_today, nullable=False)\n    total_ventas = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    numero_ventas = db.Column(db.Integer, default=0, nullable=False)\n    utilidad_diaria = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    salida_efectivo_proveedores = db.Column(\n        db.Numeric(12, 2), default=0, nullable=False\n    )",
+        "peekOfCode": "class CorteDiario(TimestampMixin, db.Model):\n    __tablename__ = \"corte_diario\"\n    id_corte = db.Column(db.Integer, primary_key=True)\n    fecha = db.Column(db.Date, default=utc_today, nullable=False)\n    total_ventas = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    numero_ventas = db.Column(db.Integer, default=0, nullable=False)\n    total_transacciones = db.Column(db.Integer, default=0, nullable=False)\n    total_efectivo = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    total_tarjeta = db.Column(db.Numeric(12, 2), default=0, nullable=False)\n    total_salidas = db.Column(db.Numeric(12, 2), default=0, nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8381,7 +9032,7 @@
         "kind": 5,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "ESTADOS_PAGO = (\"PENDIENTE\", \"PAGADO\")\nTIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"",
+        "peekOfCode": "ESTADOS_PAGO = (\"PENDIENTE\", \"PAGADO\")\nTIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\", \"CANCELADO\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8390,7 +9041,7 @@
         "kind": 5,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "TIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"",
+        "peekOfCode": "TIPOS_MOVIMIENTO = (\"ENTRADA\", \"SALIDA\", \"AJUSTE\")\nESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\", \"CANCELADO\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8399,7 +9050,7 @@
         "kind": 5,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "ESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"",
+        "peekOfCode": "ESTADOS_SOLICITUD = (\"PENDIENTE\", \"APROBADA\", \"RECHAZADA\")\nESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\", \"CANCELADO\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8408,7 +9059,7 @@
         "kind": 5,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "ESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"",
+        "peekOfCode": "ESTADOS_ORDEN = (\"PENDIENTE\", \"EN_PROCESO\", \"FINALIZADO\", \"CANCELADO\")\nESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\", \"CANCELADO\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8417,7 +9068,7 @@
         "kind": 5,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "ESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:",
+        "peekOfCode": "ESTADOS_VENTA = (\"CONFIRMADO\", \"EN_PROCESO_PRODUCCION\", \"CANCELADO\")\nESTADOS_PEDIDO = (\"PENDIENTE\", \"CONFIRMADO\", \"PAGADO\", \"ENTREGADO\", \"CANCELADO\")\nTIPOS_PAGO = (\"EFECTIVO\", \"TARJETA\")\nTIPOS_PAGO_PEDIDO = (\"EN_LINEA\", \"CONTRA_ENTREGA\")\nFK_USUARIO = \"usuario.id_usuario\"\nFK_UNIDAD = \"unidad_medida.id_unidad\"\nFK_MATERIA = \"materia_prima.id_materia\"\nFK_PRODUCTO = \"producto.id_producto\"\nCASCADE_DELETE_ORPHAN = \"all, delete-orphan\"\ndef utc_now() -> datetime:",
         "detail": "app.models",
         "documentation": {}
     },
@@ -8498,7 +9149,7 @@
         "kind": 2,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_product_costing()\n    _seed_production_flow(users)\n    _seed_customer_flow(users)",
+        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_measurement_units_metadata()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_product_costing()\n    _seed_production_flow(users)",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -8649,6 +9300,114 @@
     {
         "label": "upgrade",
         "kind": 2,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "def upgrade() -> None:\n    table_name = \"movimiento_inventario_producto\"\n    index_name = \"ix_movimiento_producto_producto_fecha\"\n    if not _table_exists(table_name):\n        op.create_table(\n            table_name,\n            sa.Column(\"id_movimiento\", sa.Integer(), primary_key=True),\n            sa.Column(\"fecha_creacion\", sa.DateTime(), nullable=False),\n            sa.Column(\"id_producto\", sa.Integer(), nullable=False),\n            sa.Column(\"tipo\", sa.String(length=20), nullable=False),",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "def downgrade() -> None:\n    table_name = \"movimiento_inventario_producto\"\n    index_name = \"ix_movimiento_producto_producto_fecha\"\n    if _table_exists(table_name) and _index_exists(table_name, index_name):\n        op.drop_index(index_name, table_name=table_name)\n    if _table_exists(table_name):\n        op.drop_table(table_name)",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "revision = \"2f3a4b5c6d7e\"\ndown_revision = \"65d138ccdfb0\"\nbranch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "down_revision = \"65d138ccdfb0\"\nbranch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = inspector.get_indexes(table_name)",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "description": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "peekOfCode": "depends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = inspector.get_indexes(table_name)\n    return any(idx.get(\"name\") == index_name for idx in indexes)",
+        "detail": "migrations.versions.2f3a4b5c6d7e_add_movimiento_inventario_producto",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "def upgrade():\n    pass\ndef downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "def downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "revision = '65d138ccdfb0'\ndown_revision = ('ab12cd34ef56', 'b7a8c9d0e1f2')\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    pass\ndef downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "down_revision = ('ab12cd34ef56', 'b7a8c9d0e1f2')\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    pass\ndef downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    pass\ndef downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "description": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    pass\ndef downgrade():\n    pass",
+        "detail": "migrations.versions.65d138ccdfb0_merge_heads_rf06_rf08",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
         "importPath": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
         "description": "migrations.versions.9f1a2b3c4d5e_invert_producto_receta_relation",
         "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(sa.Column(\"id_receta\", sa.Integer(), nullable=True))\n        batch_op.create_foreign_key(\n            \"fk_producto_id_receta\",\n            \"receta\",\n            [\"id_receta\"],\n            [\"id_receta\"],\n        )\n    with op.batch_alter_table(\"receta\", schema=None) as batch_op:",
@@ -8757,6 +9516,132 @@
     {
         "label": "upgrade",
         "kind": 2,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "def upgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        op.create_table(\n            TABLE_NAME,\n            sa.Column(\"id_historial\", sa.Integer(), nullable=False),\n            sa.Column(\"id_pedido\", sa.Integer(), nullable=False),\n            sa.Column(\"estado_anterior\", sa.String(length=20), nullable=True),\n            sa.Column(\"estado_nuevo\", sa.String(length=20), nullable=False),\n            sa.Column(\"detalle\", sa.String(length=255), nullable=True),\n            sa.Column(\"id_usuario\", sa.Integer(), nullable=True),",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "def downgrade() -> None:\n    if _table_exists(TABLE_NAME) and _index_exists(TABLE_NAME, INDEX_NAME):\n        op.drop_index(INDEX_NAME, table_name=TABLE_NAME)\n    if _table_exists(TABLE_NAME):\n        op.drop_table(TABLE_NAME)",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "revision = \"a6b7c8d9e0f1\"\ndown_revision = \"ff14a5b6c7d8\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"pedido_estado_historial\"\nINDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "down_revision = \"ff14a5b6c7d8\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"pedido_estado_historial\"\nINDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_NAME = \"pedido_estado_historial\"\nINDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "depends_on = None\nTABLE_NAME = \"pedido_estado_historial\"\nINDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "TABLE_NAME = \"pedido_estado_historial\"\nINDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "INDEX_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "description": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "peekOfCode": "INDEX_NAME = \"ix_pedido_estado_historial_pedido_fecha\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {\n        index.get(\"name\")",
+        "detail": "migrations.versions.a6b7c8d9e0f1_rf14_add_pedido_status_history",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"dimension\",\n                sa.String(length=20),\n                nullable=False,\n                server_default=\"CONTEO\",\n            )\n        )",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "def downgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.drop_constraint(\n            \"ck_unidad_medida_factor_base_positivo\",\n            type_=\"check\",\n        )\n        batch_op.drop_column(\"factor_base\")\n        batch_op.drop_column(\"dimension\")",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "revision = \"ab12cd34ef56\"\ndown_revision = \"f6a7b8c9d0e1\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"dimension\",\n                sa.String(length=20),",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "down_revision = \"f6a7b8c9d0e1\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"dimension\",\n                sa.String(length=20),\n                nullable=False,",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"dimension\",\n                sa.String(length=20),\n                nullable=False,\n                server_default=\"CONTEO\",",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "description": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"unidad_medida\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"dimension\",\n                sa.String(length=20),\n                nullable=False,\n                server_default=\"CONTEO\",\n            )",
+        "detail": "migrations.versions.ab12cd34ef56_rf06_add_unit_dimension_and_base_factor",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
         "importPath": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
         "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
         "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,\n                server_default=\"0\",\n            )\n        )",
@@ -8806,6 +9691,222 @@
         "description": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
         "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"producto\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"costo_produccion_actual\",\n                sa.Numeric(precision=12, scale=2),\n                nullable=False,\n                server_default=\"0\",\n            )",
         "detail": "migrations.versions.b2d4f6a8c0e1_add_costing_and_margin_fields",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "def upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"id_producto\", sa.Integer(), nullable=True))\n    inspector = sa.inspect(bind)\n    foreign_keys = {\n        foreign_key.get(\"name\")",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "def downgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        return\n    unique_constraints = {\n        unique_constraint.get(\"name\")\n        for unique_constraint in inspector.get_unique_constraints(\"receta\")\n        if unique_constraint.get(\"name\")",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "revision = \"b7a8c9d0e1f2\"\ndown_revision = \"9f1a2b3c4d5e\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "down_revision = \"9f1a2b3c4d5e\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"id_producto\", sa.Integer(), nullable=True))",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"id_producto\", sa.Integer(), nullable=True))\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"id_producto\", sa.Integer(), nullable=True))\n    inspector = sa.inspect(bind)\n    foreign_keys = {",
+        "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"nombre_contacto\",\n                sa.String(length=120),\n                nullable=False,\n                server_default=\"Sin contacto\",\n            )\n        )",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "def downgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.drop_column(\"estado\")\n        batch_op.drop_column(\"ciudad\")\n        batch_op.drop_column(\"nombre_contacto\")",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "revision = \"c3f5e7a9b1d2\"\ndown_revision = \"b2d4f6a8c0e1\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"nombre_contacto\",\n                sa.String(length=120),",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "down_revision = \"b2d4f6a8c0e1\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"nombre_contacto\",\n                sa.String(length=120),\n                nullable=False,",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"nombre_contacto\",\n                sa.String(length=120),\n                nullable=False,\n                server_default=\"Sin contacto\",",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "description": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"proveedor\", schema=None) as batch_op:\n        batch_op.add_column(\n            sa.Column(\n                \"nombre_contacto\",\n                sa.String(length=120),\n                nullable=False,\n                server_default=\"Sin contacto\",\n            )",
+        "detail": "migrations.versions.c3f5e7a9b1d2_add_supplier_contact_location_fields",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "def upgrade():\n    bind = op.get_bind()\n    dialect = bind.dialect.name\n    duplicated_rows = bind.execute(\n        sa.text(\n            \"\"\"\n            SELECT\n                id_receta,\n                id_materia_prima,\n                SUM(cantidad_base) AS cantidad_total,",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "def downgrade():\n    bind = op.get_bind()\n    dialect = bind.dialect.name\n    if _index_exists(\"receta\", \"uq_receta_producto_activa\"):\n        if dialect == \"sqlite\":\n            op.execute(\"DROP INDEX IF EXISTS uq_receta_producto_activa\")\n        elif dialect == \"postgresql\":\n            op.execute(\"DROP INDEX IF EXISTS uq_receta_producto_activa\")\n        elif dialect == \"mysql\":\n            op.drop_index(\"uq_receta_producto_activa\", table_name=\"receta\")",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "revision = \"c8e1f2a3b4c5\"\ndown_revision = \"65d138ccdfb0\"\nbranch_labels = None\ndepends_on = None\ndef _constraint_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    constraints = {\n        check.get(\"name\")\n        for check in inspector.get_check_constraints(table_name)",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "down_revision = \"65d138ccdfb0\"\nbranch_labels = None\ndepends_on = None\ndef _constraint_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    constraints = {\n        check.get(\"name\")\n        for check in inspector.get_check_constraints(table_name)\n        if check.get(\"name\")",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef _constraint_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    constraints = {\n        check.get(\"name\")\n        for check in inspector.get_check_constraints(table_name)\n        if check.get(\"name\")\n    }",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "description": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "peekOfCode": "depends_on = None\ndef _constraint_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    constraints = {\n        check.get(\"name\")\n        for check in inspector.get_check_constraints(table_name)\n        if check.get(\"name\")\n    }\n    return constraint_name in constraints",
+        "detail": "migrations.versions.c8e1f2a3b4c5_rf08_recipe_integrity_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "def upgrade():\n    bind = op.get_bind()\n    if bind.dialect.name != \"mysql\":\n        return\n    if not _column_exists(\"receta\", \"id_producto_activa\"):\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(\n                sa.Column(\n                    \"id_producto_activa\",\n                    sa.Integer(),",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "def downgrade():\n    bind = op.get_bind()\n    if bind.dialect.name != \"mysql\":\n        return\n    if _index_exists(\"receta\", \"uq_receta_producto_activa\"):\n        op.drop_index(\"uq_receta_producto_activa\", table_name=\"receta\")\n    if _column_exists(\"receta\", \"id_producto_activa\"):\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.drop_column(\"id_producto_activa\")",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "revision = \"d1f2e3a4b5c6\"\ndown_revision = \"c8e1f2a3b4c5\"\nbranch_labels = None\ndepends_on = None\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {\n        index.get(\"name\")\n        for index in inspector.get_indexes(table_name)",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "down_revision = \"c8e1f2a3b4c5\"\nbranch_labels = None\ndepends_on = None\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {\n        index.get(\"name\")\n        for index in inspector.get_indexes(table_name)\n        if index.get(\"name\")",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {\n        index.get(\"name\")\n        for index in inspector.get_indexes(table_name)\n        if index.get(\"name\")\n    }",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "description": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
+        "peekOfCode": "depends_on = None\ndef _index_exists(table_name: str, index_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    indexes = {\n        index.get(\"name\")\n        for index in inspector.get_indexes(table_name)\n        if index.get(\"name\")\n    }\n    return index_name in indexes",
+        "detail": "migrations.versions.d1f2e3a4b5c6_rf08_mysql_active_recipe_unique",
         "documentation": {}
     },
     {
@@ -8914,6 +10015,438 @@
         "description": "migrations.versions.e4f7a1b2c3d4_add_business_check_constraints",
         "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"materia_prima\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_mp_factor_conversion_positiva\", \"factor_conversion > 0\"\n        )\n        batch_op.create_check_constraint(\n            \"ck_mp_porcentaje_merma_no_negativo\", \"porcentaje_merma >= 0\"\n        )\n        batch_op.create_check_constraint(",
         "detail": "migrations.versions.e4f7a1b2c3d4_add_business_check_constraints",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "def upgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_movimiento_mp_cantidad_positiva\", \"cantidad > 0\"\n        )\n        batch_op.create_index(\n            \"ix_movimiento_mp_materia_fecha\",\n            [\"id_materia_prima\", \"fecha\"],\n            unique=False,\n        )",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "def downgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.drop_index(\"ix_movimiento_mp_materia_fecha\")\n        batch_op.drop_constraint(\"ck_movimiento_mp_cantidad_positiva\", type_=\"check\")",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "revision = \"f6a7b8c9d0e1\"\ndown_revision = \"c3f5e7a9b1d2\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_movimiento_mp_cantidad_positiva\", \"cantidad > 0\"\n        )\n        batch_op.create_index(",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "down_revision = \"c3f5e7a9b1d2\"\nbranch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_movimiento_mp_cantidad_positiva\", \"cantidad > 0\"\n        )\n        batch_op.create_index(\n            \"ix_movimiento_mp_materia_fecha\",",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_movimiento_mp_cantidad_positiva\", \"cantidad > 0\"\n        )\n        batch_op.create_index(\n            \"ix_movimiento_mp_materia_fecha\",\n            [\"id_materia_prima\", \"fecha\"],",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "description": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "peekOfCode": "depends_on = None\ndef upgrade():\n    with op.batch_alter_table(\"movimiento_inventario_mp\", schema=None) as batch_op:\n        batch_op.create_check_constraint(\n            \"ck_movimiento_mp_cantidad_positiva\", \"cantidad > 0\"\n        )\n        batch_op.create_index(\n            \"ix_movimiento_mp_materia_fecha\",\n            [\"id_materia_prima\", \"fecha\"],\n            unique=False,",
+        "detail": "migrations.versions.f6a7b8c9d0e1_rf06_movimientos_index_and_constraint",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "def upgrade():\n    if not _column_exists(\"orden_produccion\", \"observaciones\"):\n        with op.batch_alter_table(\"orden_produccion\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"observaciones\", sa.String(length=255)))\n    if _column_exists(\"orden_produccion\", \"id_solicitud\") and not _column_nullable(\n        \"orden_produccion\", \"id_solicitud\"\n    ):\n        with op.batch_alter_table(\"orden_produccion\", schema=None) as batch_op:\n            batch_op.alter_column(\n                \"id_solicitud\",",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "def downgrade():\n    bind = op.get_bind()\n    if _index_exists(\"detalle_orden_produccion\", \"ix_detalle_orden_id_orden\"):\n        op.drop_index(\n            \"ix_detalle_orden_id_orden\", table_name=\"detalle_orden_produccion\"\n        )\n    if _table_exists(\"detalle_orden_produccion\"):\n        op.drop_table(\"detalle_orden_produccion\")\n    if _column_exists(\"orden_produccion\", \"observaciones\"):\n        with op.batch_alter_table(\"orden_produccion\", schema=None) as batch_op:",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "revision = \"fa09c0d1e2f3\"\ndown_revision = \"d1f2e3a4b5c6\"\nbranch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "down_revision = \"d1f2e3a4b5c6\"\nbranch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "description": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "peekOfCode": "depends_on = None\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {\n        column.get(\"name\")",
+        "detail": "migrations.versions.fa09c0d1e2f3_rf09_ordenes_produccion_traceability",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "def upgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    missing_columns = [\n        column_name\n        for column_name in (\n            \"cantidad_real_descontada\",\n            \"stock_previo\",\n            \"stock_posterior\",\n        )",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "def downgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    with op.batch_alter_table(TABLE_NAME, schema=None) as batch_op:\n        if _column_exists(TABLE_NAME, \"stock_posterior\"):\n            batch_op.drop_column(\"stock_posterior\")\n        if _column_exists(TABLE_NAME, \"stock_previo\"):\n            batch_op.drop_column(\"stock_previo\")\n        if _column_exists(TABLE_NAME, \"cantidad_real_descontada\"):\n            batch_op.drop_column(\"cantidad_real_descontada\")",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "revision = \"fb10a1b2c3d4\"\ndown_revision = \"fa09c0d1e2f3\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "down_revision = \"fa09c0d1e2f3\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "depends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "description": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "peekOfCode": "TABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {\n        column.get(\"name\")",
+        "detail": "migrations.versions.fb10a1b2c3d4_rf09_fix_detalle_orden_columns",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "def upgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    # En esquemas legacy este check apunta a `cantidad_real` y rompe inserts RF09.\n    if _check_exists(TABLE_NAME, \"ck_detalle_orden_cantidad_real_positiva\"):\n        with op.batch_alter_table(TABLE_NAME, schema=None) as batch_op:\n            batch_op.drop_constraint(\n                \"ck_detalle_orden_cantidad_real_positiva\",\n                type_=\"check\",\n            )",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "def downgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    if _check_exists(TABLE_NAME, \"ck_detalle_orden_stock_posterior_no_negativo\"):\n        with op.batch_alter_table(TABLE_NAME, schema=None) as batch_op:\n            batch_op.drop_constraint(\n                \"ck_detalle_orden_stock_posterior_no_negativo\",\n                type_=\"check\",\n            )\n    if _check_exists(TABLE_NAME, \"ck_detalle_orden_stock_previo_no_negativo\"):",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "revision = \"fc11d2e3f4a5\"\ndown_revision = \"fb10a1b2c3d4\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _check_exists(table_name: str, constraint_name: str) -> bool:",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "down_revision = \"fb10a1b2c3d4\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _check_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _check_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "depends_on = None\nTABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _check_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    checks = {",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "description": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "peekOfCode": "TABLE_NAME = \"detalle_orden_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _check_exists(table_name: str, constraint_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    checks = {\n        check.get(\"name\")",
+        "detail": "migrations.versions.fc11d2e3f4a5_rf09_fix_legacy_checks_detalle_orden",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "def upgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    with op.batch_alter_table(TABLE_NAME, schema=None) as batch_op:\n        if not _column_exists(TABLE_NAME, \"fecha_resolucion\"):\n            batch_op.add_column(\n                sa.Column(\"fecha_resolucion\", sa.DateTime(), nullable=True)\n            )\n        if not _column_exists(TABLE_NAME, \"observaciones_resolucion\"):\n            batch_op.add_column(",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "def downgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    with op.batch_alter_table(TABLE_NAME, schema=None) as batch_op:\n        if _column_exists(TABLE_NAME, \"observaciones_resolucion\"):\n            batch_op.drop_column(\"observaciones_resolucion\")\n        if _column_exists(TABLE_NAME, \"fecha_resolucion\"):\n            batch_op.drop_column(\"fecha_resolucion\")",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "revision = \"fd12e3f4a5b6\"\ndown_revision = \"fc11d2e3f4a5\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "down_revision = \"fc11d2e3f4a5\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "depends_on = None\nTABLE_NAME = \"solicitud_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "description": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "peekOfCode": "TABLE_NAME = \"solicitud_produccion\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {\n        column.get(\"name\")",
+        "detail": "migrations.versions.fd12e3f4a5b6_rf10_add_resolution_fields_to_solicitud",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "def upgrade() -> None:\n    if _table_exists(TABLE_CORTE):\n        with op.batch_alter_table(TABLE_CORTE, schema=None) as batch_op:\n            if not _column_exists(TABLE_CORTE, \"total_transacciones\"):\n                batch_op.add_column(\n                    sa.Column(\n                        \"total_transacciones\",\n                        sa.Integer(),\n                        nullable=False,\n                        server_default=\"0\",",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "def downgrade() -> None:\n    if _table_exists(TABLE_TICKET):\n        with op.batch_alter_table(TABLE_TICKET, schema=None) as batch_op:\n            if _column_exists(TABLE_TICKET, \"nombre_negocio\"):\n                batch_op.drop_column(\"nombre_negocio\")\n    if _table_exists(TABLE_SALIDA):\n        with op.batch_alter_table(TABLE_SALIDA, schema=None) as batch_op:\n            if _column_exists(TABLE_SALIDA, \"referencia_id\"):\n                batch_op.drop_column(\"referencia_id\")\n            if _column_exists(TABLE_SALIDA, \"referencia_tipo\"):",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "revision = \"fe13f4a5b6c7\"\ndown_revision = \"fd12e3f4a5b6\"\nbranch_labels = None\ndepends_on = None\nTABLE_CORTE = \"corte_diario\"\nTABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "down_revision = \"fd12e3f4a5b6\"\nbranch_labels = None\ndepends_on = None\nTABLE_CORTE = \"corte_diario\"\nTABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_CORTE = \"corte_diario\"\nTABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "depends_on = None\nTABLE_CORTE = \"corte_diario\"\nTABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_CORTE",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "TABLE_CORTE = \"corte_diario\"\nTABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_SALIDA",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "TABLE_SALIDA = \"salida_efectivo\"\nTABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_TICKET",
+        "kind": 5,
+        "importPath": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "description": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "peekOfCode": "TABLE_TICKET = \"ticket_venta\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {\n        column.get(\"name\")",
+        "detail": "migrations.versions.fe13f4a5b6c7_rf13_expand_sales_tables",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "def upgrade() -> None:\n    # Merge revision without DDL changes.\n    pass\ndef downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "def downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "revision = \"ff14a5b6c7d8\"\ndown_revision = (\"2f3a4b5c6d7e\", \"fe13f4a5b6c7\")\nbranch_labels = None\ndepends_on = None\ndef upgrade() -> None:\n    # Merge revision without DDL changes.\n    pass\ndef downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "down_revision = (\"2f3a4b5c6d7e\", \"fe13f4a5b6c7\")\nbranch_labels = None\ndepends_on = None\ndef upgrade() -> None:\n    # Merge revision without DDL changes.\n    pass\ndef downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\ndef upgrade() -> None:\n    # Merge revision without DDL changes.\n    pass\ndef downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "description": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
+        "peekOfCode": "depends_on = None\ndef upgrade() -> None:\n    # Merge revision without DDL changes.\n    pass\ndef downgrade() -> None:\n    # Merge revision without reversible DDL changes.\n    pass",
+        "detail": "migrations.versions.ff14a5b6c7d8_merge_heads_rf13",
         "documentation": {}
     },
     {

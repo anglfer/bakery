@@ -1,88 +1,91 @@
-{% extends "base_template.html" %} {% block title %}Login - SoftBakery{% endblock %} {% block
-content %}
+{% extends "base_template.html" %} {% block title %}Portal de Clientes · Iniciar sesión{% endblock
+%} {% block content %}
 <div class="login-wrapper">
-	<div class="login-container">
-		<div class="text-center mb-4">
+	<div class="login-container portal-auth-card">
+		<div class="text-center mb-3">
 			<i class="bi bi-cake2-fill logo-icon"></i>
-			<h2 class="login-title mt-2">SoftBakery</h2>
+			<h2 class="login-title mt-1">SoftBakery</h2>
+			<p class="subtitle mb-0">Portal de Clientes</p>
+		</div>
+
+		<div class="tab-bar mb-4" role="tablist" aria-label="Acceso cliente">
+			<a class="tab-btn active" href="{{ url_for('auth.login') }}">
+				<i class="bi bi-person-fill"></i>
+				Iniciar sesión
+			</a>
+			<a class="tab-btn" href="{{ url_for('auth.registro_cliente') }}">
+				<i class="bi bi-person-plus-fill"></i>
+				Crear cuenta
+			</a>
 		</div>
 
 		<form method="POST" novalidate>
 			{{ form.hidden_tag() }}
 
 			<div class="mb-3">
-				<label class="form-label fw-semibold">Usuario</label>
+				<label class="form-label">
+					Usuario
+					<span class="req">*</span>
+				</label>
 				<div class="input-group">
-					<span class="input-group-text">
-						<i class="bi bi-person-fill"></i>
-					</span>
-					{{ form.username(class_='form-control', placeholder='Ingrese su usuario') }}
+					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+					{{ form.username(class_='form-control', placeholder='Ingresa tu usuario',
+					autocomplete='username') }}
 				</div>
 				{% if form.username.errors %}
 				<div class="text-danger small mt-1">
-					{% for error in form.username.errors %}{{ error }}{% endfor %}
+					{% for error in form.username.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
 				</div>
 				{% endif %}
 			</div>
 
 			<div class="mb-2">
-				<label class="form-label fw-semibold">Contraseña</label>
+				<label class="form-label">
+					Contraseña
+					<span class="req">*</span>
+				</label>
 				<div class="input-group">
-					<span class="input-group-text">
-						<i class="bi bi-lock-fill"></i>
-					</span>
-					{{ form.password(class_='form-control', id='password', placeholder='Ingrese su
-					contraseña') }}
-					<span
-						class="input-group-text p-0"
-						style="
-							background: #fff;
-							border-radius: 0 50px 50px 0;
-							border: 1px solid #eee;
-							border-left: none;
-						">
-						<button
-							type="button"
-							class="btn border-0 toggle-password h-100 px-3 d-flex align-items-center"
-							id="togglePassword"
-							style="color: #aaa">
-							<i class="bi bi-eye-slash"></i>
-						</button>
+					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+					{{ form.password(class_='form-control mid', id='password', placeholder='Ingresa tu
+					contraseña', autocomplete='current-password') }}
+					<span class="toggle-password" id="togglePassword" role="button" tabindex="0">
+						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
 				{% if form.password.errors %}
 				<div class="text-danger small mt-1">
-					{% for error in form.password.errors %}{{ error }}{% endfor %}
+					{% for error in form.password.errors %}
+					<div>{{ error }}</div>
+					{% endfor %}
 				</div>
 				{% endif %}
-
-				<!-- Según Reglas de Negocio v2.pdf, se debe indicar la política de contraseñas -->
-				<div class="mt-2" style="font-size: 0.7rem; color: #777">
-					<i class="bi bi-exclamation-circle"></i>
-					Debe contener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter
-					especial.
-				</div>
 			</div>
 
-			<!-- Espacio para CAPTCHA requerido en las reglas de negocio (opcional en UI visual si no hay backend activo) -->
 			{% if show_captcha %}
-			<div class="mb-3">
+			<div class="mb-3 mt-3">
 				<div class="d-flex justify-content-center">
 					<div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
 				</div>
 			</div>
 			{% endif %}
 
-			<div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+			<div class="d-flex justify-content-end mt-2 mb-3">
 				<a href="#" class="link">¿Olvidaste tu contraseña?</a>
 			</div>
 
 			{{ form.submit(class_='btn btn-login w-100', value='Iniciar sesión') }}
 
-			<div class="text-center mt-3" style="font-size: 0.9rem">
-				¿Eres nuevo cliente?
-				<a href="{{ url_for('auth.registro_cliente') }}" class="link fw-semibold">Crear cuenta</a>
-			</div>
+			<div class="divider">o</div>
+			<p class="text-center mb-0" style="font-size: 0.8rem; color: #888">
+				¿Aún no tienes cuenta?
+				<a class="link fw-semibold" href="{{ url_for('auth.registro_cliente') }}">Créala aquí</a>
+			</p>
+			<p class="security-note">
+				<i class="bi bi-shield-check"></i>
+				Conexión segura · tus datos están protegidos
+			</p>
 		</form>
 	</div>
 </div>
@@ -90,15 +93,26 @@ content %}
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endif %}
 <script>
-	const toggle = document.getElementById('togglePassword');
-	if (toggle) {
-		toggle.addEventListener('click', function () {
-			const password = document.getElementById('password');
-			const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-			password.setAttribute('type', type);
-			this.innerHTML =
-				type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+	(function bindTogglePassword() {
+		const toggle = document.getElementById('togglePassword');
+		const password = document.getElementById('password');
+		if (!toggle || !password) {
+			return;
+		}
+
+		const toggleState = () => {
+			const show = password.type === 'password';
+			password.type = show ? 'text' : 'password';
+			toggle.innerHTML = show ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+		};
+
+		toggle.addEventListener('click', toggleState);
+		toggle.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				toggleState();
+			}
 		});
-	}
+	})();
 </script>
 {% endblock %}

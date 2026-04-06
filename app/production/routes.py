@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
 
-from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy.orm import selectinload
 
 from app.common.security import log_audit_event, require_permission
 from app.common.services import (
@@ -14,17 +15,21 @@ from app.common.services import (
     desactivar_materia_prima,
     finalizar_orden_produccion,
     iniciar_orden_produccion,
+    recalcular_costo_y_precio_sugerido_producto,
 )
 from app.extensions import db
 from app.models import (
     DetalleReceta,
     MateriaPrima,
+    Modulo,
     MovimientoInventarioMP,
     OrdenProduccion,
+    Permiso,
     Producto,
     Receta,
     SolicitudProduccion,
     UnidadMedida,
+    utc_now,
 )
 from app.production import production_bp
 
@@ -41,6 +46,296 @@ def _int(value: str, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+def _decimal_text(value: Decimal | int | float | None, precision: int = 4) -> str:
+    decimal_value = Decimal(str(value or 0))
+    formatted = f"{decimal_value:.{precision}f}"
+    return formatted.rstrip("0").rstrip(".") or "0"
+
+
+def _fecha_texto(value) -> str:
+    if not value:
+        return ""
+    return value.strftime("%d/%m/%Y")
+
+
+def _normalizar_detalles_receta(
+    ids_materia: list[str],
+    cantidades: list[str],
+) -> tuple[list[tuple[int, Decimal]], str | None]:
+    if not ids_materia or not cantidades or len(ids_materia) != len(cantidades):
+        return [], "Debes registrar al menos un ingrediente valido."
+
+    detalles: list[tuple[int, Decimal]] = []
+    materias_vistas: set[int] = set()
+    for id_materia_raw, cantidad_raw in zip(ids_materia, cantidades):
+        id_materia = _int(id_materia_raw, 0)
+        cantidad = _decimal(cantidad_raw, "0")
+        if id_materia <= 0 or cantidad <= 0:
+            continue
+
+        if id_materia in materias_vistas:
+            return [], "No puedes repetir la misma materia prima en una receta."
+
+        materias_vistas.add(id_materia)
+        detalles.append((id_materia, cantidad))
+
+    if not detalles:
+        return [], "Debes registrar al menos un ingrediente con cantidad mayor a cero."
+
+    return detalles, None
+
+
+def _firma_detalles_receta(receta: Receta) -> list[tuple[int, str]]:
+    return sorted(
+        (
+            int(detalle.id_materia_prima),
+            _decimal_text(detalle.cantidad_base),
+        )
+        for detalle in receta.detalles
+    )
+
+
+def _calcular_explosion_receta(
+    receta: Receta, cantidad_producir: Decimal | int
+) -> tuple[list[dict], bool]:
+    cantidad = Decimal(str(cantidad_producir or 0))
+    rendimiento = Decimal(str(receta.rendimiento_base or 0))
+    if cantidad <= 0 or rendimiento <= 0:
+        return [], False
+
+    factor = cantidad / rendimiento
+    filas: list[dict] = []
+    puede_producir = True
+    for detalle in sorted(receta.detalles, key=lambda item: item.id_detalle):
+        materia = detalle.materia_prima
+        cantidad_requerida = Decimal(str(detalle.cantidad_base)) * factor
+        cantidad_disponible = Decimal(str(materia.cantidad_disponible or 0))
+        suficiente = cantidad_disponible >= cantidad_requerida
+        puede_producir = puede_producir and suficiente
+        filas.append(
+            {
+                "id_detalle": detalle.id_detalle,
+                "id_materia_prima": detalle.id_materia_prima,
+                "materia_nombre": materia.nombre,
+                "unidad_base": materia.unidad_base.abreviatura,
+                "cantidad_base": _decimal_text(detalle.cantidad_base),
+                "cantidad_requerida": _decimal_text(cantidad_requerida),
+                "cantidad_disponible": _decimal_text(cantidad_disponible),
+                "suficiente": suficiente,
+            }
+        )
+
+    return filas, puede_producir
+
+
+def _serializar_receta(receta: Receta) -> dict:
+    detalles, puede_producir_base = _calcular_explosion_receta(
+        receta, receta.rendimiento_base
+    )
+    return {
+        "id_receta": receta.id_receta,
+        "id_producto": receta.id_producto,
+        "producto_nombre": receta.producto.nombre if receta.producto else receta.nombre,
+        "nombre": receta.nombre,
+        "descripcion": receta.descripcion or "",
+        "categoria": receta.categoria or "",
+        "unidad_produccion": receta.unidad_produccion or "pieza",
+        "version": receta.version,
+        "rendimiento_base": _decimal_text(receta.rendimiento_base),
+        "activa": bool(receta.activa),
+        "fecha_creacion": _fecha_texto(receta.fecha_creacion),
+        "detalles": detalles,
+        "detalles_count": len(detalles),
+        "puede_producir_base": puede_producir_base,
+    }
+
+
+def _receta_form_payload(receta: Receta) -> dict:
+    return {
+        "id_receta": receta.id_receta,
+        "id_producto": receta.id_producto,
+        "version": receta.version,
+        "nombre": receta.nombre,
+        "descripcion": receta.descripcion or "",
+        "categoria": receta.categoria or "",
+        "unidad_produccion": receta.unidad_produccion or "pieza",
+        "rendimiento_base": _decimal_text(receta.rendimiento_base),
+        "activa": bool(receta.activa),
+        "fecha_creacion": _fecha_texto(receta.fecha_creacion),
+        "detalles": [
+            {
+                "id_materia_prima": detalle.id_materia_prima,
+                "cantidad_base": _decimal_text(detalle.cantidad_base),
+            }
+            for detalle in sorted(receta.detalles, key=lambda item: item.id_detalle)
+        ],
+    }
+
+
+def _receta_historial_payload(recetas: list[Receta]) -> list[dict]:
+    historial: list[dict] = []
+    for receta in sorted(recetas, key=lambda item: item.version, reverse=True):
+        historial.append(
+            {
+                "id_receta": receta.id_receta,
+                "version": receta.version,
+                "activa": bool(receta.activa),
+                "rendimiento_base": _decimal_text(receta.rendimiento_base),
+                "fecha_creacion": _fecha_texto(receta.fecha_creacion),
+                "detalles_count": len(receta.detalles),
+            }
+        )
+    return historial
+
+
+def _decimal_value(value: Decimal | int | float | None) -> Decimal:
+    return Decimal(str(value or 0))
+
+
+def _serializar_explosion_orden(
+    *,
+    receta: Receta,
+    cantidad_producir: int,
+) -> tuple[list[dict], bool, Decimal]:
+    cantidad = _decimal_value(cantidad_producir)
+    rendimiento = _decimal_value(receta.rendimiento_base)
+    if cantidad <= 0 or rendimiento <= 0:
+        return [], False, Decimal("0")
+
+    factor = cantidad / rendimiento
+    filas: list[dict] = []
+    puede_producir = True
+    costo_total = Decimal("0")
+    for detalle in sorted(receta.detalles, key=lambda item: item.id_detalle):
+        materia = detalle.materia_prima
+        if not materia:
+            continue
+        unidad = materia.unidad_base.abreviatura if materia.unidad_base else "u"
+        cantidad_receta = _decimal_value(detalle.cantidad_base)
+        cantidad_necesaria = cantidad_receta * factor
+        merma_pct = _decimal_value(materia.porcentaje_merma)
+        cantidad_real = cantidad_necesaria * (
+            Decimal("1") + (merma_pct / Decimal("100"))
+        )
+        stock_actual = _decimal_value(materia.cantidad_disponible)
+        costo_unitario = _decimal_value(materia.costo_unitario)
+        suficiente = stock_actual >= cantidad_real
+        puede_producir = puede_producir and suficiente
+        costo_total += cantidad_real * costo_unitario
+        filas.append(
+            {
+                "id_materia_prima": materia.id_materia,
+                "materia_nombre": materia.nombre,
+                "unidad": unidad,
+                "cantidad_receta": float(cantidad_receta),
+                "cantidad_necesaria": float(cantidad_necesaria),
+                "merma_pct": float(merma_pct),
+                "cantidad_real": float(cantidad_real),
+                "stock_actual": float(stock_actual),
+                "suficiente": suficiente,
+            }
+        )
+
+    return filas, puede_producir, costo_total
+
+
+def _serializar_orden_produccion(orden: OrdenProduccion) -> dict:
+    detalles: list[dict] = []
+    costo_estimado = Decimal(str(orden.costo_total or 0))
+    tipo_detalle = "CONSUMIDO"
+    puede_producir = True
+
+    if orden.detalles_consumo:
+        for detalle in sorted(orden.detalles_consumo, key=lambda item: item.id_detalle):
+            materia = detalle.materia_prima
+            unidad = "u"
+            stock_actual = Decimal("0")
+            materia_nombre = "Materia prima"
+            if materia:
+                unidad = materia.unidad_base.abreviatura if materia.unidad_base else "u"
+                stock_actual = _decimal_value(materia.cantidad_disponible)
+                materia_nombre = materia.nombre
+
+            cantidad_real = _decimal_value(detalle.cantidad_real_descontada)
+            suficiente = stock_actual >= cantidad_real
+            puede_producir = puede_producir and suficiente
+            detalles.append(
+                {
+                    "id_materia_prima": detalle.id_materia_prima,
+                    "materia_nombre": materia_nombre,
+                    "unidad": unidad,
+                    "cantidad_receta": float(_decimal_value(detalle.cantidad_receta)),
+                    "cantidad_necesaria": float(
+                        _decimal_value(detalle.cantidad_necesaria)
+                    ),
+                    "merma_pct": float(_decimal_value(detalle.porcentaje_merma)),
+                    "cantidad_real": float(cantidad_real),
+                    "stock_actual": float(stock_actual),
+                    "suficiente": suficiente,
+                }
+            )
+    else:
+        tipo_detalle = "ESTIMADO"
+        if orden.receta:
+            detalles, puede_producir, costo_estimado = _serializar_explosion_orden(
+                receta=orden.receta,
+                cantidad_producir=int(orden.cantidad_producir or 0),
+            )
+        else:
+            puede_producir = False
+
+    return {
+        "id_orden": orden.id_orden,
+        "folio": f"ORD-{orden.id_orden:03d}",
+        "id_producto": orden.id_producto,
+        "producto_nombre": orden.producto.nombre if orden.producto else "Producto",
+        "id_receta": orden.id_receta,
+        "receta_version": orden.receta.version if orden.receta else 0,
+        "cantidad_producir": int(orden.cantidad_producir or 0),
+        "estado": orden.estado,
+        "costo_total": float(_decimal_value(orden.costo_total)),
+        "costo_estimado": float(costo_estimado),
+        "fecha_inicio": orden.fecha_inicio.isoformat() if orden.fecha_inicio else "",
+        "fecha_fin": orden.fecha_fin.isoformat() if orden.fecha_fin else "",
+        "fecha_inicio_texto": _fecha_texto(orden.fecha_inicio),
+        "fecha_fin_texto": _fecha_texto(orden.fecha_fin),
+        "observaciones": orden.observaciones or "",
+        "puede_producir": puede_producir,
+        "tipo_detalle": tipo_detalle,
+        "detalles": detalles,
+    }
+
+
+def _serializar_receta_activa_para_orden(receta: Receta) -> dict:
+    detalles: list[dict] = []
+    for detalle in sorted(receta.detalles, key=lambda item: item.id_detalle):
+        materia = detalle.materia_prima
+        if not materia:
+            continue
+        unidad = materia.unidad_base.abreviatura if materia.unidad_base else "u"
+        detalles.append(
+            {
+                "id_materia_prima": materia.id_materia,
+                "materia_nombre": materia.nombre,
+                "unidad": unidad,
+                "cantidad_receta": float(_decimal_value(detalle.cantidad_base)),
+                "merma_pct": float(_decimal_value(materia.porcentaje_merma)),
+                "stock_actual": float(_decimal_value(materia.cantidad_disponible)),
+                "costo_unitario": float(_decimal_value(materia.costo_unitario)),
+            }
+        )
+
+    return {
+        "id_receta": receta.id_receta,
+        "id_producto": receta.id_producto,
+        "nombre": receta.nombre,
+        "version": receta.version,
+        "rendimiento_base": float(_decimal_value(receta.rendimiento_base)),
+        "unidad_produccion": receta.unidad_produccion or "pieza",
+        "detalles": detalles,
+    }
 
 
 @production_bp.route("/inventario-mp", methods=["GET", "POST"])
@@ -305,117 +600,218 @@ def api_movimientos_inventario():
 @require_permission("Recetas", "leer")
 def recetas():
     if request.method == "POST":
-        nombre = (request.form.get("nombre") or "").strip()
+        action = (request.form.get("action") or "crear").strip().lower()
+
+        modulo = Modulo.query.filter_by(nombre="Recetas").first()
+        permiso = (
+            Permiso.query.filter_by(
+                id_rol=current_user.id_rol,
+                id_modulo=modulo.id_modulo if modulo else None,
+            ).first()
+            if modulo
+            else None
+        )
+        if action == "crear" and (not permiso or not permiso.escritura):
+            abort(403)
+        if action == "editar" and (not permiso or not permiso.actualizacion):
+            abort(403)
+
         id_producto = _int(request.form.get("id_producto", "0"))
-        rendimiento = _decimal(request.form.get("rendimiento", "0"))
-        unidad_produccion = (request.form.get("unidad_produccion") or "pieza").strip()
+        rendimiento = _decimal(
+            request.form.get("rendimiento_base")
+            or request.form.get("rendimiento")
+            or "0"
+        )
+        estado_receta = (request.form.get("estado") or "ACTIVA").strip().upper()
+        activa = estado_receta != "INACTIVA"
         categoria = (request.form.get("categoria") or "").strip() or None
         descripcion = (request.form.get("descripcion") or "").strip() or None
+        id_receta_base = _int(request.form.get("id_receta_base", "0"))
 
         ids_materia = request.form.getlist("id_materia_prima[]")
         cantidades = request.form.getlist("cantidad_receta[]")
 
-        if not nombre or rendimiento <= 0:
-            flash("Nombre y rendimiento base son obligatorios.", "warning")
+        detalles_normalizados, error_detalles = _normalizar_detalles_receta(
+            ids_materia,
+            cantidades,
+        )
+        if error_detalles:
+            flash(error_detalles, "warning")
+            return redirect(url_for("production.recetas"))
+
+        if rendimiento <= 0:
+            flash("El rendimiento base debe ser mayor a cero.", "warning")
             return redirect(url_for("production.recetas"))
 
         producto = Producto.query.get(id_producto)
         if not producto or not producto.activo:
-            flash("Debes seleccionar un producto activo para la receta.", "warning")
-            return redirect(url_for("production.recetas"))
-
-        if nombre.strip().lower() != producto.nombre.strip().lower():
             flash(
-                "El nombre de la receta debe coincidir con el producto seleccionado.",
+                "Debes seleccionar un producto activo para la receta.",
                 "warning",
             )
             return redirect(url_for("production.recetas"))
 
-        if not ids_materia or not cantidades or len(ids_materia) != len(cantidades):
-            flash("Debes registrar al menos un ingrediente valido.", "warning")
+        if action not in {"crear", "editar"}:
+            flash("Accion de receta no valida.", "warning")
+            return redirect(url_for("production.recetas"))
+
+        if action == "editar" and id_receta_base <= 0:
+            flash("Debes seleccionar una receta base para editar.", "warning")
             return redirect(url_for("production.recetas"))
 
         version_actual = (
-            Receta.query.filter(db.func.lower(Receta.nombre) == nombre.lower())
+            Receta.query.filter_by(id_producto=producto.id_producto)
             .order_by(Receta.version.desc())
             .first()
         )
         next_version = 1 if not version_actual else version_actual.version + 1
 
-        receta = Receta(
-            nombre=nombre,
-            descripcion=descripcion,
-            unidad_produccion=unidad_produccion or "pieza",
-            categoria=categoria,
-            version=next_version,
-            rendimiento_base=rendimiento,
-            activa=True,
-        )
-        db.session.add(receta)
-        db.session.flush()
-
-        detalles_validos = 0
-        for id_materia_raw, cantidad_raw in zip(ids_materia, cantidades):
-            id_materia = _int(id_materia_raw, 0)
-            cantidad = _decimal(cantidad_raw, "0")
-            if id_materia <= 0 or cantidad <= 0:
-                continue
-
-            materia = MateriaPrima.query.get(id_materia)
-            if not materia or not materia.activa:
-                db.session.rollback()
+        receta_base = None
+        if id_receta_base > 0:
+            receta_base = Receta.query.get(id_receta_base)
+            if not receta_base or receta_base.id_producto != producto.id_producto:
                 flash(
-                    "No se puede crear la receta con materias primas inexistentes o inactivas.",
+                    "La receta base seleccionada no corresponde al producto.", "warning"
+                )
+                return redirect(url_for("production.recetas"))
+
+        if action == "editar" and receta_base:
+            firma_nueva = sorted(
+                (id_materia, _decimal_text(cantidad))
+                for id_materia, cantidad in detalles_normalizados
+            )
+            firma_actual = _firma_detalles_receta(receta_base)
+            rendimiento_actual = Decimal(str(receta_base.rendimiento_base or 0))
+            if firma_nueva == firma_actual and rendimiento == rendimiento_actual:
+                flash(
+                    "No se detectaron cambios significativos en ingredientes o rendimiento para crear una nueva version.",
                     "warning",
                 )
                 return redirect(url_for("production.recetas"))
 
-            db.session.add(
-                DetalleReceta(
-                    id_receta=receta.id_receta,
-                    id_materia_prima=id_materia,
-                    cantidad_base=cantidad,
-                )
-            )
-            detalles_validos += 1
+        receta = Receta()
+        receta.id_producto = producto.id_producto
+        receta.nombre = producto.nombre.strip()
+        receta.descripcion = descripcion
+        receta.unidad_produccion = (
+            request.form.get("unidad_produccion") or producto.unidad_venta or "pieza"
+        ).strip()
+        receta.categoria = categoria
+        receta.version = next_version
+        receta.rendimiento_base = rendimiento
+        receta.activa = activa
+        db.session.add(receta)
+        db.session.flush()
 
-        receta_ids_previas = [producto.id_receta] if producto.id_receta else []
-        if receta_ids_previas:
-            Receta.query.filter(Receta.id_receta.in_(receta_ids_previas)).update(
-                {"activa": False},
-                synchronize_session=False,
-            )
+        detalles_validos = 0
+        for id_materia, cantidad in detalles_normalizados:
+            materia = MateriaPrima.query.get(id_materia)
+            if not materia or not materia.activa:
+                db.session.rollback()
+                flash(
+                    "No se puede guardar la receta con materias primas inexistentes o inactivas.",
+                    "warning",
+                )
+                return redirect(url_for("production.recetas"))
+
+            detalle = DetalleReceta()
+            detalle.id_receta = receta.id_receta
+            detalle.id_materia_prima = id_materia
+            detalle.cantidad_base = cantidad
+            db.session.add(detalle)
+            detalles_validos += 1
 
         if detalles_validos == 0:
             db.session.rollback()
-            flash(
-                "Debes registrar al menos un ingrediente " "con cantidad mayor a cero.",
-                "warning",
-            )
+            flash("Debes registrar al menos un ingrediente valido.", "warning")
             return redirect(url_for("production.recetas"))
 
-        producto.id_receta = receta.id_receta
+        if receta.activa:
+            Receta.query.filter(
+                Receta.id_producto == producto.id_producto,
+                Receta.id_receta != receta.id_receta,
+                Receta.activa.is_(True),
+            ).update({"activa": False}, synchronize_session=False)
+            producto.id_receta = receta.id_receta
+            try:
+                recalcular_costo_y_precio_sugerido_producto(
+                    id_producto=producto.id_producto
+                )
+            except ValueError:
+                producto.costo_produccion_actual = Decimal("0")
+                producto.precio_sugerido = None
+                producto.fecha_costo_actualizado = None
+        elif producto.id_receta == receta.id_receta:
+            producto.id_receta = None
+            producto.costo_produccion_actual = Decimal("0")
+            producto.precio_sugerido = None
+            producto.fecha_costo_actualizado = None
+
         db.session.commit()
+        nombre_evento = "RECETA_EDITADA" if action == "editar" else "RECETA_CREADA"
         log_audit_event(
-            "RECETA_CREADA",
-            f"id_receta={receta.id_receta}; id_producto={producto.id_producto}; nombre={receta.nombre}; version={receta.version}",
+            nombre_evento,
+            (
+                f"id_receta={receta.id_receta}; id_producto={producto.id_producto}; "
+                f"nombre={receta.nombre}; version={receta.version}; activa={receta.activa}"
+            ),
         )
-        flash("Receta creada con ingredientes y nueva version.", "success")
+        flash(
+            f"Receta version {receta.version} guardada correctamente.",
+            "success",
+        )
         return redirect(url_for("production.recetas"))
 
-    data = Receta.query.order_by(Receta.id_receta.desc()).all()
+    recetas_query = Receta.query.order_by(Receta.id_receta.desc()).all()
+    recetas_por_producto: dict[int, list[Receta]] = {}
+    recetas_data: list[dict] = []
+    for receta in recetas_query:
+        recetas_por_producto.setdefault(receta.id_producto, []).append(receta)
+        recetas_data.append(_serializar_receta(receta))
+
+    recetas_por_producto_payload = {
+        id_producto: _receta_historial_payload(recetas_producto)
+        for id_producto, recetas_producto in recetas_por_producto.items()
+    }
+
     materias = (
         MateriaPrima.query.filter_by(activa=True)
         .order_by(MateriaPrima.nombre.asc())
         .all()
     )
+    productos = (
+        Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
+    )
+    productos_payload = []
+    for producto in productos:
+        historial = recetas_por_producto.get(producto.id_producto, [])
+        receta_activa = next((item for item in historial if item.activa), None)
+        siguiente_version = (
+            1 if not historial else max(r.version for r in historial) + 1
+        )
+        productos_payload.append(
+            {
+                "id_producto": producto.id_producto,
+                "nombre": producto.nombre,
+                "precio_venta": _decimal_text(producto.precio_venta, precision=2),
+                "unidad_venta": producto.unidad_venta,
+                "cantidad_disponible": int(producto.cantidad_disponible or 0),
+                "recetas_count": len(historial),
+                "receta_activa_id": receta_activa.id_receta if receta_activa else None,
+                "receta_activa_version": (
+                    receta_activa.version if receta_activa else None
+                ),
+                "siguiente_version": siguiente_version,
+                "tiene_receta": bool(historial),
+            }
+        )
+
     return render_template(
         "production/recetas.html",
-        recetas=data,
+        recetas=recetas_data,
+        recetas_por_producto=recetas_por_producto_payload,
         materias=materias,
-        productos=Producto.query.filter_by(activo=True)
-        .order_by(Producto.nombre.asc())
-        .all(),
+        productos=productos_payload,
         unidades=UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all(),
     )
 
@@ -425,16 +821,53 @@ def recetas():
 @require_permission("Recetas", "editar")
 def toggle_receta(id_receta: int):
     receta = Receta.query.get_or_404(id_receta)
-    if not receta.activa:
+    producto = Producto.query.get(receta.id_producto)
+    if not producto:
+        flash("No se encontro el producto asociado a la receta.", "warning")
+        return redirect(url_for("production.recetas"))
+
+    if receta.activa:
+        receta.activa = False
+        producto.id_receta = (
+            Receta.query.filter(
+                Receta.id_producto == producto.id_producto,
+                Receta.id_receta != receta.id_receta,
+                Receta.activa.is_(True),
+            )
+            .order_by(Receta.version.desc())
+            .with_entities(Receta.id_receta)
+            .scalar()
+        )
+    else:
         Receta.query.filter(
-            db.func.lower(Receta.nombre) == receta.nombre.lower(),
+            Receta.id_producto == producto.id_producto,
             Receta.activa.is_(True),
+            Receta.id_receta != receta.id_receta,
         ).update({"activa": False}, synchronize_session=False)
-    receta.activa = not receta.activa
+        receta.activa = True
+        producto.id_receta = receta.id_receta
+
+    if producto.id_receta:
+        try:
+            recalcular_costo_y_precio_sugerido_producto(
+                id_producto=producto.id_producto
+            )
+        except ValueError:
+            producto.costo_produccion_actual = Decimal("0")
+            producto.precio_sugerido = None
+            producto.fecha_costo_actualizado = None
+    else:
+        producto.costo_produccion_actual = Decimal("0")
+        producto.precio_sugerido = None
+        producto.fecha_costo_actualizado = None
+
     db.session.commit()
     log_audit_event(
         "RECETA_TOGGLE",
-        f"id_receta={receta.id_receta}; nombre={receta.nombre}; activa={receta.activa}",
+        (
+            f"id_receta={receta.id_receta}; id_producto={producto.id_producto}; "
+            f"nombre={receta.nombre}; activa={receta.activa}"
+        ),
     )
     flash("Estado de receta actualizado.", "success")
     return redirect(url_for("production.recetas"))
@@ -455,23 +888,30 @@ def ordenes():
 
         action = request.form.get("action", "")
         if action == "crear":
-            id_solicitud = _int(request.form.get("id_solicitud", "0"))
+            id_producto = _int(request.form.get("id_producto", "0"))
             id_receta = _int(request.form.get("id_receta", "0"))
             cantidad = _int(request.form.get("cantidad", "0"))
-            if id_solicitud <= 0 or id_receta <= 0 or cantidad <= 0:
+            id_solicitud = _int(request.form.get("id_solicitud", "0"))
+            if id_producto <= 0 or id_receta <= 0 or cantidad <= 0:
                 flash("Datos invalidos para crear la orden.", "warning")
                 return redirect(url_for("production.ordenes"))
 
             try:
                 orden = crear_orden_produccion(
-                    id_solicitud=id_solicitud,
                     id_receta=id_receta,
                     cantidad=cantidad,
                     id_usuario=current_user.id_usuario,
+                    id_producto=id_producto,
+                    id_solicitud=id_solicitud if id_solicitud > 0 else None,
+                    observaciones=request.form.get("observaciones", ""),
                 )
                 log_audit_event(
                     "ORDEN_PRODUCCION_CREADA",
-                    f"id_orden={orden.id_orden}; id_solicitud={id_solicitud}; id_receta={id_receta}; cantidad={cantidad}",
+                    (
+                        f"id_orden={orden.id_orden}; id_producto={id_producto}; "
+                        f"id_receta={id_receta}; cantidad={cantidad}; "
+                        f"id_solicitud={id_solicitud if id_solicitud > 0 else 'N/A'}"
+                    ),
                 )
                 flash("Orden de produccion creada.", "success")
             except ValueError as exc:
@@ -488,12 +928,16 @@ def ordenes():
             try:
                 iniciar_orden_produccion(
                     id_orden=orden.id_orden,
+                    id_usuario=current_user.id_usuario,
                 )
                 log_audit_event(
                     "ORDEN_PRODUCCION_INICIADA",
                     f"id_orden={orden.id_orden}",
                 )
-                flash("Orden iniciada correctamente.", "success")
+                flash(
+                    "Orden iniciada correctamente. Se descontaron insumos con merma.",
+                    "success",
+                )
             except ValueError as exc:
                 flash(str(exc), "danger")
             return redirect(url_for("production.ordenes"))
@@ -509,7 +953,7 @@ def ordenes():
                     f"id_orden={orden_actualizada.id_orden}; id_producto={orden_actualizada.id_producto}; cantidad={orden_actualizada.cantidad_producir}",
                 )
                 flash(
-                    "Orden finalizada. Se descontaron insumos y se actualizo el stock de producto.",
+                    "Orden finalizada. Se ingreso producto terminado a inventario.",
                     "success",
                 )
             except ValueError as exc:
@@ -529,19 +973,55 @@ def ordenes():
             return redirect(url_for("production.ordenes"))
 
     data = OrdenProduccion.query.order_by(OrdenProduccion.id_orden.desc()).all()
+    ordenes_payload = [_serializar_orden_produccion(orden) for orden in data]
+
     recetas_activas = (
-        Receta.query.filter_by(activa=True).order_by(Receta.id_receta.desc()).all()
+        Receta.query.filter_by(activa=True)
+        .order_by(Receta.id_producto.asc(), Receta.version.desc())
+        .all()
     )
+    recetas_payload = [
+        _serializar_receta_activa_para_orden(receta) for receta in recetas_activas
+    ]
+
+    productos_con_receta_activa = []
+    for receta in recetas_activas:
+        if not receta.producto or not receta.producto.activo:
+            continue
+        productos_con_receta_activa.append(
+            {
+                "id_producto": receta.producto.id_producto,
+                "nombre": receta.producto.nombre,
+                "receta_activa_id": receta.id_receta,
+                "receta_version": receta.version,
+                "rendimiento_base": float(_decimal_value(receta.rendimiento_base)),
+                "unidad_produccion": receta.unidad_produccion or "pieza",
+            }
+        )
+
+    productos_unicos: dict[int, dict] = {
+        producto["id_producto"]: producto for producto in productos_con_receta_activa
+    }
+
     solicitudes_aprobadas = (
         SolicitudProduccion.query.filter_by(estado="APROBADA")
         .order_by(SolicitudProduccion.id_solicitud.desc())
         .all()
     )
+    id_solicitud_preseleccionada = _int(request.args.get("id_solicitud", "0"), 0)
+
+    can_manage = role_name in {"Administrador", "Produccion"}
     return render_template(
         "production/ordenes.html",
         ordenes=data,
+        ordenes_payload=ordenes_payload,
         recetas=recetas_activas,
+        recetas_payload=recetas_payload,
+        productos_con_receta=list(productos_unicos.values()),
         solicitudes=solicitudes_aprobadas,
+        id_solicitud_preseleccionada=id_solicitud_preseleccionada,
+        can_manage=can_manage,
+        is_readonly=role_name == "Ventas",
     )
 
 
@@ -557,7 +1037,12 @@ def solicitudes():
     if request.method == "POST":
         id_solicitud = _int(request.form.get("id_solicitud", "0"))
         estado = request.form.get("estado", "PENDIENTE").strip().upper()
-        solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)
+        solicitud = SolicitudProduccion.query.options(
+            selectinload(SolicitudProduccion.producto),
+            selectinload(SolicitudProduccion.usuario_solicita),
+            selectinload(SolicitudProduccion.usuario_resuelve),
+            selectinload(SolicitudProduccion.ordenes),
+        ).get_or_404(id_solicitud)
         if solicitud.estado != "PENDIENTE":
             flash("Solo se pueden resolver solicitudes pendientes.", "warning")
             return redirect(url_for("production.solicitudes"))
@@ -568,7 +1053,10 @@ def solicitudes():
 
         solicitud.estado = estado
         solicitud.id_usuario_resuelve = current_user.id_usuario
-        solicitud.observaciones = request.form.get("observaciones", "").strip()
+        solicitud.fecha_resolucion = utc_now()
+        solicitud.observaciones_resolucion = (
+            request.form.get("observaciones_resolucion", "").strip() or None
+        )
         db.session.commit()
         log_audit_event(
             "SOLICITUD_PRODUCCION_RESUELTA",
@@ -577,7 +1065,43 @@ def solicitudes():
         flash("Solicitud actualizada.", "success")
         return redirect(url_for("production.solicitudes"))
 
-    data = SolicitudProduccion.query.order_by(
-        SolicitudProduccion.id_solicitud.desc()
-    ).all()
-    return render_template("production/solicitudes.html", solicitudes=data)
+    estado_filtro = (request.args.get("estado") or "TODOS").strip().upper()
+    busqueda = (request.args.get("q") or "").strip()
+
+    solicitudes_query = SolicitudProduccion.query.options(
+        selectinload(SolicitudProduccion.producto),
+        selectinload(SolicitudProduccion.usuario_solicita),
+        selectinload(SolicitudProduccion.usuario_resuelve),
+        selectinload(SolicitudProduccion.ordenes),
+    )
+    if estado_filtro in {"PENDIENTE", "APROBADA", "RECHAZADA"}:
+        solicitudes_query = solicitudes_query.filter(
+            SolicitudProduccion.estado == estado_filtro
+        )
+
+    if busqueda:
+        term = f"%{busqueda}%"
+        solicitudes_query = solicitudes_query.join(Producto).filter(
+            db.or_(
+                Producto.nombre.ilike(term),
+                db.cast(SolicitudProduccion.id_solicitud, db.String).ilike(term),
+            )
+        )
+
+    data = solicitudes_query.order_by(SolicitudProduccion.id_solicitud.desc()).all()
+    recetas_activas = (
+        Receta.query.filter_by(activa=True)
+        .order_by(Receta.id_producto.asc(), Receta.version.desc())
+        .all()
+    )
+    recetas_payload = [
+        _serializar_receta_activa_para_orden(receta) for receta in recetas_activas
+    ]
+    return render_template(
+        "production/solicitudes.html",
+        solicitudes=data,
+        estado_filtro=estado_filtro,
+        busqueda=busqueda,
+        recetas_payload=recetas_payload,
+        role_name=role_name,
+    )

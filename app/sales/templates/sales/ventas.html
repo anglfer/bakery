@@ -1,79 +1,469 @@
-{% extends "base_template.html" %} {% block title %}Ventas{% endblock %} {% block content %}
-<section class="section">
-	<div class="ops-hero">
-		<p class="ops-meta mb-1">Panel de ventas</p>
-		<h2 class="ops-hero-title">Módulo de ventas</h2>
-		<p class="ops-hero-text">Registra ventas de mostrador y consulta el historial del día.</p>
+{% extends "base_template.html" %}
+{% block title %}Ventas{% endblock %}
+
+{% block page_title %}Comercial — Ventas{% endblock %}
+
+{% block content %}
+<section class="section sales-module-shell" data-tab="{{ tab }}">
+	<div class="ops-meta mb-2">Dashboard / Comercial / Ventas</div>
+	<h2 class="ops-hero-title mb-3">Módulo de Ventas</h2>
+
+	<div class="sales-tabs mb-3">
+		<a class="sales-tab {{ 'active' if tab == 'nueva' else '' }}" href="{{ url_for('sales.ventas', tab='nueva') }}">
+			<i class="bi bi-cart-plus"></i> Nueva venta
+		</a>
+		<a class="sales-tab {{ 'active' if tab == 'historial' else '' }}" href="{{ url_for('sales.ventas', tab='historial') }}">
+			<i class="bi bi-list-ul"></i> Historial
+		</a>
+		<a class="sales-tab {{ 'active' if tab == 'salidas' else '' }}" href="{{ url_for('sales.ventas', tab='salidas') }}">
+			<i class="bi bi-arrow-up-circle"></i> Salidas
+		</a>
+		<a class="sales-tab {{ 'active' if tab == 'corte' else '' }}" href="{{ url_for('sales.ventas', tab='corte') }}">
+			<i class="bi bi-clipboard-data"></i> Corte diario
+		</a>
 	</div>
 
-	<div class="ops-card">
-		<h3 class="ops-card-title">Registrar venta</h3>
-		<form method="post" class="ops-grid">
-			<select name="id_producto" required>
-				<option value="">Producto</option>
+	{% if tab == 'nueva' %}
+	<div class="sales-grid-new">
+		<div class="ops-card mb-0">
+			<div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+				<h3 class="ops-card-title mb-0"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Productos</h3>
+				<input id="salesSearch" type="text" class="sales-search" placeholder="Buscar producto..." />
+			</div>
+			<div id="salesCatalog" class="sales-catalog-grid">
 				{% for p in productos %}
-				<option value="{{ p.id_producto }}">{{ p.nombre }} ({{ p.cantidad_libre }})</option>
+				{% set nombre_l = (p.nombre or '')|lower %}
+				{% set emoji = '🧁' %}
+				{% if 'pastel' in nombre_l %}
+					{% set emoji = '🎂' %}
+				{% elif 'pay' in nombre_l or 'tarta' in nombre_l %}
+					{% set emoji = '🥧' %}
+				{% elif 'muffin' in nombre_l %}
+					{% set emoji = '🧁' %}
+				{% elif 'brownie' in nombre_l %}
+					{% set emoji = '🍫' %}
+				{% elif 'galleta' in nombre_l %}
+					{% set emoji = '🍪' %}
+				{% elif 'cuerno' in nombre_l or 'croissant' in nombre_l %}
+					{% set emoji = '🥐' %}
+				{% endif %}
+				<button
+					type="button"
+					class="sales-product-card"
+					data-id="{{ p.id_producto }}"
+					data-nombre="{{ p.nombre }}"
+					data-precio="{{ '%.2f'|format(p.precio_venta) }}"
+					data-stock="{{ p.cantidad_libre }}"
+					title="Agregar {{ p.nombre }}">
+					<div class="sales-product-emoji">{{ emoji }}</div>
+					<div class="sales-product-name">{{ p.nombre }}</div>
+					<div class="sales-product-price">${{ '%.2f'|format(p.precio_venta) }}</div>
+					<div class="sales-product-stock">{{ p.cantidad_libre }} en stock</div>
+				</button>
+				{% else %}
+				<div class="sales-empty">No hay productos disponibles para venta.</div>
 				{% endfor %}
-			</select>
-			<input type="number" name="cantidad" min="1" value="1" required />
-			<select name="tipo_pago" required>
-				<option value="EFECTIVO">Efectivo</option>
-				<option value="TARJETA">Tarjeta</option>
-			</select>
-			<label class="form-check d-flex align-items-center gap-2">
-				<input class="form-check-input" type="checkbox" name="requiere_ticket" />
-				<span class="small text-secondary">Ticket (si el cliente lo solicita)</span>
-			</label>
-			<button type="submit">Registrar venta</button>
-		</form>
-	</div>
+			</div>
+		</div>
 
+		<div class="ops-card mb-0">
+			<h3 class="ops-card-title"><i class="bi bi-receipt-cutoff me-1"></i> Venta actual</h3>
+			<div id="cartItems" class="sales-cart-items">
+				<p class="sales-empty mb-0">
+					<i class="bi bi-cart-x d-block sales-empty-icon"></i>
+					Sin productos.<br />Selecciona del catálogo.
+				</p>
+			</div>
+
+			<form id="salesForm" method="post" class="mt-2">
+				<input type="hidden" name="action" value="registrar_venta" />
+				<input type="hidden" id="detallesJson" name="detalles_json" value="[]" />
+
+				<div class="sales-pay-switch mb-2">
+					<label class="sales-pay-option">
+						<input type="radio" name="tipo_pago" value="EFECTIVO" checked />
+						<span><i class="bi bi-cash-coin me-1"></i> Efectivo</span>
+					</label>
+					<label class="sales-pay-option">
+						<input type="radio" name="tipo_pago" value="TARJETA" />
+						<span><i class="bi bi-credit-card me-1"></i> Tarjeta</span>
+					</label>
+				</div>
+
+				<label class="small d-flex align-items-center gap-2 mb-2">
+					<input type="checkbox" name="requiere_ticket" />
+					<span>El cliente requiere ticket</span>
+				</label>
+
+				<div class="sales-cart-total mb-2">
+					<span>Total</span>
+					<strong id="cartTotal">$0.00</strong>
+				</div>
+
+				<button type="submit" id="btnCobrar" class="w-100" disabled>
+					<i class="bi bi-bag-check me-1"></i> Cobrar
+				</button>
+			</form>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if tab == 'historial' %}
 	<div class="ops-card">
-		<h3 class="ops-card-title">Historial de ventas</h3>
+		<form method="get" class="ops-toolbar">
+			<input type="hidden" name="tab" value="historial" />
+			<div class="ops-input-wrap">
+				<i class="bi bi-search"></i>
+				<input name="q" value="{{ filtros.q }}" placeholder="Buscar venta..." />
+			</div>
+			<select name="pago">
+				<option value="TODOS" {{ 'selected' if filtros.pago == 'TODOS' else '' }}>Todos</option>
+				<option value="EFECTIVO" {{ 'selected' if filtros.pago == 'EFECTIVO' else '' }}>Efectivo</option>
+				<option value="TARJETA" {{ 'selected' if filtros.pago == 'TARJETA' else '' }}>Tarjeta</option>
+			</select>
+			<select name="estado">
+				<option value="TODOS" {{ 'selected' if filtros.estado == 'TODOS' else '' }}>Todos</option>
+				<option value="CONFIRMADO" {{ 'selected' if filtros.estado == 'CONFIRMADO' else '' }}>Confirmada</option>
+				<option value="CANCELADO" {{ 'selected' if filtros.estado == 'CANCELADO' else '' }}>Cancelada</option>
+			</select>
+			<button type="submit" class="btn-soft-primary">Filtrar</button>
+		</form>
+
 		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
+			<table class="table align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>Fecha</th>
+						<th>Productos</th>
 						<th>Total</th>
-						<th>Estado</th>
-						<th>Tipo pago</th>
+						<th>Pago</th>
 						<th>Ticket</th>
-						<th>Detalle</th>
+						<th>Estado</th>
+						<th>Fecha</th>
+						<th>Cajero</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for v in ventas %}
+					{% for venta in ventas %}
+					{% set row_id = 'venta-detalle-' ~ venta.id_venta %}
 					<tr>
-						<td>{{ v.id_venta }}</td>
-						<td>{{ v.fecha.strftime('%Y-%m-%d') }}</td>
-						<td>${{ '%.2f'|format(v.total) }}</td>
+						<td>V-{{ '%03d'|format(venta.id_venta) }}</td>
 						<td>
-							<span class="ops-chip neutral">{{ v.estado }}</span>
+							{% for d in venta.detalles %}
+							<div class="small">{{ d.producto.nombre if d.producto else 'Producto' }}{% if not loop.last %}, {% endif %}</div>
+							{% endfor %}
 						</td>
-						<td><span class="ops-chip">{{ v.tipo_pago }}</span></td>
+						<td><strong>${{ '%.2f'|format(venta.total) }}</strong></td>
 						<td>
-							<span class="ops-chip {{ 'success' if v.requiere_ticket else 'neutral' }}">
-								{{ 'Sí' if v.requiere_ticket else 'No' }}
+							<span class="ops-chip {{ 'warning' if venta.tipo_pago == 'EFECTIVO' else 'neutral' }}">
+								{{ venta.tipo_pago|lower }}
 							</span>
 						</td>
 						<td>
-							{% for d in v.detalles %}
-							<div>{{ d.producto.nombre }} × {{ d.cantidad }}</div>
+							{% set t = tickets_por_venta.get(venta.id_venta) %}
+							{% if t %}
+								<span class="ops-chip success">{{ t.folio }}</span>
 							{% else %}
-							<div>Sin detalle</div>
-							{% endfor %}
+								<span class="ops-chip neutral">—</span>
+							{% endif %}
+						</td>
+						<td>
+							<span class="ops-chip {{ 'danger' if venta.estado == 'CANCELADO' else 'success' }}">
+								{{ venta.estado|lower }}
+							</span>
+						</td>
+						<td>{{ venta.fecha.strftime('%Y-%m-%d') }}</td>
+						<td>{{ venta.usuario_cliente.username if venta.usuario_cliente else '—' }}</td>
+						<td>
+							<div class="d-flex gap-1 flex-wrap">
+								<button
+									type="button"
+									class="btn-soft-secondary btn-sm"
+									data-bs-toggle="collapse"
+									data-bs-target="#{{ row_id }}"
+									aria-expanded="false"
+									aria-controls="{{ row_id }}">
+									<i class="bi bi-eye me-1"></i> Ver
+								</button>
+								{% if venta.estado == 'CONFIRMADO' %}
+								<form method="post" onsubmit="return confirm('¿Cancelar venta y devolver stock?');">
+									<input type="hidden" name="action" value="cancelar_venta" />
+									<input type="hidden" name="id_venta" value="{{ venta.id_venta }}" />
+									<button type="submit" class="btn-soft-danger btn-sm">Cancelar</button>
+								</form>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+					<tr class="collapse" id="{{ row_id }}">
+						<td colspan="9" class="sales-detail-row">
+							<div class="sales-detail-grid">
+								{% for d in venta.detalles %}
+								<div class="sales-detail-item">
+									<div class="fw-semibold">{{ d.producto.nombre if d.producto else 'Producto' }}</div>
+									<div class="small text-muted">Cantidad: {{ d.cantidad }}</div>
+									<div class="small text-muted">Precio unitario: ${{ '%.2f'|format(d.precio_unitario) }}</div>
+									<div class="small text-muted">Subtotal: ${{ '%.2f'|format(d.subtotal) }}</div>
+								</div>
+								{% endfor %}
+							</div>
 						</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="7">No hay ventas registradas.</td>
+						<td colspan="9" class="text-center py-4 text-muted">No hay ventas para el filtro seleccionado.</td>
 					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
 		</div>
 	</div>
+	{% endif %}
+
+	{% if tab == 'salidas' %}
+	<div class="sales-grid-salidas">
+		<div class="ops-card mb-0">
+			<h3 class="ops-card-title"><i class="bi bi-cash-stack me-1"></i> Nueva salida de efectivo</h3>
+			<form method="post" class="ops-grid">
+				<input type="hidden" name="action" value="registrar_salida" />
+				<input type="hidden" name="referencia_tipo" value="MANUAL" />
+				<div>
+					<label for="salidaConcepto">Concepto *</label>
+					<input id="salidaConcepto" name="concepto" placeholder="Ej. Pago proveedor, limpieza..." required />
+				</div>
+				<div>
+					<label for="salidaMonto">Monto *</label>
+					<input id="salidaMonto" type="number" min="0.01" step="0.01" name="monto" placeholder="$ 0.00" required />
+				</div>
+				<div>
+					<label for="salidaTipo">Tipo *</label>
+					<select id="salidaTipo" name="tipo">
+						<option value="GASTO_OPERATIVO">Gasto operativo</option>
+						<option value="COMPRA_MATERIA_PRIMA">Compra MP</option>
+						<option value="PAGO_PROVEEDOR">Pago proveedor</option>
+					</select>
+				</div>
+				<div class="sales-field-optional">
+					<label for="salidaReferencia">Referencia (opcional)</label>
+					<input id="salidaReferencia" name="referencia" placeholder="Ej. SAL-001 / factura" />
+				</div>
+				<button type="submit"><i class="bi bi-plus-lg me-1"></i> Registrar salida</button>
+			</form>
+		</div>
+
+		<div class="ops-card mb-0">
+			<h3 class="ops-card-title">Salidas del día</h3>
+			<div class="sales-salidas-list">
+				{% for salida in salidas_hoy %}
+				<div class="sales-salida-item">
+					<div>
+						<div class="fw-semibold">{{ salida.concepto }}</div>
+						<div class="small text-muted">
+							{{ salida.tipo }}
+							{% if salida.referencia %}· {{ salida.referencia }}{% endif %}
+						</div>
+					</div>
+					<strong class="text-danger">-${{ '%.2f'|format(salida.monto) }}</strong>
+				</div>
+				{% else %}
+				<p class="sales-empty mb-0">Sin salidas registradas hoy.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if tab == 'corte' %}
+	<div class="sales-grid-corte">
+		<div class="ops-card mb-0">
+			<h3 class="ops-card-title">
+				<i class="bi bi-journal-check me-1"></i>
+				Resumen — {{ resumen_dia.fecha.strftime('%A, %d de %B de %Y') }}
+			</h3>
+
+			<div class="sales-corte-lines">
+				<div class="sales-corte-line success"><span><i class="bi bi-check-circle me-1"></i> Total ventas del día</span><strong>${{ '%.2f'|format(resumen_dia.total_ventas) }}</strong></div>
+				<div class="sales-corte-line info"><span><i class="bi bi-cash-coin me-1"></i> Efectivo</span><strong>${{ '%.2f'|format(resumen_dia.total_efectivo) }}</strong></div>
+				<div class="sales-corte-line info"><span><i class="bi bi-credit-card me-1"></i> Tarjeta</span><strong>${{ '%.2f'|format(resumen_dia.total_tarjeta) }}</strong></div>
+				<div class="sales-corte-line danger"><span><i class="bi bi-arrow-up-circle me-1"></i> Salidas de efectivo</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.total_salidas) }}</strong></div>
+				<div class="sales-corte-line warn"><span><i class="bi bi-box-seam me-1"></i> Costo producción (estimado)</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.costo_produccion) }}</strong></div>
+				<div class="sales-corte-line sales-corte-utilidad">
+					<span>Utilidad estimada del día</span>
+					<strong>${{ '%.2f'|format(resumen_dia.utilidad) }}</strong>
+				</div>
+			</div>
+
+			<p class="small text-muted mt-2 mb-3">Transacciones completadas: {{ resumen_dia.transacciones }}</p>
+
+			<div class="d-flex gap-2 flex-wrap">
+				{% if puede_generar_corte %}
+				<form method="post">
+					<input type="hidden" name="action" value="generar_corte" />
+					<button type="submit" class="btn-soft-primary"><i class="bi bi-check2-circle me-1"></i> Generar corte</button>
+				</form>
+				{% endif %}
+				<button type="button" class="btn-soft-secondary" onclick="window.print()">
+					<i class="bi bi-printer me-1"></i> Imprimir
+				</button>
+			</div>
+		</div>
+
+		<div class="ops-card mb-0">
+			<h3 class="ops-card-title">Cortes anteriores</h3>
+			<div class="sales-cortes-list">
+				{% for corte in cortes_previos %}
+				<div class="sales-corte-item">
+					<div>
+						<div class="fw-semibold">{{ corte.fecha.strftime('%Y-%m-%d') }}</div>
+						<div class="small text-muted">
+							${{ '%.2f'|format(corte.total_efectivo or 0) }} · {{ corte.total_transacciones or corte.numero_ventas }} trans.
+							· ↓ ${{ '%.2f'|format(corte.total_salidas or 0) }}
+						</div>
+					</div>
+					<strong>${{ '%.2f'|format(corte.total_ventas) }}</strong>
+				</div>
+				{% else %}
+				<p class="sales-empty mb-0">Sin cortes registrados.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	{% endif %}
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+	(function salesModule() {
+		const shell = document.querySelector('.sales-module-shell');
+		const tab = (shell && shell.dataset && shell.dataset.tab) || '';
+		if (tab !== 'nueva') {
+			return;
+		}
+
+		const catalog = document.getElementById('salesCatalog');
+		const search = document.getElementById('salesSearch');
+		const cartItems = document.getElementById('cartItems');
+		const cartTotal = document.getElementById('cartTotal');
+		const detallesJson = document.getElementById('detallesJson');
+		const btnCobrar = document.getElementById('btnCobrar');
+
+		if (!catalog || !cartItems || !cartTotal || !detallesJson || !btnCobrar) {
+			return;
+		}
+
+		const cart = new Map();
+
+		const money = (value) =>
+			new Intl.NumberFormat('es-MX', {
+				style: 'currency',
+				currency: 'MXN',
+			}).format(value || 0);
+
+		const render = () => {
+			const entries = Array.from(cart.values());
+			if (!entries.length) {
+				cartItems.innerHTML = '<p class="sales-empty mb-0"><i class="bi bi-cart-x d-block sales-empty-icon"></i>Sin productos.<br />Selecciona del catálogo.</p>';
+				cartTotal.textContent = money(0);
+				detallesJson.value = '[]';
+				btnCobrar.disabled = true;
+				return;
+			}
+
+			let total = 0;
+			const html = entries
+				.map((item) => {
+					const subtotal = item.precio * item.cantidad;
+					total += subtotal;
+					return `
+					<div class="sales-cart-item">
+						<div>
+							<div class="fw-semibold">${item.nombre}</div>
+							<div class="small text-muted">${money(item.precio)} c/u</div>
+						</div>
+						<div class="sales-cart-controls">
+							<button type="button" data-op="dec" data-id="${item.id}" aria-label="Disminuir">−</button>
+							<span>${item.cantidad}</span>
+							<button type="button" data-op="inc" data-id="${item.id}" aria-label="Aumentar">+</button>
+							<button type="button" data-op="del" data-id="${item.id}" class="sales-cart-delete" aria-label="Eliminar">×</button>
+						</div>
+					</div>`;
+				})
+				.join('');
+
+			cartItems.innerHTML = html;
+			cartTotal.textContent = money(total);
+			detallesJson.value = JSON.stringify(
+				entries.map((item) => ({ id_producto: item.id, cantidad: item.cantidad }))
+			);
+			btnCobrar.disabled = false;
+		};
+
+		catalog.addEventListener('click', (event) => {
+			const button = event.target.closest('.sales-product-card');
+			if (!button) {
+				return;
+			}
+
+			const id = Number(button.dataset.id || '0');
+			const nombre = button.dataset.nombre || 'Producto';
+			const precio = Number(button.dataset.precio || '0');
+			const stock = Number(button.dataset.stock || '0');
+			const current = cart.get(id);
+
+			if (!current) {
+				if (stock < 1) {
+					return;
+				}
+				cart.set(id, { id, nombre, precio, cantidad: 1, stock });
+				render();
+				return;
+			}
+
+			if (current.cantidad >= current.stock) {
+				return;
+			}
+			current.cantidad += 1;
+			render();
+		});
+
+		cartItems.addEventListener('click', (event) => {
+			const button = event.target.closest('button[data-op]');
+			if (!button) {
+				return;
+			}
+
+			const id = Number(button.dataset.id || '0');
+			const item = cart.get(id);
+			if (!item) {
+				return;
+			}
+
+			if (button.dataset.op === 'inc' && item.cantidad < item.stock) {
+				item.cantidad += 1;
+			}
+			if (button.dataset.op === 'dec') {
+				item.cantidad -= 1;
+			}
+			if (button.dataset.op === 'del' || item.cantidad <= 0) {
+				cart.delete(id);
+			}
+			render();
+		});
+
+		if (search) {
+			search.addEventListener('input', () => {
+				const q = (search.value || '').trim().toLowerCase();
+				catalog.querySelectorAll('.sales-product-card').forEach((card) => {
+					const name = (card.dataset.nombre || '').toLowerCase();
+					card.style.display = name.includes(q) ? '' : 'none';
+				});
+			});
+		}
+
+		render();
+	})();
+</script>
 {% endblock %}

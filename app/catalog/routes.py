@@ -4,13 +4,33 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from flask import flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, logout_user
 
 from app.catalog import catalog_bp
 from app.common.security import log_audit_event, require_permission
-from app.common.services import agregar_producto_a_carrito, crear_pedido_desde_carrito
+from app.common.services import (
+    agregar_producto_a_carrito,
+    crear_pedido_desde_carrito,
+)
 from app.extensions import db
-from app.models import Carrito, DetalleCarrito, Pedido, Producto
+from app.models import Carrito, DetalleCarrito, Pedido, Producto, Usuario
+
+
+def _guard_cliente_activo():
+    usuario = Usuario.query.get(int(current_user.get_id()))
+    if not usuario or not usuario.rol or usuario.rol.nombre != "Cliente":
+        flash("Solo clientes pueden usar el portal de compras.", "warning")
+        return redirect(url_for("catalog.catalogo"))
+
+    if not usuario.activo:
+        logout_user()
+        flash(
+            "Tu cuenta está inactiva. Contacta a soporte para activarla.",
+            "danger",
+        )
+        return redirect(url_for("auth.login"))
+
+    return None
 
 
 @catalog_bp.route("/")
@@ -20,7 +40,10 @@ def home():
             Producto.activo.is_(True),
             (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,
         )
-        .order_by(Producto.cantidad_disponible.desc(), Producto.id_producto.asc())
+        .order_by(
+            Producto.cantidad_disponible.desc(),
+            Producto.id_producto.asc(),
+        )
         .limit(6)
         .all()
     )
@@ -37,16 +60,19 @@ def catalogo():
         .order_by(Producto.nombre.asc())
         .all()
     )
-    return render_template("catalog/catalogo_productos.html", productos=productos)
+    return render_template(
+        "catalog/catalogo_productos.html",
+        productos=productos,
+    )
 
 
 @catalog_bp.post("/carrito/agregar")
 @login_required
 @require_permission("Carrito", "crear")
 def carrito_agregar():
-    if not current_user.rol or current_user.rol.nombre != "Cliente":
-        flash("Solo clientes pueden usar el carrito web.", "warning")
-        return redirect(url_for("catalog.catalogo"))
+    guard = _guard_cliente_activo()
+    if guard:
+        return guard
 
     try:
         id_producto = int(request.form.get("id_producto", "0") or 0)
@@ -63,7 +89,10 @@ def carrito_agregar():
         )
         log_audit_event(
             "CARRITO_AGREGAR",
-            f"id_usuario={current_user.id_usuario}; id_producto={id_producto}; cantidad={cantidad}",
+            (
+                f"id_usuario={current_user.id_usuario}; "
+                f"id_producto={id_producto}; cantidad={cantidad}"
+            ),
         )
         flash("Producto agregado al carrito.", "success")
     except (ValueError, TypeError) as exc:
@@ -75,9 +104,9 @@ def carrito_agregar():
 @login_required
 @require_permission("Carrito", "leer")
 def carrito():
-    if not current_user.rol or current_user.rol.nombre != "Cliente":
-        flash("Solo clientes pueden usar el carrito web.", "warning")
-        return redirect(url_for("catalog.catalogo"))
+    guard = _guard_cliente_activo()
+    if guard:
+        return guard
 
     if request.method == "POST":
         action = (request.form.get("action") or "").strip().lower()
@@ -101,7 +130,10 @@ def carrito():
             db.session.commit()
             log_audit_event(
                 "CARRITO_ELIMINAR",
-                f"id_usuario={current_user.id_usuario}; id_producto={detalle.id_producto}",
+                (
+                    f"id_usuario={current_user.id_usuario}; "
+                    f"id_producto={detalle.id_producto}"
+                ),
             )
             flash("Producto eliminado del carrito.", "info")
             return redirect(url_for("catalog.carrito"))
@@ -129,7 +161,8 @@ def carrito():
             )
             if cantidad > stock_libre:
                 flash(
-                    "La cantidad solicitada excede el inventario disponible.", "danger"
+                    "La cantidad solicitada excede el inventario disponible.",
+                    "danger",
                 )
                 return redirect(url_for("catalog.carrito"))
 
@@ -137,7 +170,11 @@ def carrito():
             db.session.commit()
             log_audit_event(
                 "CARRITO_ACTUALIZAR",
-                f"id_usuario={current_user.id_usuario}; id_producto={detalle.id_producto}; cantidad={cantidad}",
+                (
+                    f"id_usuario={current_user.id_usuario}; "
+                    f"id_producto={detalle.id_producto}; "
+                    f"cantidad={cantidad}"
+                ),
             )
             flash("Carrito actualizado.", "success")
             return redirect(url_for("catalog.carrito"))
@@ -163,19 +200,22 @@ def carrito():
 @login_required
 @require_permission("Pedidos Clientes", "crear")
 def checkout():
-    if not current_user.rol or current_user.rol.nombre != "Cliente":
-        flash("Solo clientes pueden generar pedidos.", "warning")
-        return redirect(url_for("catalog.catalogo"))
+    guard = _guard_cliente_activo()
+    if guard:
+        return guard
 
     fecha_entrega_raw = (request.form.get("fecha_entrega") or "").strip()
     tipo_entrega = (request.form.get("tipo_entrega") or "pickup").strip().lower()
 
-    # Regla de negocio: pedidos web se pagan en linea con tarjeta y se recolectan en sucursal.
+    # Regla de negocio: pedidos web se pagan en linea con tarjeta
+    # y se recolectan en sucursal.
     tipo_pago_pedido = "EN_LINEA"
     tipo_pago = "TARJETA"
     referencia = (request.form.get("referencia_pago") or "").strip() or None
     if not referencia:
-        referencia = f"WEB-{current_user.id_usuario}-{int(datetime.now().timestamp())}"
+        referencia = (
+            f"WEB-{current_user.id_usuario}-" f"{int(datetime.now().timestamp())}"
+        )
 
     try:
         fecha_entrega = date.fromisoformat(fecha_entrega_raw)
@@ -184,7 +224,10 @@ def checkout():
         return redirect(url_for("catalog.carrito"))
 
     if fecha_entrega < date.today():
-        flash("La fecha de entrega no puede ser anterior al dia actual.", "warning")
+        flash(
+            "La fecha de entrega no puede ser anterior al dia actual.",
+            "warning",
+        )
         return redirect(url_for("catalog.carrito"))
 
     if tipo_entrega != "pickup":
@@ -198,12 +241,20 @@ def checkout():
             tipo_pago_pedido=tipo_pago_pedido,
             tipo_pago=tipo_pago,
             referencia_pago=referencia,
+            id_usuario_accion=current_user.id_usuario,
         )
         log_audit_event(
             "PEDIDO_WEB_CREADO",
-            f"id_usuario={current_user.id_usuario}; id_pedido={pedido.id_pedido}; tipo_pago={tipo_pago_pedido}",
+            (
+                f"id_usuario={current_user.id_usuario}; "
+                f"id_pedido={pedido.id_pedido}; "
+                f"tipo_pago={tipo_pago_pedido}"
+            ),
         )
-        flash(f"Pedido generado correctamente (ID {pedido.id_pedido}).", "success")
+        flash(
+            f"Pedido generado correctamente (ID {pedido.id_pedido}).",
+            "success",
+        )
         return redirect(url_for("catalog.mis_pedidos"))
     except ValueError as exc:
         flash(str(exc), "danger")
@@ -214,9 +265,9 @@ def checkout():
 @login_required
 @require_permission("Pedidos Clientes", "leer")
 def mis_pedidos():
-    if not current_user.rol or current_user.rol.nombre != "Cliente":
-        flash("Solo clientes pueden consultar pedidos web.", "warning")
-        return redirect(url_for("catalog.catalogo"))
+    guard = _guard_cliente_activo()
+    if guard:
+        return guard
 
     pedidos = (
         Pedido.query.filter_by(id_usuario_cliente=current_user.id_usuario)

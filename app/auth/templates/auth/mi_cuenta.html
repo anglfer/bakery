@@ -1,0 +1,85 @@
+{% extends "base_template.html" %} {% block title %}Mi cuenta · SoftBakery{% endblock %} {% block
+content %}
+<section class="section">
+	<div class="row justify-content-center">
+		<div class="col-xl-8 col-lg-10">
+			<div class="ops-hero mb-3">
+				<p class="ops-meta mb-1">Portal de clientes</p>
+				<h2 class="ops-hero-title">Gestionar mi cuenta</h2>
+				<p class="ops-hero-text">Actualiza tus datos personales para mantener tu cuenta al día.</p>
+			</div>
+
+			<div class="ops-card">
+				<form method="post" class="form-grid form-grid-2">
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+					<div>
+						<label for="nombre" class="form-label">Nombre *</label>
+						<input
+							type="text"
+							id="nombre"
+							name="nombre"
+							maxlength="100"
+							required
+							value="{{ usuario.persona.nombre }}" />
+					</div>
+
+					<div>
+						<label for="apellidos" class="form-label">Apellido *</label>
+						<input
+							type="text"
+							id="apellidos"
+							name="apellidos"
+							maxlength="120"
+							required
+							value="{{ usuario.persona.apellidos }}" />
+					</div>
+
+					<div>
+						<label for="telefono" class="form-label">Teléfono *</label>
+						<input
+							type="text"
+							id="telefono"
+							name="telefono"
+							maxlength="30"
+							required
+							value="{{ usuario.persona.telefono }}" />
+					</div>
+
+					<div>
+						<label for="username" class="form-label">Usuario</label>
+						<input type="text" id="username" value="{{ usuario.username }}" disabled />
+					</div>
+
+					<div>
+						<label for="ciudad" class="form-label">Ciudad</label>
+						<input
+							type="text"
+							id="ciudad"
+							name="ciudad"
+							maxlength="120"
+							value="{{ usuario.persona.ciudad or '' }}" />
+					</div>
+
+					<div class="field-span-2">
+						<label for="direccion" class="form-label">Dirección</label>
+						<input
+							type="text"
+							id="direccion"
+							name="direccion"
+							maxlength="255"
+							value="{{ usuario.persona.direccion or '' }}" />
+					</div>
+
+					<div class="field-span-2 d-flex justify-content-end mt-2">
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-check2-circle me-1"></i>
+							Guardar cambios
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}

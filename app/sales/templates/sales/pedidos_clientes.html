@@ -1,99 +1,225 @@
 {% extends "base_template.html" %}
 {% block title %}Pedidos de Clientes{% endblock %}
+
+{% block page_title %}Gestión de Pedidos de Clientes{% endblock %}
+
 {% block content %}
-<section class="section">
-	<div class="ops-hero">
-		<p class="ops-meta mb-1">Panel de ventas</p>
-		<h2 class="ops-hero-title">Gestión de pedidos de clientes</h2>
-		<p class="ops-hero-text">Confirma estados y completa entregas con trazabilidad de pago.</p>
+<section class="section pedidos-shell">
+	<div class="ops-meta mb-2">Pedidos Clientes</div>
+	<h2 class="ops-hero-title mb-3">Gestión de pedidos de clientes</h2>
+
+	<form method="get" class="ops-toolbar pedidos-toolbar">
+		<div class="ops-input-wrap">
+			<i class="bi bi-search"></i>
+			<input
+				name="q"
+				value="{{ filtros.q }}"
+				placeholder="Buscar por folio o nombre de cliente..." />
+		</div>
+		<select name="estado" aria-label="Filtrar por estado">
+			<option value="TODOS" {{ 'selected' if filtros.estado == 'TODOS' else '' }}>Todos los estados</option>
+			<option value="PENDIENTE" {{ 'selected' if filtros.estado == 'PENDIENTE' else '' }}>Pendiente</option>
+			<option value="CONFIRMADO" {{ 'selected' if filtros.estado == 'CONFIRMADO' else '' }}>Confirmado</option>
+			<option value="PAGADO" {{ 'selected' if filtros.estado == 'PAGADO' else '' }}>Pagado</option>
+			<option value="ENTREGADO" {{ 'selected' if filtros.estado == 'ENTREGADO' else '' }}>Entregado</option>
+			<option value="CANCELADO" {{ 'selected' if filtros.estado == 'CANCELADO' else '' }}>Cancelado</option>
+		</select>
+		<button type="submit" class="btn-soft-primary">Filtrar</button>
+	</form>
+
+	<div class="ops-kpi-grid compact pedidos-kpis">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pedidos visibles</p>
+			<p class="ops-kpi-value">{{ resumen.total }}</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pendientes</p>
+			<p class="ops-kpi-value">{{ resumen.pendiente }}</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Confirmados</p>
+			<p class="ops-kpi-value">{{ resumen.confirmado }}</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pagados</p>
+			<p class="ops-kpi-value">{{ resumen.pagado }}</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Entregados</p>
+			<p class="ops-kpi-value">{{ resumen.entregado }}</p>
+		</article>
 	</div>
-	<div class="ops-card">
+
+	<div class="ops-card mb-0">
+		<div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+			<h3 class="ops-card-title mb-0"><i class="bi bi-clipboard-check me-1"></i> Pedidos recibidos</h3>
+			<span class="ops-chip neutral">{{ resumen.total }} pedido{{ 's' if resumen.total != 1 else '' }}</span>
+		</div>
+
 		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
-		<thead>
-			<tr>
-				<th>ID Pedido</th>
-				<th>Cliente</th>
-				<th>Fecha</th>
-				<th>Entrega</th>
-				<th>Total</th>
-				<th>Estado pedido</th>
-				<th>Estado pago</th>
-				<th>Actualizar</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for p in pedidos %}
-			<tr>
-				<td>{{ p.id_pedido }}</td>
-				<td>{{ p.usuario_cliente.username }}</td>
-				<td>{{ p.fecha_pedido.strftime('%Y-%m-%d') }}</td>
-				<td>{{ p.fecha_entrega.strftime('%Y-%m-%d') }}</td>
-				<td>${{ '%.2f'|format(p.total) }}</td>
-				<td><span class="ops-chip neutral">{{ p.estado_pedido }}</span></td>
-				<td>
-					<span class="ops-chip {{ 'success' if p.estado_pago == 'PAGADO' else 'warning' }}">
-						{{ p.estado_pago }}
-					</span>
-				</td>
-				<td>
-					<div class="d-flex flex-wrap gap-2" style="min-width: 220px;">
-						<button
-							type="button"
-							class="btn btn-sm btn-outline-primary js-actualizar-pedido"
-							data-id="{{ p.id_pedido }}"
-							data-estado="{{ p.estado_pedido }}"
-							data-referencia="{{ p.referencia_pago or '' }}">
-							Actualizar
-						</button>
-						<button
-							type="button"
-							class="btn btn-sm js-entregar-pedido"
-							data-id="{{ p.id_pedido }}"
-							{{ 'disabled' if p.estado_pedido == 'ENTREGADO' else '' }}>
-							Entregar
-						</button>
-					</div>
-				</td>
-			</tr>
-			{% else %}
-			<tr>
-				<td colspan="8">No hay pedidos para mostrar.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
+			<table class="table align-middle mb-0">
+				<thead>
+					<tr>
+						<th>Folio</th>
+						<th>Cliente</th>
+						<th>Fecha pedido</th>
+						<th>Fecha entrega</th>
+						<th>Productos</th>
+						<th>Total</th>
+						<th>Estado</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for p in pedidos %}
+					{% set cliente = p.usuario_cliente.persona.nombre ~ ' ' ~ p.usuario_cliente.persona.apellidos if p.usuario_cliente and p.usuario_cliente.persona else (p.usuario_cliente.username if p.usuario_cliente else 'Cliente') %}
+					{% set estado = (p.estado_pedido or 'PENDIENTE').upper() %}
+					{% set pago = (p.estado_pago or 'PENDIENTE').upper() %}
+					{% set puede_entregar = estado in ['CONFIRMADO', 'PAGADO'] and pago == 'PAGADO' %}
+					<tr>
+						<td><strong class="pedidos-folio">PED-{{ '%04d'|format(p.id_pedido) }}</strong></td>
+						<td>{{ cliente }}</td>
+						<td>{{ p.fecha_pedido.strftime('%d/%m/%Y') if p.fecha_pedido else '—' }}</td>
+						<td>{{ p.fecha_entrega.strftime('%d/%m/%Y') if p.fecha_entrega else '—' }}</td>
+						<td><span class="ops-chip neutral">{{ p.detalles|length }} prod.</span></td>
+						<td><strong>${{ '%.2f'|format(p.total) }}</strong></td>
+						<td>
+							<span class="ops-chip {{ 'warning' if estado == 'PENDIENTE' else 'neutral' if estado == 'CONFIRMADO' else 'success' if estado in ['PAGADO', 'ENTREGADO'] else 'danger' }}">
+								{{ estado|lower }}
+							</span>
+						</td>
+						<td>
+							<div class="btn-action-group">
+								<button
+									type="button"
+									class="btn-soft-secondary btn-sm js-ver-pedido"
+									data-id="{{ p.id_pedido }}">
+									<i class="bi bi-eye me-1"></i> Ver
+								</button>
+
+								{% if estado in ['PENDIENTE', 'CONFIRMADO'] %}
+								<button
+									type="button"
+									class="btn-soft-primary btn-sm js-actualizar-pedido"
+									data-id="{{ p.id_pedido }}"
+									data-estado="{{ estado }}"
+									data-referencia="{{ p.referencia_pago or '' }}">
+									Gestionar
+								</button>
+								{% endif %}
+
+								{% if puede_entregar %}
+								<button
+									type="button"
+									class="btn-soft-primary btn-sm js-entregar-pedido"
+									data-id="{{ p.id_pedido }}">
+									<i class="bi bi-box-seam me-1"></i> Entregar
+								</button>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+					{% else %}
+					<tr>
+						<td colspan="8" class="text-center py-4 text-muted">No hay pedidos para los filtros seleccionados.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
 			</table>
 		</div>
 	</div>
 
+	<div class="modal fade" id="modalDetallePedido" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content pedidos-modal">
+				<div class="modal-header pedidos-modal-header">
+					<h5 class="modal-title"><i class="bi bi-clipboard-data me-1"></i> Detalle del pedido</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="pedidos-detalle-head mb-3">
+						<div>
+							<div class="pedidos-detalle-folio" id="detallePedidoFolio">PED-0000</div>
+							<div class="small text-muted" id="detallePedidoCliente">Cliente</div>
+						</div>
+						<div class="text-end">
+							<div class="small text-muted">Total</div>
+							<div class="pedidos-detalle-total" id="detallePedidoTotal">$0.00</div>
+						</div>
+					</div>
+
+					<div class="pedidos-detalle-grid mb-3">
+						<div class="pedidos-info-box">
+							<span>Fecha pedido</span>
+							<strong id="detallePedidoFechaPedido">—</strong>
+						</div>
+						<div class="pedidos-info-box">
+							<span>Fecha entrega</span>
+							<strong id="detallePedidoFechaEntrega">—</strong>
+						</div>
+						<div class="pedidos-info-box">
+							<span>Estado</span>
+							<strong id="detallePedidoEstado">—</strong>
+						</div>
+						<div class="pedidos-info-box">
+							<span>Pago</span>
+							<strong id="detallePedidoPago">—</strong>
+						</div>
+					</div>
+
+					<h6 class="pedidos-subtitle">Productos solicitados</h6>
+					<div class="table-responsive mb-3">
+						<table class="table table-sm pedidos-detalle-table mb-0">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Producto</th>
+									<th>Cantidad</th>
+									<th>Precio unit.</th>
+									<th>Subtotal</th>
+								</tr>
+							</thead>
+							<tbody id="detallePedidoProductos"></tbody>
+						</table>
+					</div>
+
+					<h6 class="pedidos-subtitle">Trazabilidad de estados</h6>
+					<ul class="pedidos-timeline" id="detallePedidoTimeline"></ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="modal fade" id="modalActualizarPedido" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Actualizar pedido</h5>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content pedidos-modal">
+				<div class="modal-header pedidos-modal-header">
+					<h5 class="modal-title">Actualizar estado de pedido</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<form method="post" id="formActualizarPedido">
 					<input type="hidden" name="action" value="actualizar" />
 					<input type="hidden" name="id_pedido" id="actualizarPedidoId" />
 					<div class="modal-body">
-						<div class="ops-grid">
-							<select name="estado" id="actualizarPedidoEstado" required>
-								<option value="PENDIENTE">PENDIENTE</option>
-								<option value="CONFIRMADO">CONFIRMADO</option>
-								<option value="PAGADO">PAGADO</option>
-								<option value="CANCELADO">CANCELADO</option>
-							</select>
+						<div class="mb-2">
+							<label for="actualizarPedidoEstado" class="form-label">Nuevo estado</label>
+							<select name="estado" id="actualizarPedidoEstado" required></select>
+						</div>
+						<div>
+							<label for="actualizarPedidoReferencia" class="form-label">Referencia de pago (opcional)</label>
 							<input
 								type="text"
 								name="referencia_pago"
 								id="actualizarPedidoReferencia"
-								placeholder="Referencia pago (opcional)" />
+								placeholder="Ej. TRX-12345" />
 						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Guardar</button>
+						<button type="submit" class="btn-soft-primary">Guardar cambios</button>
 					</div>
 				</form>
 			</div>
@@ -101,24 +227,25 @@
 	</div>
 
 	<div class="modal fade" id="modalEntregarPedido" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-lg modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Entregar pedido</h5>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content pedidos-modal">
+				<div class="modal-header pedidos-modal-header">
+					<h5 class="modal-title">Confirmar entrega de pedido</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<form method="post" id="formEntregarPedido">
 					<input type="hidden" name="action" value="entregar" />
 					<input type="hidden" name="id_pedido" id="entregarPedidoId" />
 					<div class="modal-body">
-						<label class="small text-secondary d-flex align-items-center gap-2">
+						<p class="small text-muted mb-2">Al confirmar se generará automáticamente la venta en RF13 y se descontará inventario.</p>
+						<label class="small d-flex align-items-center gap-2">
 							<input type="checkbox" name="requiere_ticket" />
-							Generar ticket (si el cliente lo solicita)
+							Generar ticket para el cliente
 						</label>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Marcar como ENTREGADO</button>
+						<button type="submit" class="btn-soft-primary">Marcar como entregado</button>
 					</div>
 				</form>
 			</div>
@@ -128,21 +255,119 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
-	document.querySelectorAll('.js-actualizar-pedido').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			document.getElementById('actualizarPedidoId').value = buttonElement.dataset.id || '';
-			document.getElementById('actualizarPedidoEstado').value = buttonElement.dataset.estado || 'PENDIENTE';
-			document.getElementById('actualizarPedidoReferencia').value = buttonElement.dataset.referencia || '';
-			new bootstrap.Modal(document.getElementById('modalActualizarPedido')).show();
-		});
-	});
+	(function pedidosClientesModule() {
+		const pedidosData = {{ pedidos_payload | tojson }};
+		const pedidosById = new Map(pedidosData.map((pedido) => [Number(pedido.id_pedido), pedido]));
 
-	document.querySelectorAll('.js-entregar-pedido').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			document.getElementById('entregarPedidoId').value = buttonElement.dataset.id || '';
-			new bootstrap.Modal(document.getElementById('modalEntregarPedido')).show();
+		const modalDetalleEl = document.getElementById('modalDetallePedido');
+		const modalActualizarEl = document.getElementById('modalActualizarPedido');
+		const modalEntregarEl = document.getElementById('modalEntregarPedido');
+		if (!modalDetalleEl || !modalActualizarEl || !modalEntregarEl) {
+			return;
+		}
+
+		const modalDetalle = new bootstrap.Modal(modalDetalleEl);
+		const modalActualizar = new bootstrap.Modal(modalActualizarEl);
+		const modalEntregar = new bootstrap.Modal(modalEntregarEl);
+
+		const money = (value) =>
+			new Intl.NumberFormat('es-MX', {
+				style: 'currency',
+				currency: 'MXN',
+			}).format(Number(value || 0));
+
+		const estadoLabel = (estado) => (estado || '').toLowerCase();
+
+		document.querySelectorAll('.js-ver-pedido').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				const pedido = pedidosById.get(Number(buttonElement.dataset.id || '0'));
+				if (!pedido) {
+					return;
+				}
+
+				document.getElementById('detallePedidoFolio').textContent = pedido.folio;
+				document.getElementById('detallePedidoCliente').textContent = pedido.cliente;
+				document.getElementById('detallePedidoTotal').textContent = money(pedido.total);
+				document.getElementById('detallePedidoFechaPedido').textContent = pedido.fecha_pedido || '—';
+				document.getElementById('detallePedidoFechaEntrega').textContent = pedido.fecha_entrega || '—';
+				document.getElementById('detallePedidoEstado').textContent = estadoLabel(pedido.estado_pedido);
+				document.getElementById('detallePedidoPago').textContent = estadoLabel(pedido.estado_pago);
+
+				const productosTbody = document.getElementById('detallePedidoProductos');
+				if (!pedido.productos.length) {
+					productosTbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Sin productos en el detalle.</td></tr>';
+				} else {
+					productosTbody.innerHTML = pedido.productos
+						.map((item, index) => `
+							<tr>
+								<td>${index + 1}</td>
+								<td>${item.nombre}</td>
+								<td>${item.cantidad}</td>
+								<td>${money(item.precio_unitario)}</td>
+								<td>${money(item.subtotal)}</td>
+							</tr>
+						`)
+						.join('');
+				}
+
+				const timeline = document.getElementById('detallePedidoTimeline');
+				if (!pedido.historial.length) {
+					timeline.innerHTML = '<li class="text-muted small">Sin eventos de trazabilidad aún.</li>';
+				} else {
+					timeline.innerHTML = pedido.historial
+						.map(
+							(evento) => `
+								<li>
+									<div class="pedidos-timeline-head">
+										<strong>${estadoLabel(evento.estado_nuevo)}</strong>
+										<span>${evento.fecha || ''}</span>
+									</div>
+									<div class="small text-muted">${evento.detalle || 'Cambio de estado registrado.'}</div>
+									<div class="small text-muted">Responsable: ${evento.usuario || 'Sistema'}</div>
+								</li>
+							`
+						)
+						.join('');
+				}
+
+				modalDetalle.show();
+			});
 		});
-	});
+
+		document.querySelectorAll('.js-actualizar-pedido').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				const pedido = pedidosById.get(Number(buttonElement.dataset.id || '0'));
+				if (!pedido) {
+					return;
+				}
+
+				document.getElementById('actualizarPedidoId').value = String(pedido.id_pedido);
+				document.getElementById('actualizarPedidoReferencia').value = pedido.referencia_pago || '';
+
+				const selectEstado = document.getElementById('actualizarPedidoEstado');
+				const estadosSiguientes = (pedido.acciones && pedido.acciones.estados_siguientes) || [];
+				if (!estadosSiguientes.length) {
+					selectEstado.innerHTML = '<option value="">Sin cambios disponibles</option>';
+					selectEstado.disabled = true;
+				} else {
+					selectEstado.disabled = false;
+					selectEstado.innerHTML = estadosSiguientes
+						.map((estado) => `<option value="${estado}">${estado}</option>`)
+						.join('');
+				}
+
+				modalActualizar.show();
+			});
+		});
+
+		document.querySelectorAll('.js-entregar-pedido').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				document.getElementById('entregarPedidoId').value = buttonElement.dataset.id || '';
+				modalEntregar.show();
+			});
+		});
+	})();
 </script>
 {% endblock %}

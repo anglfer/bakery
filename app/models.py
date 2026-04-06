@@ -12,7 +12,7 @@ ESTADOS_PAGO = ("PENDIENTE", "PAGADO")
 TIPOS_MOVIMIENTO = ("ENTRADA", "SALIDA", "AJUSTE")
 ESTADOS_SOLICITUD = ("PENDIENTE", "APROBADA", "RECHAZADA")
 ESTADOS_ORDEN = ("PENDIENTE", "EN_PROCESO", "FINALIZADO", "CANCELADO")
-ESTADOS_VENTA = ("CONFIRMADO", "EN_PROCESO_PRODUCCION")
+ESTADOS_VENTA = ("CONFIRMADO", "EN_PROCESO_PRODUCCION", "CANCELADO")
 ESTADOS_PEDIDO = ("PENDIENTE", "CONFIRMADO", "PAGADO", "ENTREGADO", "CANCELADO")
 TIPOS_PAGO = ("EFECTIVO", "TARJETA")
 TIPOS_PAGO_PEDIDO = ("EN_LINEA", "CONTRA_ENTREGA")
@@ -232,7 +232,9 @@ class MateriaPrima(TimestampMixin, db.Model):
         if self.esta_bajo_minimo:
             return "CRITICO"
         minimo = Decimal(str(self.stock_minimo))
-        if minimo > 0 and Decimal(str(self.cantidad_disponible)) < (minimo * Decimal("1.5")):
+        if minimo > 0 and Decimal(str(self.cantidad_disponible)) < (
+            minimo * Decimal("1.5")
+        ):
             return "BAJO"
         return "OK"
 
@@ -374,6 +376,11 @@ class Producto(TimestampMixin, db.Model):
     )
 
     receta_base = db.relationship("Receta", foreign_keys=[id_receta])
+    movimientos_inventario = db.relationship(
+        "MovimientoInventarioProducto",
+        back_populates="producto",
+        cascade=CASCADE_DELETE_ORPHAN,
+    )
 
     @property
     def cantidad_libre(self) -> int:
@@ -382,14 +389,55 @@ class Producto(TimestampMixin, db.Model):
             0,
         )
 
+    @property
+    def esta_bajo_stock(self) -> bool:
+        return int(self.cantidad_disponible or 0) < int(self.stock_minimo or 0)
+
+    @property
+    def estado_stock(self) -> str:
+        if not self.activo:
+            return "INACTIVO"
+        if self.esta_bajo_stock:
+            return "BAJO"
+        return "OK"
+
+
+class MovimientoInventarioProducto(TimestampMixin, db.Model):
+    __tablename__ = "movimiento_inventario_producto"
+    __table_args__ = (
+        CheckConstraint(
+            "cantidad > 0", name="ck_movimiento_producto_cantidad_positiva"
+        ),
+        Index(
+            "ix_movimiento_producto_producto_fecha",
+            "id_producto",
+            "fecha_creacion",
+        ),
+    )
+
+    id_movimiento = db.Column(db.Integer, primary_key=True)
+    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
+    tipo = db.Column(db.String(20), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    stock_anterior = db.Column(db.Integer, nullable=False)
+    stock_posterior = db.Column(db.Integer, nullable=False)
+    referencia_id = db.Column(db.String(50), nullable=True)
+    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)
+
+    producto = db.relationship("Producto", back_populates="movimientos_inventario")
+    usuario = db.relationship("Usuario")
+
 
 class Receta(TimestampMixin, db.Model):
     __tablename__ = "receta"
     __table_args__ = (
-        UniqueConstraint("nombre", "version", name="uq_receta_nombre_version"),
+        CheckConstraint("version > 0", name="ck_receta_version_positiva"),
+        CheckConstraint("rendimiento_base > 0", name="ck_receta_rendimiento_positivo"),
+        UniqueConstraint("id_producto", "version", name="uq_receta_producto_version"),
     )
 
     id_receta = db.Column(db.Integer, primary_key=True)
+    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
     nombre = db.Column(db.String(120), nullable=False)
     descripcion = db.Column(db.String(255), nullable=True)
     unidad_produccion = db.Column(db.String(50), default="pieza", nullable=False)
@@ -402,11 +450,17 @@ class Receta(TimestampMixin, db.Model):
     detalles = db.relationship(
         "DetalleReceta", back_populates="receta", cascade=CASCADE_DELETE_ORPHAN
     )
+    producto = db.relationship("Producto", foreign_keys=[id_producto])
 
 
 class DetalleReceta(db.Model):
     __tablename__ = "detalle_receta"
     __table_args__ = (
+        UniqueConstraint(
+            "id_receta",
+            "id_materia_prima",
+            name="uq_detalle_receta_materia",
+        ),
         CheckConstraint(
             "cantidad_base > 0", name="ck_detalle_receta_cantidad_positiva"
         ),
@@ -438,9 +492,14 @@ class SolicitudProduccion(TimestampMixin, db.Model):
     id_usuario_resuelve = db.Column(
         db.Integer, db.ForeignKey(FK_USUARIO), nullable=True
     )
+    fecha_resolucion = db.Column(db.DateTime, nullable=True)
     observaciones = db.Column(db.String(255), nullable=True)
+    observaciones_resolucion = db.Column(db.String(255), nullable=True)
 
     producto = db.relationship("Producto")
+    usuario_solicita = db.relationship("Usuario", foreign_keys=[id_usuario_solicita])
+    usuario_resuelve = db.relationship("Usuario", foreign_keys=[id_usuario_resuelve])
+    ordenes = db.relationship("OrdenProduccion", back_populates="solicitud")
 
 
 class OrdenProduccion(TimestampMixin, db.Model):
@@ -451,10 +510,20 @@ class OrdenProduccion(TimestampMixin, db.Model):
 
     id_orden = db.Column(db.Integer, primary_key=True)
     id_solicitud = db.Column(
-        db.Integer, db.ForeignKey("solicitud_produccion.id_solicitud"), nullable=False
+        db.Integer,
+        db.ForeignKey("solicitud_produccion.id_solicitud"),
+        nullable=True,
     )
-    id_receta = db.Column(db.Integer, db.ForeignKey("receta.id_receta"), nullable=False)
-    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
+    id_receta = db.Column(
+        db.Integer,
+        db.ForeignKey("receta.id_receta"),
+        nullable=False,
+    )
+    id_producto = db.Column(
+        db.Integer,
+        db.ForeignKey(FK_PRODUCTO),
+        nullable=False,
+    )
     cantidad_producir = db.Column(db.Integer, nullable=False)
     estado = db.Column(db.String(20), default="PENDIENTE", nullable=False)
     fecha_inicio = db.Column(db.DateTime, nullable=True)
@@ -462,11 +531,75 @@ class OrdenProduccion(TimestampMixin, db.Model):
     id_usuario_responsable = db.Column(
         db.Integer, db.ForeignKey(FK_USUARIO), nullable=False
     )
+    observaciones = db.Column(db.String(255), nullable=True)
     costo_total = db.Column(db.Numeric(12, 2), default=0, nullable=False)
 
-    solicitud = db.relationship("SolicitudProduccion")
+    solicitud = db.relationship("SolicitudProduccion", back_populates="ordenes")
     receta = db.relationship("Receta")
     producto = db.relationship("Producto")
+    detalles_consumo = db.relationship(
+        "DetalleOrdenProduccion",
+        back_populates="orden",
+        cascade=CASCADE_DELETE_ORPHAN,
+    )
+
+
+class DetalleOrdenProduccion(db.Model):
+    __tablename__ = "detalle_orden_produccion"
+    __table_args__ = (
+        UniqueConstraint(
+            "id_orden",
+            "id_materia_prima",
+            name="uq_detalle_orden_materia",
+        ),
+        CheckConstraint(
+            "cantidad_receta > 0",
+            name="ck_detalle_orden_cantidad_receta_positiva",
+        ),
+        CheckConstraint(
+            "cantidad_necesaria > 0",
+            name="ck_detalle_orden_cantidad_necesaria_positiva",
+        ),
+        CheckConstraint(
+            "porcentaje_merma >= 0", name="ck_detalle_orden_merma_no_negativa"
+        ),
+        CheckConstraint(
+            "cantidad_real_descontada > 0",
+            name="ck_detalle_orden_cantidad_real_positiva",
+        ),
+        CheckConstraint(
+            "stock_previo >= 0",
+            name="ck_detalle_orden_stock_previo_no_negativo",
+        ),
+        CheckConstraint(
+            "stock_posterior >= 0",
+            name="ck_detalle_orden_stock_posterior_no_negativo",
+        ),
+    )
+
+    id_detalle = db.Column(db.Integer, primary_key=True)
+    id_orden = db.Column(
+        db.Integer,
+        db.ForeignKey("orden_produccion.id_orden"),
+        nullable=False,
+    )
+    id_materia_prima = db.Column(
+        db.Integer,
+        db.ForeignKey(FK_MATERIA),
+        nullable=False,
+    )
+    cantidad_receta = db.Column(db.Numeric(12, 4), nullable=False)
+    cantidad_necesaria = db.Column(db.Numeric(12, 4), nullable=False)
+    porcentaje_merma = db.Column(db.Numeric(5, 2), default=0, nullable=False)
+    cantidad_real_descontada = db.Column(db.Numeric(12, 4), nullable=False)
+    stock_previo = db.Column(db.Numeric(12, 4), nullable=False)
+    stock_posterior = db.Column(db.Numeric(12, 4), nullable=False)
+
+    orden = db.relationship(
+        "OrdenProduccion",
+        back_populates="detalles_consumo",
+    )
+    materia_prima = db.relationship("MateriaPrima")
 
 
 class Carrito(TimestampMixin, db.Model):
@@ -522,6 +655,12 @@ class Pedido(TimestampMixin, db.Model):
     detalles = db.relationship(
         "DetallePedido", back_populates="pedido", cascade=CASCADE_DELETE_ORPHAN
     )
+    historial_estados = db.relationship(
+        "PedidoEstadoHistorial",
+        back_populates="pedido",
+        cascade=CASCADE_DELETE_ORPHAN,
+        order_by="PedidoEstadoHistorial.id_historial.asc()",
+    )
     pago = db.relationship(
         "PagoPedido",
         back_populates="pedido",
@@ -547,6 +686,24 @@ class DetallePedido(db.Model):
 
     pedido = db.relationship("Pedido", back_populates="detalles")
     producto = db.relationship("Producto")
+
+
+class PedidoEstadoHistorial(db.Model):
+    __tablename__ = "pedido_estado_historial"
+    __table_args__ = (
+        Index("ix_pedido_estado_historial_pedido_fecha", "id_pedido", "fecha_cambio"),
+    )
+
+    id_historial = db.Column(db.Integer, primary_key=True)
+    id_pedido = db.Column(db.Integer, db.ForeignKey("pedido.id_pedido"), nullable=False)
+    estado_anterior = db.Column(db.String(20), nullable=True)
+    estado_nuevo = db.Column(db.String(20), nullable=False)
+    detalle = db.Column(db.String(255), nullable=True)
+    id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=True)
+    fecha_cambio = db.Column(db.DateTime, default=utc_now, nullable=False)
+
+    pedido = db.relationship("Pedido", back_populates="historial_estados")
+    usuario = db.relationship("Usuario")
 
 
 class PagoPedido(db.Model):
@@ -593,6 +750,7 @@ class TicketVenta(db.Model):
         db.Integer, db.ForeignKey("venta.id_venta"), unique=True, nullable=False
     )
     folio = db.Column(db.String(30), unique=True, nullable=False)
+    nombre_negocio = db.Column(db.String(120), default="SoftBakery", nullable=False)
     fecha = db.Column(db.DateTime, default=utc_now, nullable=False)
 
     venta = db.relationship("Venta")
@@ -623,6 +781,8 @@ class SalidaEfectivo(TimestampMixin, db.Model):
     tipo = db.Column(db.String(50), nullable=False)
     id_usuario = db.Column(db.Integer, db.ForeignKey(FK_USUARIO), nullable=False)
     referencia = db.Column(db.String(80), nullable=True)
+    referencia_tipo = db.Column(db.String(50), nullable=True)
+    referencia_id = db.Column(db.Integer, nullable=True)
 
 
 class CorteDiario(TimestampMixin, db.Model):
@@ -632,6 +792,11 @@ class CorteDiario(TimestampMixin, db.Model):
     fecha = db.Column(db.Date, default=utc_today, nullable=False)
     total_ventas = db.Column(db.Numeric(12, 2), default=0, nullable=False)
     numero_ventas = db.Column(db.Integer, default=0, nullable=False)
+    total_transacciones = db.Column(db.Integer, default=0, nullable=False)
+    total_efectivo = db.Column(db.Numeric(12, 2), default=0, nullable=False)
+    total_tarjeta = db.Column(db.Numeric(12, 2), default=0, nullable=False)
+    total_salidas = db.Column(db.Numeric(12, 2), default=0, nullable=False)
+    costo_produccion = db.Column(db.Numeric(12, 2), default=0, nullable=False)
     utilidad_diaria = db.Column(db.Numeric(12, 2), default=0, nullable=False)
     salida_efectivo_proveedores = db.Column(
         db.Numeric(12, 2), default=0, nullable=False

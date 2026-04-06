@@ -1,71 +1,66 @@
-{% extends "base_template.html" %}
-{% block title %}Ordenes{% endblock %}
-{% block content %}
-<section class="section">
-	{% set ns = namespace(pendientes=0, en_proceso=0, finalizadas=0, canceladas=0) %}
-	{% for o in ordenes %}
-		{% if o.estado == 'PENDIENTE' %}
-			{% set ns.pendientes = ns.pendientes + 1 %}
-		{% elif o.estado == 'EN_PROCESO' %}
-			{% set ns.en_proceso = ns.en_proceso + 1 %}
-		{% elif o.estado == 'FINALIZADO' %}
-			{% set ns.finalizadas = ns.finalizadas + 1 %}
-		{% elif o.estado == 'CANCELADO' %}
-			{% set ns.canceladas = ns.canceladas + 1 %}
-		{% endif %}
-	{% endfor %}
+{% extends "base_template.html" %} {% block title %}Órdenes{% endblock %} {% block page_title
+%}Módulo de Producción — Órdenes{% endblock %} {% block content %}
+<section class="section prod-orders-page">
+	{% set ns = namespace(pendientes=0, en_proceso=0, finalizadas=0, canceladas=0) %} {% for orden in
+	ordenes_payload %} {% if orden.estado == 'PENDIENTE' %} {% set ns.pendientes = ns.pendientes + 1
+	%} {% elif orden.estado == 'EN_PROCESO' %} {% set ns.en_proceso = ns.en_proceso + 1 %} {% elif
+	orden.estado == 'FINALIZADO' %} {% set ns.finalizadas = ns.finalizadas + 1 %} {% elif orden.estado
+	== 'CANCELADO' %} {% set ns.canceladas = ns.canceladas + 1 %} {% endif %} {% endfor %}
 
-	<div class="ops-hero">
+	<div class="ops-hero prod-orders-hero">
 		<p class="ops-meta mb-1">Panel de producción</p>
-		<h2 class="ops-hero-title">Órdenes de producción</h2>
-		<p class="ops-hero-text">Genera, inicia, finaliza y monitorea órdenes productivas.</p>
+		<h2 class="ops-hero-title">Órdenes de Producción</h2>
+		<p class="ops-hero-text">
+			Planifica, ejecuta y controla la fabricación con descuento automático de materia prima y
+			trazabilidad de consumo con merma.
+		</p>
 	</div>
 
 	<div class="ops-kpi-grid compact">
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Órdenes totales</p>
-			<p class="ops-kpi-value">{{ ordenes|length }}</p>
+			<p class="ops-kpi-value" id="kpiTotalOrdenes">{{ ordenes_payload|length }}</p>
 			<p class="ops-kpi-sub">Histórico del módulo</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Pendientes</p>
-			<p class="ops-kpi-value">{{ ns.pendientes }}</p>
-			<p class="ops-kpi-sub">Aún no iniciadas</p>
+			<p class="ops-kpi-value" id="kpiPendientes">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">Sin iniciar</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">En proceso</p>
-			<p class="ops-kpi-value">{{ ns.en_proceso }}</p>
-			<p class="ops-kpi-sub">Producción activa</p>
+			<p class="ops-kpi-value" id="kpiEnProceso">{{ ns.en_proceso }}</p>
+			<p class="ops-kpi-sub">Con consumo aplicado</p>
 		</article>
 		<article class="ops-kpi">
 			<p class="ops-kpi-label">Finalizadas</p>
-			<p class="ops-kpi-value">{{ ns.finalizadas }}</p>
-			<p class="ops-kpi-sub">Listas para venta</p>
+			<p class="ops-kpi-value" id="kpiFinalizadas">{{ ns.finalizadas }}</p>
+			<p class="ops-kpi-sub">Disponibles para venta</p>
 		</article>
 	</div>
 
-	<div class="ops-card d-flex flex-wrap justify-content-between align-items-center gap-3">
-		<div>
-			<h3 class="ops-card-title mb-1">Crear orden</h3>
-			<p class="text-secondary mb-0 small">Genera la orden desde una pantallita separada.</p>
+	<div class="ops-card prod-orders-toolbar-card">
+		<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+			<div>
+				<h3 class="ops-card-title mb-1">Control operativo</h3>
+				<p class="text-secondary mb-0 small">
+					El área de ventas consulta en modo lectura; producción gestiona ciclo completo.
+				</p>
+			</div>
+			{% if can_manage %}
+			<button type="button" class="btn btn-sm" id="btnNuevaOrden">
+				<i class="bi bi-plus-lg me-1"></i>
+				Nueva orden
+			</button>
+			{% endif %}
 		</div>
-		<button
-			type="button"
-			class="btn btn-sm"
-			data-bs-toggle="modal"
-			data-bs-target="#modalOrdenCrear">
-			Nueva orden
-		</button>
-	</div>
 
-	<div class="ops-card">
-		<h3 class="ops-card-title">Historial de órdenes</h3>
-		<div class="ops-toolbar">
+		<div class="ops-toolbar mt-3">
 			<div class="ops-input-wrap">
 				<i class="bi bi-search"></i>
-				<input type="text" id="ordenesSearch" placeholder="Buscar por id o producto" />
+				<input type="text" id="ordenesSearch" placeholder="Buscar por folio, producto o receta" />
 			</div>
-			<select id="ordenesEstadoFiltro" style="max-width: 220px">
+			<select id="ordenesEstadoFiltro" class="form-select form-select-sm prod-orders-filter">
 				<option value="TODOS">Todos los estados</option>
 				<option value="PENDIENTE">Pendiente</option>
 				<option value="EN_PROCESO">En proceso</option>
@@ -73,132 +68,873 @@
 				<option value="CANCELADO">Cancelado</option>
 			</select>
 		</div>
-		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0">
+	</div>
+
+	<div class="ops-card">
+		<div class="ops-table table-responsive prod-orders-table-wrap">
+			<table class="table table-hover align-middle mb-0" id="ordenesTable">
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th>Orden</th>
 						<th>Producto</th>
-						<th>Cantidad</th>
-						<th>Estado</th>
+						<th>Cant. a producir</th>
 						<th>Costo</th>
+						<th>Estado</th>
+						<th>Fecha inicio</th>
+						<th>Fecha fin</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for o in ordenes %}
-					<tr
-						data-row="orden"
-						data-label="{{ (o.id_orden|string ~ ' ' ~ o.producto.nombre)|lower }}"
-						data-estado="{{ o.estado }}">
-						<td>{{ o.id_orden }}</td>
-						<td>{{ o.producto.nombre }}</td>
-						<td>{{ o.cantidad_producir }}</td>
-						<td>
-							<span
-								class="ops-chip {{ 'warning' if o.estado == 'PENDIENTE' else 'success' if o.estado == 'FINALIZADO' else 'neutral' }}">
-								{{ o.estado }}
-							</span>
-						</td>
-						<td>${{ '%.2f'|format(o.costo_total) }}</td>
-						<td>
-							<form method="post" class="btn-action-group">
-								<input type="hidden" name="id_orden" value="{{ o.id_orden }}" />
-								<button
-									type="submit"
-									name="action"
-									value="iniciar"
-									class="btn btn-sm btn-icon-sm"
-									title="Iniciar orden"
-									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
-									<i class="bi bi-play-fill"></i>
-								</button>
-								<button
-									type="submit"
-									name="action"
-									value="finalizar"
-									class="btn btn-sm btn-icon-sm"
-									title="Finalizar orden"
-									{{ 'disabled' if o.estado != 'EN_PROCESO' else '' }}>
-									<i class="bi bi-check2-all"></i>
-								</button>
-								<button
-									type="submit"
-									name="action"
-									value="cancelar"
-									class="btn btn-sm btn-outline-dark btn-icon-sm"
-									title="Cancelar orden"
-									{{ 'disabled' if o.estado != 'PENDIENTE' else '' }}>
-									<i class="bi bi-x-lg"></i>
-								</button>
-							</form>
-						</td>
-					</tr>
-					{% else %}
-					<tr>
-						<td colspan="6">No hay ordenes registradas.</td>
-					</tr>
-					{% endfor %}
-				</tbody>
+				<tbody id="ordenesBody"></tbody>
 			</table>
 		</div>
 	</div>
+</section>
 
-	<div class="modal fade" id="modalOrdenCrear" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-xl modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Crear orden de producción</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<form method="post" class="ops-grid p-3">
-					<input type="hidden" name="action" value="crear" />
-					<select name="id_solicitud" required>
-						<option value="">Solicitud aprobada</option>
-						{% for s in solicitudes %}
-						<option value="{{ s.id_solicitud }}">#{{ s.id_solicitud }} - {{ s.producto.nombre }} ({{ s.cantidad }})</option>
-						{% endfor %}
-					</select>
-					<select name="id_receta" required>
-						<option value="">Receta activa</option>
-						{% for r in recetas %}
-						<option value="{{ r.id_receta }}">#{{ r.id_receta }} - {{ r.nombre }} v{{ r.version }}</option>
-						{% endfor %}
-					</select>
-					<input type="number" min="1" name="cantidad" placeholder="Cantidad a producir" required />
-					<div class="d-flex justify-content-end gap-2" style="grid-column: 1 / -1">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit">Crear orden</button>
+{% if can_manage %}
+<div class="modal fade" id="modalNuevaOrden" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content prod-orders-modal-content">
+			<div class="modal-header prod-orders-modal-header">
+				<h5 class="modal-title fw-bold">
+					<i class="bi bi-cpu me-2"></i>
+					Nueva Orden de Producción
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" id="formCrearOrden" novalidate>
+				<input type="hidden" name="action" value="crear" />
+				<div class="modal-body prod-orders-modal-body">
+					<div class="prod-orders-section-card">
+						<div class="prod-orders-section-title">
+							<i class="bi bi-info-circle-fill"></i>
+							Datos de la orden
+						</div>
+						<div class="ops-grid prod-orders-header-grid">
+							<div>
+								<label class="form-label fw-semibold" for="crearOrdenSolicitud">
+									Solicitud aprobada (opcional)
+								</label>
+								<select id="crearOrdenSolicitud" name="id_solicitud" class="form-select">
+									<option value="">Sin solicitud vinculada</option>
+									{% for solicitud in solicitudes %}
+									<option
+										value="{{ solicitud.id_solicitud }}"
+										data-producto="{{ solicitud.id_producto }}"
+										data-cantidad="{{ solicitud.cantidad }}"
+										{{ 'selected' if id_solicitud_preseleccionada == solicitud.id_solicitud else '' }}>
+										SOL-{{ '%03d'|format(solicitud.id_solicitud) }} ·
+										{{ solicitud.producto.nombre }} · {{ solicitud.cantidad }} pzas
+									</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="crearOrdenProducto">
+									Producto
+									<span class="text-danger">*</span>
+								</label>
+								<select id="crearOrdenProducto" name="id_producto" class="form-select" required>
+									<option value="">Seleccionar producto...</option>
+									{% for producto in productos_con_receta %}
+									<option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="crearOrdenReceta">
+									Receta activa
+									<span class="text-danger">*</span>
+								</label>
+								<select id="crearOrdenReceta" name="id_receta" class="form-select" required>
+									<option value="">Selecciona primero un producto...</option>
+								</select>
+								<small class="text-muted d-block mt-1" id="crearOrdenRecetaHint">
+									Sólo se muestran versiones activas.
+								</small>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="crearOrdenCantidad">
+									Cantidad a producir
+									<span class="text-danger">*</span>
+								</label>
+								<input
+									type="number"
+									id="crearOrdenCantidad"
+									name="cantidad"
+									class="form-control"
+									min="1"
+									step="1"
+									placeholder="Ej. 24"
+									required />
+								<small class="text-muted d-block mt-1" id="crearOrdenRendHint"></small>
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="crearOrdenObservaciones">
+									Observaciones
+								</label>
+								<input
+									type="text"
+									id="crearOrdenObservaciones"
+									name="observaciones"
+									class="form-control"
+									placeholder="Opcional..." />
+							</div>
+						</div>
 					</div>
+
+					<div class="prod-orders-info-banner">
+						<i class="bi bi-info-circle-fill"></i>
+						<span>
+							Al iniciar la orden se descuenta materia prima aplicando merma. Al finalizar se
+							incrementa producto terminado en inventario para venta.
+						</span>
+					</div>
+
+					<div class="prod-orders-section-card" id="explosionWrap" style="display: none">
+						<div class="prod-orders-section-title">
+							<i class="bi bi-list-check"></i>
+							Explosión de materiales — consumo estimado
+						</div>
+						<div class="ops-table table-responsive prod-orders-detail-table-wrap">
+							<table class="table table-hover align-middle mb-0">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Materia prima</th>
+										<th>Unidad</th>
+										<th>Cant. receta</th>
+										<th>Cant. necesaria</th>
+										<th>Merma (%)</th>
+										<th>Cant. real a descontar</th>
+										<th>Stock actual</th>
+										<th>Disponibilidad</th>
+									</tr>
+								</thead>
+								<tbody id="explosionBody"></tbody>
+							</table>
+						</div>
+						<div class="prod-orders-cost-preview" id="explosionCostoPreview"></div>
+						<div id="explosionEstadoMensaje" class="mt-2"></div>
+					</div>
+				</div>
+				<div class="modal-footer border-0 prod-orders-modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-outline-primary" id="btnVerificarMateriales">
+						<i class="bi bi-boxes me-1"></i>
+						Verificar materiales
+					</button>
+					<button type="submit" class="btn btn-primary">
+						<i class="bi bi-check2 me-1"></i>
+						Crear orden
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+<div class="modal fade" id="modalDetalleOrden" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content prod-orders-modal-content">
+			<div class="modal-header prod-orders-modal-header">
+				<h5 class="modal-title fw-bold" id="detalleOrdenTitulo">
+					<i class="bi bi-eye-fill me-2"></i>
+					Detalle de orden
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body prod-orders-modal-body">
+				<div class="prod-orders-section-card">
+					<div class="prod-orders-section-title">
+						<i class="bi bi-info-circle-fill"></i>
+						Información general
+					</div>
+					<div class="prod-orders-summary-grid" id="detalleOrdenResumen"></div>
+				</div>
+
+				<div class="prod-orders-section-card">
+					<div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+						<div class="prod-orders-section-title mb-0">
+							<i class="bi bi-list-check"></i>
+							Ingredientes consumidos / a consumir
+						</div>
+						<span class="ops-chip neutral" id="detalleOrdenTipoChip">—</span>
+					</div>
+					<div class="ops-table table-responsive prod-orders-detail-table-wrap">
+						<table class="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Materia prima</th>
+									<th>Unidad</th>
+									<th>Cant. receta</th>
+									<th>Cant. necesaria</th>
+									<th>Merma (%)</th>
+									<th>Cant. real</th>
+									<th>Stock actual</th>
+									<th>Disp.</th>
+								</tr>
+							</thead>
+							<tbody id="detalleOrdenBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-0 prod-orders-modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if can_manage %}
+<div class="modal fade" id="modalConfirmarAccionOrden" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-sm modal-dialog-centered">
+		<div class="modal-content prod-orders-confirm-content">
+			<div class="modal-body text-center py-4">
+				<div class="prod-orders-confirm-icon" id="confirmOrdenIcon">
+					<i class="bi bi-question-lg"></i>
+				</div>
+				<h5 class="prod-orders-confirm-title" id="confirmOrdenTitulo"></h5>
+				<p class="prod-orders-confirm-text" id="confirmOrdenMensaje"></p>
+			</div>
+			<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+				<form method="post" id="formAccionOrden">
+					<input type="hidden" name="id_orden" id="accionOrdenId" />
+					<input type="hidden" name="action" id="accionOrdenTipo" />
+					<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="submit" class="btn" id="confirmOrdenBtn"></button>
 				</form>
 			</div>
 		</div>
 	</div>
-</section>
-{% endblock %}
+</div>
+{% endif %}
 
-{% block scripts %}
+<script id="ordenesData" type="application/json">
+	{{ ordenes_payload | tojson }}
+</script>
+<script id="recetasActivasData" type="application/json">
+	{{ recetas_payload | tojson }}
+</script>
+<script id="canManageData" type="application/json">
+	{{ can_manage | tojson }}
+</script>
+<script id="solicitudPreseleccionada" type="application/json">
+	{{ id_solicitud_preseleccionada | tojson }}
+</script>
+{% endblock %} {% block scripts %}
 <script>
-	const ordenesSearchInput = document.getElementById('ordenesSearch');
-	const ordenesEstadoFiltro = document.getElementById('ordenesEstadoFiltro');
+	const ORDERS = JSON.parse(document.getElementById('ordenesData').textContent || '[]');
+	const ACTIVE_RECIPES = JSON.parse(
+		document.getElementById('recetasActivasData').textContent || '[]'
+	);
+	const CAN_MANAGE = JSON.parse(document.getElementById('canManageData').textContent || 'false');
+	const SOLICITUD_PRESELECCIONADA = JSON.parse(
+		document.getElementById('solicitudPreseleccionada').textContent || '0'
+	);
 
-	function applyOrdenesFilters() {
-		const searchValue = String(ordenesSearchInput?.value || '').toLowerCase().trim();
-		const estadoValue = String(ordenesEstadoFiltro?.value || 'TODOS').toUpperCase();
-		document.querySelectorAll('tr[data-row="orden"]').forEach((tableRowElement) => {
-			const rowLabel = String(tableRowElement.dataset.label || '').toLowerCase();
-			const rowEstado = String(tableRowElement.dataset.estado || '').toUpperCase();
-			const matchesSearch = rowLabel.includes(searchValue);
-			const matchesEstado = estadoValue === 'TODOS' || rowEstado === estadoValue;
-			tableRowElement.style.display = matchesSearch && matchesEstado ? '' : 'none';
+	const recipesByProduct = ACTIVE_RECIPES.reduce((accumulator, recipeItem) => {
+		const productId = String(recipeItem.id_producto);
+		if (!accumulator[productId]) {
+			accumulator[productId] = [];
+		}
+		accumulator[productId].push(recipeItem);
+		return accumulator;
+	}, {});
+
+	const ordersById = new Map(ORDERS.map((orderItem) => [Number(orderItem.id_orden), orderItem]));
+
+	const stateClasses = {
+		PENDIENTE: 'warning',
+		EN_PROCESO: 'neutral',
+		FINALIZADO: 'success',
+		CANCELADO: 'danger',
+	};
+
+	const orderBody = document.getElementById('ordenesBody');
+	const searchInput = document.getElementById('ordenesSearch');
+	const stateFilter = document.getElementById('ordenesEstadoFiltro');
+	const kpiTotal = document.getElementById('kpiTotalOrdenes');
+	const kpiPendientes = document.getElementById('kpiPendientes');
+	const kpiEnProceso = document.getElementById('kpiEnProceso');
+	const kpiFinalizadas = document.getElementById('kpiFinalizadas');
+
+	const detailModal = new bootstrap.Modal(document.getElementById('modalDetalleOrden'));
+	const detailTitle = document.getElementById('detalleOrdenTitulo');
+	const detailSummary = document.getElementById('detalleOrdenResumen');
+	const detailTypeChip = document.getElementById('detalleOrdenTipoChip');
+	const detailBody = document.getElementById('detalleOrdenBody');
+
+	function formatNumber(value, fractionDigits = 2) {
+		const numberValue = Number(value || 0);
+		return numberValue.toLocaleString('es-MX', {
+			minimumFractionDigits: fractionDigits,
+			maximumFractionDigits: fractionDigits,
 		});
 	}
 
-	if (ordenesSearchInput) {
-		ordenesSearchInput.addEventListener('input', applyOrdenesFilters);
+	function formatMoney(value) {
+		return `$${formatNumber(value, 2)}`;
 	}
-	if (ordenesEstadoFiltro) {
-		ordenesEstadoFiltro.addEventListener('change', applyOrdenesFilters);
+
+	function formatQty(value) {
+		return formatNumber(value, 2).replace(/\.00$/, '');
+	}
+
+	function normalizeStateLabel(stateValue) {
+		return String(stateValue || '').replaceAll('_', ' ');
+	}
+
+	function updateKpis(filteredOrders) {
+		const pendingCount = filteredOrders.filter((item) => item.estado === 'PENDIENTE').length;
+		const inProgressCount = filteredOrders.filter((item) => item.estado === 'EN_PROCESO').length;
+		const completedCount = filteredOrders.filter((item) => item.estado === 'FINALIZADO').length;
+		kpiTotal.textContent = String(filteredOrders.length);
+		kpiPendientes.textContent = String(pendingCount);
+		kpiEnProceso.textContent = String(inProgressCount);
+		kpiFinalizadas.textContent = String(completedCount);
+	}
+
+	function buildActions(orderItem) {
+		const viewButton = `
+			<button
+				type="button"
+				class="btn btn-sm btn-outline-primary"
+				onclick="verDetalleOrden(${orderItem.id_orden})">
+				<i class="bi bi-eye-fill"></i>
+				Ver
+			</button>
+		`;
+
+		if (!CAN_MANAGE) {
+			return `<div class="btn-action-group">${viewButton}</div>`;
+		}
+
+		let actionButtons = viewButton;
+		if (orderItem.estado === 'PENDIENTE') {
+			actionButtons += `
+				<button
+					type="button"
+					class="btn btn-sm btn-outline-success"
+					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'iniciar')">
+					<i class="bi bi-play-fill"></i>
+					Iniciar
+				</button>
+				<button
+					type="button"
+					class="btn btn-sm btn-outline-danger"
+					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'cancelar')">
+					<i class="bi bi-x-lg"></i>
+					Cancelar
+				</button>
+			`;
+		}
+
+		if (orderItem.estado === 'EN_PROCESO') {
+			actionButtons += `
+				<button
+					type="button"
+					class="btn btn-sm btn-outline-secondary"
+					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'finalizar')">
+					<i class="bi bi-check2-all"></i>
+					Finalizar
+				</button>
+			`;
+		}
+
+		return `<div class="btn-action-group">${actionButtons}</div>`;
+	}
+
+	function renderOrders(orderList) {
+		if (!orderBody) {
+			return;
+		}
+
+		if (!orderList.length) {
+			orderBody.innerHTML = `
+				<tr>
+					<td colspan="8" class="text-center py-4 text-secondary">
+						No hay órdenes para este filtro.
+					</td>
+				</tr>
+			`;
+			updateKpis(orderList);
+			return;
+		}
+
+		orderBody.innerHTML = orderList
+			.map((orderItem) => {
+				const chipClass = stateClasses[orderItem.estado] || 'neutral';
+				const costoMostrado =
+					orderItem.costo_total && Number(orderItem.costo_total) > 0
+						? formatMoney(orderItem.costo_total)
+						: orderItem.costo_estimado && Number(orderItem.costo_estimado) > 0
+							? `${formatMoney(orderItem.costo_estimado)}*`
+							: 'Por calcular';
+				const fechaInicio = orderItem.fecha_inicio_texto || '—';
+				const fechaFin = orderItem.fecha_fin_texto || '—';
+				return `
+					<tr>
+						<td>
+							<div class="prod-orders-folio">${orderItem.folio}</div>
+						</td>
+						<td>
+							<div class="prod-orders-product-cell">
+								<div class="prod-orders-product-icon">
+									<i class="bi bi-cake2-fill"></i>
+								</div>
+								<div>
+									<div class="prod-orders-product-name">${orderItem.producto_nombre}</div>
+									<div class="prod-orders-product-sub">Receta v${orderItem.receta_version}</div>
+								</div>
+							</div>
+						</td>
+						<td>${formatQty(orderItem.cantidad_producir)} pzas</td>
+						<td class="prod-orders-costo">${costoMostrado}</td>
+						<td>
+							<span class="ops-chip ${chipClass}">${normalizeStateLabel(orderItem.estado)}</span>
+						</td>
+						<td>${fechaInicio}</td>
+						<td>${fechaFin}</td>
+						<td>${buildActions(orderItem)}</td>
+					</tr>
+				`;
+			})
+			.join('');
+
+		updateKpis(orderList);
+	}
+
+	function applyFilters() {
+		const query = String(searchInput?.value || '')
+			.toLowerCase()
+			.trim();
+		const stateValue = String(stateFilter?.value || 'TODOS').toUpperCase();
+
+		const filtered = ORDERS.filter((orderItem) => {
+			const label =
+				`${orderItem.folio} ${orderItem.producto_nombre} receta v${orderItem.receta_version}`
+					.toLowerCase()
+					.trim();
+			const queryOk = !query || label.includes(query);
+			const stateOk = stateValue === 'TODOS' || orderItem.estado === stateValue;
+			return queryOk && stateOk;
+		});
+
+		renderOrders(filtered);
+	}
+
+	function renderDetailRows(orderItem) {
+		if (!detailBody) {
+			return;
+		}
+		if (!orderItem.detalles || !orderItem.detalles.length) {
+			detailBody.innerHTML = `
+				<tr>
+					<td colspan="9" class="text-center py-3 text-secondary">
+						No hay insumos registrados para esta orden.
+					</td>
+				</tr>
+			`;
+			return;
+		}
+
+		detailBody.innerHTML = orderItem.detalles
+			.map((detalle, index) => {
+				const stockClass = detalle.suficiente ? 'success' : 'danger';
+				return `
+					<tr>
+						<td>${index + 1}</td>
+						<td class="fw-semibold">${detalle.materia_nombre}</td>
+						<td><span class="ops-chip neutral">${detalle.unidad}</span></td>
+						<td>${formatQty(detalle.cantidad_receta)} ${detalle.unidad}</td>
+						<td>${formatQty(detalle.cantidad_necesaria)} ${detalle.unidad}</td>
+						<td>${formatQty(detalle.merma_pct)}%</td>
+						<td class="fw-semibold">${formatQty(detalle.cantidad_real)} ${detalle.unidad}</td>
+						<td>${formatQty(detalle.stock_actual)} ${detalle.unidad}</td>
+						<td>
+							<span class="ops-chip ${stockClass}">
+								${detalle.suficiente ? 'OK' : 'Insuficiente'}
+							</span>
+						</td>
+					</tr>
+				`;
+			})
+			.join('');
+	}
+
+	function renderDetailSummary(orderItem) {
+		detailSummary.innerHTML = `
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Orden</span>
+				<strong>${orderItem.folio}</strong>
+			</div>
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Producto</span>
+				<strong>${orderItem.producto_nombre}</strong>
+			</div>
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Cantidad</span>
+				<strong>${formatQty(orderItem.cantidad_producir)} pzas</strong>
+			</div>
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Estado</span>
+				<strong>${normalizeStateLabel(orderItem.estado)}</strong>
+			</div>
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Costo</span>
+				<strong>${
+					orderItem.costo_total && Number(orderItem.costo_total) > 0
+						? formatMoney(orderItem.costo_total)
+						: formatMoney(orderItem.costo_estimado)
+				}</strong>
+			</div>
+			<div class="prod-orders-summary-card">
+				<span class="prod-orders-summary-label">Fechas</span>
+				<strong>${orderItem.fecha_inicio_texto || '—'} / ${orderItem.fecha_fin_texto || '—'}</strong>
+			</div>
+			${
+				orderItem.observaciones
+					? `<div class="prod-orders-summary-card prod-orders-summary-wide"><span class="prod-orders-summary-label">Observaciones</span><strong>${orderItem.observaciones}</strong></div>`
+					: ''
+			}
+		`;
+	}
+
+	function verDetalleOrden(orderId) {
+		const orderItem = ordersById.get(Number(orderId));
+		if (!orderItem) {
+			return;
+		}
+		detailTitle.innerHTML = `<i class="bi bi-eye-fill me-2"></i>${orderItem.producto_nombre} — ${orderItem.folio}`;
+		renderDetailSummary(orderItem);
+		renderDetailRows(orderItem);
+		detailTypeChip.className = `ops-chip ${
+			orderItem.tipo_detalle === 'CONSUMIDO' ? 'success' : 'neutral'
+		}`;
+		detailTypeChip.textContent =
+			orderItem.tipo_detalle === 'CONSUMIDO'
+				? 'Consumo registrado'
+				: 'Estimado (pendiente de inicio)';
+		detailModal.show();
+	}
+
+	window.verDetalleOrden = verDetalleOrden;
+
+	if (searchInput) {
+		searchInput.addEventListener('input', applyFilters);
+	}
+	if (stateFilter) {
+		stateFilter.addEventListener('change', applyFilters);
+	}
+
+	applyFilters();
+
+	if (CAN_MANAGE) {
+		const createModal = new bootstrap.Modal(document.getElementById('modalNuevaOrden'));
+		const confirmModal = new bootstrap.Modal(document.getElementById('modalConfirmarAccionOrden'));
+		const btnNuevaOrden = document.getElementById('btnNuevaOrden');
+		const productSelect = document.getElementById('crearOrdenProducto');
+		const solicitudSelect = document.getElementById('crearOrdenSolicitud');
+		const recipeSelect = document.getElementById('crearOrdenReceta');
+		const cantidadInput = document.getElementById('crearOrdenCantidad');
+		const recetaHint = document.getElementById('crearOrdenRecetaHint');
+		const rendHint = document.getElementById('crearOrdenRendHint');
+		const explosionWrap = document.getElementById('explosionWrap');
+		const explosionBody = document.getElementById('explosionBody');
+		const explosionCostoPreview = document.getElementById('explosionCostoPreview');
+		const explosionEstadoMensaje = document.getElementById('explosionEstadoMensaje');
+		const formCrearOrden = document.getElementById('formCrearOrden');
+		const btnVerificarMateriales = document.getElementById('btnVerificarMateriales');
+		const actionOrderId = document.getElementById('accionOrdenId');
+		const actionOrderType = document.getElementById('accionOrdenTipo');
+		const confirmOrderTitle = document.getElementById('confirmOrdenTitulo');
+		const confirmOrderMessage = document.getElementById('confirmOrdenMensaje');
+		const confirmOrderIcon = document.getElementById('confirmOrdenIcon');
+		const confirmOrderBtn = document.getElementById('confirmOrdenBtn');
+
+		function resetCreateModal() {
+			if (!formCrearOrden) {
+				return;
+			}
+			formCrearOrden.reset();
+			if (solicitudSelect && SOLICITUD_PRESELECCIONADA > 0) {
+				solicitudSelect.value = String(SOLICITUD_PRESELECCIONADA);
+			}
+			recipeSelect.innerHTML = '<option value="">Selecciona primero un producto...</option>';
+			recetaHint.textContent = 'Sólo se muestran versiones activas.';
+			rendHint.textContent = '';
+			explosionWrap.style.display = 'none';
+			explosionBody.innerHTML = '';
+			explosionCostoPreview.innerHTML = '';
+			explosionEstadoMensaje.innerHTML = '';
+		}
+
+		function syncFromSolicitud() {
+			if (!solicitudSelect || !solicitudSelect.value) {
+				return;
+			}
+			const selected = solicitudSelect.options[solicitudSelect.selectedIndex];
+			if (!selected) {
+				return;
+			}
+			const producto = String(selected.dataset.producto || '');
+			const cantidad = Number(selected.dataset.cantidad || 0);
+			if (producto) {
+				productSelect.value = producto;
+				populateRecipesByProduct();
+			}
+			if (cantidad > 0) {
+				cantidadInput.value = String(cantidad);
+			}
+		}
+
+		function getSelectedRecipe() {
+			const recipeId = String(recipeSelect?.value || '');
+			if (!recipeId) {
+				return null;
+			}
+			return ACTIVE_RECIPES.find((item) => String(item.id_receta) === recipeId) || null;
+		}
+
+		function populateRecipesByProduct() {
+			const productId = String(productSelect?.value || '');
+			recipeSelect.innerHTML = '';
+			if (!productId) {
+				recipeSelect.innerHTML = '<option value="">Selecciona primero un producto...</option>';
+				rendHint.textContent = '';
+				return;
+			}
+			const productRecipes = recipesByProduct[productId] || [];
+			if (!productRecipes.length) {
+				recipeSelect.innerHTML = '<option value="">Sin receta activa</option>';
+				recetaHint.textContent = 'No existe receta activa para este producto.';
+				rendHint.textContent = '';
+				return;
+			}
+			recipeSelect.innerHTML = '<option value="">Seleccionar receta...</option>';
+			productRecipes.forEach((recipeItem) => {
+				const option = document.createElement('option');
+				option.value = String(recipeItem.id_receta);
+				option.textContent = `v${recipeItem.version} — Rendimiento: ${formatQty(
+					recipeItem.rendimiento_base
+				)} ${recipeItem.unidad_produccion}`;
+				recipeSelect.appendChild(option);
+			});
+			recetaHint.textContent = 'Sólo se muestran versiones activas.';
+		}
+
+		function calcularExplosion() {
+			const recipeItem = getSelectedRecipe();
+			const cantidad = Number(cantidadInput?.value || 0);
+			if (!recipeItem || !cantidad || cantidad <= 0) {
+				return null;
+			}
+			const factor = cantidad / Number(recipeItem.rendimiento_base || 1);
+			let totalCost = 0;
+			let stockOk = true;
+			const rows = (recipeItem.detalles || []).map((detalleItem) => {
+				const cantidadReceta = Number(detalleItem.cantidad_receta || 0);
+				const merma = Number(detalleItem.merma_pct || 0);
+				const cantidadNecesaria = cantidadReceta * factor;
+				const cantidadReal = cantidadNecesaria * (1 + merma / 100);
+				const stockActual = Number(detalleItem.stock_actual || 0);
+				const suficiente = stockActual >= cantidadReal;
+				if (!suficiente) {
+					stockOk = false;
+				}
+				totalCost += cantidadReal * Number(detalleItem.costo_unitario || 0);
+				return {
+					...detalleItem,
+					cantidadNecesaria,
+					cantidadReal,
+					stockActual,
+					suficiente,
+				};
+			});
+			return {
+				rows,
+				stockOk,
+				totalCost,
+				costoUnitario: cantidad > 0 ? totalCost / cantidad : 0,
+			};
+		}
+
+		function renderExplosion(result) {
+			if (!result) {
+				explosionWrap.style.display = 'none';
+				return;
+			}
+
+			explosionBody.innerHTML = result.rows
+				.map((detalleItem, index) => {
+					const chipClass = detalleItem.suficiente ? 'success' : 'danger';
+					return `
+						<tr>
+							<td>${index + 1}</td>
+							<td class="fw-semibold">${detalleItem.materia_nombre}</td>
+							<td><span class="ops-chip neutral">${detalleItem.unidad}</span></td>
+							<td>${formatQty(detalleItem.cantidad_receta)} ${detalleItem.unidad}</td>
+							<td>${formatQty(detalleItem.cantidadNecesaria)} ${detalleItem.unidad}</td>
+							<td>${formatQty(detalleItem.merma_pct)}%</td>
+							<td class="fw-semibold">${formatQty(detalleItem.cantidadReal)} ${detalleItem.unidad}</td>
+							<td>${formatQty(detalleItem.stockActual)} ${detalleItem.unidad}</td>
+							<td><span class="ops-chip ${chipClass}">${
+								detalleItem.suficiente ? 'OK' : 'Insuficiente'
+							}</span></td>
+						</tr>
+					`;
+				})
+				.join('');
+
+			explosionCostoPreview.innerHTML = `
+				<div class="prod-orders-cost-row">
+					<span>Costo estimado de materiales</span>
+					<strong>${formatMoney(result.totalCost)}</strong>
+				</div>
+				<div class="prod-orders-cost-row">
+					<span>Costo unitario estimado</span>
+					<strong>${formatMoney(result.costoUnitario)}</strong>
+				</div>
+			`;
+
+			explosionEstadoMensaje.innerHTML = result.stockOk
+				? '<div class="prod-orders-alert success"><i class="bi bi-check-circle-fill"></i>Materiales suficientes para iniciar la producción.</div>'
+				: '<div class="prod-orders-alert danger"><i class="bi bi-exclamation-triangle-fill"></i>Inventario insuficiente en uno o más insumos.</div>';
+
+			explosionWrap.style.display = 'block';
+		}
+
+		function validarFormularioCrearOrden() {
+			const productId = Number(productSelect?.value || 0);
+			const recipeId = Number(recipeSelect?.value || 0);
+			const cantidad = Number(cantidadInput?.value || 0);
+			if (productId <= 0 || recipeId <= 0 || cantidad <= 0) {
+				return 'Selecciona producto, receta activa y cantidad mayor a cero.';
+			}
+
+			const result = calcularExplosion();
+			if (!result) {
+				return 'No se pudo calcular la explosión de materiales.';
+			}
+			if (!result.stockOk) {
+				return 'No hay suficiente materia prima para crear la orden.';
+			}
+			return null;
+		}
+
+		function getActionConfig(actionType, orderItem) {
+			if (actionType === 'iniciar') {
+				return {
+					title: '¿Iniciar producción?',
+					message: `Se descontará materia prima con merma para ${orderItem.producto_nombre} (${formatQty(orderItem.cantidad_producir)} pzas).`,
+					iconClass: 'success',
+					buttonClass: 'btn btn-success',
+					buttonText: 'Iniciar',
+				};
+			}
+			if (actionType === 'finalizar') {
+				return {
+					title: '¿Finalizar producción?',
+					message: `Se incrementará inventario de producto terminado para ${orderItem.producto_nombre}.`,
+					iconClass: 'neutral',
+					buttonClass: 'btn btn-primary',
+					buttonText: 'Finalizar',
+				};
+			}
+			return {
+				title: '¿Cancelar orden?',
+				message: `La orden ${orderItem.folio} pasará a estado cancelado.`,
+				iconClass: 'danger',
+				buttonClass: 'btn btn-danger',
+				buttonText: 'Cancelar orden',
+			};
+		}
+
+		function confirmarAccionOrden(orderId, actionType) {
+			const orderItem = ordersById.get(Number(orderId));
+			if (!orderItem) {
+				return;
+			}
+			const config = getActionConfig(actionType, orderItem);
+			actionOrderId.value = String(orderItem.id_orden);
+			actionOrderType.value = actionType;
+			confirmOrderTitle.textContent = config.title;
+			confirmOrderMessage.textContent = config.message;
+			confirmOrderIcon.className = `prod-orders-confirm-icon ${config.iconClass}`;
+			confirmOrderIcon.innerHTML = '<i class="bi bi-exclamation-lg"></i>';
+			confirmOrderBtn.className = config.buttonClass;
+			confirmOrderBtn.textContent = config.buttonText;
+			confirmModal.show();
+		}
+
+		window.confirmarAccionOrden = confirmarAccionOrden;
+
+		if (btnNuevaOrden) {
+			btnNuevaOrden.addEventListener('click', () => {
+				resetCreateModal();
+				syncFromSolicitud();
+				createModal.show();
+			});
+		}
+
+		if (solicitudSelect) {
+			solicitudSelect.addEventListener('change', () => {
+				syncFromSolicitud();
+				explosionWrap.style.display = 'none';
+			});
+		}
+
+		if (productSelect) {
+			productSelect.addEventListener('change', () => {
+				populateRecipesByProduct();
+				explosionWrap.style.display = 'none';
+			});
+		}
+
+		if (recipeSelect) {
+			recipeSelect.addEventListener('change', () => {
+				const recipeItem = getSelectedRecipe();
+				rendHint.textContent = recipeItem
+					? `Rendimiento base: ${formatQty(recipeItem.rendimiento_base)} ${recipeItem.unidad_produccion}`
+					: '';
+				explosionWrap.style.display = 'none';
+			});
+		}
+
+		if (cantidadInput) {
+			cantidadInput.addEventListener('input', () => {
+				explosionWrap.style.display = 'none';
+			});
+		}
+
+		if (btnVerificarMateriales) {
+			btnVerificarMateriales.addEventListener('click', () => {
+				const result = calcularExplosion();
+				renderExplosion(result);
+			});
+		}
+
+		if (formCrearOrden) {
+			formCrearOrden.addEventListener('submit', (event) => {
+				const error = validarFormularioCrearOrden();
+				if (!error) {
+					return;
+				}
+				event.preventDefault();
+				renderExplosion(calcularExplosion());
+				explosionEstadoMensaje.innerHTML = `<div class="prod-orders-alert danger"><i class="bi bi-exclamation-triangle-fill"></i>${error}</div>`;
+			});
+		}
 	}
 </script>
 {% endblock %}

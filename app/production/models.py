@@ -1,4 +1,15 @@
-from app.models import DetalleReceta, OrdenProduccion, Receta, SolicitudProduccion
+from app.models import (
+    DetalleOrdenProduccion,
+    DetalleReceta,
+    OrdenProduccion,
+    Receta,
+    SolicitudProduccion,
+)
 
-
-__all__ = ["Receta", "DetalleReceta", "SolicitudProduccion", "OrdenProduccion"]
+__all__ = [
+    "Receta",
+    "DetalleReceta",
+    "SolicitudProduccion",
+    "OrdenProduccion",
+    "DetalleOrdenProduccion",
+]

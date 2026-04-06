@@ -1,56 +1,450 @@
-{% extends "base_template.html" %} {% block title %}Solicitudes de Produccion{% endblock %} {% block
-content %}
+{% extends "base_template.html" %}
+{% block title %}Solicitudes de Producción{% endblock %}
+{% block page_title %}Módulo de Ventas — Solicitudes{% endblock %}
+
+{% block content %}
 <section class="section">
+	{% set ns = namespace(total=0, pendientes=0, aprobadas=0, rechazadas=0) %}
+	{% set ns_stock = namespace(bajo=0) %}
+	{% for producto in productos %}
+		{% if productos_bajo_stock.get(producto.id_producto) %}
+			{% set ns_stock.bajo = ns_stock.bajo + 1 %}
+		{% endif %}
+	{% endfor %}
+	{% for s in solicitudes %}
+		{% set ns.total = ns.total + 1 %}
+		{% if s.estado == 'PENDIENTE' %}
+			{% set ns.pendientes = ns.pendientes + 1 %}
+		{% elif s.estado == 'APROBADA' %}
+			{% set ns.aprobadas = ns.aprobadas + 1 %}
+		{% elif s.estado == 'RECHAZADA' %}
+			{% set ns.rechazadas = ns.rechazadas + 1 %}
+		{% endif %}
+	{% endfor %}
+
 	<div class="ops-hero">
 		<p class="ops-meta mb-1">Panel de ventas</p>
-		<h2 class="ops-hero-title">Solicitudes de producción</h2>
-		<p class="ops-hero-text">Genera solicitudes cuando el stock esté cerca del mínimo.</p>
+		<h2 class="ops-hero-title">Solicitudes de Producción</h2>
+		<p class="ops-hero-text">
+			Registra solicitudes cuando detectes riesgo de quiebre de stock. Cada solicitud nace
+			en estado pendiente y queda trazada para producción.
+		</p>
 	</div>
-	<div class="ops-card">
-		<h3 class="ops-card-title">Nueva solicitud</h3>
-		<form method="post" class="ops-grid">
-			<select name="id_producto" required>
-				<option value="">Producto</option>
-				{% for p in productos %}
-				<option value="{{ p.id_producto }}">{{ p.nombre }}</option>
-				{% endfor %}
-			</select>
-			<input type="number" min="1" name="cantidad" placeholder="Cantidad" required />
-			<input type="text" name="observaciones" placeholder="Observaciones" />
-			<button type="submit">Solicitar</button>
-		</form>
+
+	<div class="ops-kpi-grid compact">
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Solicitudes totales</p>
+			<p class="ops-kpi-value">{{ ns.total }}</p>
+			<p class="ops-kpi-sub">Histórico de ventas</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Pendientes</p>
+			<p class="ops-kpi-value text-warning">{{ ns.pendientes }}</p>
+			<p class="ops-kpi-sub">En espera de revisión</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Aprobadas</p>
+			<p class="ops-kpi-value text-success">{{ ns.aprobadas }}</p>
+			<p class="ops-kpi-sub">Disponibles para orden</p>
+		</article>
+		<article class="ops-kpi">
+			<p class="ops-kpi-label">Rechazadas</p>
+			<p class="ops-kpi-value text-danger">{{ ns.rechazadas }}</p>
+			<p class="ops-kpi-sub">Sin seguimiento productivo</p>
+		</article>
 	</div>
 
 	<div class="ops-card">
-		<h3 class="ops-card-title">Historial de solicitudes</h3>
+		<div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+			<div>
+				<h3 class="ops-card-title mb-1">Bandeja de solicitudes</h3>
+				<p class="text-secondary mb-0 small">
+					Solo puedes editar tus solicitudes mientras permanezcan en estado pendiente.
+				</p>
+			</div>
+			<button
+				type="button"
+				class="btn btn-sm"
+				data-bs-toggle="modal"
+				data-bs-target="#modalNuevaSolicitud">
+				<i class="bi bi-plus-lg me-1"></i>
+				Nueva solicitud
+			</button>
+		</div>
+
+		<div class="ops-toolbar mt-3">
+			<form method="get" class="ops-toolbar w-100 mb-0">
+				<div class="ops-input-wrap">
+					<i class="bi bi-search"></i>
+					<input
+						type="text"
+						name="q"
+						value="{{ busqueda or '' }}"
+						placeholder="Buscar por id o producto" />
+				</div>
+				<select name="estado" style="max-width: 180px">
+					<option value="TODOS" {{ 'selected' if estado_filtro == 'TODOS' else '' }}>
+						Todos
+					</option>
+					<option value="PENDIENTE" {{ 'selected' if estado_filtro == 'PENDIENTE' else '' }}>
+						Pendiente
+					</option>
+					<option value="APROBADA" {{ 'selected' if estado_filtro == 'APROBADA' else '' }}>
+						Aprobada
+					</option>
+					<option value="RECHAZADA" {{ 'selected' if estado_filtro == 'RECHAZADA' else '' }}>
+						Rechazada
+					</option>
+				</select>
+				<button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+			</form>
+		</div>
+
+		{% if ns_stock.bajo %}
+		<div class="prod-orders-alert danger mb-3">
+			<i class="bi bi-exclamation-triangle-fill"></i>
+			<div>
+				<strong>{{ ns_stock.bajo }} producto{{ 's' if ns_stock.bajo != 1 else '' }} con stock bajo</strong>
+				<div class="small">Úsalos como referencia para justificar solicitudes urgentes.</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="prod-orders-alert success mb-3">
+			<i class="bi bi-check-circle-fill"></i>
+			<div>
+				<strong>Inventario estable</strong>
+				<div class="small">No hay productos por debajo de su mínimo configurado.</div>
+			</div>
+		</div>
+		{% endif %}
+
 		<div class="ops-table table-responsive">
 			<table class="table table-hover align-middle mb-0">
 				<thead>
 					<tr>
 						<th>ID</th>
 						<th>Producto</th>
-						<th>Cantidad</th>
+						<th>Cant. solicitada</th>
+						<th>Stock actual</th>
+						<th>Solicitante</th>
+						<th>Fecha solicitud</th>
 						<th>Estado</th>
-						<th>Solicita</th>
+						<th>Resuelto por</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for s in solicitudes %}
+					{% set producto = s.producto %}
+					{% set orden_vinculada = s.ordenes[0] if s.ordenes else none %}
+					{% set stock_actual = producto.cantidad_disponible if producto else 0 %}
+					{% set stock_minimo = producto.stock_minimo if producto else 0 %}
 					<tr>
-						<td>{{ s.id_solicitud }}</td>
-						<td>{{ s.producto.nombre }}</td>
-						<td>{{ s.cantidad }}</td>
-						<td><span class="ops-chip neutral">{{ s.estado }}</span></td>
-						<td>{{ s.id_usuario_solicita }}</td>
+						<td><strong class="text-primary">SOL-{{ '%03d'|format(s.id_solicitud) }}</strong></td>
+						<td>
+							<div class="d-flex align-items-center gap-2">
+								<div class="prod-orders-product-icon">
+									<i class="bi bi-send-fill"></i>
+								</div>
+								<div>
+									<div class="prod-orders-product-name">
+										{{ producto.nombre if producto else 'Producto' }}
+									</div>
+									<div class="prod-orders-product-sub">Prod. terminado</div>
+								</div>
+							</div>
+						</td>
+						<td><strong>{{ s.cantidad }} pzas</strong></td>
+						<td>
+							{% if stock_actual <= 0 %}
+								<span class="ops-chip danger">0 pzas</span>
+							{% elif stock_actual < stock_minimo %}
+								<span class="ops-chip warning">{{ stock_actual }} pzas ↓</span>
+							{% else %}
+								<span class="ops-chip success">{{ stock_actual }} pzas ✓</span>
+							{% endif %}
+						</td>
+						<td>
+							{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}
+						</td>
+						<td>{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
+						<td>
+							<span
+								class="ops-chip {{ 'warning' if s.estado == 'PENDIENTE' else 'success' if s.estado == 'APROBADA' else 'danger' }}">
+								{{ s.estado }}
+							</span>
+						</td>
+						<td>
+							{% if s.usuario_resuelve and s.usuario_resuelve.persona %}
+								{{ s.usuario_resuelve.persona.nombre }}
+							{% elif s.usuario_resuelve %}
+								{{ s.usuario_resuelve.username }}
+							{% else %}
+								—
+							{% endif %}
+						</td>
+						<td>
+							<div class="btn-action-group">
+								<button
+									type="button"
+									class="btn btn-sm btn-outline-primary btn-icon-sm js-editar-solicitud"
+									title="Editar solicitud"
+									data-id="{{ s.id_solicitud }}"
+									data-producto="{{ producto.nombre if producto else 'Producto' }}"
+									data-cantidad="{{ s.cantidad }}"
+									data-observaciones="{{ s.observaciones or '' }}"
+									{{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
+									<i class="bi bi-pencil-fill"></i>
+								</button>
+								{% if orden_vinculada %}
+									<span class="ops-chip neutral" title="Orden vinculada">
+										<i class="bi bi-link-45deg"></i>
+										ORD-{{ '%03d'|format(orden_vinculada.id_orden) }}
+									</span>
+								{% elif s.estado == 'APROBADA' %}
+									<span class="ops-chip warning">Lista para orden</span>
+								{% endif %}
+							</div>
+						</td>
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="5">No hay solicitudes registradas.</td>
+						<td colspan="9" class="text-center py-4">No hay solicitudes registradas.</td>
 					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content prod-orders-modal-content">
+				<div class="modal-header prod-orders-modal-header">
+					<h5 class="modal-title fw-bold">
+						<i class="bi bi-send me-2"></i>
+						Nueva Solicitud de Producción
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Cerrar"></button>
+				</div>
+				<form method="post" id="formNuevaSolicitud">
+					<input type="hidden" name="action" value="crear" />
+					<div class="modal-body prod-orders-modal-body">
+						<div class="prod-orders-section-card">
+							<div class="prod-orders-section-title">
+								<i class="bi bi-info-circle-fill"></i>
+								Datos de la solicitud
+							</div>
+							<div class="ops-grid">
+								<div>
+									<label class="form-label fw-semibold" for="nuevoProducto">Producto <span class="text-danger">*</span></label>
+									<select id="nuevoProducto" name="id_producto" class="form-select" required>
+										<option value="">Seleccionar producto...</option>
+										{% for p in productos %}
+										<option
+											value="{{ p.id_producto }}"
+											data-stock="{{ p.cantidad_disponible }}"
+											data-min="{{ p.stock_minimo }}"
+											data-bajo="{{ 1 if productos_bajo_stock.get(p.id_producto) else 0 }}">
+											{{ p.nombre }}
+										</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div>
+									<label class="form-label fw-semibold" for="nuevoCantidad">
+										Cantidad solicitada <span class="text-danger">*</span>
+									</label>
+									<input
+										id="nuevoCantidad"
+										type="number"
+										min="1"
+										step="1"
+										name="cantidad"
+										class="form-control"
+										placeholder="Ej. 24"
+										required />
+									<div class="form-hint mt-1">Piezas / porciones requeridas.</div>
+								</div>
+								<div>
+									<label class="form-label fw-semibold" for="nuevoObs">Observaciones</label>
+									<input
+										id="nuevoObs"
+										type="text"
+										name="observaciones"
+										class="form-control"
+										placeholder="Motivo, pedido especial..." />
+								</div>
+						</div>
+						<div id="nuevoStockPreview" class="mt-3" style="display: none;"></div>
+					</div>
+					<div class="prod-orders-info-banner mb-0">
+						<i class="bi bi-info-circle-fill"></i>
+						<span>
+							La solicitud nace en estado <strong>PENDIENTE</strong> y producción será quien la
+							revise, apruebe o rechace.
+						</span>
+					</div>
+					<div class="modal-footer prod-orders-modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-send-fill me-1"></i>
+							Enviar solicitud
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalEditarSolicitud" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-md modal-dialog-centered">
+			<div class="modal-content prod-orders-modal-content">
+				<div class="modal-header prod-orders-modal-header">
+					<h5 class="modal-title fw-bold">
+						<i class="bi bi-pencil-square me-2"></i>
+						Editar solicitud pendiente
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Cerrar"></button>
+				</div>
+				<form method="post">
+					<input type="hidden" name="action" value="editar" />
+					<input type="hidden" name="id_solicitud" id="editarSolicitudId" />
+					<div class="modal-body prod-orders-modal-body">
+						<div class="prod-orders-section-card mb-3">
+							<div class="prod-orders-section-title">
+								<i class="bi bi-box2-heart-fill"></i>
+								Producto
+							</div>
+							<div class="fw-bold" id="editarSolicitudProducto">—</div>
+						</div>
+						<div class="ops-grid">
+							<div>
+								<label class="form-label fw-semibold" for="editarSolicitudCantidad">Cantidad</label>
+								<input
+									id="editarSolicitudCantidad"
+									type="number"
+									name="cantidad"
+									min="1"
+									step="1"
+									class="form-control"
+									required />
+							</div>
+							<div>
+								<label class="form-label fw-semibold" for="editarSolicitudObs">Observaciones</label>
+								<input
+									id="editarSolicitudObs"
+									type="text"
+									name="observaciones"
+									class="form-control"
+									placeholder="Actualiza el contexto..." />
+							</div>
+						</div>
+						<div class="prod-orders-info-banner mb-0 mt-3">
+							<i class="bi bi-lock-fill"></i>
+							<span>Solo las solicitudes en estado <strong>PENDIENTE</strong> pueden editarse.</span>
+						</div>
+					</div>
+					<div class="modal-footer prod-orders-modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">Guardar cambios</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	const nuevoProducto = document.getElementById('nuevoProducto');
+	const nuevoStockPreview = document.getElementById('nuevoStockPreview');
+	const modalEditarSolicitud = new bootstrap.Modal(
+		document.getElementById('modalEditarSolicitud'),
+	);
+	const modalNuevaSolicitud = document.getElementById('modalNuevaSolicitud');
+
+	function actualizarPreviewStock() {
+		if (!nuevoProducto || !nuevoStockPreview) {
+			return;
+		}
+
+		const option = nuevoProducto.options[nuevoProducto.selectedIndex];
+		if (!option || !option.value) {
+			nuevoStockPreview.style.display = 'none';
+			nuevoStockPreview.innerHTML = '';
+			return;
+		}
+
+		const stock = Number(option.dataset.stock || 0);
+		const min = Number(option.dataset.min || 0);
+		const bajo = String(option.dataset.bajo || '0') === '1';
+		const porcentaje = min > 0 ? Math.min(100, Math.round((stock / min) * 100)) : 0;
+		const color = stock <= 0 ? 'danger' : bajo ? 'danger' : 'success';
+		const icon = stock <= 0 ? 'bi-x-circle-fill' : bajo ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill';
+		const titulo = stock <= 0 ? 'Sin stock disponible' : bajo ? 'Stock bajo — justificación de la solicitud' : 'Stock disponible actualmente';
+		const descripcion = `Stock actual: ${stock} pzas · mínimo: ${min} pzas`;
+
+		nuevoStockPreview.className = `prod-orders-alert ${color}`;
+		nuevoStockPreview.style.display = 'flex';
+		nuevoStockPreview.innerHTML = `
+			<i class="bi ${icon}"></i>
+			<div class="w-100">
+				<strong>${titulo}</strong>
+				<div class="small mb-2">${descripcion}</div>
+				<div class="progress" style="height: 7px; background: #eadfd8;">
+					<div
+						class="progress-bar ${stock <= 0 ? 'bg-danger' : bajo ? 'bg-warning' : 'bg-success'}"
+						role="progressbar"
+						style="width: ${porcentaje}%"
+						aria-valuenow="${porcentaje}"
+						aria-valuemin="0"
+						aria-valuemax="100"></div>
+				</div>
+			</div>`;
+	}
+
+	if (nuevoProducto) {
+		nuevoProducto.addEventListener('change', actualizarPreviewStock);
+	}
+
+	document.querySelectorAll('.js-editar-solicitud').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			document.getElementById('editarSolicitudId').value = buttonElement.dataset.id || '';
+			document.getElementById('editarSolicitudProducto').textContent =
+				buttonElement.dataset.producto || '—';
+			document.getElementById('editarSolicitudCantidad').value =
+				buttonElement.dataset.cantidad || '';
+			document.getElementById('editarSolicitudObs').value =
+				buttonElement.dataset.observaciones || '';
+			modalEditarSolicitud.show();
+		});
+	});
+
+	if (modalNuevaSolicitud) {
+		modalNuevaSolicitud.addEventListener('shown.bs.modal', actualizarPreviewStock);
+		modalNuevaSolicitud.addEventListener('hidden.bs.modal', () => {
+			if (nuevoProducto) {
+				nuevoProducto.value = '';
+			}
+			if (nuevoStockPreview) {
+				nuevoStockPreview.style.display = 'none';
+				nuevoStockPreview.innerHTML = '';
+			}
+		});
+	}
+</script>
 {% endblock %}
