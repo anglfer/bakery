@@ -225,6 +225,8 @@ def verify_2fa():
         return redirect(url_for(LOGIN_ENDPOINT))
 
     form = Verify2FAForm()
+    es_registro_nuevo = session.get("es_registro_nuevo", False)
+
     if form.validate_on_submit():
         now = utc_now()
         if not usuario.expiracion_2fa or now > usuario.expiracion_2fa:
@@ -233,21 +235,41 @@ def verify_2fa():
 
         if form.code.data != usuario.token_2fa:
             flash("Codigo 2FA incorrecto", "danger")
-            return render_template("auth/verificacion_2fa.html", form=form)
+            return render_template(
+                "auth/verificacion_2fa.html",
+                form=form,
+                es_registro_nuevo=es_registro_nuevo,
+            )
 
         usuario.ultimo_acceso = now
         usuario.token_2fa = None
         usuario.expiracion_2fa = None
+
+        # Si es registro nuevo, marcar como verificado y activar
+        if es_registro_nuevo:
+            usuario.activo = True
+            log_audit_event(
+                "CLIENTE_EMAIL_VERIFICADO",
+                f"id_usuario={usuario.id_usuario}",
+            )
+            session.pop("es_registro_nuevo", None)
+
         _registrar_bitacora(usuario, True)
         db.session.commit()
 
         login_user(usuario)
         session.permanent = True
         session.pop("pending_2fa_user", None)
-        flash("Bienvenido a SoftBakery", "success")
+
+        if es_registro_nuevo:
+            flash("Bienvenido a SoftBakery. Tu cuenta ha sido activada.", "success")
+        else:
+            flash("Bienvenido a SoftBakery", "success")
         return redirect(url_for(_resolve_home_by_role(usuario)))
 
-    return render_template("auth/verificacion_2fa.html", form=form)
+    return render_template(
+        "auth/verificacion_2fa.html", form=form, es_registro_nuevo=es_registro_nuevo
+    )
 
 
 @auth_bp.route("/registro-cliente", methods=["GET", "POST"])
@@ -255,12 +277,26 @@ def registro_cliente():
     form = RegisterClientForm()
     if form.validate_on_submit():
         username = form.username.data.strip()
+        correo = form.correo.data.strip()
+
+        # Verificar que el usuario no exista
         existe_user = Usuario.query.filter(
             db.func.lower(Usuario.username) == username.lower()
         ).first()
         if existe_user:
             flash(
                 "El nombre de usuario ya existe. Elige uno diferente.",
+                "danger",
+            )
+            return render_template(REGISTER_TEMPLATE, form=form)
+
+        # Verificar que el correo no exista
+        existe_correo = Persona.query.filter(
+            db.func.lower(Persona.correo) == correo.lower()
+        ).first()
+        if existe_correo:
+            flash(
+                "El correo ya está registrado. Usa otro correo.",
                 "danger",
             )
             return render_template(REGISTER_TEMPLATE, form=form)
@@ -288,7 +324,7 @@ def registro_cliente():
             nombre=nombre,
             apellidos=apellidos,
             telefono=telefono,
-            correo=_build_cliente_default_email(username),
+            correo=correo,
             direccion="No especificada",
             ciudad="No especificada",
         )
@@ -299,19 +335,36 @@ def registro_cliente():
             activo=True,
         )
         usuario.set_password(form.password.data)
+        usuario.token_2fa = f"{random.randint(0, 999999):06d}"
+        usuario.expiracion_2fa = utc_now() + timedelta(minutes=5)
 
         db.session.add(persona)
         db.session.add(usuario)
         db.session.commit()
-        log_audit_event(
-            "CLIENTE_REGISTRADO",
-            f"id_usuario={usuario.id_usuario}; username={usuario.username}",
-        )
-        flash(
-            "Cuenta creada correctamente. Ya puedes iniciar sesion.",
-            "success",
-        )
-        return redirect(url_for(LOGIN_ENDPOINT))
+
+        # Intentar enviar código por email
+        sent = _send_2fa_code_email(usuario)
+        if sent:
+            log_audit_event(
+                "CLIENTE_REGISTRADO_PENDIENTE_VERIFICACION",
+                f"id_usuario={usuario.id_usuario}; username={usuario.username}",
+            )
+            session["pending_2fa_user"] = usuario.id_usuario
+            session["es_registro_nuevo"] = True
+            flash(
+                "Cuenta creada. Te enviamos un código de verificación a tu correo.",
+                "info",
+            )
+            return redirect(url_for("auth.verify_2fa"))
+        else:
+            # Si no se puede enviar email, mostrar error y marcarlo como no activo
+            usuario.activo = False
+            db.session.commit()
+            flash(
+                "Error al enviar correo de verificación. Contacta a soporte.",
+                "danger",
+            )
+            return render_template(REGISTER_TEMPLATE, form=form)
 
     return render_template(REGISTER_TEMPLATE, form=form)
 

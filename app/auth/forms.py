@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import (
     DataRequired,
+    Email,
     EqualTo,
     Length,
     Regexp,
@@ -20,16 +21,25 @@ PASSWORD_RULE = Regexp(
 
 class LoginForm(FlaskForm):
     username = StringField(
-        "Usuario", validators=[DataRequired(message="El usuario es obligatorio"), Length(min=3, max=60, message="Entre 3 y 60 caracteres.")]
+        "Usuario",
+        validators=[
+            DataRequired(message="El usuario es obligatorio"),
+            Length(min=3, max=60, message="Entre 3 y 60 caracteres."),
+        ],
     )
-    password = PasswordField("Contrasena", validators=[DataRequired(message="La contraseña es obligatoria")])
+    password = PasswordField(
+        "Contrasena", validators=[DataRequired(message="La contraseña es obligatoria")]
+    )
     submit = SubmitField("Iniciar sesion")
 
 
 class Verify2FAForm(FlaskForm):
     code = StringField(
         "Codigo",
-        validators=[DataRequired(message="El codigo es obligatorio"), Length(min=6, max=6, message="Debe ser de 6 caracteres.")],
+        validators=[
+            DataRequired(message="El codigo es obligatorio"),
+            Length(min=6, max=6, message="Debe ser de 6 caracteres."),
+        ],
     )
     submit = SubmitField("Verificar codigo")
 
@@ -37,11 +47,17 @@ class Verify2FAForm(FlaskForm):
 class RegisterClientForm(FlaskForm):
     nombre = StringField(
         "Nombre",
-        validators=[DataRequired(message="El nombre es obligatorio."), Length(max=100, message="Máximo 100 caracteres.")],
+        validators=[
+            DataRequired(message="El nombre es obligatorio."),
+            Length(max=100, message="Máximo 100 caracteres."),
+        ],
     )
     apellidos = StringField(
         "Apellido",
-        validators=[DataRequired(message="El apellido es obligatorio."), Length(max=120, message="Máximo 120 caracteres.")],
+        validators=[
+            DataRequired(message="El apellido es obligatorio."),
+            Length(max=120, message="Máximo 120 caracteres."),
+        ],
     )
     telefono = StringField(
         "Telefono",
@@ -50,10 +66,16 @@ class RegisterClientForm(FlaskForm):
             Length(min=7, max=30, message="Entre 7 y 30 caracteres."),
             Regexp(
                 r"^[\d\s\-\+\(\)]+$",
-                message=(
-                    "Teléfono inválido. Usa solo números y separadores (+ - ())."
-                ),
+                message=("Teléfono inválido. Usa solo números y separadores (+ - ())."),
             ),
+        ],
+    )
+    correo = StringField(
+        "Correo electronico",
+        validators=[
+            DataRequired(message="El correo es obligatorio."),
+            Email(message="Correo inválido."),
+            Length(max=150, message="Máximo 150 caracteres."),
         ],
     )
     username = StringField(
@@ -72,7 +94,10 @@ class RegisterClientForm(FlaskForm):
     )
     password = PasswordField(
         "Contrasena",
-        validators=[DataRequired(message="La contraseña es obligatoria."), PASSWORD_RULE],
+        validators=[
+            DataRequired(message="La contraseña es obligatoria."),
+            PASSWORD_RULE,
+        ],
     )
     confirm_password = PasswordField(
         "Confirmar contrasena",

@@ -5,7 +5,14 @@
 		<div class="col-lg-5 col-md-8">
 			<div class="card p-4">
 				<h2 class="mb-3">Verificacion en dos pasos</h2>
+				{% if es_registro_nuevo %}
+				<p class="text-secondary">
+					Hemos enviado un código de verificación a tu correo electrónico. Ingresa el código para
+					activar tu cuenta.
+				</p>
+				{% else %}
 				<p class="text-secondary">Ingresa el codigo enviado a tu correo.</p>
+				{% endif %}
 				<form method="post" class="simple">
 					{{ form.hidden_tag() }} {{ form.code.label }} {{ form.code() }} {{
 					form.submit(class_='btn') }}

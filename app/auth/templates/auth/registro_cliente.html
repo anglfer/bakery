@@ -25,16 +25,14 @@
 			{{ form.hidden_tag() }}
 
 			<div class="row-fields mb-3">
-				<div>
-					{{ campo(form.nombre, placeholder='Laura') }}
-				</div>
-				<div>
-					{{ campo(form.apellidos, placeholder='Martínez') }}
-				</div>
+				<div>{{ campo(form.nombre, placeholder='Laura') }}</div>
+				<div>{{ campo(form.apellidos, placeholder='Martínez') }}</div>
 			</div>
 
+			<div class="mb-3">{{ campo(form.telefono, placeholder='477-100-0001') }}</div>
+
 			<div class="mb-3">
-				{{ campo(form.telefono, placeholder='477-100-0001') }}
+				{{ campo(form.correo, placeholder='laura.martinez@example.com', type='email') }}
 			</div>
 
 			<div class="mb-3">
@@ -44,8 +42,14 @@
 
 			<div class="mb-3">
 				<div class="position-relative">
-					{{ campo(form.password, id='password', placeholder='Mínimo 8 caracteres', autocomplete='new-password') }}
-					<span class="toggle-password" data-target="password" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
+					{{ campo(form.password, id='password', placeholder='Mínimo 8 caracteres',
+					autocomplete='new-password') }}
+					<span
+						class="toggle-password"
+						data-target="password"
+						role="button"
+						tabindex="0"
+						style="position: absolute; right: 10px; top: 38px; z-index: 10">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
@@ -81,8 +85,14 @@
 
 			<div class="mb-3">
 				<div class="position-relative">
-					{{ campo(form.confirm_password, id='confirmPassword', placeholder='Repite tu contraseña', autocomplete='new-password') }}
-					<span class="toggle-password" data-target="confirmPassword" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
+					{{ campo(form.confirm_password, id='confirmPassword', placeholder='Repite tu contraseña',
+					autocomplete='new-password') }}
+					<span
+						class="toggle-password"
+						data-target="confirmPassword"
+						role="button"
+						tabindex="0"
+						style="position: absolute; right: 10px; top: 38px; z-index: 10">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
@@ -185,7 +195,7 @@
 				usernameHelp.innerHTML = formatOk
 					? '<i class="bi bi-check-circle"></i>Formato de usuario válido'
 					: '<i class="bi bi-exclamation-circle"></i>' +
-					'Mín. 4 caracteres: letras, números, _ y .';
+						'Mín. 4 caracteres: letras, números, _ y .';
 			});
 		}
 
