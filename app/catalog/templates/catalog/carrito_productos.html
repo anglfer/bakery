@@ -178,7 +178,8 @@
 				<div class="cart-item-icon" style="overflow: hidden">
 					{% if d.producto.imagen and (d.producto.imagen.startswith('http') or
 					d.producto.imagen.startswith('data:') or d.producto.imagen.startswith('img/')) %}
-					<img src="{{ url_for('static', filename=d.producto.imagen) if d.producto.imagen.startswith('img/') else d.producto.imagen }}"
+					<img
+						src="{{ url_for('static', filename=d.producto.imagen) if d.producto.imagen.startswith('img/') else d.producto.imagen }}"
 						alt="{{ d.producto.nombre }}"
 						style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px" />
 					{% else %}
@@ -198,14 +199,22 @@
 				<form method="post" class="d-flex align-items-center gap-1" style="flex-shrink: 0">
 					<input type="hidden" name="action" value="actualizar" />
 					<input type="hidden" name="id_detalle" value="{{ d.id_detalle }}" />
-					<input type="number" name="cantidad" value="{{ d.cantidad }}" min="1" max="99" step="1" style="
+					<input
+						type="number"
+						name="cantidad"
+						value="{{ d.cantidad }}"
+						min="1"
+						max="99"
+						step="1"
+						style="
 							width: 64px;
 							padding: 0.2rem 0.5rem;
 							border-radius: 8px;
 							border: 1.5px solid var(--sb-border);
 							font-size: 0.82rem;
 							text-align: center;
-						" onchange="this.form.submit()" />
+						"
+						onchange="this.form.submit()" />
 				</form>
 
 				<span class="cart-item-total">${{ "%.2f"|format(subtotal) }}</span>
@@ -236,7 +245,11 @@
 					<span id="lblTotal">${{ "%.2f"|format(total) }}</span>
 				</div>
 
-				<button type="button" class="btn-confirmar" data-bs-toggle="modal" data-bs-target="#modalConfirmar">
+				<button
+					type="button"
+					class="btn-confirmar"
+					data-bs-toggle="modal"
+					data-bs-target="#modalConfirmar">
 					<i class="bi bi-check2-circle me-1"></i>
 					Confirmar Pedido
 				</button>
@@ -254,7 +267,8 @@
 	<div class="modal fade" id="modalConfirmar" tabindex="-1">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content" style="border-radius: 18px; border: none">
-				<div class="modal-header"
+				<div
+					class="modal-header"
 					style="background: var(--sb-primary); color: #fff; border-radius: 18px 18px 0 0">
 					<h5 class="modal-title">
 						<i class="bi bi-bag-check-fill me-2"></i>
@@ -272,21 +286,34 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									Fecha de entrega / recolección *
 								</label>
-								<input type="date" name="fecha_entrega" class="form-control" required
-									min="{{ today.isoformat() }}" />
+								<input
+									type="date"
+									name="fecha_entrega"
+									class="form-control"
+									required
+									min="{{ min_delivery_date.isoformat() }}" />
+								<div class="form-text">
+									La fecha debe ser al menos
+									<strong>3 días</strong>
+									posterior a hoy.
+								</div>
 							</div>
 
 							<div class="col-12">
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									¿Cómo recibirás tu pedido? *
 								</label>
-								<div class="alert alert-warning py-2 mb-2"
+								<div
+									class="alert alert-warning py-2 mb-2"
 									style="font-size: 0.75rem; border-radius: 10px">
 									<i class="bi bi-shop me-1"></i>
 									Por política de la sucursal, los pedidos son solo para recolección en tienda.
 								</div>
 								<div class="d-flex gap-2 flex-wrap mt-1">
-									<label class="entrega-opt" id="lbl-pickup" style="
+									<label
+										class="entrega-opt"
+										id="lbl-pickup"
+										style="
 											flex: 1;
 											min-width: 140px;
 											border: 1.5px solid var(--sb-border);
@@ -298,15 +325,19 @@
 											gap: 0.6rem;
 											font-size: 0.82rem;
 										">
-										<input type="radio" name="tipo_entrega" value="pickup" checked
-											onchange="actualizarEntrega()" style="accent-color: var(--sb-primary)" />
+										<input
+											type="radio"
+											name="tipo_entrega"
+											value="pickup"
+											checked
+											onchange="actualizarEntrega()"
+											style="accent-color: var(--sb-primary)" />
 										<div>
 											<i class="bi bi-shop me-1"></i>
 											<strong>Recoger en tienda</strong>
 											<div style="font-size: 0.7rem; color: #888">Sin costo de envío</div>
 										</div>
 									</label>
-
 								</div>
 							</div>
 
@@ -314,12 +345,17 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									Forma de pago *
 								</label>
-								<div class="alert alert-info py-2 mb-2" style="font-size: 0.75rem; border-radius: 10px">
+								<div
+									class="alert alert-info py-2 mb-2"
+									style="font-size: 0.75rem; border-radius: 10px">
 									<i class="bi bi-info-circle me-1"></i>
 									Para pedidos web el pago en línea con tarjeta es obligatorio.
 								</div>
 								<div class="d-flex gap-2 flex-wrap mt-1">
-									<label class="pago-opt" id="lbl-tarjeta" style="
+									<label
+										class="pago-opt"
+										id="lbl-tarjeta"
+										style="
 											flex: 1;
 											min-width: 120px;
 											border: 1.5px solid var(--sb-border);
@@ -331,8 +367,14 @@
 											gap: 0.5rem;
 											font-size: 0.82rem;
 										">
-										<input type="radio" name="metodo_pago" value="tarjeta" checked disabled
-											onchange="actualizarPago()" style="accent-color: var(--sb-primary)" />
+										<input
+											type="radio"
+											name="metodo_pago"
+											value="tarjeta"
+											checked
+											disabled
+											onchange="actualizarPago()"
+											style="accent-color: var(--sb-primary)" />
 										<div>
 											<i class="bi bi-credit-card me-1"></i>
 											<strong>Tarjeta</strong>
@@ -343,7 +385,8 @@
 							</div>
 
 							<div class="col-12" id="seccionTarjeta" style="display: none">
-								<div style="
+								<div
+									style="
 										background: #f0f7ff;
 										border-radius: 12px;
 										padding: 1rem;
@@ -351,31 +394,47 @@
 									">
 									<p style="font-size: 0.75rem; color: #1a5fa0; margin-bottom: 0.8rem">
 										<i class="bi bi-shield-lock me-1"></i>
-										Pago simulado — no se realiza un cobro real
+										Pago en línea requerido para registrar el pedido
 									</p>
 									<div class="row g-2">
 										<div class="col-12">
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												Número de tarjeta *
 											</label>
-											<input type="text" name="numero_tarjeta" id="inputTarjeta"
-												class="form-control" maxlength="19" placeholder="0000 0000 0000 0000"
-												autocomplete="off" oninput="formatearTarjeta(this)" />
+											<input
+												type="text"
+												name="numero_tarjeta"
+												id="inputTarjeta"
+												class="form-control"
+												maxlength="19"
+												placeholder="0000 0000 0000 0000"
+												autocomplete="off"
+												oninput="formatearTarjeta(this)" />
 										</div>
 										<div class="col-7">
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												Fecha expiración *
 											</label>
-											<input type="text" name="expiracion" class="form-control" maxlength="5"
-												placeholder="MM/AA" autocomplete="off"
+											<input
+												type="text"
+												name="expiracion"
+												class="form-control"
+												maxlength="5"
+												placeholder="MM/AA"
+												autocomplete="off"
 												oninput="formatearExpiracion(this)" />
 										</div>
 										<div class="col-5">
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												CVV *
 											</label>
-											<input type="text" name="cvv" class="form-control" maxlength="4"
-												placeholder="123" autocomplete="off"
+											<input
+												type="text"
+												name="cvv"
+												class="form-control"
+												maxlength="4"
+												placeholder="123"
+												autocomplete="off"
 												oninput="this.value = this.value.replace(/\D/g, '')" />
 										</div>
 									</div>
@@ -383,26 +442,47 @@
 							</div>
 
 							<div class="col-12">
-								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
-									Notas
-								</label>
-								<textarea name="notas_pedido" class="form-control" rows="2"
-									placeholder="Instrucciones especiales..." maxlength="255"></textarea>
+								<div
+									class="alert alert-secondary py-2"
+									style="font-size: 0.74rem; border-radius: 10px">
+									<div><strong>Políticas:</strong></div>
+									<ul class="mb-0 ps-3">
+										<li>El pedido debe recogerse en la fecha seleccionada.</li>
+										<li>No hay devoluciones ni reembolsos.</li>
+										<li>
+											Pedidos no recogidos después de la fecha de entrega son responsabilidad del
+											cliente.
+										</li>
+									</ul>
+								</div>
 							</div>
 
 							<div class="col-12">
-								<div style="
+								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">Notas</label>
+								<textarea
+									name="notas_pedido"
+									class="form-control"
+									rows="2"
+									placeholder="Instrucciones especiales..."
+									maxlength="255"></textarea>
+							</div>
+
+							<div class="col-12">
+								<div
+									style="
 										background: #fdf3f0;
 										border-radius: 10px;
 										padding: 0.9rem;
 										font-size: 0.82rem;
 									">
-									<div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem">
+									<div
+										style="display: flex; justify-content: space-between; margin-bottom: 0.35rem">
 										<span>Subtotal productos</span>
 										<span>${{ "%.2f"|format(total) }}</span>
 									</div>
 
-									<div style="
+									<div
+										style="
 											display: flex;
 											justify-content: space-between;
 											font-size: 1rem;
@@ -421,7 +501,9 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn-confirmar"
+						<button
+							type="submit"
+							class="btn-confirmar"
 							style="width: auto; padding: 0.5rem 1.5rem; margin: 0">
 							<i class="bi bi-check2-circle me-1"></i>
 							Confirmar Pedido

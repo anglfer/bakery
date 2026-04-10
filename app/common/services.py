@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
 from flask import current_app
@@ -283,6 +284,51 @@ def _validar_parametros_checkout(
         raise ValueError("Los pedidos en linea solo permiten pago con tarjeta")
     if tipo_pago_pedido == "EN_LINEA" and not referencia_pago:
         raise ValueError("La referencia de pago es obligatoria para pagos en linea")
+
+
+def _validar_fecha_entrega_programada(fecha_entrega: date) -> None:
+    fecha_minima = date.today() + timedelta(days=3)
+    if fecha_entrega < fecha_minima:
+        raise ValueError("La fecha de entrega debe ser al menos 3 días posterior a hoy")
+
+
+def _validar_pedido_producido_para_entrega(pedido: Pedido) -> None:
+    solicitudes_ligadas = SolicitudProduccion.query.filter_by(
+        id_pedido=pedido.id_pedido
+    ).all()
+    if not solicitudes_ligadas:
+        return
+
+    solicitudes_activas = [
+        solicitud
+        for solicitud in solicitudes_ligadas
+        if solicitud.estado in {"PENDIENTE", "APROBADA"}
+    ]
+    if solicitudes_activas:
+        raise ValueError("El pedido aún tiene solicitudes de producción sin cerrar")
+
+    solicitudes_rechazadas = [
+        solicitud
+        for solicitud in solicitudes_ligadas
+        if solicitud.estado == "RECHAZADA"
+    ]
+    if solicitudes_rechazadas:
+        raise ValueError(
+            "No se puede entregar: existe solicitud de producción rechazada"
+        )
+
+    for solicitud in solicitudes_ligadas:
+        ordenes_vigentes = [
+            orden for orden in solicitud.ordenes if orden.estado != "CANCELADO"
+        ]
+        if not ordenes_vigentes:
+            raise ValueError(
+                "No se puede entregar: falta la orden de producción vinculada"
+            )
+        if not any(orden.estado == "FINALIZADO" for orden in ordenes_vigentes):
+            raise ValueError(
+                "No se puede entregar: la producción aún no está finalizada"
+            )
 
 
 def _reservar_inventario_para_pedido(
@@ -700,6 +746,7 @@ def crear_pedido_desde_carrito(
         tipo_pago=tipo_pago,
         referencia_pago=referencia_pago,
     )
+    _validar_fecha_entrega_programada(fecha_entrega)
 
     # Validar y reservar inventario al momento de generar pedido.
     detalles_ordenados = sorted(
@@ -782,6 +829,7 @@ def generar_venta_desde_pedido(
         raise ValueError(
             "Solo pedidos confirmados y pagados pueden entregarse y generar venta"
         )
+    _validar_pedido_producido_para_entrega(pedido)
 
     # Validar y descontar inventario al momento de entrega/venta.
     detalles_ordenados = sorted(

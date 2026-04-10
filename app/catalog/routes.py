@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from flask import flash, redirect, render_template, request, url_for
@@ -14,6 +14,39 @@ from app.common.services import (
 )
 from app.extensions import db
 from app.models import Carrito, DetalleCarrito, Pedido, Producto, Usuario
+
+
+def _validar_pago_en_linea_tarjeta(
+    *,
+    numero_tarjeta: str,
+    expiracion: str,
+    cvv: str,
+) -> None:
+    numero_limpio = "".join(ch for ch in (numero_tarjeta or "") if ch.isdigit())
+    if len(numero_limpio) != 16:
+        raise ValueError("Número de tarjeta inválido. Debe contener 16 dígitos.")
+
+    exp_limpia = (expiracion or "").strip()
+    if len(exp_limpia) != 5 or "/" not in exp_limpia:
+        raise ValueError("Fecha de expiración inválida. Usa formato MM/AA.")
+
+    mes_texto, anio_texto = exp_limpia.split("/", maxsplit=1)
+    if not mes_texto.isdigit() or not anio_texto.isdigit():
+        raise ValueError("Fecha de expiración inválida. Usa formato MM/AA.")
+
+    mes = int(mes_texto)
+    anio = int(anio_texto)
+    if mes < 1 or mes > 12:
+        raise ValueError("Mes de expiración inválido.")
+
+    referencia = date.today()
+    anio_actual_2d = referencia.year % 100
+    if anio < anio_actual_2d or (anio == anio_actual_2d and mes < referencia.month):
+        raise ValueError("La tarjeta ingresada está vencida.")
+
+    cvv_limpio = (cvv or "").strip()
+    if not cvv_limpio.isdigit() or len(cvv_limpio) not in {3, 4}:
+        raise ValueError("CVV inválido.")
 
 
 def _guard_cliente_activo():
@@ -99,9 +132,19 @@ def carrito_agregar():
             ),
         )
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            carrito_db = Carrito.query.filter_by(id_usuario_cliente=current_user.id_usuario).first()
-            total_items = sum(detalle.cantidad for detalle in carrito_db.detalles) if carrito_db else 0
-            return {"success": True, "message": "Producto agregado.", "cart_count": total_items}
+            carrito_db = Carrito.query.filter_by(
+                id_usuario_cliente=current_user.id_usuario
+            ).first()
+            total_items = (
+                sum(detalle.cantidad for detalle in carrito_db.detalles)
+                if carrito_db
+                else 0
+            )
+            return {
+                "success": True,
+                "message": "Producto agregado.",
+                "cart_count": total_items,
+            }
 
         flash("Producto agregado al carrito.", "success")
     except (ValueError, TypeError) as exc:
@@ -204,6 +247,7 @@ def carrito():
         detalles=detalles,
         total=total,
         today=date.today(),
+        min_delivery_date=(date.today() + timedelta(days=3)),
     )
 
 
@@ -223,6 +267,9 @@ def checkout():
     tipo_pago_pedido = "EN_LINEA"
     tipo_pago = "TARJETA"
     referencia = (request.form.get("referencia_pago") or "").strip() or None
+    numero_tarjeta = (request.form.get("numero_tarjeta") or "").strip()
+    expiracion = (request.form.get("expiracion") or "").strip()
+    cvv = (request.form.get("cvv") or "").strip()
     if not referencia:
         referencia = (
             f"WEB-{current_user.id_usuario}-" f"{int(datetime.now().timestamp())}"
@@ -234,15 +281,26 @@ def checkout():
         flash("Fecha de entrega invalida.", "warning")
         return redirect(url_for("catalog.carrito"))
 
-    if fecha_entrega < date.today():
+    fecha_minima = date.today() + timedelta(days=3)
+    if fecha_entrega < fecha_minima:
         flash(
-            "La fecha de entrega no puede ser anterior al dia actual.",
+            "La fecha de entrega debe ser al menos 3 días posterior a hoy.",
             "warning",
         )
         return redirect(url_for("catalog.carrito"))
 
     if tipo_entrega != "pickup":
         flash("Los pedidos solo pueden recolectarse en sucursal.", "warning")
+        return redirect(url_for("catalog.carrito"))
+
+    try:
+        _validar_pago_en_linea_tarjeta(
+            numero_tarjeta=numero_tarjeta,
+            expiracion=expiracion,
+            cvv=cvv,
+        )
+    except ValueError as exc:
+        flash(f"Pago rechazado: {exc}", "danger")
         return redirect(url_for("catalog.carrito"))
 
     try:

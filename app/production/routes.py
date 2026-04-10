@@ -1039,6 +1039,7 @@ def solicitudes():
         estado = request.form.get("estado", "PENDIENTE").strip().upper()
         solicitud = SolicitudProduccion.query.options(
             selectinload(SolicitudProduccion.producto),
+            selectinload(SolicitudProduccion.pedido),
             selectinload(SolicitudProduccion.usuario_solicita),
             selectinload(SolicitudProduccion.usuario_resuelve),
             selectinload(SolicitudProduccion.ordenes),
@@ -1070,6 +1071,7 @@ def solicitudes():
 
     solicitudes_query = SolicitudProduccion.query.options(
         selectinload(SolicitudProduccion.producto),
+        selectinload(SolicitudProduccion.pedido),
         selectinload(SolicitudProduccion.usuario_solicita),
         selectinload(SolicitudProduccion.usuario_resuelve),
         selectinload(SolicitudProduccion.ordenes),

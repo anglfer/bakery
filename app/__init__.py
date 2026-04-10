@@ -3,7 +3,9 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template, request
+from flask_wtf.csrf import CSRFError
+from werkzeug.exceptions import HTTPException
 
 from app.admin import admin_bp
 from app.auth import auth_bp
@@ -23,6 +25,7 @@ def create_app(config_object: str | None = None) -> Flask:
     configure_logging(app)
     init_extensions(app)
     register_blueprints(app)
+    register_error_handlers(app)
     register_cli_commands(app)
 
     if app.config.get("AUTO_DB_INIT", False):
@@ -80,6 +83,113 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(production_bp, url_prefix="/production")
     app.register_blueprint(sales_bp, url_prefix="/sales")
+
+
+def register_error_handlers(app: Flask) -> None:
+    def _render_http_error(
+        *,
+        status_code: int,
+        title: str,
+        message: str,
+        details: str | None = None,
+    ):
+        return (
+            render_template(
+                "errors/http_error.html",
+                status_code=status_code,
+                title=title,
+                message=message,
+                details=details,
+            ),
+            status_code,
+        )
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error: CSRFError):
+        return _render_http_error(
+            status_code=400,
+            title="Solicitud inválida",
+            message=(
+                "Tu sesión o formulario expiró. "
+                "Recarga la página e intenta de nuevo."
+            ),
+            details=error.description,
+        )
+
+    @app.errorhandler(400)
+    def handle_bad_request(error):
+        return _render_http_error(
+            status_code=400,
+            title="Solicitud inválida",
+            message="No se pudo procesar la solicitud.",
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(401)
+    def handle_unauthorized(error):
+        return _render_http_error(
+            status_code=401,
+            title="No autorizado",
+            message="Debes iniciar sesión para continuar.",
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(403)
+    def handle_forbidden(error):
+        return _render_http_error(
+            status_code=403,
+            title="Acceso denegado",
+            message="No tienes permisos para acceder a este recurso.",
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(404)
+    def handle_not_found(error):
+        return _render_http_error(
+            status_code=404,
+            title="Página no encontrada",
+            message="La ruta que buscaste no existe o fue movida.",
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(405)
+    def handle_method_not_allowed(error):
+        return _render_http_error(
+            status_code=405,
+            title="Método no permitido",
+            message=("La operación solicitada " "no está permitida para esta ruta."),
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(500)
+    def handle_internal_server_error(error):
+        app.logger.exception("Error interno 500 en ruta %s", request.path)
+        return _render_http_error(
+            status_code=500,
+            title="Error interno del servidor",
+            message=(
+                "Ocurrió un error inesperado. " "Intenta nuevamente en unos minutos."
+            ),
+            details=getattr(error, "description", None),
+        )
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_exception(error: Exception):
+        if isinstance(error, HTTPException):
+            return error
+
+        app.logger.exception(
+            "Excepción no controlada en ruta %s",
+            request.path,
+        )
+        return _render_http_error(
+            status_code=500,
+            title="Error interno del servidor",
+            message=(
+                "Ocurrió un error inesperado. " "Intenta nuevamente en unos minutos."
+            ),
+            details=str(error) if app.debug else None,
+        )
 
 
 def register_cli_commands(app: Flask) -> None:

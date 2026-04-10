@@ -138,7 +138,12 @@
 									<div class="prod-orders-product-name">
 										{{ producto.nombre if producto else 'Producto' }}
 									</div>
-									<div class="prod-orders-product-sub">Solicitud de ventas</div>
+									<div class="prod-orders-product-sub">
+										Solicitud de ventas
+										{% if s.id_pedido %}
+										· PED-{{ '%04d'|format(s.id_pedido) }}
+										{% endif %}
+									</div>
 								</div>
 							</div>
 						</td>

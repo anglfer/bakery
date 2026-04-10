@@ -85,8 +85,8 @@
 						<th>Unidad compra</th>
 						<th>Factor conv.</th>
 						<th>Merma %</th>
-						<th>Existencia actual</th>
-						<th>Stock mínimo</th>
+						<th>Existencia actual (compra)</th>
+						<th>Stock mínimo (compra)</th>
 						<th>Estado stock</th>
 						<th>Estado</th>
 						<th>Acciones</th>
@@ -95,11 +95,15 @@
 				<tbody>
 					{% for m in materias %}
 					{% set stock_estado = (m.estado_stock or 'OK')|lower %}
+					{% set factor_compra = (m.factor_conversion|float) if (m.factor_conversion|float) > 0 else 1 %}
+					{% set cantidad_compra = (m.cantidad_disponible|float) / factor_compra %}
+					{% set stock_minimo_compra = (m.stock_minimo|float) / factor_compra %}
 					<tr data-row="materia" data-id="{{ m.id_materia }}"
 						data-label="{{ (m.nombre ~ ' ' ~ m.unidad_base.abreviatura ~ ' ' ~ m.unidad_compra.abreviatura)|lower }}"
 						data-estado="{{ 'activa' if m.activa else 'inactiva' }}" data-stock="{{ stock_estado }}"
-						data-nombre="{{ m.nombre }}" data-cantidad="{{ m.cantidad_disponible }}"
-						data-unidad="{{ m.unidad_base.abreviatura }}">
+						data-nombre="{{ m.nombre }}" data-cantidad="{{ cantidad_compra }}"
+						data-unidad="{{ m.unidad_compra.abreviatura }}" data-cantidad-base="{{ m.cantidad_disponible }}"
+						data-unidad-base="{{ m.unidad_base.abreviatura }}">
 						<td class="fw-semibold">{{ m.nombre }}</td>
 						<td><span class="ops-chip neutral">{{ m.unidad_base.abreviatura }}</span></td>
 						<td><span class="ops-chip neutral">{{ m.unidad_compra.abreviatura }}</span></td>
@@ -110,11 +114,14 @@
 								<div class="ops-stock-bar">
 									<div class="ops-stock-bar-fill {{ stock_estado }}"></div>
 								</div>
-								<span class="ops-stock-number">{{ m.cantidad_disponible }} {{ m.unidad_base.abreviatura
-									}}</span>
+								<span class="ops-stock-number">{{ '%.2f'|format(cantidad_compra) }} {{ m.unidad_compra.abreviatura }}</span>
+								<small class="text-muted d-block">{{ m.cantidad_disponible }} {{ m.unidad_base.abreviatura }}</small>
 							</div>
 						</td>
-						<td>{{ m.stock_minimo }} {{ m.unidad_base.abreviatura }}</td>
+						<td>
+							<span class="d-block">{{ '%.2f'|format(stock_minimo_compra) }} {{ m.unidad_compra.abreviatura }}</span>
+							<small class="text-muted">{{ m.stock_minimo }} {{ m.unidad_base.abreviatura }}</small>
+						</td>
 						<td>
 							{% if stock_estado == 'critico' %}
 							<span class="ops-chip danger">Crítico</span>
@@ -550,14 +557,16 @@
 			const nombre = row?.dataset.nombre || 'Materia prima';
 			const cantidad = row?.dataset.cantidad || '-';
 			const unidad = row?.dataset.unidad || '';
+			const cantidadBase = row?.dataset.cantidadBase || '-';
+			const unidadBase = row?.dataset.unidadBase || '';
 
 			document.getElementById('ajusteIdMateria').value = String(idMateria);
 			document.getElementById('modalAjusteTitulo').textContent = `Ajuste de inventario — ${nombre}`;
 			document.getElementById('ajusteMateriaNombre').textContent = nombre;
 			document.getElementById('ajusteExistenciaTexto').textContent =
-				`Existencia actual: ${cantidad} ${unidad}`;
-			document.getElementById('ajusteUnidadLabel').textContent = unidad
-				? `(${unidad})`
+				`Existencia actual: ${cantidad} ${unidad} (equiv. ${cantidadBase} ${unidadBase})`;
+			document.getElementById('ajusteUnidadLabel').textContent = unidadBase
+				? `(${unidadBase})`
 				: '';
 
 			document.getElementById('ajusteTipo').value = 'ENTRADA';

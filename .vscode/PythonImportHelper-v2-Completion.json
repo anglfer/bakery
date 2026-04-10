@@ -8041,7 +8041,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired()])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(), Length(min=6, max=6)],",
+        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(message=\"El usuario es obligatorio\"), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired(message=\"La contraseña es obligatoria\")])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(message=\"El codigo es obligatorio\"), Length(min=6, max=6)],",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8050,7 +8050,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(), Length(min=6, max=6)],\n    )\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],",
+        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(message=\"El codigo es obligatorio\"), Length(min=6, max=6)],\n    )\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8068,7 +8068,7 @@
         "kind": 5,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=(\n        \"Minimo 8 caracteres con mayuscula, minuscula, \" \"numero y caracter especial.\"\n    ),\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(), Length(min=3, max=60)]\n    )",
+        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=(\n        \"Minimo 8 caracteres con mayuscula, minuscula, \" \"numero y caracter especial.\"\n    ),\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(message=\"El usuario es obligatorio\"), Length(min=3, max=60)]\n    )",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8185,7 +8185,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def carrito_agregar():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    try:\n        id_producto = int(request.form.get(\"id_producto\", \"0\") or 0)\n        cantidad = int(request.form.get(\"cantidad\", \"1\") or 1)\n    except ValueError:\n        flash(\"Datos invalidos.\", \"warning\")\n        return redirect(url_for(\"catalog.catalogo\"))",
+        "peekOfCode": "def carrito_agregar():\n    guard = _guard_cliente_activo()\n    if guard:\n        if request.headers.get(\"X-Requested-With\") == \"XMLHttpRequest\":\n            return {\"success\": False, \"error\": \"No autorizado\"}, 403\n        return guard\n    try:\n        id_producto = int(request.form.get(\"id_producto\", \"0\") or 0)\n        cantidad = int(request.form.get(\"cantidad\", \"1\") or 1)\n    except ValueError:",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -9274,7 +9274,7 @@
         "kind": 6,
         "importPath": "config.development",
         "description": "config.development",
-        "peekOfCode": "class DevelopmentConfig:\n    DEBUG = True\n    TESTING = False\n    SECRET_KEY = os.getenv(\"SECRET_KEY\", \"dev-softbakery-key\")\n    SQLALCHEMY_DATABASE_URI = os.getenv(\n        \"DATABASE_URL\",\n        \"mysql+pymysql://root:root@localhost/softbakery2?charset=utf8mb4\",\n    )\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    SESSION_COOKIE_HTTPONLY = True",
+        "peekOfCode": "class DevelopmentConfig:\n    DEBUG = True\n    TESTING = False\n    SECRET_KEY = os.getenv(\"SECRET_KEY\", \"dev-softbakery-key\")\n    SQLALCHEMY_DATABASE_URI = os.getenv(\n        \"DATABASE_URL\",\n        \"mysql+pymysql://root:alejandro.com13@127.0.0.1/softbakery2?charset=utf8mb4\",\n    )\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    SESSION_COOKIE_HTTPONLY = True",
         "detail": "config.development",
         "documentation": {}
     },
@@ -9283,7 +9283,7 @@
         "kind": 6,
         "importPath": "config.local",
         "description": "config.local",
-        "peekOfCode": "class LocalConfig(DevelopmentConfig):\n    DEBUG = True\n    SQLALCHEMY_DATABASE_URI = \"mysql+pymysql://root:root@localhost/softbakery2?charset=utf8mb4\"",
+        "peekOfCode": "class LocalConfig(DevelopmentConfig):\n    DEBUG = True\n    SQLALCHEMY_DATABASE_URI = \"mysql+pymysql://root:alejandro.com13@127.0.0.1/softbakery2?charset=utf8mb4\"",
         "detail": "config.local",
         "documentation": {}
     },

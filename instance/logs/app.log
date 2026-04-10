@@ -35,3 +35,14 @@
 2026-04-09 15:04:30,864 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=9
 2026-04-09 15:09:57,553 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
 2026-04-09 15:18:45,411 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=1; tipo_pago=EN_LINEA
+2026-04-10 08:49:13,880 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5; cantidad=1
+2026-04-10 08:49:15,550 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
+2026-04-10 08:49:17,391 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=10; cantidad=1
+2026-04-10 08:49:19,573 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=2; cantidad=1
+2026-04-10 08:49:20,852 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=3; cantidad=1
+2026-04-10 08:49:21,546 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=3; cantidad=1
+2026-04-10 09:43:33,587 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_usuario=1; id_producto=1; cantidad=2
+2026-04-10 09:44:10,314 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=3
+2026-04-10 09:44:50,022 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=6; estado=APROBADA; id_usuario_resuelve=3
+2026-04-10 09:45:24,214 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_solicitud=7; estado=RECHAZADA; id_usuario_resuelve=1
+2026-04-10 10:39:11,957 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=11; detalles=3; tipo_pago=EFECTIVO; requiere_ticket=True

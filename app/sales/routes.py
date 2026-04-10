@@ -9,6 +9,7 @@ from flask import (
     current_app,
     flash,
     jsonify,
+    make_response,
     redirect,
     render_template,
     request,
@@ -103,6 +104,34 @@ def _parse_fecha_compra(value: str | None) -> datetime:
     except ValueError:
         return datetime.combine(utc_today(), time.min)
     return datetime.combine(fecha.date(), time.min)
+
+
+def _solicitudes_pedido_activas(pedido: Pedido) -> list[SolicitudProduccion]:
+    return [
+        solicitud
+        for solicitud in (pedido.solicitudes_produccion or [])
+        if solicitud.estado in {"PENDIENTE", "APROBADA"}
+    ]
+
+
+def _produccion_pedido_lista(pedido: Pedido) -> bool:
+    solicitudes = pedido.solicitudes_produccion or []
+    if not solicitudes:
+        return True
+
+    for solicitud in solicitudes:
+        if solicitud.estado != "APROBADA":
+            return False
+
+        ordenes_vigentes = [
+            orden for orden in solicitud.ordenes if orden.estado != "CANCELADO"
+        ]
+        if not ordenes_vigentes:
+            return False
+        if not any(orden.estado == "FINALIZADO" for orden in ordenes_vigentes):
+            return False
+
+    return True
 
 
 def _to_mxn(value: Decimal) -> Decimal:
@@ -562,6 +591,27 @@ def _serializar_receta_para_producto(receta: Receta) -> dict:
     }
 
 
+def _obtener_o_crear_ticket_venta(venta: Venta) -> TicketVenta:
+    ticket = TicketVenta.query.filter_by(id_venta=venta.id_venta).first()
+    if ticket:
+        return ticket
+
+    nombre_negocio = (
+        str(current_app.config.get("BUSINESS_NAME", "SoftBakery")).strip()
+        or "SoftBakery"
+    )
+    ticket = TicketVenta(
+        id_venta=venta.id_venta,
+        folio=f"SB-{venta.id_venta:06d}",
+        nombre_negocio=nombre_negocio,
+    )
+    db.session.add(ticket)
+    if not venta.requiere_ticket:
+        venta.requiere_ticket = True
+    db.session.commit()
+    return ticket
+
+
 def _serializar_producto_terminado(
     producto: Producto,
     metrica: dict,
@@ -922,9 +972,9 @@ def solicitudes():
     role_name = current_user.rol.nombre if current_user.rol else ""
 
     if request.method == "POST":
-        if role_name != "Ventas":
+        if role_name not in {"Ventas", "Administrador"}:
             flash(
-                "Solo el area de ventas puede registrar solicitudes de produccion.",
+                "Solo ventas y administración pueden registrar solicitudes.",
                 "danger",
             )
             return redirect(url_for("sales.solicitudes"))
@@ -935,6 +985,7 @@ def solicitudes():
             id_solicitud = _int(request.form.get("id_solicitud", "0"))
             solicitud = SolicitudProduccion.query.options(
                 selectinload(SolicitudProduccion.producto),
+                selectinload(SolicitudProduccion.pedido),
                 selectinload(SolicitudProduccion.usuario_solicita),
                 selectinload(SolicitudProduccion.usuario_resuelve),
                 selectinload(SolicitudProduccion.ordenes),
@@ -1006,14 +1057,19 @@ def solicitudes():
         Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
     )
 
-    solicitudes_query = SolicitudProduccion.query.filter(
-        SolicitudProduccion.id_usuario_solicita == current_user.id_usuario
-    ).options(
+    solicitudes_query = SolicitudProduccion.query.options(
         selectinload(SolicitudProduccion.producto),
+        selectinload(SolicitudProduccion.pedido),
         selectinload(SolicitudProduccion.usuario_solicita),
         selectinload(SolicitudProduccion.usuario_resuelve),
         selectinload(SolicitudProduccion.ordenes),
     )
+
+    # Administrador ve todas, Ventas ve solo sus propias
+    if role_name != "Administrador":
+        solicitudes_query = solicitudes_query.filter(
+            SolicitudProduccion.id_usuario_solicita == current_user.id_usuario
+        )
     if estado_filtro in {"PENDIENTE", "APROBADA", "RECHAZADA"}:
         solicitudes_query = solicitudes_query.filter(
             SolicitudProduccion.estado == estado_filtro
@@ -1063,6 +1119,90 @@ def pedidos_clientes():
     if request.method == "POST":
         action = request.form.get("action", "actualizar").strip().lower()
         id_pedido = _int(request.form.get("id_pedido", "0"))
+        if action == "solicitar_produccion":
+            pedido = (
+                Pedido.query.options(
+                    selectinload(Pedido.detalles).selectinload(DetallePedido.producto)
+                )
+                .filter(Pedido.id_pedido == id_pedido)
+                .first()
+            )
+            if not pedido:
+                flash("Pedido no encontrado.", "warning")
+                return redirect(url_for("sales.pedidos_clientes"))
+
+            if (pedido.estado_pago or "").upper() != "PAGADO":
+                flash(
+                    "Solo puedes solicitar producción para pedidos pagados.",
+                    "warning",
+                )
+                return redirect(url_for("sales.pedidos_clientes"))
+
+            if (pedido.estado_pedido or "").upper() in {"CANCELADO", "ENTREGADO"}:
+                flash("El pedido ya no permite solicitudes de producción.", "warning")
+                return redirect(url_for("sales.pedidos_clientes"))
+
+            creadas = 0
+            for detalle in pedido.detalles:
+                producto = detalle.producto
+                if not producto or not producto.activo:
+                    continue
+
+                receta_activa = (
+                    Receta.query.filter_by(
+                        id_producto=producto.id_producto,
+                        activa=True,
+                    )
+                    .order_by(Receta.version.desc())
+                    .first()
+                )
+                if not receta_activa:
+                    continue
+
+                solicitud_existente = (
+                    SolicitudProduccion.query.filter_by(
+                        id_pedido=pedido.id_pedido,
+                        id_producto=producto.id_producto,
+                    )
+                    .filter(SolicitudProduccion.estado.in_(["PENDIENTE", "APROBADA"]))
+                    .first()
+                )
+                if solicitud_existente:
+                    continue
+
+                db.session.add(
+                    SolicitudProduccion(
+                        id_producto=producto.id_producto,
+                        id_pedido=pedido.id_pedido,
+                        cantidad=int(detalle.cantidad or 0),
+                        estado="PENDIENTE",
+                        id_usuario_solicita=current_user.id_usuario,
+                        observaciones=(
+                            f"Solicitud automática desde pedido "
+                            f"PED-{int(pedido.id_pedido):04d}"
+                        ),
+                    )
+                )
+                creadas += 1
+
+            if creadas <= 0:
+                flash(
+                    "No se generaron solicitudes: ya existen o no hay receta activa.",
+                    "warning",
+                )
+                return redirect(url_for("sales.pedidos_clientes"))
+
+            db.session.commit()
+            log_audit_event(
+                "PEDIDO_SOLICITUD_PRODUCCION_CREADA",
+                f"id_pedido={pedido.id_pedido}; solicitudes={creadas}",
+            )
+            flash(
+                f"Se generaron {creadas} solicitud(es) de producción.",
+                "success",
+            )
+            return redirect(url_for("sales.pedidos_clientes"))
+
         if action == "entregar":
             requiere_ticket = request.form.get("requiere_ticket") == "on"
             try:
@@ -1106,6 +1246,9 @@ def pedidos_clientes():
     pedidos_query = Pedido.query.options(
         selectinload(Pedido.usuario_cliente).selectinload(Usuario.persona),
         selectinload(Pedido.detalles).selectinload(DetallePedido.producto),
+        selectinload(Pedido.solicitudes_produccion).selectinload(
+            SolicitudProduccion.ordenes
+        ),
         selectinload(Pedido.historial_estados).selectinload(
             PedidoEstadoHistorial.usuario
         ),
@@ -1171,6 +1314,9 @@ def pedidos_clientes():
                 }
             )
 
+        solicitudes_activas = _solicitudes_pedido_activas(pedido)
+        produccion_lista = _produccion_pedido_lista(pedido)
+
         pedidos_payload.append(
             {
                 "id_pedido": pedido.id_pedido,
@@ -1206,7 +1352,15 @@ def pedidos_clientes():
                     "puede_entregar": (
                         estado_actual in {"CONFIRMADO", "PAGADO"}
                         and (pedido.estado_pago or "").upper() == "PAGADO"
+                        and produccion_lista
                     ),
+                    "puede_solicitar_produccion": (
+                        estado_actual in {"CONFIRMADO", "PAGADO"}
+                        and (pedido.estado_pago or "").upper() == "PAGADO"
+                        and not solicitudes_activas
+                    ),
+                    "produccion_lista": produccion_lista,
+                    "solicitudes_activas": len(solicitudes_activas),
                     "estados_siguientes": transiciones_permitidas.get(
                         estado_actual, []
                     ),
@@ -1442,6 +1596,54 @@ def ventas():
             current_user.rol is not None and current_user.rol.nombre == "Administrador"
         ),
     )
+
+
+@sales_bp.get("/ventas/<int:id_venta>/ticket")
+@login_required
+@require_permission("Ventas", "leer")
+def ver_ticket_venta(id_venta: int):
+    venta = (
+        Venta.query.options(
+            selectinload(Venta.detalles).selectinload(DetalleVenta.producto),
+            selectinload(Venta.usuario_cliente).selectinload(Usuario.persona),
+        )
+        .filter(Venta.id_venta == id_venta)
+        .first_or_404()
+    )
+    ticket = _obtener_o_crear_ticket_venta(venta)
+
+    cliente = "Mostrador"
+    if venta.usuario_cliente:
+        if venta.usuario_cliente.persona:
+            cliente = (
+                f"{venta.usuario_cliente.persona.nombre} "
+                f"{venta.usuario_cliente.persona.apellidos}"
+            ).strip()
+        else:
+            cliente = venta.usuario_cliente.username
+
+    total_detalle = sum(Decimal(str(d.subtotal or 0)) for d in venta.detalles)
+    if total_detalle <= 0:
+        total_detalle = Decimal(str(venta.total or 0))
+
+    html = render_template(
+        "sales/ticket_venta.html",
+        venta=venta,
+        ticket=ticket,
+        cliente=cliente,
+        total_detalle=total_detalle,
+        download_mode=request.args.get("download") == "1",
+    )
+
+    if request.args.get("download") == "1":
+        response = make_response(html)
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="ticket-{ticket.folio}.html"'
+        )
+        return response
+
+    return html
 
 
 @sales_bp.route("/compras-mp", methods=["GET", "POST"])

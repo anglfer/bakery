@@ -8,7 +8,9 @@
 		{% for p in productos %}
 		<div class="col-12 col-sm-6 col-md-4 col-xl-3">
 			<article class="card product-card h-100 border-0 shadow-sm overflow-hidden">
-				<div class="product-img-wrapper" style="
+				<div
+					class="product-img-wrapper"
+					style="
 						height: 200px;
 						overflow: hidden;
 						background: #fdf6f3;
@@ -18,8 +20,10 @@
 					">
 					{% if p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:') or
 					p.imagen.startswith('img/')) %}
-					<img src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
-						alt="{{ p.nombre }}" style="width: 100%; height: 100%; object-fit: cover" />
+					<img
+						src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
+						alt="{{ p.nombre }}"
+						style="width: 100%; height: 100%; object-fit: cover" />
 					{% else %}
 					<span style="font-size: 5rem">{{ p.imagen or '🍞' }}</span>
 					{% endif %}
@@ -28,15 +32,24 @@
 					<h3 class="h5 mb-2">{{ p.nombre }}</h3>
 					<p class="text-muted small mb-3 flex-grow-1">{{ p.descripcion }}</p>
 					<div class="d-flex justify-content-between align-items-center mb-3">
-						<span class="badge bg-secondary">Disponibles: {{ p.cantidad_disponible }}</span>
+						<span class="badge bg-secondary">Pedido programado</span>
 						<p class="price h5 mb-0 text-primary fw-bold">${{ '%.2f'|format(p.precio_venta) }}</p>
 					</div>
 					{% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre ==
 					'Cliente' %}
-					<form method="post" action="{{ url_for('catalog.carrito_agregar') }}" class="d-flex gap-2 mt-auto">
+					<form
+						method="post"
+						action="{{ url_for('catalog.carrito_agregar') }}"
+						class="d-flex gap-2 mt-auto">
 						<input type="hidden" name="id_producto" value="{{ p.id_producto }}" />
-						<input type="number" name="cantidad" min="1" max="5" value="1"
-							class="form-control form-control-sm text-center" style="width: 70px" />
+						<input
+							type="number"
+							name="cantidad"
+							min="1"
+							max="5"
+							value="1"
+							class="form-control form-control-sm text-center"
+							style="width: 70px" />
 						<button type="submit" class="btn btn-primary btn-sm flex-grow-1">
 							<i class="bi bi-cart-plus"></i>
 							Agregar
@@ -60,10 +73,7 @@
 		{% endfor %}
 	</div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
 		const cartIcon = document.querySelector('.bi-cart3');
@@ -80,14 +90,15 @@
 			}
 		}
 
-		document.querySelectorAll('form[action*="carrito/agregar"]').forEach(form => {
+		document.querySelectorAll('form[action*="carrito/agregar"]').forEach((form) => {
 			form.addEventListener('submit', async (e) => {
 				e.preventDefault();
 
 				const submitBtn = form.querySelector('button[type="submit"]');
 				const originalBtnHtml = submitBtn.innerHTML;
 				submitBtn.disabled = true;
-				submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>...';
+				submitBtn.innerHTML =
+					'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>...';
 
 				const formData = new FormData(form);
 
@@ -96,8 +107,8 @@
 						method: 'POST',
 						body: formData,
 						headers: {
-							'X-Requested-With': 'XMLHttpRequest'
-						}
+							'X-Requested-With': 'XMLHttpRequest',
+						},
 					});
 
 					const result = await response.json();
@@ -106,7 +117,8 @@
 						// Elementos para animación
 						const card = form.closest('.product-card');
 						const imgWrapper = card.querySelector('.product-img-wrapper');
-						const visualElement = imgWrapper.querySelector('img') || imgWrapper.querySelector('span');
+						const visualElement =
+							imgWrapper.querySelector('img') || imgWrapper.querySelector('span');
 
 						if (visualElement && badge) {
 							const elementRect = visualElement.getBoundingClientRect();
@@ -166,7 +178,6 @@
 								setTimeout(() => {
 									badge.style.transform = 'translate(-50%, -50%) scale(1)';
 								}, 200);
-
 							}, 600);
 						} else {
 							// Fallback si no hay elementos visuales

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Ticket {{ ticket.folio }}</title>
+		<style>
+			:root {
+				--ink: #2f231d;
+				--muted: #7a6a61;
+				--paper: #fffdf9;
+				--accent: #b34a2f;
+				--line: #eaded6;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 24px;
+				font-family: 'Segoe UI', Tahoma, sans-serif;
+				background: #f5f2ef;
+				color: var(--ink);
+			}
+			.ticket-wrap {
+				max-width: 420px;
+				margin: 0 auto;
+			}
+			.ticket {
+				background: var(--paper);
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				padding: 18px;
+				box-shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 14px;
+			}
+			.brand {
+				font-weight: 800;
+				font-size: 1.2rem;
+				letter-spacing: 0.4px;
+				color: var(--accent);
+			}
+			.subtitle {
+				font-size: 0.85rem;
+				color: var(--muted);
+			}
+			.meta,
+			.footer {
+				font-size: 0.82rem;
+				color: var(--muted);
+			}
+			.meta {
+				display: grid;
+				gap: 4px;
+				padding-bottom: 12px;
+				border-bottom: 1px dashed var(--line);
+				margin-bottom: 10px;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.88rem;
+			}
+			th,
+			td {
+				padding: 6px 0;
+				vertical-align: top;
+			}
+			th {
+				text-align: left;
+				font-size: 0.76rem;
+				color: var(--muted);
+				font-weight: 700;
+				border-bottom: 1px solid var(--line);
+			}
+			td.num,
+			th.num {
+				text-align: right;
+			}
+			.total {
+				margin-top: 10px;
+				padding-top: 10px;
+				border-top: 1px dashed var(--line);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				font-size: 1.02rem;
+				font-weight: 800;
+			}
+			.footer {
+				margin-top: 12px;
+				text-align: center;
+			}
+			.actions {
+				max-width: 420px;
+				margin: 12px auto 0;
+				display: flex;
+				gap: 8px;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+			.btn {
+				border: 1px solid #d9c8bd;
+				background: #fff;
+				color: var(--ink);
+				padding: 8px 12px;
+				border-radius: 10px;
+				text-decoration: none;
+				font-size: 0.85rem;
+				font-weight: 600;
+			}
+			.btn.primary {
+				background: var(--accent);
+				border-color: var(--accent);
+				color: #fff;
+			}
+			.status {
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 999px;
+				font-size: 0.75rem;
+				font-weight: 700;
+				border: 1px solid #e0d1c8;
+			}
+			@media print {
+				body {
+					background: #fff;
+					padding: 0;
+				}
+				.ticket-wrap {
+					max-width: none;
+				}
+				.ticket {
+					border: 0;
+					box-shadow: none;
+					border-radius: 0;
+					padding: 0;
+				}
+				.actions {
+					display: none !important;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="ticket-wrap">
+			<article class="ticket">
+				<header class="header">
+					<div class="brand">{{ ticket.nombre_negocio }}</div>
+					<div class="subtitle">Ticket de venta</div>
+				</header>
+
+				<section class="meta">
+					<div>
+						<strong>Folio:</strong>
+						{{ ticket.folio }}
+					</div>
+					<div>
+						<strong>Venta:</strong>
+						V-{{ '%03d'|format(venta.id_venta) }}
+					</div>
+					<div>
+						<strong>Fecha:</strong>
+						{{ ticket.fecha.strftime('%Y-%m-%d %H:%M') if ticket.fecha else '—' }}
+					</div>
+					<div>
+						<strong>Cliente:</strong>
+						{{ cliente }}
+					</div>
+					<div>
+						<strong>Pago:</strong>
+						{{ venta.tipo_pago }}
+					</div>
+					<div>
+						<strong>Estado:</strong>
+						<span class="status">{{ venta.estado }}</span>
+					</div>
+				</section>
+
+				<table aria-label="Detalle del ticket">
+					<thead>
+						<tr>
+							<th>Producto</th>
+							<th class="num">Cant.</th>
+							<th class="num">P. Unit</th>
+							<th class="num">Importe</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for d in venta.detalles %}
+						<tr>
+							<td>{{ d.producto.nombre if d.producto else 'Producto' }}</td>
+							<td class="num">{{ d.cantidad }}</td>
+							<td class="num">${{ '%.2f'|format(d.precio_unitario) }}</td>
+							<td class="num">${{ '%.2f'|format(d.subtotal) }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+				<div class="total">
+					<span>Total</span>
+					<strong>${{ '%.2f'|format(total_detalle) }}</strong>
+				</div>
+
+				<footer class="footer">Gracias por tu compra · SoftBakery</footer>
+			</article>
+		</div>
+
+		{% if not download_mode %}
+		<div class="actions">
+			<button class="btn primary" type="button" onclick="window.print()">Imprimir</button>
+			<a
+				class="btn"
+				href="{{ url_for('sales.ver_ticket_venta', id_venta=venta.id_venta, download=1) }}">
+				Descargar
+			</a>
+			<a class="btn" href="{{ url_for('sales.ventas', tab='historial') }}">Volver a ventas</a>
+		</div>
+		{% endif %}
+	</body>
+</html>

@@ -182,6 +182,14 @@
 									data-bs-target="#{{ row_id }}" aria-expanded="false" aria-controls="{{ row_id }}">
 									<i class="bi bi-eye me-1"></i> Ver
 								</button>
+								{% if t %}
+								<a
+									href="{{ url_for('sales.ver_ticket_venta', id_venta=venta.id_venta) }}"
+									target="_blank"
+									class="btn-soft-primary btn-sm">
+									<i class="bi bi-receipt me-1"></i> Ticket
+								</a>
+								{% endif %}
 								{% if venta.estado == 'CONFIRMADO' %}
 								<form method="post" onsubmit="return confirm('¿Cancelar venta y devolver stock?');">
 									<input type="hidden" name="action" value="cancelar_venta" />

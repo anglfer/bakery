@@ -483,6 +483,7 @@ class SolicitudProduccion(TimestampMixin, db.Model):
 
     id_solicitud = db.Column(db.Integer, primary_key=True)
     id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)
+    id_pedido = db.Column(db.Integer, db.ForeignKey("pedido.id_pedido"), nullable=True)
     cantidad = db.Column(db.Integer, nullable=False)
     estado = db.Column(db.String(20), default="PENDIENTE", nullable=False)
     fecha_solicitud = db.Column(db.DateTime, default=utc_now, nullable=False)
@@ -497,6 +498,7 @@ class SolicitudProduccion(TimestampMixin, db.Model):
     observaciones_resolucion = db.Column(db.String(255), nullable=True)
 
     producto = db.relationship("Producto")
+    pedido = db.relationship("Pedido", back_populates="solicitudes_produccion")
     usuario_solicita = db.relationship("Usuario", foreign_keys=[id_usuario_solicita])
     usuario_resuelve = db.relationship("Usuario", foreign_keys=[id_usuario_resuelve])
     ordenes = db.relationship("OrdenProduccion", back_populates="solicitud")
@@ -660,6 +662,10 @@ class Pedido(TimestampMixin, db.Model):
         back_populates="pedido",
         cascade=CASCADE_DELETE_ORPHAN,
         order_by="PedidoEstadoHistorial.id_historial.asc()",
+    )
+    solicitudes_produccion = db.relationship(
+        "SolicitudProduccion",
+        back_populates="pedido",
     )
     pago = db.relationship(
         "PagoPedido",
