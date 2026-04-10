@@ -32,6 +32,7 @@ from app.models import (
     utc_now,
 )
 from app.production import production_bp
+from app.production.forms import MateriaPrimaForm
 
 
 def _decimal(value: str, default: str = "0") -> Decimal:
@@ -342,24 +343,23 @@ def _serializar_receta_activa_para_orden(receta: Receta) -> dict:
 @login_required
 @require_permission("Inventario MP", "leer")
 def inventario_mp():
+    form_mp = MateriaPrimaForm()
+    unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()
+    form_mp.id_unidad_base.choices = [(u.id_unidad, f"{u.nombre} ({u.abreviatura})") for u in unidades]
+    form_mp.id_unidad_compra.choices = [(u.id_unidad, f"{u.nombre} ({u.abreviatura})") for u in unidades]
+
     if request.method == "POST":
         action = request.form.get("action", "")
-        if action == "crear":
+        if action == "crear" and form_mp.validate_on_submit():
             try:
                 materia = crear_materia_prima(
-                    nombre=request.form.get("nombre", ""),
-                    id_unidad_base=_int(request.form.get("id_unidad_base", "0")),
-                    id_unidad_compra=_int(request.form.get("id_unidad_compra", "0")),
-                    factor_conversion=_decimal(
-                        request.form.get("factor_conversion", "0")
-                    ),
-                    porcentaje_merma=_decimal(
-                        request.form.get("porcentaje_merma", "0")
-                    ),
-                    stock_minimo=_decimal(request.form.get("stock_minimo", "0")),
-                    cantidad_inicial=_decimal(
-                        request.form.get("cantidad_inicial", "0")
-                    ),
+                    nombre=form_mp.nombre.data.strip(),
+                    id_unidad_base=form_mp.id_unidad_base.data,
+                    id_unidad_compra=form_mp.id_unidad_compra.data,
+                    factor_conversion=form_mp.factor_conversion.data,
+                    porcentaje_merma=form_mp.porcentaje_merma.data,
+                    stock_minimo=form_mp.stock_minimo.data,
+                    cantidad_inicial=form_mp.cantidad_inicial.data,
                     id_usuario=current_user.id_usuario,
                 )
                 log_audit_event(
@@ -371,21 +371,17 @@ def inventario_mp():
                 flash(str(exc), "danger")
             return redirect(url_for("production.inventario_mp"))
 
-        if action == "editar":
+        if action == "editar" and form_mp.validate_on_submit():
             id_materia = _int(request.form.get("id_materia", "0"))
             try:
                 materia = actualizar_materia_prima(
                     id_materia=id_materia,
-                    nombre=request.form.get("nombre", ""),
-                    id_unidad_base=_int(request.form.get("id_unidad_base", "0")),
-                    id_unidad_compra=_int(request.form.get("id_unidad_compra", "0")),
-                    factor_conversion=_decimal(
-                        request.form.get("factor_conversion", "0")
-                    ),
-                    porcentaje_merma=_decimal(
-                        request.form.get("porcentaje_merma", "0")
-                    ),
-                    stock_minimo=_decimal(request.form.get("stock_minimo", "0")),
+                    nombre=form_mp.nombre.data.strip(),
+                    id_unidad_base=form_mp.id_unidad_base.data,
+                    id_unidad_compra=form_mp.id_unidad_compra.data,
+                    factor_conversion=form_mp.factor_conversion.data,
+                    porcentaje_merma=form_mp.porcentaje_merma.data,
+                    stock_minimo=form_mp.stock_minimo.data,
                 )
                 log_audit_event(
                     "INVENTARIO_MP_EDITAR",
@@ -511,6 +507,7 @@ def inventario_mp():
         movimientos=movimientos,
         resumen_stock=resumen_stock,
         alertas_stock=alertas_stock,
+        form_mp=form_mp,
     )
 
 

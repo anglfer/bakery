@@ -1,4 +1,5 @@
 {% extends "base_template.html" %} {% block title %}Proveedores{% endblock %} {% block content %}
+{% from '_macros.html' import campo %}
 <section class="section">
 	<div class="ops-card mb-3">
 		<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
@@ -111,39 +112,30 @@
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
-				<form method="post">
+				<form method="post" novalidate>
+					{{ form.hidden_tag() }}
 					<div class="modal-body">
 						<div class="row g-3">
 							<div class="col-md-6">
-								<label class="form-label">Nombre del proveedor *</label>
-								<input type="text" name="nombre_proveedor" placeholder="Ej. Harinera del Centro"
-									required />
+								{{ campo(form.nombre_empresa, placeholder='Ej. Harinera del Centro') }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Nombre de contacto *</label>
-								<input type="text" name="nombre_contacto" placeholder="Ej. Roberto Sánchez" required />
+								{{ campo(form.nombre_contacto, placeholder='Ej. Roberto Sánchez') }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Teléfono *</label>
-								<input type="text" name="telefono" class="form-control tel-format"
-									placeholder="477-123-4567" required />
+								{{ campo(form.telefono, class='form-control tel-format', placeholder='477-123-4567') }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Correo electrónico *</label>
-								<input type="email" name="correo" placeholder="contacto@proveedor.com" required />
+								{{ campo(form.correo, placeholder='contacto@proveedor.com') }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Ciudad *</label>
-								<input type="text" name="ciudad" placeholder="León" required />
+								{{ campo(form.ciudad, placeholder='León') }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Estado *</label>
-								<input type="text" name="estado" placeholder="Guanajuato" required />
+								{{ campo(form.estado, placeholder='Guanajuato') }}
 							</div>
 							<div class="col-12">
-								<label class="form-label">Dirección *</label>
-								<input type="text" name="direccion" placeholder="Blvd. Delta 505, Col. San José"
-									required />
+								{{ campo(form.direccion, placeholder='Blvd. Delta 505, Col. San José') }}
 							</div>
 						</div>
 					</div>
@@ -169,7 +161,7 @@
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
-				<form method="post" id="formEditarProveedor">
+				<form method="post" id="formEditarProveedor" novalidate>
 					<div class="modal-body">
 						<div class="row g-3">
 							<div class="col-md-6">
@@ -358,5 +350,11 @@
 			this.value = val;
 		});
 	});
+
+	{% if form.errors %}
+	document.addEventListener("DOMContentLoaded", function() {
+		new bootstrap.Modal(document.getElementById('modalProveedorCrear')).show();
+	});
+	{% endif %}
 </script>
 {% endblock %}

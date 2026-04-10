@@ -58,6 +58,7 @@ from app.models import (
     utc_today,
 )
 from app.sales import sales_bp
+from app.sales.forms import SalidaEfectivoForm
 
 
 def _can_manage_producto_terminado() -> bool:
@@ -1386,6 +1387,8 @@ def ventas():
     if tab not in {"nueva", "historial", "salidas", "corte"}:
         tab = "nueva"
 
+    form_salida = SalidaEfectivoForm()
+
     if request.method == "POST":
         action = (request.form.get("action") or "registrar_venta").strip().lower()
         if action == "registrar_venta":
@@ -1443,37 +1446,38 @@ def ventas():
             return redirect(url_for("sales.ventas", tab="historial"))
 
         if action == "registrar_salida":
-            concepto = request.form.get("concepto", "").strip()
-            monto = _dec(request.form.get("monto", "0"))
-            tipo = request.form.get("tipo", "GASTO_OPERATIVO").strip().upper()
-            referencia_tipo = (
-                request.form.get("referencia_tipo", "MANUAL").strip().upper()
-            )
-            referencia_id = _int(request.form.get("referencia_id", "0"), 0)
-            if not concepto or monto <= 0:
-                flash("Concepto y monto válido son obligatorios.", "warning")
+            if form_salida.validate_on_submit():
+                concepto = form_salida.concepto.data.strip()
+                monto = _dec(str(form_salida.monto.data))
+                tipo = form_salida.tipo.data.strip().upper()
+                referencia_tipo = (
+                    request.form.get("referencia_tipo", "MANUAL").strip().upper()
+                )
+                referencia_id = _int(request.form.get("referencia_id", "0"), 0)
+                if not concepto or monto <= 0:
+                    flash("Concepto y monto válido son obligatorios.", "warning")
+                    return redirect(url_for("sales.ventas", tab="salidas"))
+
+                db.session.add(
+                    SalidaEfectivo(
+                        concepto=concepto,
+                        monto=_to_mxn(monto),
+                        tipo=tipo,
+                        id_usuario=current_user.id_usuario,
+                        referencia=request.form.get("referencia", "").strip() or None,
+                        referencia_tipo=referencia_tipo or None,
+                        referencia_id=referencia_id if referencia_id > 0 else None,
+                    )
+                )
+                db.session.commit()
+                log_audit_event(
+                    "SALIDA_EFECTIVO_REGISTRADA",
+                    f"concepto={concepto}; monto={monto}; tipo={tipo}",
+                )
+                flash("Salida registrada correctamente.", "success")
                 return redirect(url_for("sales.ventas", tab="salidas"))
 
-            db.session.add(
-                SalidaEfectivo(
-                    concepto=concepto,
-                    monto=_to_mxn(monto),
-                    tipo=tipo,
-                    id_usuario=current_user.id_usuario,
-                    referencia=request.form.get("referencia", "").strip() or None,
-                    referencia_tipo=referencia_tipo or None,
-                    referencia_id=referencia_id if referencia_id > 0 else None,
-                )
-            )
-            db.session.commit()
-            log_audit_event(
-                "SALIDA_EFECTIVO_REGISTRADA",
-                f"concepto={concepto}; monto={monto}; tipo={tipo}",
-            )
-            flash("Salida registrada correctamente.", "success")
-            return redirect(url_for("sales.ventas", tab="salidas"))
-
-        if action == "generar_corte":
+        elif action == "generar_corte":
             rol_nombre = current_user.rol.nombre if current_user.rol else ""
             if rol_nombre != "Administrador":
                 flash("Solo administración puede generar el corte diario.", "warning")
@@ -1483,8 +1487,9 @@ def ventas():
             flash("Corte diario generado correctamente.", "success")
             return redirect(url_for("sales.ventas", tab="corte"))
 
-        flash("Acción no reconocida en módulo de ventas.", "warning")
-        return redirect(url_for("sales.ventas", tab=tab))
+        elif action not in ["registrar_venta", "cancelar_venta", "registrar_salida"]:
+            flash("Acción no reconocida en módulo de ventas.", "warning")
+            return redirect(url_for("sales.ventas", tab=tab))
 
     productos = (
         Producto.query.filter(
@@ -1595,6 +1600,7 @@ def ventas():
         puede_generar_corte=(
             current_user.rol is not None and current_user.rol.nombre == "Administrador"
         ),
+        form_salida=form_salida,
     )
 
 

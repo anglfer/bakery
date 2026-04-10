@@ -8,6 +8,8 @@
 			<p class="subtitle mb-0">Iniciar sesión</p>
 		</div>
 
+		{% from '_macros.html' import campo %}
+
 		<div class="tab-bar mb-4" role="tablist" aria-label="Acceso cliente">
 			<a class="tab-btn active" href="{{ url_for('auth.login') }}">
 				<i class="bi bi-person-fill"></i>
@@ -23,44 +25,16 @@
 			{{ form.hidden_tag() }}
 
 			<div class="mb-3">
-				<label class="form-label">
-					Usuario
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-					{{ form.username(class_='form-control', placeholder='Ingresa tu usuario',
-					autocomplete='username') }}
-				</div>
-				{% if form.username.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.username.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
+				{{ campo(form.username, placeholder='Ingresa tu usuario', autocomplete='username') }}
 			</div>
 
 			<div class="mb-2">
-				<label class="form-label">
-					Contraseña
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-					{{ form.password(class_='form-control', id='password', placeholder='Ingresa tu contraseña',
-					autocomplete='current-password') }}
-					<span class="toggle-password" id="togglePassword" role="button" tabindex="0">
+				<div class="position-relative">
+					{{ campo(form.password, id='password', placeholder='Ingresa tu contraseña', autocomplete='current-password') }}
+					<span class="toggle-password" id="togglePassword" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
-				{% if form.password.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.password.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
 			</div>
 
 			{% if show_captcha %}

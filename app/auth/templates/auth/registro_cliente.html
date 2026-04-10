@@ -8,6 +8,8 @@
 			<p class="subtitle mb-0">Portal de Clientes</p>
 		</div>
 
+		{% from '_macros.html' import campo %}
+
 		<div class="tab-bar mb-4" role="tablist" aria-label="Acceso cliente">
 			<a class="tab-btn" href="{{ url_for('auth.login') }}">
 				<i class="bi bi-person-fill"></i>
@@ -24,88 +26,26 @@
 
 			<div class="row-fields mb-3">
 				<div>
-					<label class="form-label">
-						Nombre
-						<span class="req">*</span>
-					</label>
-					<div class="input-group">
-						<span class="input-group-text"><i class="bi bi-person"></i></span>
-						{{ form.nombre(class_='form-control', placeholder='Laura', id='nombre') }}
-					</div>
-					{% if form.nombre.errors %}
-					<div class="text-danger small mt-1">
-						{% for error in form.nombre.errors %}
-						<div>{{ error }}</div>
-						{% endfor %}
-					</div>
-					{% endif %}
+					{{ campo(form.nombre, placeholder='Laura') }}
 				</div>
 				<div>
-					<label class="form-label">
-						Apellido
-						<span class="req">*</span>
-					</label>
-					<div class="input-group">
-						<span class="input-group-text"><i class="bi bi-person"></i></span>
-						{{ form.apellidos(class_='form-control', placeholder='Martínez', id='apellidos') }}
-					</div>
-					{% if form.apellidos.errors %}
-					<div class="text-danger small mt-1">
-						{% for error in form.apellidos.errors %}
-						<div>{{ error }}</div>
-						{% endfor %}
-					</div>
-					{% endif %}
+					{{ campo(form.apellidos, placeholder='Martínez') }}
 				</div>
 			</div>
 
 			<div class="mb-3">
-				<label class="form-label">
-					Teléfono
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
-					{{ form.telefono(class_='form-control', placeholder='477-100-0001', id='telefono') }}
-				</div>
-				{% if form.telefono.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.telefono.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
+				{{ campo(form.telefono, placeholder='477-100-0001') }}
 			</div>
 
 			<div class="mb-3">
-				<label class="form-label">
-					Usuario
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-at"></i></span>
-					{{ form.username(class_='form-control', placeholder='laura_martinez', id='username') }}
-				</div>
+				{{ campo(form.username, placeholder='laura_martinez') }}
 				<div class="field-msg" id="usernameHelp" aria-live="polite"></div>
-				{% if form.username.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.username.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
 			</div>
 
 			<div class="mb-3">
-				<label class="form-label">
-					Contraseña
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-					{{ form.password(class_='form-control', id='password', placeholder='Mínimo 8 caracteres',
-					autocomplete='new-password') }}
-					<span class="toggle-password" data-target="password" role="button" tabindex="0">
+				<div class="position-relative">
+					{{ campo(form.password, id='password', placeholder='Mínimo 8 caracteres', autocomplete='new-password') }}
+					<span class="toggle-password" data-target="password" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
@@ -137,36 +77,16 @@
 						Al menos un carácter especial
 					</div>
 				</div>
-				{% if form.password.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.password.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
 			</div>
 
 			<div class="mb-3">
-				<label class="form-label">
-					Confirmar contraseña
-					<span class="req">*</span>
-				</label>
-				<div class="input-group">
-					<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-					{{ form.confirm_password(class_='form-control', id='confirmPassword', placeholder='Repite tu
-					contraseña', autocomplete='new-password') }}
-					<span class="toggle-password" data-target="confirmPassword" role="button" tabindex="0">
+				<div class="position-relative">
+					{{ campo(form.confirm_password, id='confirmPassword', placeholder='Repite tu contraseña', autocomplete='new-password') }}
+					<span class="toggle-password" data-target="confirmPassword" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
 				<div class="field-msg" id="confirmHelp" aria-live="polite"></div>
-				{% if form.confirm_password.errors %}
-				<div class="text-danger small mt-1">
-					{% for error in form.confirm_password.errors %}
-					<div>{{ error }}</div>
-					{% endfor %}
-				</div>
-				{% endif %}
 			</div>
 
 			{{ form.submit(class_='btn btn-login w-100', value='Crear mi cuenta') }}

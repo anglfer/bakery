@@ -1,4 +1,5 @@
 {% extends "base_template.html" %}
+{% from '_macros.html' import campo %}
 {% block title %}Inventario MP{% endblock %}
 
 {% block content %}
@@ -178,7 +179,8 @@
 				<h5 class="modal-title w-100 text-white" id="modalMateriaTitulo">Nueva materia prima</h5>
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
-			<form method="post" id="formMateriaPrima">
+			<form method="post" id="formMateriaPrima" novalidate>
+				{{ form_mp.hidden_tag() }}
 				<input type="hidden" name="action" id="mpAction" value="crear" />
 				<input type="hidden" name="id_materia" id="mpIdMateria" value="" />
 				<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
@@ -186,10 +188,8 @@
 						<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Datos generales</p>
 						<div class="ops-grid">
 							<div class="mp-field-full">
-								<label for="mpNombre" class="form-label fw-semibold">Nombre *</label>
-								<input type="text" name="nombre" id="mpNombre" placeholder="Ej. Harina de trigo"
-									required />
-								<small class="text-muted">Nombre único. No se permiten duplicados.</small>
+								{{ campo(form_mp.nombre, id='mpNombre', placeholder='Ej. Harina de trigo') }}
+								<small class="text-muted" style="display:block; margin-top:-0.5rem; margin-bottom:0.8rem">Nombre único. No se permiten duplicados.</small>
 							</div>
 						</div>
 					</div>
@@ -200,28 +200,14 @@
 						</p>
 						<div class="ops-grid mp-grid-3">
 							<div>
-								<label for="mpUnidadBase" class="form-label fw-semibold">Unidad base *</label>
-								<select name="id_unidad_base" id="mpUnidadBase" required>
-									<option value="">Seleccionar...</option>
-									{% for u in unidades %}
-									<option value="{{ u.id_unidad }}">{{ u.nombre }} ({{ u.abreviatura }})</option>
-									{% endfor %}
-								</select>
+								{{ campo(form_mp.id_unidad_base, id='mpUnidadBase') }}
 							</div>
 							<div>
-								<label for="mpUnidadCompra" class="form-label fw-semibold">Unidad de compra *</label>
-								<select name="id_unidad_compra" id="mpUnidadCompra" required>
-									<option value="">Seleccionar...</option>
-									{% for u in unidades %}
-									<option value="{{ u.id_unidad }}">{{ u.nombre }} ({{ u.abreviatura }})</option>
-									{% endfor %}
-								</select>
+								{{ campo(form_mp.id_unidad_compra, id='mpUnidadCompra') }}
 							</div>
 							<div>
-								<label for="mpFactor" class="form-label fw-semibold">Factor de conversión *</label>
-								<input type="number" step="0.0001" min="0.0001" name="factor_conversion" id="mpFactor"
-									placeholder="Ej. 25000" required />
-								<small class="text-muted">Se autocompleta según unidades seleccionadas.</small>
+								{{ campo(form_mp.factor_conversion, id='mpFactor', step='0.0001', min='0.0001', placeholder='Ej. 25000') }}
+								<small class="text-muted" style="display:block; margin-top:-0.5rem; margin-bottom:0.8rem">Se autocompleta según unidades seleccionadas.</small>
 							</div>
 						</div>
 						<div class="ops-chip neutral mt-2" id="mpPreviewConversion">
@@ -233,20 +219,14 @@
 						<p class="ops-meta mb-2"><i class="bi bi-percent me-1"></i>Merma y stock mínimo</p>
 						<div class="ops-grid mp-grid-3">
 							<div>
-								<label for="mpMerma" class="form-label fw-semibold">% Merma</label>
-								<input type="number" step="0.01" min="0" name="porcentaje_merma" id="mpMerma" value="0"
-									required />
+								{{ campo(form_mp.porcentaje_merma, id='mpMerma', step='0.01', min='0') }}
 							</div>
 							<div>
-								<label for="mpStockMinimo" class="form-label fw-semibold">Stock mínimo</label>
-								<input type="number" step="0.0001" min="0" name="stock_minimo" id="mpStockMinimo"
-									placeholder="0.00" required />
+								{{ campo(form_mp.stock_minimo, id='mpStockMinimo', step='0.0001', min='0', placeholder='0.00') }}
 							</div>
 							<div>
-								<label for="mpCantidadInicial" class="form-label fw-semibold">Cantidad inicial</label>
-								<input type="number" step="0.0001" min="0" name="cantidad_inicial"
-									id="mpCantidadInicial" value="0" required />
-								<small class="text-muted" id="mpCantidadInicialHint">
+								{{ campo(form_mp.cantidad_inicial, id='mpCantidadInicial', step='0.0001', min='0') }}
+								<small class="text-muted" id="mpCantidadInicialHint" style="display:block; margin-top:-0.5rem;">
 									Existencia de apertura en unidad base.
 								</small>
 							</div>
@@ -675,5 +655,11 @@
 	if (mpFactor) mpFactor.dataset.autofill = '1';
 	applyAutoFactorFromUnits(true);
 	updateConversionPreview();
+
+	{% if form_mp.errors %}
+	document.addEventListener("DOMContentLoaded", function() {
+		modalMateria.show();
+	});
+	{% endif %}
 </script>
 {% endblock %}

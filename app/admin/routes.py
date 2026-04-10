@@ -24,6 +24,8 @@ from app.models import (
     Venta,
     utc_today,
 )
+from app.admin.forms import ProveedorForm
+
 
 BASE_ROLES = {"Administrador", "Ventas", "Produccion"}
 DASHBOARD_ALLOWED_ROLES = {"Administrador", "Ventas", "Produccion"}
@@ -602,21 +604,20 @@ def rol_permisos(id_rol: int):
 @login_required
 @require_permission("Proveedores", "leer")
 def proveedores():
-    if request.method == "POST":
+    form = ProveedorForm()
+    if form.validate_on_submit():
         if not _can_create_supplier():
             flash("No tienes permiso para registrar proveedores.", "danger")
             return redirect(url_for(SUPPLIERS_ENDPOINT))
 
-        nombre = (
-            request.form.get("nombre_proveedor", "").strip()
-            or request.form.get("nombre_empresa", "").strip()
-        )
-        nombre_contacto = request.form.get("nombre_contacto", "").strip()
-        telefono = request.form.get("telefono", "").strip()
-        correo = request.form.get("correo", "").strip().lower()
-        ciudad = request.form.get("ciudad", "").strip()
-        estado = request.form.get("estado", "").strip()
-        direccion = request.form.get("direccion", "").strip()
+        nombre = form.nombre_empresa.data.strip()
+        nombre_contacto = form.nombre_contacto.data.strip()
+        telefono = form.telefono.data.strip()
+        correo = form.correo.data.strip().lower()
+        ciudad = form.ciudad.data.strip()
+        estado = form.estado.data.strip()
+        direccion = form.direccion.data.strip()
+
         error_message = _validate_supplier_payload(
             nombre_proveedor=nombre,
             nombre_contacto=nombre_contacto,
@@ -675,6 +676,7 @@ def proveedores():
         "admin/proveedores.html",
         proveedores=data,
         q=search,
+        form=form,
     )
 
 

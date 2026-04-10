@@ -259,3 +259,21 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
 	{% endfor %}
 </section>
 {% endif %} {% endwith %} {%- endmacro %}
+
+{# ── campo(field) ─────────────────────────────────────────────
+   Igual al camposNuevos del ejemplo de clase.
+   Renderiza: label + widget del field + errores en rojo.
+   Uso: {{ campo(form.nombre) }}
+        {{ campo(form.correo, class='form-control') }}
+──────────────────────────────────────────────────────────────── #}
+{% macro campo(field) %}
+<div class="mb-2">
+  {{ field.label(class='form-label') }}
+  {{ field(class=kwargs.pop('class', 'form-control'), **kwargs) }}
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <span class="text-danger" style="font-size:.78rem;">{{ error }}</span>
+    {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
