@@ -7,6 +7,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		gap: 1.1rem;
 		margin-bottom: 1.5rem;
 	}
+
 	.rol-card {
 		background: #fff;
 		border-radius: 14px;
@@ -15,27 +16,33 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		overflow: hidden;
 		transition: all 0.2s ease;
 	}
+
 	.rol-card.base {
 		border-top-color: var(--sb-primary);
 	}
+
 	.rol-card:hover {
 		box-shadow: 0 6px 22px rgba(158, 59, 59, 0.13);
 		transform: translateY(-3px);
 	}
+
 	.rol-card-body {
 		padding: 1.1rem 1.2rem;
 	}
+
 	.rol-top {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		margin-bottom: 0.7rem;
 	}
+
 	.rol-left {
 		display: flex;
 		align-items: center;
 		gap: 0.65rem;
 	}
+
 	.rol-icon {
 		width: 40px;
 		height: 40px;
@@ -46,27 +53,33 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		font-size: 1.05rem;
 		flex-shrink: 0;
 	}
+
 	.ic-admin {
 		background: #fdeaea;
 		color: var(--sb-primary);
 	}
+
 	.ic-ventas {
 		background: #e8f5e9;
 		color: #2e7d32;
 	}
+
 	.ic-prod {
 		background: #e8eaf6;
 		color: #3949ab;
 	}
+
 	.ic-custom {
 		background: #f3e5f5;
 		color: #7b1fa2;
 	}
+
 	.rol-nombre {
 		font-size: 0.92rem;
 		font-weight: 700;
 		color: var(--sb-text);
 	}
+
 	.badge-base {
 		font-size: 0.6rem;
 		background: #fce9e9;
@@ -75,6 +88,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		padding: 0.18rem 0.55rem;
 		font-weight: 600;
 	}
+
 	.badge-activo {
 		background: #e8f5e9;
 		color: #2e7d32;
@@ -83,6 +97,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		border-radius: 50px;
 		font-weight: 600;
 	}
+
 	.badge-inactivo {
 		background: #f5f5f5;
 		color: #757575;
@@ -91,18 +106,21 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		border-radius: 50px;
 		font-weight: 600;
 	}
+
 	.rol-desc {
 		font-size: 0.75rem;
 		color: var(--sb-muted);
 		line-height: 1.5;
 		margin-bottom: 0.8rem;
 	}
+
 	.perms-summary {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.3rem;
 		margin-bottom: 0.9rem;
 	}
+
 	.chip-mod {
 		font-size: 0.6rem;
 		padding: 0.15rem 0.5rem;
@@ -111,15 +129,18 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		background: #f8efea;
 		color: var(--sb-muted);
 	}
+
 	.chip-mod.has {
 		background: #fce9e9;
 		color: var(--sb-primary);
 	}
+
 	.rol-meta {
 		font-size: 0.68rem;
 		color: var(--sb-muted);
 		margin-bottom: 0.8rem;
 	}
+
 	.rol-acciones {
 		display: flex;
 		gap: 0.45rem;
@@ -128,6 +149,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		background: #fdf8f6;
 		flex-wrap: wrap;
 	}
+
 	.btn-accion-rol {
 		height: 30px;
 		border-radius: 8px;
@@ -143,35 +165,43 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		transition: all 0.16s;
 		font-family: 'Poppins', sans-serif;
 	}
+
 	.btn-edit {
 		background: #e8eaf6;
 		color: #3949ab;
 	}
+
 	.btn-edit:hover {
 		background: #3949ab;
 		color: #fff;
 	}
+
 	.btn-perms {
 		background: #fce9e9;
 		color: var(--sb-primary);
 	}
+
 	.btn-perms:hover {
 		background: var(--sb-primary);
 		color: #fff;
 	}
+
 	.btn-deact {
 		background: #fff8e1;
 		color: #e65100;
 	}
+
 	.btn-deact:hover {
 		background: #e65100;
 		color: #fff;
 	}
+
 	.perms-table {
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 0.78rem;
 	}
+
 	.perms-table th {
 		background: var(--sb-primary);
 		color: #fff;
@@ -181,14 +211,17 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
+
 	.perms-table td {
 		padding: 0.45rem 0.75rem;
 		border-bottom: 1px solid var(--sb-border);
 		vertical-align: middle;
 	}
+
 	.perms-table tbody tr:hover {
 		background: #fce9e9;
 	}
+
 	.perms-check {
 		width: 18px;
 		height: 18px;
@@ -207,9 +240,8 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 				Gestiona roles y asigna permisos por módulo
 			</p>
 		</div>
-		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoRol">
-			<i class="bi bi-plus-lg"></i>
-			Nuevo rol
+		<button class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#modalNuevoRol">
+			<i class="bi bi-plus-lg text-white me-1"></i>Nuevo rol
 		</button>
 	</div>
 
@@ -259,40 +291,26 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 			</div>
 			<div class="rol-acciones">
 				{% if not r.es_base %}
-				<button
-					class="btn-accion-rol btn-edit"
-					data-action="edit-rol"
-					data-id-rol="{{ r.id_rol }}"
-					data-desc='{{ (r.descripcion or "") | tojson }}'
-					data-activo="{{ 'true' if r.activo else 'false' }}"
+				<button class="btn-accion-rol btn-edit" data-action="edit-rol" data-id-rol="{{ r.id_rol }}"
+					data-desc='{{ (r.descripcion or "") | tojson }}' data-activo="{{ 'true' if r.activo else 'false' }}"
 					type="button">
 					<i class="bi bi-pencil-fill"></i>
 					Editar
 				</button>
 				{% endif %}
-				<button
-					class="btn-accion-rol btn-perms"
-					data-action="open-perms"
-					data-id-rol="{{ r.id_rol }}"
-					data-nombre="{{ r.nombre | tojson }}"
-					type="button">
+				<button class="btn-accion-rol btn-perms" data-action="open-perms" data-id-rol="{{ r.id_rol }}"
+					data-nombre="{{ r.nombre | tojson }}" type="button">
 					<i class="bi bi-key-fill"></i>
 					Permisos
 				</button>
 				{% if not r.es_base and r.activo %}
-				<button
-					class="btn-accion-rol btn-deact"
-					data-action="deactivate-rol"
-					data-id-rol="{{ r.id_rol }}"
-					data-nombre="{{ r.nombre | tojson }}"
-					type="button">
+				<button class="btn-accion-rol btn-deact" data-action="deactivate-rol" data-id-rol="{{ r.id_rol }}"
+					data-nombre="{{ r.nombre | tojson }}" type="button">
 					<i class="bi bi-slash-circle"></i>
 					Desactivar
 				</button>
 				{% elif not r.es_base and not r.activo %}
-				<form
-					method="post"
-					action="{{ url_for('admin.activar_rol', id_rol=r.id_rol) }}"
+				<form method="post" action="{{ url_for('admin.activar_rol', id_rol=r.id_rol) }}"
 					style="display: inline">
 					<button type="submit" class="btn-accion-rol" style="background: #e8f5ee; color: #2e7d52">
 						<i class="bi bi-check-circle-fill"></i>
@@ -303,9 +321,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 			</div>
 		</div>
 		{% else %}
-		<div
-			class="text-center py-5"
-			style="color: var(--sb-muted); font-size: 0.82rem; grid-column: 1/-1">
+		<div class="text-center py-5" style="color: var(--sb-muted); font-size: 0.82rem; grid-column: 1/-1">
 			<i class="bi bi-shield-x fs-2 d-block mb-2"></i>
 			No hay roles registrados
 		</div>
@@ -313,47 +329,35 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 	</div>
 
 	<div class="modal fade" id="modalNuevoRol" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title w-100 text-white">
+						<i class="bi bi-plus-circle-fill me-2 text-white"></i>Nuevo rol
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
 				<form method="post" action="{{ url_for('admin.roles') }}">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							<i class="bi bi-plus-circle-fill me-2"></i>
-							Nuevo rol
-						</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
 					<div class="modal-body">
-						<div class="mb-3">
-							<label class="form-label" for="nuevo-rol-nombre">Nombre del rol</label>
-							<input
-								id="nuevo-rol-nombre"
-								type="text"
-								name="nombre"
-								class="form-control"
-								required
-								maxlength="50"
-								pattern="[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 _\-]+"
-								placeholder="ej. supervisor" />
-						</div>
-						<div class="mb-3">
-							<label class="form-label" for="nuevo-rol-descripcion">Descripción</label>
-							<textarea
-								id="nuevo-rol-descripcion"
-								name="descripcion"
-								class="form-control"
-								rows="2"
-								maxlength="255"
-								required></textarea>
+						<div class="row g-3">
+							<div class="col-12">
+								<label class="form-label" for="nuevo-rol-nombre">Nombre del rol</label>
+								<input id="nuevo-rol-nombre" type="text" name="nombre" class="form-control" required
+									maxlength="50" pattern="[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 _\-]+"
+									placeholder="ej. supervisor" />
+							</div>
+							<div class="col-12">
+								<label class="form-label" for="nuevo-rol-descripcion">Descripción</label>
+								<textarea id="nuevo-rol-descripcion" name="descripcion" class="form-control" rows="2"
+									maxlength="255" required></textarea>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer border-0">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-							Cancelar
-						</button>
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-check2 me-1"></i>
-							Crear rol
+						<button type="button" class="btn btn-primary text-white"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm btn-primary text-white">
+							<i class="bi bi-check2 me-1 text-white"></i>Crear rol
 						</button>
 					</div>
 				</form>
@@ -362,55 +366,44 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 	</div>
 
 	<div class="modal fade" id="modalEditarRol" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title w-100 text-white">
+						<i class="bi bi-pencil-fill me-2 text-white"></i>Editar rol
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
 				<form method="post" id="formEditarRol">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							<i class="bi bi-pencil-fill me-2"></i>
-							Editar rol
-						</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
 					<div class="modal-body">
-						<div class="mb-3">
-							<label class="form-label" for="edit-rol-desc">Descripción</label>
-							<textarea
-								name="descripcion"
-								id="edit-rol-desc"
-								class="form-control"
-								rows="2"
-								maxlength="255"
-								required></textarea>
-						</div>
-						<div class="form-check">
-							<input
-								class="form-check-input"
-								type="checkbox"
-								name="activo"
-								id="edit-rol-activo"
-								value="on"
-								checked />
-							<label class="form-check-label" for="edit-rol-activo">Activo</label>
+						<div class="row g-3">
+							<div class="col-12">
+								<label class="form-label" for="edit-rol-desc">Descripción</label>
+								<textarea name="descripcion" id="edit-rol-desc" class="form-control" rows="2"
+									maxlength="255" required></textarea>
+							</div>
+							<div class="col-12 d-flex align-items-end">
+								<div class="form-check mb-2">
+									<input class="form-check-input" type="checkbox" name="activo" id="edit-rol-activo"
+										value="on" checked />
+									<label class="form-check-label" for="edit-rol-activo">Rol Activo</label>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer border-0">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-							Cancelar
+						<button type="button" class="btn btn-outline-secondary"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm btn-primary text-white">
+							<i class="bi bi-save me-1 text-white"></i> Guardar
 						</button>
-						<button type="submit" class="btn btn-primary">Guardar</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 
-	<div
-		class="modal fade"
-		id="modalPermisos"
-		tabindex="-1"
-		aria-labelledby="labelPermisos"
-		aria-hidden="true">
+	<div class="modal fade" id="modalPermisos" tabindex="-1" aria-labelledby="labelPermisos" aria-hidden="true">
 		<div class="modal-dialog modal-lg modal-dialog-scrollable">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -453,8 +446,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-body text-center py-4">
-					<div
-						style="
+					<div style="
 							width: 56px;
 							height: 56px;
 							border-radius: 50%;
@@ -476,9 +468,7 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 						<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
 							Cancelar
 						</button>
-						<button
-							type="submit"
-							class="btn btn-primary"
+						<button type="submit" class="btn btn-primary"
 							style="background: #e65100; border-color: #e65100">
 							Desactivar
 						</button>

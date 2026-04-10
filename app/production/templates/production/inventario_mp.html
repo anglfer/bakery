@@ -20,7 +20,8 @@
 			</p>
 			<p class="ops-alert-stock-text mb-0">
 				{% for alerta in alertas_stock %}
-					{{ alerta.nombre }} ({{ alerta.cantidad }} {{ alerta.unidad }} / mín. {{ alerta.stock_minimo }} {{ alerta.unidad }}){% if not loop.last %} · {% endif %}
+				{{ alerta.nombre }} ({{ alerta.cantidad }} {{ alerta.unidad }} / mín. {{ alerta.stock_minimo }} {{
+				alerta.unidad }}){% if not loop.last %} · {% endif %}
 				{% endfor %}
 				— Solicita una compra o ajuste de inventario.
 			</p>
@@ -62,11 +63,11 @@
 			<option value="bajo">Bajo</option>
 			<option value="ok">OK</option>
 		</select>
-		<button type="button" class="btn btn-outline-secondary btn-sm" id="btnHistorialGlobal">
-			<i class="bi bi-clock-history me-1"></i>Movimientos
+		<button type="button" class="btn btn-secondary text-white border-0 btn-sm" id="btnHistorialGlobal">
+			<i class="bi bi-clock-history me-1 text-white"></i>Movimientos
 		</button>
-		<button type="button" class="btn btn-sm" id="btnNuevaMateria">
-			<i class="bi bi-plus-lg me-1"></i>Nueva materia prima
+		<button type="button" class="btn btn-primary text-white border-0 btn-sm" id="btnNuevaMateria">
+			<i class="bi bi-plus-lg me-1 text-white"></i>Nueva materia prima
 		</button>
 	</div>
 
@@ -94,14 +95,10 @@
 				<tbody>
 					{% for m in materias %}
 					{% set stock_estado = (m.estado_stock or 'OK')|lower %}
-					<tr
-						data-row="materia"
-						data-id="{{ m.id_materia }}"
+					<tr data-row="materia" data-id="{{ m.id_materia }}"
 						data-label="{{ (m.nombre ~ ' ' ~ m.unidad_base.abreviatura ~ ' ' ~ m.unidad_compra.abreviatura)|lower }}"
-						data-estado="{{ 'activa' if m.activa else 'inactiva' }}"
-						data-stock="{{ stock_estado }}"
-						data-nombre="{{ m.nombre }}"
-						data-cantidad="{{ m.cantidad_disponible }}"
+						data-estado="{{ 'activa' if m.activa else 'inactiva' }}" data-stock="{{ stock_estado }}"
+						data-nombre="{{ m.nombre }}" data-cantidad="{{ m.cantidad_disponible }}"
 						data-unidad="{{ m.unidad_base.abreviatura }}">
 						<td class="fw-semibold">{{ m.nombre }}</td>
 						<td><span class="ops-chip neutral">{{ m.unidad_base.abreviatura }}</span></td>
@@ -113,7 +110,8 @@
 								<div class="ops-stock-bar">
 									<div class="ops-stock-bar-fill {{ stock_estado }}"></div>
 								</div>
-								<span class="ops-stock-number">{{ m.cantidad_disponible }} {{ m.unidad_base.abreviatura }}</span>
+								<span class="ops-stock-number">{{ m.cantidad_disponible }} {{ m.unidad_base.abreviatura
+									}}</span>
 							</div>
 						</td>
 						<td>{{ m.stock_minimo }} {{ m.unidad_base.abreviatura }}</td>
@@ -133,35 +131,23 @@
 						</td>
 						<td>
 							<div class="btn-action-group">
-								<button
-									type="button"
-									class="btn btn-outline-secondary btn-icon-sm btnEditar"
-									data-id="{{ m.id_materia }}"
-									title="Editar">
-									<i class="bi bi-pencil-fill"></i>
+								<button type="button" class="btn btn-primary text-white btn-icon-sm btnEditar"
+									data-id="{{ m.id_materia }}" title="Editar">
+									<i class="bi bi-pencil-fill text-white"></i>
 								</button>
-								<button
-									type="button"
-									class="btn btn-outline-secondary btn-icon-sm btnAjustar"
-									data-id="{{ m.id_materia }}"
-									title="Ajuste inventario"
-									{{ 'disabled' if not m.activa else '' }}>
-									<i class="bi bi-arrow-left-right"></i>
+								<button type="button" class="btn btn-primary text-white btn-icon-sm btnAjustar"
+									data-id="{{ m.id_materia }}" title="Ajuste inventario" {{ 'disabled' if not m.activa
+									else '' }}>
+									<i class="bi bi-arrow-left-right text-white"></i>
 								</button>
-								<button
-									type="button"
-									class="btn btn-outline-secondary btn-icon-sm btnHistorial"
-									data-id="{{ m.id_materia }}"
-									title="Historial">
-									<i class="bi bi-clock-history"></i>
+								<button type="button" class="btn btn-primary text-white btn-icon-sm btnHistorial"
+									data-id="{{ m.id_materia }}" title="Historial">
+									<i class="bi bi-clock-history text-white"></i>
 								</button>
 								{% if m.activa %}
-								<button
-									type="button"
-									class="btn btn-outline-danger btn-icon-sm btnDesactivar"
-									data-id="{{ m.id_materia }}"
-									title="Desactivar">
-									<i class="bi bi-archive-fill"></i>
+								<button type="button" class="btn btn-primary text-white btn-icon-sm btnDesactivar"
+									data-id="{{ m.id_materia }}" data-nombre="{{ m.nombre }}" title="Desactivar">
+									<i class="bi bi-slash-circle-fill text-white"></i>
 								</button>
 								{% endif %}
 							</div>
@@ -181,24 +167,20 @@
 <div class="modal fade" id="modalMateriaPrima" tabindex="-1" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content border-0 shadow">
-			<div class="modal-header">
-				<h5 class="modal-title" id="modalMateriaTitulo">Nueva materia prima</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+				<h5 class="modal-title w-100 text-white" id="modalMateriaTitulo">Nueva materia prima</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
 			<form method="post" id="formMateriaPrima">
 				<input type="hidden" name="action" id="mpAction" value="crear" />
 				<input type="hidden" name="id_materia" id="mpIdMateria" value="" />
-				<div class="modal-body">
+				<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
 					<div class="mp-form-block">
 						<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Datos generales</p>
 						<div class="ops-grid">
 							<div class="mp-field-full">
 								<label for="mpNombre" class="form-label fw-semibold">Nombre *</label>
-								<input
-									type="text"
-									name="nombre"
-									id="mpNombre"
-									placeholder="Ej. Harina de trigo"
+								<input type="text" name="nombre" id="mpNombre" placeholder="Ej. Harina de trigo"
 									required />
 								<small class="text-muted">Nombre único. No se permiten duplicados.</small>
 							</div>
@@ -230,14 +212,8 @@
 							</div>
 							<div>
 								<label for="mpFactor" class="form-label fw-semibold">Factor de conversión *</label>
-								<input
-									type="number"
-									step="0.0001"
-									min="0.0001"
-									name="factor_conversion"
-									id="mpFactor"
-									placeholder="Ej. 25000"
-									required />
+								<input type="number" step="0.0001" min="0.0001" name="factor_conversion" id="mpFactor"
+									placeholder="Ej. 25000" required />
 								<small class="text-muted">Se autocompleta según unidades seleccionadas.</small>
 							</div>
 						</div>
@@ -251,36 +227,18 @@
 						<div class="ops-grid mp-grid-3">
 							<div>
 								<label for="mpMerma" class="form-label fw-semibold">% Merma</label>
-								<input
-									type="number"
-									step="0.01"
-									min="0"
-									name="porcentaje_merma"
-									id="mpMerma"
-									value="0"
+								<input type="number" step="0.01" min="0" name="porcentaje_merma" id="mpMerma" value="0"
 									required />
 							</div>
 							<div>
 								<label for="mpStockMinimo" class="form-label fw-semibold">Stock mínimo</label>
-								<input
-									type="number"
-									step="0.0001"
-									min="0"
-									name="stock_minimo"
-									id="mpStockMinimo"
-									placeholder="0.00"
-									required />
+								<input type="number" step="0.0001" min="0" name="stock_minimo" id="mpStockMinimo"
+									placeholder="0.00" required />
 							</div>
 							<div>
 								<label for="mpCantidadInicial" class="form-label fw-semibold">Cantidad inicial</label>
-								<input
-									type="number"
-									step="0.0001"
-									min="0"
-									name="cantidad_inicial"
-									id="mpCantidadInicial"
-									value="0"
-									required />
+								<input type="number" step="0.0001" min="0" name="cantidad_inicial"
+									id="mpCantidadInicial" value="0" required />
 								<small class="text-muted" id="mpCantidadInicialHint">
 									Existencia de apertura en unidad base.
 								</small>
@@ -289,10 +247,10 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary btn-sm text-white" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-sm" id="mpSubmitLabel">
+					<button type="submit" class="btn btn-primary btn-sm text-white" id="mpSubmitLabel">
 						Guardar materia prima
 					</button>
 				</div>
@@ -302,16 +260,16 @@
 </div>
 
 <div class="modal fade" id="modalInventarioAjuste" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content border-0 shadow">
-			<div class="modal-header">
-				<h5 class="modal-title" id="modalAjusteTitulo">Ajuste de inventario</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+				<h5 class="modal-title w-100 text-white" id="modalAjusteTitulo">Ajuste de inventario</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
 			<form method="post" id="formAjuste">
 				<input type="hidden" name="action" value="ajuste" />
 				<input type="hidden" name="tipo" id="ajusteTipo" value="ENTRADA" />
-				<div class="modal-body">
+				<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
 					<input type="hidden" name="id_materia" id="ajusteIdMateria" required />
 					<div class="mb-3">
 						<p class="mb-1 fw-semibold" id="ajusteMateriaNombre">Selecciona una materia prima</p>
@@ -320,13 +278,13 @@
 
 					<p class="form-label fw-semibold d-block mb-2">Tipo de movimiento *</p>
 					<div class="ops-grid mp-grid-3 mb-3">
-						<button type="button" class="btn btn-outline-secondary btnTipoAjuste active" data-tipo="ENTRADA">
+						<button type="button" class="btn btn-primary btnTipoAjuste active" data-tipo="ENTRADA">
 							<i class="bi bi-box-arrow-in-down me-1"></i>Entrada
 						</button>
-						<button type="button" class="btn btn-outline-secondary btnTipoAjuste" data-tipo="SALIDA">
+						<button type="button" class="btn btn-primary btnTipoAjuste" data-tipo="SALIDA">
 							<i class="bi bi-box-arrow-up me-1"></i>Salida
 						</button>
-						<button type="button" class="btn btn-outline-secondary btnTipoAjuste" data-tipo="AJUSTE">
+						<button type="button" class="btn btn-primary btnTipoAjuste" data-tipo="AJUSTE">
 							<i class="bi bi-pencil-square me-1"></i>Ajuste
 						</button>
 					</div>
@@ -336,31 +294,21 @@
 							<label for="ajusteCantidad" class="form-label fw-semibold">
 								Cantidad <span id="ajusteUnidadLabel"></span>
 							</label>
-							<input
-								type="number"
-								step="0.0001"
-								min="0.0001"
-								name="cantidad"
-								id="ajusteCantidad"
-								placeholder="0.00"
-								required />
+							<input type="number" step="0.0001" min="0.0001" name="cantidad" id="ajusteCantidad"
+								placeholder="0.00" required />
 						</div>
 						<div>
 							<label for="ajusteReferencia" class="form-label fw-semibold">Referencia / Motivo *</label>
-							<input
-								type="text"
-								name="referencia_id"
-								id="ajusteReferencia"
-								placeholder="Ej. Compra extra · Ajuste por conteo"
-								required />
+							<input type="text" name="referencia_id" id="ajusteReferencia"
+								placeholder="Ej. Compra extra · Ajuste por conteo" required />
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary btn-sm text-white" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-sm">Registrar movimiento</button>
+					<button type="submit" class="btn btn-primary btn-sm text-white">Registrar movimiento</button>
 				</div>
 			</form>
 		</div>
@@ -370,9 +318,9 @@
 <div class="modal fade" id="modalHistorial" tabindex="-1" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content border-0 shadow">
-			<div class="modal-header">
-				<h5 class="modal-title" id="historialTitulo">Historial de movimientos</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+				<h5 class="modal-title w-100 text-white" id="historialTitulo">Historial de movimientos</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
 			<div class="modal-body">
 				<div class="ops-table table-responsive">
@@ -398,23 +346,29 @@
 <div class="modal fade" id="modalDesactivar" tabindex="-1" aria-hidden="true">
 	<div class="modal-dialog modal-sm modal-dialog-centered">
 		<div class="modal-content border-0 shadow">
-			<div class="modal-header">
-				<h5 class="modal-title">Desactivar materia prima</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
 			<form method="post" id="formDesactivar">
 				<input type="hidden" name="action" value="desactivar" />
 				<input type="hidden" name="id_materia" id="desactivarIdMateria" />
-				<div class="modal-body">
-					<p class="mb-0">
-						¿Deseas desactivar <strong id="desactivarNombreMateria"></strong>? El historial se conserva.
+				<div class="modal-body text-center py-4">
+					<div
+						style="width: 60px; height: 60px; border-radius: 50%; background: #fff8e1; color: #e65100; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1rem;">
+						<i class="bi bi-box-seam"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1.05rem">
+						¿Desactivar materia prima?
+					</h5>
+					<p style="font-size: 0.9rem; color: var(--sb-muted)">
+						La materia prima <strong id="desactivarNombreMateria"></strong> pasará a estado
+						<em>inactiva</em>. No se eliminará el registro.
 					</p>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<button type="button" class="btn btn-danger text-white border-0" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-sm">Confirmar</button>
+					<button type="submit" class="btn btn-danger text-white border-0">
+						<i class="bi bi-check-lg me-1 text-white"></i> Confirmar
+					</button>
 				</div>
 			</form>
 		</div>
@@ -433,6 +387,18 @@
 	const modalAjuste = new bootstrap.Modal(document.getElementById('modalInventarioAjuste'));
 	const modalHistorial = new bootstrap.Modal(document.getElementById('modalHistorial'));
 	const modalDesactivar = new bootstrap.Modal(document.getElementById('modalDesactivar'));
+
+	// Desactivar
+	document.addEventListener('click', e => {
+		const btn = e.target.closest('.btnDesactivar');
+		if (btn) {
+			const id = btn.getAttribute('data-id');
+			const nombre = btn.getAttribute('data-nombre');
+			document.getElementById('desactivarIdMateria').value = id;
+			document.getElementById('desactivarNombreMateria').textContent = nombre;
+			modalDesactivar.show();
+		}
+	});
 
 	const inventarioSearchInput = document.getElementById('inventarioSearch');
 	const filtroEstado = document.getElementById('filtroEstado');

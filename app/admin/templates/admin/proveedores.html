@@ -11,17 +11,10 @@
 		<div class="ops-toolbar mb-0 mt-3">
 			<form method="get" class="ops-input-wrap d-flex gap-2">
 				<i class="bi bi-search"></i>
-				<input
-					type="text"
-					name="q"
-					value="{{ q or '' }}"
-					placeholder="Buscar por nombre de proveedor..." />
-				<button type="submit" class="btn btn-sm">Buscar</button>
+				<input type="text" name="q" value="{{ q or '' }}" placeholder="Buscar por nombre de proveedor..." />
+				<button type="submit" class="btn btn-primary btn-sm">Buscar</button>
 			</form>
-			<button
-				type="button"
-				class="btn btn-sm"
-				data-bs-toggle="modal"
+			<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
 				data-bs-target="#modalProveedorCrear">
 				<i class="bi bi-plus-lg me-1"></i>
 				Agregar proveedor
@@ -64,46 +57,35 @@
 						<td>{{ p.fecha_alta.strftime('%d/%m/%Y') if p.fecha_alta else '-' }}</td>
 						<td>
 							<div class="btn-action-group" style="min-width: 120px">
-								<button
-									type="button"
-									class="btn btn-sm btn-outline-primary btn-icon-sm js-editar-proveedor"
-									title="Editar proveedor"
-									data-id="{{ p.id_proveedor }}"
+								<button type="button"
+									class="btn btn-sm btn-primary text-white btn-icon-sm js-editar-proveedor"
+									title="Editar proveedor" data-id="{{ p.id_proveedor }}"
 									data-nombre-proveedor="{{ p.nombre_empresa }}"
-									data-nombre-contacto="{{ p.nombre_contacto }}"
-									data-correo="{{ p.correo }}"
-									data-telefono="{{ p.telefono }}"
-									data-direccion="{{ p.direccion }}"
-									data-ciudad="{{ p.ciudad }}"
-									data-estado="{{ p.estado }}">
-									<i class="bi bi-pencil-fill"></i>
+									data-nombre-contacto="{{ p.nombre_contacto }}" data-correo="{{ p.correo }}"
+									data-telefono="{{ p.telefono }}" data-direccion="{{ p.direccion }}"
+									data-ciudad="{{ p.ciudad }}" data-estado="{{ p.estado }}">
+									<i class="bi bi-pencil-fill text-white"></i>
 								</button>
 								{% if p.activo %}
-								<button
-									type="button"
-									class="btn btn-sm btn-outline-dark btn-icon-sm js-desactivar-proveedor"
-									title="Desactivar proveedor"
-									data-id="{{ p.id_proveedor }}"
+								<button type="button"
+									class="btn btn-sm btn-dark text-white btn-icon-sm js-desactivar-proveedor"
+									title="Desactivar proveedor" data-id="{{ p.id_proveedor }}"
 									data-nombre="{{ p.nombre_empresa }}">
-									<i class="bi bi-slash-circle-fill"></i>
+									<i class="bi bi-slash-circle-fill text-white"></i>
 								</button>
-								<form
-									method="post"
-									id="formDesactivarProveedor{{ p.id_proveedor }}"
-									action="{{ url_for('admin.desactivar_proveedor', id_proveedor=p.id_proveedor) }}"></form>
+								<form method="post" id="formDesactivarProveedor{{ p.id_proveedor }}"
+									action="{{ url_for('admin.desactivar_proveedor', id_proveedor=p.id_proveedor) }}">
+								</form>
 								{% else %}
-								<button
-									type="button"
-									class="btn btn-sm btn-outline-success btn-icon-sm js-activar-proveedor"
-									title="Activar proveedor"
-									data-id="{{ p.id_proveedor }}"
+								<button type="button"
+									class="btn btn-sm btn-success text-white btn-icon-sm js-activar-proveedor"
+									title="Activar proveedor" data-id="{{ p.id_proveedor }}"
 									data-nombre="{{ p.nombre_empresa }}">
-									<i class="bi bi-check-circle-fill"></i>
+									<i class="bi bi-check-circle-fill text-white"></i>
 								</button>
-								<form
-									method="post"
-									id="formActivarProveedor{{ p.id_proveedor }}"
-									action="{{ url_for('admin.activar_proveedor', id_proveedor=p.id_proveedor) }}"></form>
+								<form method="post" id="formActivarProveedor{{ p.id_proveedor }}"
+									action="{{ url_for('admin.activar_proveedor', id_proveedor=p.id_proveedor) }}">
+								</form>
 								{% endif %}
 							</div>
 						</td>
@@ -122,14 +104,11 @@
 		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
 				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
-					<h5 class="modal-title">
-						<i class="bi bi-truck me-2"></i>
+					<h5 class="modal-title w-100 text-white">
+						<i class="bi bi-truck me-2 text-white"></i>
 						Agregar proveedor
 					</h5>
-					<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
 				<form method="post">
@@ -137,23 +116,17 @@
 						<div class="row g-3">
 							<div class="col-md-6">
 								<label class="form-label">Nombre del proveedor *</label>
-								<input
-									type="text"
-									name="nombre_proveedor"
-									placeholder="Ej. Harinera del Centro"
+								<input type="text" name="nombre_proveedor" placeholder="Ej. Harinera del Centro"
 									required />
 							</div>
 							<div class="col-md-6">
 								<label class="form-label">Nombre de contacto *</label>
-								<input
-									type="text"
-									name="nombre_contacto"
-									placeholder="Ej. Roberto Sánchez"
-									required />
+								<input type="text" name="nombre_contacto" placeholder="Ej. Roberto Sánchez" required />
 							</div>
 							<div class="col-md-6">
 								<label class="form-label">Teléfono *</label>
-								<input type="text" name="telefono" placeholder="477 123 4567" required />
+								<input type="text" name="telefono" class="form-control tel-format"
+									placeholder="477-123-4567" required />
 							</div>
 							<div class="col-md-6">
 								<label class="form-label">Correo electrónico *</label>
@@ -169,19 +142,16 @@
 							</div>
 							<div class="col-12">
 								<label class="form-label">Dirección *</label>
-								<input
-									type="text"
-									name="direccion"
-									placeholder="Blvd. Delta 505, Col. San José"
+								<input type="text" name="direccion" placeholder="Blvd. Delta 505, Col. San José"
 									required />
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						<button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
 							Cancelar
 						</button>
-						<button type="submit" class="btn btn-sm">Guardar</button>
+						<button type="submit" class="btn btn-primary btn-sm">Guardar</button>
 					</div>
 				</form>
 			</div>
@@ -193,13 +163,10 @@
 			<div class="modal-content border-0 shadow">
 				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
 					<h5 class="modal-title">
-						<i class="bi bi-pencil-fill me-2"></i>
+						<i class="bi bi-pencil-fill me-2 text-white"></i>
 						Modificar proveedor
 					</h5>
-					<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
 				<form method="post" id="formEditarProveedor">
@@ -215,7 +182,8 @@
 							</div>
 							<div class="col-md-6">
 								<label class="form-label">Teléfono *</label>
-								<input type="text" name="telefono" id="editarProveedorTelefono" required />
+								<input type="text" name="telefono" id="editarProveedorTelefono"
+									class="form-control tel-format" required />
 							</div>
 							<div class="col-md-6">
 								<label class="form-label">Correo electrónico *</label>
@@ -236,10 +204,10 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						<button type="button" class="btn btn-primary btn-sm text-white" data-bs-dismiss="modal">
 							Cancelar
 						</button>
-						<button type="submit" class="btn btn-sm">Guardar</button>
+						<button type="submit" class="btn btn-primary btn-sm text-white">Guardar</button>
 					</div>
 				</form>
 			</div>
@@ -250,8 +218,7 @@
 		<div class="modal-dialog modal-sm modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-body text-center py-4">
-					<div
-						style="
+					<div style="
 							width: 60px;
 							height: 60px;
 							border-radius: 50%;
@@ -261,7 +228,6 @@
 							align-items: center;
 							justify-content: center;
 							font-size: 1.6rem;
-							margin: 0 auto 1rem;
 						">
 						<i class="bi bi-truck"></i>
 					</div>
@@ -271,11 +237,13 @@
 					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoDesactivarProveedor"></p>
 				</div>
 				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+						style="color: white !important;">
 						Cancelar
 					</button>
-					<button type="button" class="btn btn-sm" id="btnConfirmarDesactivarProveedor">
-						<i class="bi bi-check-lg me-1"></i>
+					<button type="button" class="btn btn-sm btn-danger text-white" id="btnConfirmarDesactivarProveedor"
+						style="color: white !important;">
+						<i class="bi bi-check-lg me-1 text-white"></i>
 						Confirmar
 					</button>
 				</div>
@@ -287,8 +255,7 @@
 		<div class="modal-dialog modal-sm modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-body text-center py-4">
-					<div
-						style="
+					<div style="
 							width: 60px;
 							height: 60px;
 							border-radius: 50%;
@@ -308,11 +275,13 @@
 					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoActivarProveedor"></p>
 				</div>
 				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+						style="color: white !important;">
 						Cancelar
 					</button>
-					<button type="button" class="btn btn-sm" id="btnConfirmarActivarProveedor">
-						<i class="bi bi-check-lg me-1"></i>
+					<button type="button" class="btn btn-sm btn-success text-white" id="btnConfirmarActivarProveedor"
+						style="color: white !important;">
+						<i class="bi bi-check-lg me-1 text-white"></i>
 						Confirmar
 					</button>
 				</div>
@@ -374,6 +343,20 @@
 			return;
 		}
 		document.getElementById(`formActivarProveedor${proveedorActivarId}`).submit();
+	});
+
+	// Formateador automático de teléfono (477-123-4567)
+	const telInputs = document.querySelectorAll('.tel-format');
+	telInputs.forEach(input => {
+		input.addEventListener('input', function (e) {
+			let val = this.value.replace(/\D/g, ''); // Quita lo que no sea número
+			if (val.length > 3 && val.length <= 6) {
+				val = val.slice(0, 3) + '-' + val.slice(3);
+			} else if (val.length > 6) {
+				val = val.slice(0, 3) + '-' + val.slice(3, 6) + '-' + val.slice(6, 10);
+			}
+			this.value = val;
+		});
 	});
 </script>
 {% endblock %}

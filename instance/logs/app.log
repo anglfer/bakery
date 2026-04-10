@@ -1,63 +1,37 @@
-2026-03-29 00:31:53,237 INFO AUDIT|evento=USUARIO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_usuario=10; username=ventas; id_rol=3; activo=True
-2026-03-29 01:10:12,882 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-03-29; total_ventas=810.00; total_salidas=2200.00; utilidad=-1395.6910000
-2026-04-01 21:16:08,423 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-04-02; total_ventas=0; total_salidas=0; utilidad=0
-2026-04-01 21:32:33,538 INFO AUDIT|evento=PROVEEDOR_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401
-2026-04-01 21:33:12,589 INFO AUDIT|evento=COMPRA_MP_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_compra=2; id_proveedor=4; detalles=1
-2026-04-01 21:33:57,981 INFO AUDIT|evento=INVENTARIO_MP_AJUSTE|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=1; tipo=SALIDA; cantidad=100
-2026-04-01 21:36:18,619 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=5
-2026-04-01 21:38:09,802 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=2; estado=APROBADA; id_usuario_resuelve=3
-2026-04-01 21:38:42,624 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2; id_solicitud=2; id_receta=1; cantidad=5
-2026-04-01 21:38:49,465 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2
-2026-04-01 21:38:56,052 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=2; id_producto=1; cantidad=5
-2026-04-01 21:42:12,753 INFO AUDIT|evento=VENTA_REGISTRADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_venta=2; id_producto=1; cantidad=2; tipo_pago=EFECTIVO
-2026-04-01 21:42:45,328 INFO AUDIT|evento=COMPRA_MP_PAGADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_compra=2
-2026-04-01 21:50:26,900 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=1; cantidad=2
-2026-04-01 21:50:53,241 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=1; tipo_pago=EN_LINEA
-2026-04-01 21:53:09,439 INFO AUDIT|evento=PEDIDO_ENTREGADO_VENTA_GENERADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_pedido=1; id_venta=3; requiere_ticket=True
-2026-04-01 21:53:50,364 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=4
-2026-04-01 21:56:39,696 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=3; estado=APROBADA; id_usuario_resuelve=3
-2026-04-01 21:57:33,184 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_solicitud=3; id_receta=1; cantidad=4
-2026-04-01 21:58:22,455 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3
-2026-04-01 21:58:50,757 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=3; id_producto=1; cantidad=4
-2026-04-02 15:02:48,313 INFO AUDIT|evento=PROVEEDOR_DESACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401
-2026-04-02 15:02:51,805 INFO AUDIT|evento=PROVEEDOR_ACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Proveedor QA Flujo 20260401
-2026-04-02 15:58:36,710 INFO AUDIT|evento=COMPRA_MP_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_compra=4; id_proveedor=1; detalles=1
-2026-04-02 15:58:51,961 INFO AUDIT|evento=COMPRA_MP_PAGADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_compra=4
-2026-04-02 18:30:09,652 INFO AUDIT|evento=SOLICITUD_PRODUCCION_CREADA|actor=ventas|rol=Ventas|ip=127.0.0.1|detalle=id_usuario=2; id_producto=1; cantidad=20
-2026-04-02 18:31:32,904 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_solicitud=4; estado=APROBADA; id_usuario_resuelve=1
-2026-04-02 18:31:46,794 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=6; id_producto=1; id_receta=1; cantidad=20; id_solicitud=4
-2026-04-02 18:32:02,929 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=6
-2026-04-02 18:32:07,747 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=6; id_producto=1; cantidad=20
-2026-04-02 18:32:10,994 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=5; id_producto=1; cantidad=1
-2026-04-02 18:36:25,929 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=5; estado=APROBADA; id_usuario_resuelve=3
-2026-04-02 18:36:54,530 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_orden=7; id_producto=1; id_receta=1; cantidad=12; id_solicitud=5
-2026-04-02 19:32:08,978 INFO AUDIT|evento=PRODUCTO_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=11; nombre=pastelito
-2026-04-02 19:32:59,534 INFO AUDIT|evento=RECETA_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_receta=4; id_producto=11; nombre=pastelito; version=1; activa=True
-2026-04-02 19:33:08,622 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=8; id_producto=11; id_receta=4; cantidad=23; id_solicitud=N/A
-2026-04-02 19:40:46,595 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=9; nombre=Brownie de Chocolate; activo=True
-2026-04-02 19:50:41,357 INFO AUDIT|evento=PRODUCTO_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=12; nombre=QA RF11 TEMP
-2026-04-02 19:51:01,207 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=12; nombre=QA RF11 TEMP; activo=True
-2026-04-02 19:51:16,242 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=12; nombre=QA RF11 TEMP; activo=False
-2026-04-02 20:01:40,308 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=11; nombre=pastelito; activo=True
-2026-04-02 20:01:48,502 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=11; nombre=pastelito; activo=True
-2026-04-02 20:05:54,437 INFO AUDIT|evento=PRODUCTO_EDITADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=11; nombre=pastelito; activo=True
-2026-04-02 20:07:45,380 INFO AUDIT|evento=PRODUCTO_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_producto=13; nombre=QA E2E RF11 20260403
-2026-04-02 20:08:19,238 INFO AUDIT|evento=RECETA_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_receta=5; id_producto=13; nombre=QA E2E RF11 20260403; version=1; activa=True
-2026-04-02 20:09:17,924 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=9; id_producto=13; id_receta=5; cantidad=5; id_solicitud=N/A
-2026-04-02 20:09:30,709 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=9
-2026-04-02 20:10:54,927 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=9; id_producto=13; cantidad=5
-2026-04-02 20:11:06,172 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=5; id_producto=13; cantidad=2; tipo_pago=EFECTIVO
-2026-04-02 22:11:24,547 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=6; detalles=2; tipo_pago=EFECTIVO; requiere_ticket=True
-2026-04-02 22:11:41,254 INFO AUDIT|evento=VENTA_CANCELADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=6; id_usuario=1
-2026-04-02 22:14:09,194 INFO AUDIT|evento=SALIDA_EFECTIVO_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=concepto=Prueba QA salida RF13; monto=15; tipo=GASTO_OPERATIVO
-2026-04-02 22:14:38,258 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-04-03; total_ventas=39.00; total_salidas=15.00; utilidad=23.26
-2026-04-02 22:23:57,288 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=7; detalles=4; tipo_pago=EFECTIVO; requiere_ticket=False
-2026-04-03 05:35:13,380 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=8; detalles=2; tipo_pago=EFECTIVO; requiere_ticket=False
-2026-04-05 18:08:51,835 INFO AUDIT|evento=CORTE_DIARIO_GENERADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=fecha=2026-04-06; total_ventas=0; total_salidas=0; utilidad=0
-2026-04-05 18:20:13,057 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=9; detalles=2; tipo_pago=EFECTIVO; requiere_ticket=True
-2026-04-05 18:21:42,195 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=9; cantidad=1
-2026-04-05 18:21:44,661 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5; cantidad=1
-2026-04-05 18:21:46,877 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
-2026-04-05 18:22:12,373 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=2; tipo_pago=EN_LINEA
-2026-04-05 18:23:12,872 INFO AUDIT|evento=PEDIDO_ENTREGADO_VENTA_GENERADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_pedido=2; id_venta=10; requiere_ticket=True
-2026-04-05 18:39:48,222 INFO AUDIT|evento=CLIENTE_REGISTRADO|actor=anonimo|rol=sin_rol|ip=127.0.0.1|detalle=id_usuario=5; username=ferxxo
+2026-04-09 09:44:03,691 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5; cantidad=1
+2026-04-09 09:44:07,189 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=1; cantidad=1
+2026-04-09 09:44:11,798 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=1
+2026-04-09 09:44:12,894 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=2
+2026-04-09 09:44:13,994 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=3
+2026-04-09 09:44:15,073 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5
+2026-04-09 09:44:20,662 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=3; cantidad=1
+2026-04-09 09:44:22,857 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=2; cantidad=1
+2026-04-09 09:44:25,226 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=8; cantidad=1
+2026-04-09 09:48:12,630 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=3
+2026-04-09 09:48:13,334 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=2
+2026-04-09 09:48:14,347 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=8
+2026-04-09 09:48:16,672 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
+2026-04-09 09:52:09,208 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7
+2026-04-09 10:14:18,828 INFO AUDIT|evento=USUARIO_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_usuario=5; username=paolarocha; id_rol=1
+2026-04-09 13:01:32,795 INFO AUDIT|evento=INVENTARIO_MP_CREAR|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=11; nombre=Azucar glass
+2026-04-09 13:08:02,989 INFO AUDIT|evento=INVENTARIO_MP_DESACTIVAR|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=11; nombre=Azucar glass
+2026-04-09 13:08:16,889 INFO AUDIT|evento=INVENTARIO_MP_EDITAR|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=11; nombre=Azucar glass
+2026-04-09 13:19:09,512 INFO AUDIT|evento=PROVEEDOR_CREADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Huevos San Juan
+2026-04-09 13:19:26,001 INFO AUDIT|evento=PROVEEDOR_DESACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Huevos San Juan
+2026-04-09 13:19:31,250 INFO AUDIT|evento=PROVEEDOR_ACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Huevos San Juan
+2026-04-09 13:45:21,788 INFO AUDIT|evento=PROVEEDOR_DESACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Huevos San Juan
+2026-04-09 13:45:24,830 INFO AUDIT|evento=PROVEEDOR_ACTIVADO|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_proveedor=4; nombre_empresa=Huevos San Juan
+2026-04-09 13:51:57,249 INFO AUDIT|evento=INVENTARIO_MP_CREAR|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=12; nombre=Verduras Leon
+2026-04-09 14:06:50,501 INFO AUDIT|evento=INVENTARIO_MP_EDITAR|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_materia=12; nombre=Zanahoria
+2026-04-09 14:24:43,634 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_solicitud=2; estado=APROBADA; id_usuario_resuelve=1
+2026-04-09 14:25:37,396 INFO AUDIT|evento=ORDEN_PRODUCCION_CREADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=2; id_producto=1; id_receta=1; cantidad=16; id_solicitud=2
+2026-04-09 14:26:40,322 INFO AUDIT|evento=ORDEN_PRODUCCION_INICIADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=2
+2026-04-09 14:27:40,953 INFO AUDIT|evento=ORDEN_PRODUCCION_FINALIZADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_orden=2; id_producto=1; cantidad=16
+2026-04-09 14:56:10,418 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=9; cantidad=1
+2026-04-09 14:56:17,777 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5; cantidad=1
+2026-04-09 14:56:32,456 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
+2026-04-09 15:04:27,282 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5
+2026-04-09 15:04:29,356 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7
+2026-04-09 15:04:30,864 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=9
+2026-04-09 15:09:57,553 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7; cantidad=1
+2026-04-09 15:18:45,411 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=1; tipo_pago=EN_LINEA

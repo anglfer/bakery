@@ -72,12 +72,16 @@ def catalogo():
 def carrito_agregar():
     guard = _guard_cliente_activo()
     if guard:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return {"success": False, "error": "No autorizado"}, 403
         return guard
 
     try:
         id_producto = int(request.form.get("id_producto", "0") or 0)
         cantidad = int(request.form.get("cantidad", "1") or 1)
     except ValueError:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return {"success": False, "error": "Datos inválidos"}, 400
         flash("Datos invalidos.", "warning")
         return redirect(url_for("catalog.catalogo"))
 
@@ -94,8 +98,15 @@ def carrito_agregar():
                 f"id_producto={id_producto}; cantidad={cantidad}"
             ),
         )
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            carrito_db = Carrito.query.filter_by(id_usuario_cliente=current_user.id_usuario).first()
+            total_items = sum(detalle.cantidad for detalle in carrito_db.detalles) if carrito_db else 0
+            return {"success": True, "message": "Producto agregado.", "cart_count": total_items}
+
         flash("Producto agregado al carrito.", "success")
     except (ValueError, TypeError) as exc:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return {"success": False, "error": str(exc)}, 400
         flash(str(exc), "danger")
     return redirect(url_for("catalog.catalogo"))
 

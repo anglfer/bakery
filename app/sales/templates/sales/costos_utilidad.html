@@ -40,54 +40,44 @@
 		<form method="get" class="ops-toolbar">
 			<div class="ops-input-wrap">
 				<i class="bi bi-search"></i>
-				<input
-					type="search"
-					name="q"
-					placeholder="Buscar producto..."
-					value="{{ filtros.q }}" />
+				<input type="search" name="q" placeholder="Buscar producto..." value="{{ filtros.q }}" />
 			</div>
 			<select name="margen" style="max-width: 220px">
-				<option value="todos" {{ 'selected' if filtros.margen == 'todos' else '' }}>
+				<option value="todos" {{ 'selected' if filtros.margen=='todos' else '' }}>
 					Todos los márgenes
 				</option>
-				<option value="alto" {{ 'selected' if filtros.margen == 'alto' else '' }}>
+				<option value="alto" {{ 'selected' if filtros.margen=='alto' else '' }}>
 					Alta rentabilidad
 				</option>
-				<option value="medio" {{ 'selected' if filtros.margen == 'medio' else '' }}>
+				<option value="medio" {{ 'selected' if filtros.margen=='medio' else '' }}>
 					Rentabilidad media
 				</option>
-				<option value="bajo" {{ 'selected' if filtros.margen == 'bajo' else '' }}>
+				<option value="bajo" {{ 'selected' if filtros.margen=='bajo' else '' }}>
 					Rentabilidad baja
 				</option>
-				<option
-					value="sin_datos"
-					{{ 'selected' if filtros.margen == 'sin_datos' else '' }}>
+				<option value="sin_datos" {{ 'selected' if filtros.margen=='sin_datos' else '' }}>
 					Información incompleta
 				</option>
 			</select>
 			<select name="orden" style="max-width: 220px">
-				<option
-					value="margen_desc"
-					{{ 'selected' if filtros.orden == 'margen_desc' else '' }}>
+				<option value="margen_desc" {{ 'selected' if filtros.orden=='margen_desc' else '' }}>
 					Ordenar: mayor margen
 				</option>
-				<option value="margen_asc" {{ 'selected' if filtros.orden == 'margen_asc' else '' }}>
+				<option value="margen_asc" {{ 'selected' if filtros.orden=='margen_asc' else '' }}>
 					Ordenar: menor margen
 				</option>
-				<option
-					value="utilidad_desc"
-					{{ 'selected' if filtros.orden == 'utilidad_desc' else '' }}>
+				<option value="utilidad_desc" {{ 'selected' if filtros.orden=='utilidad_desc' else '' }}>
 					Ordenar: mayor utilidad
 				</option>
-				<option value="costo_desc" {{ 'selected' if filtros.orden == 'costo_desc' else '' }}>
+				<option value="costo_desc" {{ 'selected' if filtros.orden=='costo_desc' else '' }}>
 					Ordenar: mayor costo
 				</option>
-				<option value="nombre_asc" {{ 'selected' if filtros.orden == 'nombre_asc' else '' }}>
+				<option value="nombre_asc" {{ 'selected' if filtros.orden=='nombre_asc' else '' }}>
 					Ordenar: nombre A-Z
 				</option>
 			</select>
-			<button type="submit" class="btn btn-primary">
-				<i class="bi bi-funnel-fill me-1"></i>
+			<button type="submit" class="btn btn-primary text-white border-0">
+				<i class="bi bi-funnel-fill me-1 text-white"></i>
 				Aplicar
 			</button>
 		</form>
@@ -137,9 +127,9 @@
 						<td>
 							<div class="ops-stock-cell">
 								<div class="ops-stock-bar">
-									<div
-										class="ops-stock-bar-fill {{ row.estado_margen.clave if row.es_calculable else 'inactiva' }}"
-										style="width: {{ [row.porcentaje_utilidad, 100] | min if row.es_calculable else 30 }}%"></div>
+									<div class="ops-stock-bar-fill {{ row.estado_margen.clave if row.es_calculable else 'inactiva' }}"
+										style="width: {{ [row.porcentaje_utilidad, 100] | min if row.es_calculable else 30 }}%">
+									</div>
 								</div>
 								<span class="ops-stock-number">{{ '%.2f'|format(row.porcentaje_utilidad) }}%</span>
 							</div>
@@ -153,12 +143,9 @@
 							{% endif %}
 						</td>
 						<td>
-							<button
-								type="button"
-								class="btn btn-sm btn-outline-primary js-open-breakdown"
-								data-id-producto="{{ row.id_producto }}"
-								data-nombre="{{ row.producto.nombre }}">
-								<i class="bi bi-card-list me-1"></i>
+							<button type="button" class="btn btn-sm btn-primary text-white border-0 js-open-breakdown"
+								data-id-producto="{{ row.id_producto }}" data-nombre="{{ row.producto.nombre }}">
+								<i class="bi bi-card-list me-1 text-white"></i>
 								Desglose
 							</button>
 						</td>
@@ -179,8 +166,8 @@
 		<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
 			<h3 class="ops-card-title mb-0">Historial de cortes diarios</h3>
 			<form method="post">
-				<button type="submit" class="btn btn-primary">
-					<i class="bi bi-calculator-fill me-1"></i>
+				<button type="submit" class="btn btn-primary text-white border-0">
+					<i class="bi bi-calculator-fill me-1 text-white"></i>
 					Generar corte del día
 				</button>
 			</form>
@@ -223,10 +210,7 @@
 		<div class="modal-content product-modal">
 			<div class="modal-header product-modal-header">
 				<h5 class="modal-title" id="costBreakdownTitle">Desglose de costos</h5>
-				<button
-					type="button"
-					class="btn-close btn-close-white"
-					data-bs-dismiss="modal"
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 					aria-label="Cerrar"></button>
 			</div>
 			<div class="modal-body">
@@ -261,7 +245,7 @@
 				</div>
 			</div>
 			<div class="modal-footer product-modal-footer">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 					Cerrar
 				</button>
 			</div>

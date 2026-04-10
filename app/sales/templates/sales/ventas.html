@@ -12,10 +12,12 @@
 		<a class="sales-tab {{ 'active' if tab == 'nueva' else '' }}" href="{{ url_for('sales.ventas', tab='nueva') }}">
 			<i class="bi bi-cart-plus"></i> Nueva venta
 		</a>
-		<a class="sales-tab {{ 'active' if tab == 'historial' else '' }}" href="{{ url_for('sales.ventas', tab='historial') }}">
+		<a class="sales-tab {{ 'active' if tab == 'historial' else '' }}"
+			href="{{ url_for('sales.ventas', tab='historial') }}">
 			<i class="bi bi-list-ul"></i> Historial
 		</a>
-		<a class="sales-tab {{ 'active' if tab == 'salidas' else '' }}" href="{{ url_for('sales.ventas', tab='salidas') }}">
+		<a class="sales-tab {{ 'active' if tab == 'salidas' else '' }}"
+			href="{{ url_for('sales.ventas', tab='salidas') }}">
 			<i class="bi bi-arrow-up-circle"></i> Salidas
 		</a>
 		<a class="sales-tab {{ 'active' if tab == 'corte' else '' }}" href="{{ url_for('sales.ventas', tab='corte') }}">
@@ -32,33 +34,31 @@
 			</div>
 			<div id="salesCatalog" class="sales-catalog-grid">
 				{% for p in productos %}
-				{% set nombre_l = (p.nombre or '')|lower %}
-				{% set emoji = '🧁' %}
-				{% if 'pastel' in nombre_l %}
-					{% set emoji = '🎂' %}
-				{% elif 'pay' in nombre_l or 'tarta' in nombre_l %}
-					{% set emoji = '🥧' %}
-				{% elif 'muffin' in nombre_l %}
-					{% set emoji = '🧁' %}
-				{% elif 'brownie' in nombre_l %}
-					{% set emoji = '🍫' %}
-				{% elif 'galleta' in nombre_l %}
-					{% set emoji = '🍪' %}
-				{% elif 'cuerno' in nombre_l or 'croissant' in nombre_l %}
-					{% set emoji = '🥐' %}
-				{% endif %}
-				<button
-					type="button"
-					class="sales-product-card"
-					data-id="{{ p.id_producto }}"
-					data-nombre="{{ p.nombre }}"
-					data-precio="{{ '%.2f'|format(p.precio_venta) }}"
-					data-stock="{{ p.cantidad_libre }}"
-					title="Agregar {{ p.nombre }}">
-					<div class="sales-product-emoji">{{ emoji }}</div>
-					<div class="sales-product-name">{{ p.nombre }}</div>
-					<div class="sales-product-price">${{ '%.2f'|format(p.precio_venta) }}</div>
-					<div class="sales-product-stock">{{ p.cantidad_libre }} en stock</div>
+				<button type="button" class="sales-product-card" data-id="{{ p.id_producto }}"
+					data-nombre="{{ p.nombre }}" data-precio="{{ '%.2f'|format(p.precio_venta) }}"
+					data-stock="{{ p.cantidad_libre }}" title="Agregar {{ p.nombre }}"
+					style="padding: 16px; min-height: 260px; display: flex; flex-direction: column; align-items: center;">
+					<div class="sales-product-emoji"
+						style="display: flex; align-items: center; justify-content: center; height: 130px; width: 130px; overflow: hidden; margin-bottom: 16px; border-radius: 8px; background: #ffffff;">
+						{% if p.imagen and p.imagen.startswith('img/') %}
+						<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}"
+							style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+						{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
+						<img src="{{ p.imagen }}" alt="{{ p.nombre }}"
+							style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+						{% else %}
+						<span style="font-size: 5.5rem;">{{ p.imagen or '🍰' }}</span>
+						{% endif %}
+					</div>
+					<div class="sales-product-name"
+						style="font-size: 0.9rem; font-weight: 600; text-align: center; margin-bottom: 4px; line-height: 1.2;">
+						{{ p.nombre
+						}}</div>
+					<div class="sales-product-price"
+						style="font-size: 1.3rem; font-weight: bold; text-align: center; margin-bottom: 4px;">${{
+						'%.2f'|format(p.precio_venta) }}</div>
+					<div class="sales-product-stock" style="font-size: 0.95rem; text-align: center;">{{ p.cantidad_libre
+						}} en stock</div>
 				</button>
 				{% else %}
 				<div class="sales-empty">No hay productos disponibles para venta.</div>
@@ -117,14 +117,14 @@
 				<input name="q" value="{{ filtros.q }}" placeholder="Buscar venta..." />
 			</div>
 			<select name="pago">
-				<option value="TODOS" {{ 'selected' if filtros.pago == 'TODOS' else '' }}>Todos</option>
-				<option value="EFECTIVO" {{ 'selected' if filtros.pago == 'EFECTIVO' else '' }}>Efectivo</option>
-				<option value="TARJETA" {{ 'selected' if filtros.pago == 'TARJETA' else '' }}>Tarjeta</option>
+				<option value="TODOS" {{ 'selected' if filtros.pago=='TODOS' else '' }}>Todos</option>
+				<option value="EFECTIVO" {{ 'selected' if filtros.pago=='EFECTIVO' else '' }}>Efectivo</option>
+				<option value="TARJETA" {{ 'selected' if filtros.pago=='TARJETA' else '' }}>Tarjeta</option>
 			</select>
 			<select name="estado">
-				<option value="TODOS" {{ 'selected' if filtros.estado == 'TODOS' else '' }}>Todos</option>
-				<option value="CONFIRMADO" {{ 'selected' if filtros.estado == 'CONFIRMADO' else '' }}>Confirmada</option>
-				<option value="CANCELADO" {{ 'selected' if filtros.estado == 'CANCELADO' else '' }}>Cancelada</option>
+				<option value="TODOS" {{ 'selected' if filtros.estado=='TODOS' else '' }}>Todos</option>
+				<option value="CONFIRMADO" {{ 'selected' if filtros.estado=='CONFIRMADO' else '' }}>Confirmada</option>
+				<option value="CANCELADO" {{ 'selected' if filtros.estado=='CANCELADO' else '' }}>Cancelada</option>
 			</select>
 			<button type="submit" class="btn-soft-primary">Filtrar</button>
 		</form>
@@ -151,7 +151,8 @@
 						<td>V-{{ '%03d'|format(venta.id_venta) }}</td>
 						<td>
 							{% for d in venta.detalles %}
-							<div class="small">{{ d.producto.nombre if d.producto else 'Producto' }}{% if not loop.last %}, {% endif %}</div>
+							<div class="small">{{ d.producto.nombre if d.producto else 'Producto' }}{% if not loop.last
+								%}, {% endif %}</div>
 							{% endfor %}
 						</td>
 						<td><strong>${{ '%.2f'|format(venta.total) }}</strong></td>
@@ -163,9 +164,9 @@
 						<td>
 							{% set t = tickets_por_venta.get(venta.id_venta) %}
 							{% if t %}
-								<span class="ops-chip success">{{ t.folio }}</span>
+							<span class="ops-chip success">{{ t.folio }}</span>
 							{% else %}
-								<span class="ops-chip neutral">—</span>
+							<span class="ops-chip neutral">—</span>
 							{% endif %}
 						</td>
 						<td>
@@ -177,13 +178,8 @@
 						<td>{{ venta.usuario_cliente.username if venta.usuario_cliente else '—' }}</td>
 						<td>
 							<div class="d-flex gap-1 flex-wrap">
-								<button
-									type="button"
-									class="btn-soft-secondary btn-sm"
-									data-bs-toggle="collapse"
-									data-bs-target="#{{ row_id }}"
-									aria-expanded="false"
-									aria-controls="{{ row_id }}">
+								<button type="button" class="btn-soft-secondary btn-sm" data-bs-toggle="collapse"
+									data-bs-target="#{{ row_id }}" aria-expanded="false" aria-controls="{{ row_id }}">
 									<i class="bi bi-eye me-1"></i> Ver
 								</button>
 								{% if venta.estado == 'CONFIRMADO' %}
@@ -203,7 +199,8 @@
 								<div class="sales-detail-item">
 									<div class="fw-semibold">{{ d.producto.nombre if d.producto else 'Producto' }}</div>
 									<div class="small text-muted">Cantidad: {{ d.cantidad }}</div>
-									<div class="small text-muted">Precio unitario: ${{ '%.2f'|format(d.precio_unitario) }}</div>
+									<div class="small text-muted">Precio unitario: ${{ '%.2f'|format(d.precio_unitario)
+										}}</div>
 									<div class="small text-muted">Subtotal: ${{ '%.2f'|format(d.subtotal) }}</div>
 								</div>
 								{% endfor %}
@@ -212,7 +209,8 @@
 					</tr>
 					{% else %}
 					<tr>
-						<td colspan="9" class="text-center py-4 text-muted">No hay ventas para el filtro seleccionado.</td>
+						<td colspan="9" class="text-center py-4 text-muted">No hay ventas para el filtro seleccionado.
+						</td>
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -234,7 +232,8 @@
 				</div>
 				<div>
 					<label for="salidaMonto">Monto *</label>
-					<input id="salidaMonto" type="number" min="0.01" step="0.01" name="monto" placeholder="$ 0.00" required />
+					<input id="salidaMonto" type="number" min="0.01" step="0.01" name="monto" placeholder="$ 0.00"
+						required />
 				</div>
 				<div>
 					<label for="salidaTipo">Tipo *</label>
@@ -283,11 +282,18 @@
 			</h3>
 
 			<div class="sales-corte-lines">
-				<div class="sales-corte-line success"><span><i class="bi bi-check-circle me-1"></i> Total ventas del día</span><strong>${{ '%.2f'|format(resumen_dia.total_ventas) }}</strong></div>
-				<div class="sales-corte-line info"><span><i class="bi bi-cash-coin me-1"></i> Efectivo</span><strong>${{ '%.2f'|format(resumen_dia.total_efectivo) }}</strong></div>
-				<div class="sales-corte-line info"><span><i class="bi bi-credit-card me-1"></i> Tarjeta</span><strong>${{ '%.2f'|format(resumen_dia.total_tarjeta) }}</strong></div>
-				<div class="sales-corte-line danger"><span><i class="bi bi-arrow-up-circle me-1"></i> Salidas de efectivo</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.total_salidas) }}</strong></div>
-				<div class="sales-corte-line warn"><span><i class="bi bi-box-seam me-1"></i> Costo producción (estimado)</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.costo_produccion) }}</strong></div>
+				<div class="sales-corte-line success"><span><i class="bi bi-check-circle me-1"></i> Total ventas del
+						día</span><strong>${{ '%.2f'|format(resumen_dia.total_ventas) }}</strong></div>
+				<div class="sales-corte-line info"><span><i class="bi bi-cash-coin me-1"></i> Efectivo</span><strong>${{
+						'%.2f'|format(resumen_dia.total_efectivo) }}</strong></div>
+				<div class="sales-corte-line info"><span><i class="bi bi-credit-card me-1"></i>
+						Tarjeta</span><strong>${{ '%.2f'|format(resumen_dia.total_tarjeta) }}</strong></div>
+				<div class="sales-corte-line danger"><span><i class="bi bi-arrow-up-circle me-1"></i> Salidas de
+						efectivo</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.total_salidas)
+						}}</strong></div>
+				<div class="sales-corte-line warn"><span><i class="bi bi-box-seam me-1"></i> Costo producción
+						(estimado)</span><strong class="text-danger">-${{ '%.2f'|format(resumen_dia.costo_produccion)
+						}}</strong></div>
 				<div class="sales-corte-line sales-corte-utilidad">
 					<span>Utilidad estimada del día</span>
 					<strong>${{ '%.2f'|format(resumen_dia.utilidad) }}</strong>
@@ -300,7 +306,8 @@
 				{% if puede_generar_corte %}
 				<form method="post">
 					<input type="hidden" name="action" value="generar_corte" />
-					<button type="submit" class="btn-soft-primary"><i class="bi bi-check2-circle me-1"></i> Generar corte</button>
+					<button type="submit" class="btn-soft-primary"><i class="bi bi-check2-circle me-1"></i> Generar
+						corte</button>
 				</form>
 				{% endif %}
 				<button type="button" class="btn-soft-secondary" onclick="window.print()">
@@ -317,7 +324,8 @@
 					<div>
 						<div class="fw-semibold">{{ corte.fecha.strftime('%Y-%m-%d') }}</div>
 						<div class="small text-muted">
-							${{ '%.2f'|format(corte.total_efectivo or 0) }} · {{ corte.total_transacciones or corte.numero_ventas }} trans.
+							${{ '%.2f'|format(corte.total_efectivo or 0) }} · {{ corte.total_transacciones or
+							corte.numero_ventas }} trans.
 							· ↓ ${{ '%.2f'|format(corte.total_salidas or 0) }}
 						</div>
 					</div>

@@ -6,10 +6,12 @@
 		justify-content: space-between;
 		margin-bottom: 1.2rem;
 	}
+
 	.cart-header h3 {
 		font-size: 1.3rem;
 		margin: 0;
 	}
+
 	.cart-item {
 		background: #fff;
 		border-radius: 14px;
@@ -21,9 +23,11 @@
 		margin-bottom: 0.8rem;
 		transition: box-shadow 0.16s;
 	}
+
 	.cart-item:hover {
 		box-shadow: 0 6px 18px rgba(40, 10, 10, 0.06);
 	}
+
 	.cart-item-icon {
 		width: 52px;
 		height: 52px;
@@ -36,24 +40,29 @@
 		color: var(--sb-primary);
 		flex-shrink: 0;
 	}
+
 	.cart-item-info {
 		flex: 1;
 	}
+
 	.cart-item-info .nombre {
 		font-size: 0.95rem;
 		font-weight: 700;
 		color: #2c1810;
 	}
+
 	.cart-item-info .precio {
 		font-size: 0.78rem;
 		color: var(--sb-muted);
 	}
+
 	.cart-item-total {
 		font-size: 1rem;
 		font-weight: 800;
 		color: var(--sb-primary);
 		white-space: nowrap;
 	}
+
 	.btn-quitar {
 		background: #fce8e6;
 		border: none;
@@ -66,10 +75,12 @@
 		align-items: center;
 		justify-content: center;
 	}
+
 	.btn-quitar:hover {
 		background: #c0392b;
 		color: #fff;
 	}
+
 	.cart-summary {
 		background: #fff;
 		border-radius: 18px;
@@ -78,17 +89,20 @@
 		position: sticky;
 		top: 84px;
 	}
+
 	.cart-summary h5 {
 		font-size: 1rem;
 		font-weight: 700;
 		margin-bottom: 1rem;
 	}
+
 	.summary-row {
 		display: flex;
 		justify-content: space-between;
 		font-size: 0.82rem;
 		margin-bottom: 0.5rem;
 	}
+
 	.summary-total {
 		display: flex;
 		justify-content: space-between;
@@ -99,6 +113,7 @@
 		border-top: 1px solid var(--sb-border);
 		padding-top: 0.8rem;
 	}
+
 	.btn-confirmar {
 		width: 100%;
 		padding: 0.82rem;
@@ -111,24 +126,29 @@
 		cursor: pointer;
 		margin-top: 1rem;
 	}
+
 	.btn-confirmar:hover {
 		background: var(--sb-primary-dark);
 	}
+
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
 		color: var(--muted);
 	}
+
 	.empty-state i {
 		font-size: 3rem;
 		opacity: 0.4;
 		display: block;
 		margin-bottom: 1rem;
 	}
+
 	@media (min-width: 992px) {
 		.cart-col-list {
 			order: 1;
 		}
+
 		.cart-col-summary {
 			order: 2;
 		}
@@ -158,8 +178,7 @@
 				<div class="cart-item-icon" style="overflow: hidden">
 					{% if d.producto.imagen and (d.producto.imagen.startswith('http') or
 					d.producto.imagen.startswith('data:') or d.producto.imagen.startswith('img/')) %}
-					<img
-						src="{{ url_for('static', filename=d.producto.imagen) if d.producto.imagen.startswith('img/') else d.producto.imagen }}"
+					<img src="{{ url_for('static', filename=d.producto.imagen) if d.producto.imagen.startswith('img/') else d.producto.imagen }}"
 						alt="{{ d.producto.nombre }}"
 						style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px" />
 					{% else %}
@@ -179,22 +198,14 @@
 				<form method="post" class="d-flex align-items-center gap-1" style="flex-shrink: 0">
 					<input type="hidden" name="action" value="actualizar" />
 					<input type="hidden" name="id_detalle" value="{{ d.id_detalle }}" />
-					<input
-						type="number"
-						name="cantidad"
-						value="{{ d.cantidad }}"
-						min="1"
-						max="99"
-						step="1"
-						style="
+					<input type="number" name="cantidad" value="{{ d.cantidad }}" min="1" max="99" step="1" style="
 							width: 64px;
 							padding: 0.2rem 0.5rem;
 							border-radius: 8px;
 							border: 1.5px solid var(--sb-border);
 							font-size: 0.82rem;
 							text-align: center;
-						"
-						onchange="this.form.submit()" />
+						" onchange="this.form.submit()" />
 				</form>
 
 				<span class="cart-item-total">${{ "%.2f"|format(subtotal) }}</span>
@@ -225,11 +236,7 @@
 					<span id="lblTotal">${{ "%.2f"|format(total) }}</span>
 				</div>
 
-				<button
-					type="button"
-					class="btn-confirmar"
-					data-bs-toggle="modal"
-					data-bs-target="#modalConfirmar">
+				<button type="button" class="btn-confirmar" data-bs-toggle="modal" data-bs-target="#modalConfirmar">
 					<i class="bi bi-check2-circle me-1"></i>
 					Confirmar Pedido
 				</button>
@@ -247,8 +254,7 @@
 	<div class="modal fade" id="modalConfirmar" tabindex="-1">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content" style="border-radius: 18px; border: none">
-				<div
-					class="modal-header"
+				<div class="modal-header"
 					style="background: var(--sb-primary); color: #fff; border-radius: 18px 18px 0 0">
 					<h5 class="modal-title">
 						<i class="bi bi-bag-check-fill me-2"></i>
@@ -266,11 +272,7 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									Fecha de entrega / recolección *
 								</label>
-								<input
-									type="date"
-									name="fecha_entrega"
-									class="form-control"
-									required
+								<input type="date" name="fecha_entrega" class="form-control" required
 									min="{{ today.isoformat() }}" />
 							</div>
 
@@ -278,15 +280,13 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									¿Cómo recibirás tu pedido? *
 								</label>
-								<div class="alert alert-warning py-2 mb-2" style="font-size: 0.75rem; border-radius: 10px">
+								<div class="alert alert-warning py-2 mb-2"
+									style="font-size: 0.75rem; border-radius: 10px">
 									<i class="bi bi-shop me-1"></i>
 									Por política de la sucursal, los pedidos son solo para recolección en tienda.
 								</div>
 								<div class="d-flex gap-2 flex-wrap mt-1">
-									<label
-										class="entrega-opt"
-										id="lbl-pickup"
-										style="
+									<label class="entrega-opt" id="lbl-pickup" style="
 											flex: 1;
 											min-width: 140px;
 											border: 1.5px solid var(--sb-border);
@@ -298,47 +298,15 @@
 											gap: 0.6rem;
 											font-size: 0.82rem;
 										">
-										<input
-											type="radio"
-											name="tipo_entrega"
-											value="pickup"
-											checked
-											onchange="actualizarEntrega()"
-											style="accent-color: var(--sb-primary)" />
+										<input type="radio" name="tipo_entrega" value="pickup" checked
+											onchange="actualizarEntrega()" style="accent-color: var(--sb-primary)" />
 										<div>
 											<i class="bi bi-shop me-1"></i>
 											<strong>Recoger en tienda</strong>
 											<div style="font-size: 0.7rem; color: #888">Sin costo de envío</div>
 										</div>
 									</label>
-									<label
-										class="entrega-opt"
-										id="lbl-delivery"
-										style="
-											flex: 1;
-											min-width: 140px;
-											border: 1.5px solid var(--sb-border);
-											border-radius: 10px;
-											padding: 0.65rem 1rem;
-											cursor: pointer;
-											display: flex;
-											align-items: center;
-											gap: 0.6rem;
-											font-size: 0.82rem;
-										">
-										<input
-											type="radio"
-											name="tipo_entrega"
-											value="delivery"
-											disabled
-											onchange="actualizarEntrega()"
-											style="accent-color: var(--sb-primary)" />
-										<div>
-											<i class="bi bi-truck me-1"></i>
-											<strong>Envío a domicilio</strong>
-											<div style="font-size: 0.7rem; color: #888">No disponible</div>
-										</div>
-									</label>
+
 								</div>
 							</div>
 
@@ -346,17 +314,12 @@
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
 									Forma de pago *
 								</label>
-								<div
-									class="alert alert-info py-2 mb-2"
-									style="font-size: 0.75rem; border-radius: 10px">
+								<div class="alert alert-info py-2 mb-2" style="font-size: 0.75rem; border-radius: 10px">
 									<i class="bi bi-info-circle me-1"></i>
 									Para pedidos web el pago en línea con tarjeta es obligatorio.
 								</div>
 								<div class="d-flex gap-2 flex-wrap mt-1">
-									<label
-										class="pago-opt"
-										id="lbl-tarjeta"
-										style="
+									<label class="pago-opt" id="lbl-tarjeta" style="
 											flex: 1;
 											min-width: 120px;
 											border: 1.5px solid var(--sb-border);
@@ -368,14 +331,8 @@
 											gap: 0.5rem;
 											font-size: 0.82rem;
 										">
-										<input
-											type="radio"
-											name="metodo_pago"
-											value="tarjeta"
-											checked
-											disabled
-											onchange="actualizarPago()"
-											style="accent-color: var(--sb-primary)" />
+										<input type="radio" name="metodo_pago" value="tarjeta" checked disabled
+											onchange="actualizarPago()" style="accent-color: var(--sb-primary)" />
 										<div>
 											<i class="bi bi-credit-card me-1"></i>
 											<strong>Tarjeta</strong>
@@ -386,8 +343,7 @@
 							</div>
 
 							<div class="col-12" id="seccionTarjeta" style="display: none">
-								<div
-									style="
+								<div style="
 										background: #f0f7ff;
 										border-radius: 12px;
 										padding: 1rem;
@@ -402,40 +358,24 @@
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												Número de tarjeta *
 											</label>
-											<input
-												type="text"
-												name="numero_tarjeta"
-												id="inputTarjeta"
-												class="form-control"
-												maxlength="19"
-												placeholder="0000 0000 0000 0000"
-												autocomplete="off"
-												oninput="formatearTarjeta(this)" />
+											<input type="text" name="numero_tarjeta" id="inputTarjeta"
+												class="form-control" maxlength="19" placeholder="0000 0000 0000 0000"
+												autocomplete="off" oninput="formatearTarjeta(this)" />
 										</div>
 										<div class="col-7">
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												Fecha expiración *
 											</label>
-											<input
-												type="text"
-												name="expiracion"
-												class="form-control"
-												maxlength="5"
-												placeholder="MM/AA"
-												autocomplete="off"
+											<input type="text" name="expiracion" class="form-control" maxlength="5"
+												placeholder="MM/AA" autocomplete="off"
 												oninput="formatearExpiracion(this)" />
 										</div>
 										<div class="col-5">
 											<label class="form-label" style="font-size: 0.74rem; font-weight: 600">
 												CVV *
 											</label>
-											<input
-												type="text"
-												name="cvv"
-												class="form-control"
-												maxlength="4"
-												placeholder="123"
-												autocomplete="off"
+											<input type="text" name="cvv" class="form-control" maxlength="4"
+												placeholder="123" autocomplete="off"
 												oninput="this.value = this.value.replace(/\D/g, '')" />
 										</div>
 									</div>
@@ -444,38 +384,25 @@
 
 							<div class="col-12">
 								<label class="form-label" style="font-size: 0.78rem; font-weight: 600">
-									Notas / dirección de entrega
+									Notas
 								</label>
-								<textarea
-									name="notas_pedido"
-									class="form-control"
-									rows="2"
-									placeholder="Dirección de envío, instrucciones especiales…"
-									maxlength="255"></textarea>
+								<textarea name="notas_pedido" class="form-control" rows="2"
+									placeholder="Instrucciones especiales..." maxlength="255"></textarea>
 							</div>
 
 							<div class="col-12">
-								<div
-									style="
+								<div style="
 										background: #fdf3f0;
 										border-radius: 10px;
 										padding: 0.9rem;
 										font-size: 0.82rem;
 									">
-									<div
-										style="display: flex; justify-content: space-between; margin-bottom: 0.35rem">
+									<div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem">
 										<span>Subtotal productos</span>
 										<span>${{ "%.2f"|format(total) }}</span>
 									</div>
-									<div
-										style="display: flex; justify-content: space-between; margin-bottom: 0.35rem"
-										id="filaEnvio"
-										class="d-none">
-										<span>Envío a domicilio</span>
-										<span>$50.00</span>
-									</div>
-									<div
-										style="
+
+									<div style="
 											display: flex;
 											justify-content: space-between;
 											font-size: 1rem;
@@ -494,9 +421,7 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-						<button
-							type="submit"
-							class="btn-confirmar"
+						<button type="submit" class="btn-confirmar"
 							style="width: auto; padding: 0.5rem 1.5rem; margin: 0">
 							<i class="bi bi-check2-circle me-1"></i>
 							Confirmar Pedido
@@ -520,29 +445,25 @@
 </section>
 {% endblock %} {% block scripts %} {{ super() }}
 <script>
-	const SUBTOTAL = {{ "%.2f"|format(total) if total else 0 }};
-	const COSTO_ENV = 50.00;
+	const SUBTOTAL = {{ "%.2f"| format(total) if total else 0 }};
 
-	function actualizarEntrega(){
-		const esDelivery = document.querySelector('input[name="tipo_entrega"]:checked')?.value === 'delivery';
-		document.getElementById('filaEnvio').classList.toggle('d-none', !esDelivery);
-		const totalCalc = SUBTOTAL + (esDelivery ? COSTO_ENV : 0);
-		document.getElementById('lblTotal').textContent = '$' + totalCalc.toFixed(2);
-		const lblModal = document.getElementById('lblTotalModal'); if(lblModal) lblModal.textContent = '$' + totalCalc.toFixed(2);
-		_resaltarOpts('.entrega-opt','tipo_entrega');
+	function actualizarEntrega() {
+		const lblModal = document.getElementById('lblTotalModal');
+		if (lblModal) lblModal.textContent = '$' + SUBTOTAL.toFixed(2);
+		_resaltarOpts('.entrega-opt', 'tipo_entrega');
 	}
 
-	function actualizarPago(){
+	function actualizarPago() {
 		const esTarjeta = document.querySelector('input[name="metodo_pago"]:checked')?.value === 'tarjeta';
 		document.getElementById('seccionTarjeta').style.display = esTarjeta ? 'block' : 'none';
 		document.querySelectorAll('#seccionTarjeta input').forEach(inp => inp.required = esTarjeta);
-		_resaltarOpts('.pago-opt','metodo_pago');
+		_resaltarOpts('.pago-opt', 'metodo_pago');
 	}
 
-	function _resaltarOpts(selector,inputName){
-		document.querySelectorAll(selector).forEach(lbl=>{
+	function _resaltarOpts(selector, inputName) {
+		document.querySelectorAll(selector).forEach(lbl => {
 			const radio = lbl.querySelector(`input[name="${inputName}"]`);
-			if(!radio) return;
+			if (!radio) return;
 			lbl.style.borderColor = radio.checked ? 'var(--sb-primary)' : 'var(--sb-border)';
 			lbl.style.background = radio.checked ? '#fdf0f0' : '';
 			lbl.style.color = radio.checked ? 'var(--sb-primary)' : '';
@@ -550,17 +471,17 @@
 		});
 	}
 
-	function formatearTarjeta(inp){
-		let v = inp.value.replace(/\D/g,'').substring(0,16);
-		inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+	function formatearTarjeta(inp) {
+		let v = inp.value.replace(/\D/g, '').substring(0, 16);
+		inp.value = v.replace(/(.{4})/g, '$1 ').trim();
 	}
 
-	function formatearExpiracion(inp){
-		let v = inp.value.replace(/\D/g,'').substring(0,4);
-		if(v.length>=3) v = v.substring(0,2) + '/' + v.substring(2);
+	function formatearExpiracion(inp) {
+		let v = inp.value.replace(/\D/g, '').substring(0, 4);
+		if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
 		inp.value = v;
 	}
 
-	document.addEventListener('DOMContentLoaded', ()=>{ actualizarEntrega(); actualizarPago(); });
+	document.addEventListener('DOMContentLoaded', () => { actualizarEntrega(); actualizarPago(); });
 </script>
 {% endblock %}

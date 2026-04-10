@@ -140,12 +140,10 @@ is_home else current_path.startswith(href) %}
 						aria-label="Carrito"
 						title="Carrito de compras">
 						<i class="bi bi-cart3"></i>
-						{% set cart_count = 0 %} {# You can replace "cart_count" with an actual context variable
-						if it exists #}
 						<span
 							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-							style="font-size: 0.6rem">
-							{% if session.carrito %}{{ session.carrito|length }}{% else %}0{% endif %}
+							style="font-size: 0.6rem; display: {{ 'none' if cart_count == 0 else 'inline-block' }};">
+							{{ cart_count }}
 						</span>
 					</a>
 

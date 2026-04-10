@@ -11,18 +11,13 @@
 			</div>
 			<div class="d-flex gap-2">
 				<form method="get" class="d-flex gap-2">
-					<input
-						type="text"
-						name="q"
-						value="{{ q or '' }}"
-						placeholder="Buscar por nombre o usuario" />
-					<button type="submit" class="btn btn-sm">Buscar</button>
+					<input type="text" name="q" value="{{ q or '' }}" placeholder="Buscar por nombre o usuario" />
+					<button type="submit" class="btn btn-sm text-white"><i class="bi bi-search text-white"></i>
+						Buscar</button>
 				</form>
-				<button
-					type="button"
-					class="btn btn-sm"
-					data-bs-toggle="modal"
+				<button type="button" class="btn btn-sm text-white" data-bs-toggle="modal"
 					data-bs-target="#modalUsuarioCrear">
+					<i class="bi bi-person-plus-fill me-1 text-white"></i>
 					Nuevo usuario
 				</button>
 			</div>
@@ -58,28 +53,23 @@
 							</span>
 						</td>
 						<td>
-							<div class="d-flex flex-wrap gap-2" style="min-width: 260px">
-								<button
-									type="button"
-									class="btn btn-sm btn-outline-primary js-editar-usuario"
-									data-id="{{ u.id_usuario }}"
-									data-nombre="{{ u.persona.nombre }}"
-									data-apellidos="{{ u.persona.apellidos }}"
-									data-telefono="{{ u.persona.telefono }}"
-									data-ciudad="{{ u.persona.ciudad }}"
-									data-direccion="{{ u.persona.direccion }}"
-									data-id-rol="{{ u.id_rol }}"
-									data-activo="{{ '1' if u.activo else '0' }}">
-									Editar
+							<div class="btn-action-group">
+								<button type="button"
+									class="btn btn-sm btn-primary text-white border-0 btn-icon-sm js-editar-usuario"
+									data-id="{{ u.id_usuario }}" data-nombre="{{ u.persona.nombre }}"
+									data-apellidos="{{ u.persona.apellidos }}" data-telefono="{{ u.persona.telefono }}"
+									data-ciudad="{{ u.persona.ciudad }}" data-direccion="{{ u.persona.direccion }}"
+									data-id-rol="{{ u.id_rol }}" data-activo="{{ '1' if u.activo else '0' }}">
+									<i class="bi bi-pencil-fill text-white"></i>
 								</button>
-								<form
-									method="post"
-									action="{{ url_for('admin.desactivar_usuario', id_usuario=u.id_usuario) }}"
-									class="d-inline">
-									<button type="submit" class="btn btn-sm btn-outline-dark" {{ 'disabled' if not u.activo else '' }}>
-										Desactivar
-									</button>
-								</form>
+								<button type="button"
+									class="btn btn-sm btn-dark text-white border-0 btn-icon-sm js-desactivar-usuario"
+									data-id="{{ u.id_usuario }}" data-nombre="{{ u.username }}" {{ 'disabled' if not
+									u.activo else '' }}>
+									<i class="bi bi-slash-circle-fill text-white"></i>
+								</button>
+								<form method="post" id="formDesactivarUsuario{{ u.id_usuario }}"
+									action="{{ url_for('admin.desactivar_usuario', id_usuario=u.id_usuario) }}"></form>
 							</div>
 						</td>
 					</tr>
@@ -94,34 +84,107 @@
 	</div>
 
 	<div class="modal fade" id="modalUsuarioCrear" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Alta de empleado</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title w-100 text-white">
+						<i class="bi bi-person-plus-fill me-2 text-white"></i>Alta de empleado
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
 				</div>
-				<form method="post">
+				<form method="post" id="registerFormUser">
 					<div class="modal-body">
-						<div class="ops-grid">
-							<input type="text" name="username" placeholder="Usuario" required />
-							<input type="password" name="password" placeholder="Contrasena" required />
-							<input type="text" name="nombre" placeholder="Nombre" required />
-							<input type="text" name="apellidos" placeholder="Apellidos" required />
-							<input type="text" name="telefono" placeholder="Telefono" required />
-							<input type="email" name="correo" placeholder="Correo" required />
-							<input type="text" name="ciudad" placeholder="Ciudad" required />
-							<input type="text" name="direccion" placeholder="Direccion" required />
-							<select name="id_rol" required>
-								<option value="">Rol</option>
-								{% for rol in roles %}
-								<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
-								{% endfor %}
-							</select>
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Nombre *</label>
+								<input type="text" class="form-control" name="nombre" placeholder="Nombre" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Apellidos *</label>
+								<input type="text" class="form-control" name="apellidos" placeholder="Apellidos"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono *</label>
+								<input type="text" class="form-control tel-format" name="telefono"
+									placeholder="477-123-4567" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Correo electrónico *</label>
+								<input type="email" class="form-control" name="correo" placeholder="correo@empresa.com"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ciudad *</label>
+								<input type="text" class="form-control" name="ciudad" placeholder="Ciudad" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Dirección *</label>
+								<input type="text" class="form-control" name="direccion" placeholder="Direccion"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Usuario *</label>
+								<input type="text" class="form-control" name="username" placeholder="Usuario"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Rol *</label>
+								<select class="form-control" name="id_rol" required>
+									<option value="">Seleccione Rol</option>
+									{% for rol in roles %}
+									<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="col-12">
+								<label class="form-label">Contraseña *</label>
+								<div class="input-group">
+									<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+									<input type="password" name="password" id="userPassword" class="form-control"
+										placeholder="Mínimo 8 caracteres" autocomplete="new-password" required />
+									<span class="input-group-text toggle-password" data-target="userPassword"
+										role="button" tabindex="0">
+										<i class="bi bi-eye-slash"></i>
+									</span>
+								</div>
+								<div class="pwd-rules-title mt-2">Tu contraseña debe incluir:</div>
+								<div class="pwd-rules" id="passwordRulesUser">
+									<div class="pwd-rule" data-rule="len">
+										<i class="bi bi-x-circle err-ic"></i>
+										<i class="bi bi-check-circle ok-ic"></i>
+										Mínimo 8 caracteres
+									</div>
+									<div class="pwd-rule" data-rule="upper">
+										<i class="bi bi-x-circle err-ic"></i>
+										<i class="bi bi-check-circle ok-ic"></i>
+										Al menos una mayúscula
+									</div>
+									<div class="pwd-rule" data-rule="lower">
+										<i class="bi bi-x-circle err-ic"></i>
+										<i class="bi bi-check-circle ok-ic"></i>
+										Al menos una minúscula
+									</div>
+									<div class="pwd-rule" data-rule="number">
+										<i class="bi bi-x-circle err-ic"></i>
+										<i class="bi bi-check-circle ok-ic"></i>
+										Al menos un número
+									</div>
+									<div class="pwd-rule" data-rule="special">
+										<i class="bi bi-x-circle err-ic"></i>
+										<i class="bi bi-check-circle ok-ic"></i>
+										Al menos un carácter especial
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Crear usuario</button>
+						<button type="button" class="btn btn-primary text-white"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm text-white"><i
+								class="bi bi-plus-lg me-1 text-white"></i> Crear usuario</button>
 					</div>
 				</form>
 			</div>
@@ -129,36 +192,90 @@
 	</div>
 
 	<div class="modal fade" id="modalUsuarioEditar" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-xl modal-dialog-centered">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
-				<div class="modal-header">
-					<h5 class="modal-title">Editar usuario</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-header" style="background: var(--sb-primary); color: #fff">
+					<h5 class="modal-title text-white">
+						<i class="bi bi-pencil-fill me-2 text-white"></i>
+						Editar usuario
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
 				</div>
 				<form method="post" id="formEditarUsuario">
 					<div class="modal-body">
-						<div class="ops-grid">
-							<input type="text" name="nombre" id="editarUsuarioNombre" required />
-							<input type="text" name="apellidos" id="editarUsuarioApellidos" required />
-							<input type="text" name="telefono" id="editarUsuarioTelefono" required />
-							<input type="text" name="ciudad" id="editarUsuarioCiudad" required />
-							<input type="text" name="direccion" id="editarUsuarioDireccion" required />
-							<select name="id_rol" id="editarUsuarioRol" required>
-								{% for rol in roles %}
-								<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
-								{% endfor %}
-							</select>
-						</div>
-						<div class="form-check mt-3">
-							<input class="form-check-input" type="checkbox" name="activo" id="editarUsuarioActivo" />
-							<label class="form-check-label" for="editarUsuarioActivo">Activo</label>
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Nombre *</label>
+								<input type="text" class="form-control" name="nombre" id="editarUsuarioNombre"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Apellidos *</label>
+								<input type="text" class="form-control" name="apellidos" id="editarUsuarioApellidos"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono *</label>
+								<input type="text" class="form-control tel-format" name="telefono"
+									id="editarUsuarioTelefono" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ciudad *</label>
+								<input type="text" class="form-control" name="ciudad" id="editarUsuarioCiudad"
+									required />
+							</div>
+							<div class="col-12">
+								<label class="form-label">Dirección *</label>
+								<input type="text" class="form-control" name="direccion" id="editarUsuarioDireccion"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Rol *</label>
+								<select class="form-control" name="id_rol" id="editarUsuarioRol" required>
+									{% for rol in roles %}
+									<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="col-md-6 d-flex align-items-end">
+								<div class="form-check mb-2">
+									<input class="form-check-input" type="checkbox" name="activo"
+										id="editarUsuarioActivo" />
+									<label class="form-check-label" for="editarUsuarioActivo">Usuario Activo</label>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm">Guardar cambios</button>
+						<button type="button" class="btn btn-primary text-white"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm text-white"><i class="bi bi-save me-1 text-white"></i>
+							Guardar cambios</button>
 					</div>
 				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modalUsuarioDesactivar" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-sm modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<div
+						style="width: 60px; height: 60px; border-radius: 50%; background: #fff8e1; color: #e65100; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1rem;">
+						<i class="bi bi-person-slash"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1.05rem">
+						¿Desactivar usuario?
+					</h5>
+					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoDesactivarUsuario"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<button type="button" class="bbtn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-sm btn-danger text-white" id="btnConfirmarDesactivarUsuario">
+						<i class="bi bi-check-lg me-1 text-white"></i> Confirmar
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -167,6 +284,7 @@
 
 {% block scripts %}
 <script>
+	// Llenado de modal Editar Usuario
 	document.querySelectorAll('.js-editar-usuario').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
 			document.getElementById('formEditarUsuario').action = `/admin/usuarios/${buttonElement.dataset.id}/editar`;
@@ -180,5 +298,96 @@
 			new bootstrap.Modal(document.getElementById('modalUsuarioEditar')).show();
 		});
 	});
+
+	// Modal Desactivar Usuario
+	let usuarioDesactivarId = null;
+
+	document.querySelectorAll('.js-desactivar-usuario').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			usuarioDesactivarId = buttonElement.dataset.id;
+			document.getElementById('textoDesactivarUsuario').innerHTML =
+				`El usuario <strong>${buttonElement.dataset.nombre}</strong> pasará a estado <em>inactivo</em>. No se eliminará el registro.`;
+			new bootstrap.Modal(document.getElementById('modalUsuarioDesactivar')).show();
+		});
+	});
+
+	document.getElementById('btnConfirmarDesactivarUsuario').addEventListener('click', () => {
+		if (!usuarioDesactivarId) return;
+		document.getElementById(`formDesactivarUsuario${usuarioDesactivarId}`).submit();
+	});
+
+	// Formateador automático de teléfono (477-123-4567)
+	const telInputs = document.querySelectorAll('.tel-format');
+	telInputs.forEach(input => {
+		input.addEventListener('input', function (e) {
+			let val = this.value.replace(/\D/g, ''); // Quita lo que no sea número
+			if (val.length > 3 && val.length <= 6) {
+				val = val.slice(0, 3) + '-' + val.slice(3);
+			} else if (val.length > 6) {
+				val = val.slice(0, 3) + '-' + val.slice(3, 6) + '-' + val.slice(6, 10);
+			}
+			this.value = val;
+		});
+	});
+
+	// Lógica de reglas de contraseña para Alta Empleado
+	(function setupRegisterUserUX() {
+		const passwordInput = document.getElementById('userPassword');
+		const toggleTrigger = document.querySelector('.toggle-password[data-target="userPassword"]');
+
+		const rules = {
+			len: (value) => value.length >= 8,
+			upper: (value) => /[A-Z]/.test(value),
+			lower: (value) => /[a-z]/.test(value),
+			number: (value) => /\d/.test(value),
+			special: (value) => /[^A-Za-z\d]/.test(value),
+		};
+
+		const setRuleState = (ruleName, ok) => {
+			const ruleEl = document.querySelector(`#passwordRulesUser .pwd-rule[data-rule="${ruleName}"]`);
+			if (!ruleEl) return;
+			ruleEl.classList.toggle('ok', ok);
+		};
+
+		const passwordValid = () => {
+			const value = passwordInput ? passwordInput.value : '';
+			Object.entries(rules).forEach(([ruleName, validator]) => {
+				setRuleState(ruleName, validator(value));
+			});
+			return Object.values(rules).every((validator) => validator(value));
+		};
+
+		if (passwordInput) {
+			passwordInput.addEventListener('input', passwordValid);
+			passwordInput.addEventListener('blur', passwordValid);
+		}
+
+		if (toggleTrigger && passwordInput) {
+			const toggle = () => {
+				const isPass = passwordInput.type === 'password';
+				passwordInput.type = isPass ? 'text' : 'password';
+				toggleTrigger.innerHTML = isPass ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+			};
+			toggleTrigger.addEventListener('click', toggle);
+			toggleTrigger.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					toggle();
+				}
+			});
+		}
+
+		const formElement = document.getElementById('registerFormUser');
+		if (formElement) {
+			formElement.addEventListener('submit', (event) => {
+				if (!passwordValid()) {
+					event.preventDefault();
+					alert("Por favor asegúrate de cumplir todas las reglas de la contraseña.");
+				}
+			});
+		}
+
+		passwordValid();
+	})();
 </script>
 {% endblock %}

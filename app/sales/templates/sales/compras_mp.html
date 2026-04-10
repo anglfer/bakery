@@ -5,12 +5,12 @@
 {% block content %}
 {% set ns = namespace(total=0, pendientes=0, pagadas=0, registros=compras|length) %}
 {% for compra in compras %}
-	{% set ns.total = ns.total + (compra.total or 0) %}
-	{% if compra.estado_pago == 'PAGADO' %}
-		{% set ns.pagadas = ns.pagadas + 1 %}
-	{% else %}
-		{% set ns.pendientes = ns.pendientes + 1 %}
-	{% endif %}
+{% set ns.total = ns.total + (compra.total or 0) %}
+{% if compra.estado_pago == 'PAGADO' %}
+{% set ns.pagadas = ns.pagadas + 1 %}
+{% else %}
+{% set ns.pendientes = ns.pendientes + 1 %}
+{% endif %}
 {% endfor %}
 
 <section class="section compras-page">
@@ -48,21 +48,19 @@
 	<div class="ops-toolbar compras-toolbar">
 		<div class="ops-input-wrap">
 			<i class="bi bi-search"></i>
-			<input
-				type="text"
-				id="comprasSearch"
-				placeholder="Buscar por proveedor o folio..." />
+			<input type="text" id="comprasSearch" placeholder="Buscar por proveedor o folio..." />
 		</div>
 		<select id="comprasEstadoFiltro" class="form-select form-select-sm compras-filter">
 			<option value="TODOS">Todos los pagos</option>
 			<option value="PENDIENTE">Pendiente</option>
 			<option value="PAGADO">Pagado</option>
 		</select>
-		<button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiarFiltros">
-			<i class="bi bi-eraser me-1"></i>Limpiar
+		<button type="button" class="btn btn-primary text-white border-0 btn-sm" id="btnLimpiarFiltros">
+			<i class="bi bi-eraser me-1 text-white"></i>Limpiar
 		</button>
-		<button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalCompraCrear">
-			<i class="bi bi-plus-lg me-1"></i>Nueva compra
+		<button type="button" class="btn btn-success text-white border-0 btn-sm" data-bs-toggle="modal"
+			data-bs-target="#modalCompraCrear">
+			<i class="bi bi-plus-lg me-1 text-white"></i>Nueva compra
 		</button>
 	</div>
 
@@ -93,9 +91,7 @@
 				</thead>
 				<tbody>
 					{% for compra in compras %}
-					<tr
-						data-row="compra"
-						data-id="{{ compra.id_compra }}"
+					<tr data-row="compra" data-id="{{ compra.id_compra }}"
 						data-folio="{{ compra.folio_formateado|lower }}"
 						data-proveedor="{{ compra.proveedor.nombre_empresa|lower if compra.proveedor else '' }}"
 						data-estado="{{ compra.estado_pago }}"
@@ -121,27 +117,20 @@
 						<td>{{ compra.comprador.username if compra.comprador else '-' }}</td>
 						<td>
 							<div class="btn-action-group">
-								<button
-									type="button"
-									class="btn btn-outline-secondary btn-icon-sm btnVerCompra"
-									data-bs-toggle="modal"
-									data-bs-target="#modalCompraDetalle"
-									title="Ver detalle"
-									data-id="{{ compra.id_compra }}"
-									data-folio="{{ compra.folio_formateado }}"
+								<button type="button"
+									class="btn btn-primary text-white border-0 btn-icon-sm btnVerCompra"
+									data-bs-toggle="modal" data-bs-target="#modalCompraDetalle" title="Ver detalle"
+									data-id="{{ compra.id_compra }}" data-folio="{{ compra.folio_formateado }}"
 									data-proveedor="{{ compra.proveedor.nombre_empresa if compra.proveedor else '' }}"
 									data-total="{{ '%.2f'|format(compra.total or 0) }}"
 									data-estado="{{ compra.estado_pago }}">
-									<i class="bi bi-eye-fill"></i>
+									<i class="bi bi-eye-fill text-white"></i>
 								</button>
-								<button
-									type="button"
-									class="btn btn-outline-success btn-icon-sm btnPagarCompra"
-									data-bs-toggle="modal"
-									data-bs-target="#modalConfirmarPago"
-									title="Registrar pago"
-									{{ 'disabled' if compra.estado_pago == 'PAGADO' else '' }}>
-									<i class="bi bi-cash-coin"></i>
+								<button type="button"
+									class="btn btn-success text-white border-0 btn-icon-sm btnPagarCompra"
+									data-bs-toggle="modal" data-bs-target="#modalConfirmarPago" title="Registrar pago"
+									{{ 'disabled' if compra.estado_pago=='PAGADO' else '' }}>
+									<i class="bi bi-cash-coin text-white"></i>
 								</button>
 							</div>
 						</td>
@@ -180,10 +169,11 @@
 					<p class="ops-meta mb-1 text-white-50">Nueva compra</p>
 					<h5 class="modal-title text-white mb-0">Nueva Compra de Materia Prima</h5>
 				</div>
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+					aria-label="Close"></button>
 			</div>
 			<form method="post" id="formCompraMateriaPrima" class="compras-create-form">
-				<div class="modal-body compras-modal-body">
+				<div class="modal-body compras-modal-body" style="max-height: 70vh; overflow-y: auto;">
 					<div class="compras-section-card">
 						<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Cabecera de compra</p>
 						<div class="ops-grid compras-header-grid">
@@ -223,9 +213,11 @@
 
 					<div class="compras-section-card">
 						<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-							<p class="ops-meta mb-0"><i class="bi bi-list-check me-1"></i>Detalle de insumos adquiridos</p>
-							<button type="button" class="btn btn-outline-secondary btn-sm" id="btnAgregarDetalleCompra">
-								<i class="bi bi-plus-lg me-1"></i>Agregar materia prima
+							<p class="ops-meta mb-0"><i class="bi bi-list-check me-1"></i>Detalle de insumos adquiridos
+							</p>
+							<button type="button" class="btn btn-primary text-white border-0 btn-sm"
+								id="btnAgregarDetalleCompra">
+								<i class="bi bi-plus-lg me-1 text-white"></i>Agregar materia prima
 							</button>
 						</div>
 
@@ -236,22 +228,25 @@
 									<div class="compras-detail-item-index">1</div>
 									<div>
 										<p class="fw-bold mb-0">Insumo #1</p>
-										<small class="text-secondary">Captura la materia prima, su cantidad y precio.</small>
+										<small class="text-secondary">Captura la materia prima, su cantidad y
+											precio.</small>
 									</div>
-									<button type="button" class="btn btn-outline-secondary btn-icon-sm btnEliminarDetalle" title="Eliminar renglón">
-										<i class="bi bi-x-lg"></i>
+									<button type="button"
+										class="btn btn-danger text-white border-0 btn-icon-sm btnEliminarDetalle"
+										title="Eliminar renglón">
+										<i class="bi bi-x-lg text-white"></i>
 									</button>
 								</div>
 
 								<div class="ops-grid compras-detail-grid">
 									<div class="compras-field-wide">
-										<label for="detalle-materia-template" class="form-label fw-semibold js-label-materia">Materia prima *</label>
-										<select id="detalle-materia-template" name="id_materia[]" class="js-materia" required>
+										<label for="detalle-materia-template"
+											class="form-label fw-semibold js-label-materia">Materia prima *</label>
+										<select id="detalle-materia-template" name="id_materia[]" class="js-materia"
+											required>
 											<option value="">Seleccionar...</option>
 											{% for materia in materias %}
-											<option
-												value="{{ materia.id_materia }}"
-												data-nombre="{{ materia.nombre }}"
+											<option value="{{ materia.id_materia }}" data-nombre="{{ materia.nombre }}"
 												data-unidad-compra-id="{{ materia.id_unidad_compra }}"
 												data-unidad-compra="{{ materia.unidad_compra.abreviatura }}"
 												data-unidad-base="{{ materia.unidad_base.abreviatura }}"
@@ -263,24 +258,32 @@
 									</div>
 
 									<div>
-										<label for="detalle-cantidad-template" class="form-label fw-semibold js-label-cantidad">Cant. comprada *</label>
-										<input id="detalle-cantidad-template" type="number" step="0.0001" min="0.0001" name="cantidad_comprada[]" class="js-cantidad" placeholder="0" required />
+										<label for="detalle-cantidad-template"
+											class="form-label fw-semibold js-label-cantidad">Cant. comprada *</label>
+										<input id="detalle-cantidad-template" type="number" step="0.0001" min="0.0001"
+											name="cantidad_comprada[]" class="js-cantidad" placeholder="0" required />
 									</div>
 
 									<div>
-										<label for="detalle-unidad-template" class="form-label fw-semibold js-label-unidad-compra">Unidad compra</label>
-										<input id="detalle-unidad-template" type="text" class="js-unidad-compra" readonly value="" placeholder="--" />
+										<label for="detalle-unidad-template"
+											class="form-label fw-semibold js-label-unidad-compra">Unidad compra</label>
+										<input id="detalle-unidad-template" type="text" class="js-unidad-compra"
+											readonly value="" placeholder="--" />
 										<input type="hidden" name="id_unidad_compra[]" class="js-id-unidad-compra" />
 									</div>
 
 									<div>
-										<label for="detalle-precio-template" class="form-label fw-semibold js-label-precio">Precio unitario *</label>
-										<input id="detalle-precio-template" type="number" step="0.01" min="0" name="precio_unitario[]" class="js-precio" placeholder="0.00" required />
+										<label for="detalle-precio-template"
+											class="form-label fw-semibold js-label-precio">Precio unitario *</label>
+										<input id="detalle-precio-template" type="number" step="0.01" min="0"
+											name="precio_unitario[]" class="js-precio" placeholder="0.00" required />
 									</div>
 
 									<div>
-										<label for="detalle-subtotal-template" class="form-label fw-semibold js-label-subtotal">Subtotal</label>
-										<input id="detalle-subtotal-template" type="text" class="js-subtotal" readonly value="$0.00" />
+										<label for="detalle-subtotal-template"
+											class="form-label fw-semibold js-label-subtotal">Subtotal</label>
+										<input id="detalle-subtotal-template" type="text" class="js-subtotal" readonly
+											value="$0.00" />
 									</div>
 								</div>
 
@@ -291,7 +294,8 @@
 
 					<div class="compras-total-card">
 						<div>
-							<p class="mb-1 fw-semibold"><i class="bi bi-calculator me-1"></i>Total de la compra (calculado automáticamente)</p>
+							<p class="mb-1 fw-semibold"><i class="bi bi-calculator me-1"></i>Total de la compra
+								(calculado automáticamente)</p>
 							<small class="text-secondary">La suma de los subtotales se recalcula al instante.</small>
 						</div>
 						<div class="compras-total-value" id="totalCompraPreview">$0.00</div>
@@ -299,9 +303,10 @@
 					</div>
 				</div>
 				<div class="modal-footer compras-modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-					<button type="submit" class="btn btn-sm">
-						<i class="bi bi-check2 me-1"></i>Registrar compra y actualizar inventario
+					<button type="button" class="btn btn-primary text-white border-0"
+						data-bs-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-sm btn-success text-white border-0">
+						<i class="bi bi-check2 me-1 text-white"></i>Registrar compra y actualizar inventario
 					</button>
 				</div>
 			</form>
@@ -317,9 +322,10 @@
 					<p class="ops-meta mb-1 text-white-50">Detalle de compra</p>
 					<h5 class="modal-title text-white mb-0" id="detalleCompraTitulo">Detalle de Compra</h5>
 				</div>
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+					aria-label="Close"></button>
 			</div>
-			<div class="modal-body compras-modal-body">
+			<div class="modal-body compras-modal-body" style="max-height: 70vh; overflow-y: auto;">
 				<div class="compras-section-card compras-detail-info">
 					<p class="ops-meta mb-2"><i class="bi bi-info-circle-fill me-1"></i>Información general</p>
 					<div class="compras-detail-meta-grid">
@@ -378,13 +384,15 @@
 					<div>
 						<p class="mb-1 fw-semibold">Actualización automática de inventario</p>
 						<p class="mb-0">
-							Al registrar esta compra se generaron movimientos <b>ENTRADA</b> en inventario_materia_prima para cada insumo adquirido.
+							Al registrar esta compra se generaron movimientos <b>ENTRADA</b> en inventario_materia_prima
+							para cada insumo adquirido.
 						</p>
 					</div>
 				</div>
 			</div>
 			<div class="modal-footer compras-modal-footer">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+				<button type="button" class="btn btn-primary text-white border-0"
+					data-bs-dismiss="modal">Cerrar</button>
 			</div>
 		</div>
 	</div>
@@ -405,10 +413,11 @@
 				</p>
 			</div>
 			<div class="modal-footer justify-content-center gap-2 border-0 pt-0 pb-4">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary text-white border-0"
+					data-bs-dismiss="modal">Cancelar</button>
 				<form method="post" id="formPagoCompra" class="d-inline">
-					<button type="submit" class="btn btn-sm">
-						<i class="bi bi-check2 me-1"></i>Confirmar pago
+					<button type="submit" class="btn btn-sm btn-success text-white border-0">
+						<i class="bi bi-check2 me-1 text-white"></i>Confirmar pago
 					</button>
 				</form>
 			</div>

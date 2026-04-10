@@ -18,8 +18,8 @@ endfor %}
 				Último acceso: {{ utc_now().strftime('%d/%m/%Y — %I:%M %p') }}
 			</div>
 			{% if can_manage %}
-			<button type="button" class="btn btn-primary product-hero-action" id="btnNuevoProducto">
-				<i class="bi bi-plus-lg me-2"></i>
+			<button type="button" class="btn btn-primary text-white border-0 product-hero-action" id="btnNuevoProducto">
+				<i class="bi bi-plus-lg me-2 text-white"></i>
 				Nuevo producto
 			</button>
 			{% endif %}
@@ -66,40 +66,34 @@ endfor %}
 			<option value="low">Stock bajo</option>
 			<option value="available">Disponible</option>
 		</select>
-		{% if can_manage %}
-		<button
-			type="button"
-			class="btn btn-primary product-toolbar-action"
-			id="btnNuevoProductoToolbar">
-			<i class="bi bi-plus-lg me-2"></i>
-			Nuevo producto
-		</button>
-		{% endif %}
+
 	</div>
 
 	<div class="product-view" id="catalogView">
 		<div class="product-grid">
 			{% for p in productos %} {% set m = metricas_producto.get(p.id_producto, {}) %}
-			<article
-				class="product-card"
-				data-product-item
-				data-status="{{ 'active' if p.activo else 'inactive' }}"
-				data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
-				data-name="{{ p.nombre|lower }}">
-				<div class="product-card-media">
+			<article class="product-card" data-product-item data-status="{{ 'active' if p.activo else 'inactive' }}"
+				data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}" data-name="{{ p.nombre|lower }}">
+				<div class="product-card-media" style="height: 190px; position: relative;">
 					{% if not p.activo %}
-					<span class="product-status-badge neutral">Inactivo</span>
+					<span class="product-status-badge neutral"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Inactivo</span>
 					{% elif p.esta_bajo_stock %}
-					<span class="product-status-badge warning">Stock bajo</span>
+					<span class="product-status-badge warning"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Stock bajo</span>
 					{% else %}
-					<span class="product-status-badge success">Disponible</span>
+					<span class="product-status-badge success"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Disponible</span>
 					{% endif %}
 
-					<div class="product-emoji">
+					<div class="product-emoji"
+						style="font-size: 5.5rem; height: 130px; width: 130px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px;">
 						{% if p.imagen and p.imagen.startswith('img/') %}
-						<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}" />
+						<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}"
+							style="width: 100%; height: 100%; object-fit: contain;" />
 						{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
-						<img src="{{ p.imagen }}" alt="{{ p.nombre }}" />
+						<img src="{{ p.imagen }}" alt="{{ p.nombre }}"
+							style="width: 100%; height: 100%; object-fit: contain;" />
 						{% else %}
 						<span>{{ p.imagen or '🍰' }}</span>
 						{% endif %}
@@ -129,40 +123,31 @@ endfor %}
 						<strong>{{ p.cantidad_disponible }} / mín. {{ p.stock_minimo }}</strong>
 					</div>
 					<div class="product-stock-bar">
-						<div
-							class="product-stock-fill {{ 'warning' if p.esta_bajo_stock else 'success' }}"></div>
+						<div class="product-stock-fill {{ 'warning' if p.esta_bajo_stock else 'success' }}"></div>
 					</div>
 
-					<div class="product-actions">
-						<button
-							type="button"
-							class="btn btn-soft-primary btn-sm btnVerProducto"
+					<div class="product-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
 							data-id="{{ p.id_producto }}">
-							<i class="bi bi-eye-fill me-1"></i>
+							<i class="bi bi-eye-fill me-1 text-white"></i>
 							Ver
 						</button>
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm btnMovimientosProducto"
+						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnMovimientosProducto"
 							data-id="{{ p.id_producto }}">
-							<i class="bi bi-arrow-left-right me-1"></i>
+							<i class="bi bi-arrow-left-right me-1 text-white"></i>
 							Movim.
 						</button>
 						{% if can_manage %}
-						<button
-							type="button"
-							class="btn btn-soft-secondary btn-sm btnEditarProducto"
+						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnEditarProducto"
 							data-id="{{ p.id_producto }}">
-							<i class="bi bi-pencil-fill me-1"></i>
+							<i class="bi bi-pencil-fill me-1 text-white"></i>
 							Editar
 						</button>
 						{% if p.activo %}
-						<button
-							type="button"
-							class="btn btn-soft-danger btn-sm btnDesactivarProducto"
+						<button type="button" class="btn btn-danger text-white border-0 btn-sm btnDesactivarProducto"
 							data-id="{{ p.id_producto }}">
-							<i class="bi bi-archive-fill me-1"></i>
-							Desactivar
+							<i class="bi bi-archive-fill me-1 text-white"></i>
+							Desac.
 						</button>
 						{% endif %} {% endif %}
 					</div>
@@ -195,12 +180,8 @@ endfor %}
 				</thead>
 				<tbody>
 					{% for p in productos %}
-					<tr
-						class="product-row"
-						data-product-item
-						data-status="{{ 'active' if p.activo else 'inactive' }}"
-						data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
-						data-name="{{ p.nombre|lower }}">
+					<tr class="product-row" data-product-item data-status="{{ 'active' if p.activo else 'inactive' }}"
+						data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}" data-name="{{ p.nombre|lower }}">
 						<td class="text-muted">P-{{ '%03d'|format(p.id_producto) }}</td>
 						<td>
 							<div class="d-flex align-items-center gap-3">
@@ -242,24 +223,20 @@ endfor %}
 						</td>
 						<td class="text-end">
 							<div class="product-actions justify-content-end">
-								<button
-									type="button"
-									class="btn btn-soft-primary btn-sm btnVerProducto"
+								<button type="button" class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
 									data-id="{{ p.id_producto }}">
-									<i class="bi bi-eye-fill"></i>
+									<i class="bi bi-eye-fill text-white"></i>
 								</button>
-								<button
-									type="button"
-									class="btn btn-soft-secondary btn-sm btnMovimientosProducto"
+								<button type="button"
+									class="btn btn-primary text-white border-0 btn-sm btnMovimientosProducto"
 									data-id="{{ p.id_producto }}">
-									<i class="bi bi-arrow-left-right"></i>
+									<i class="bi bi-arrow-left-right text-white"></i>
 								</button>
 								{% if can_manage %}
-								<button
-									type="button"
-									class="btn btn-soft-secondary btn-sm btnEditarProducto"
+								<button type="button"
+									class="btn btn-primary text-white border-0 btn-sm btnEditarProducto"
 									data-id="{{ p.id_producto }}">
-									<i class="bi bi-pencil-fill"></i>
+									<i class="bi bi-pencil-fill text-white"></i>
 								</button>
 								{% endif %}
 							</div>
@@ -295,27 +272,15 @@ endfor %}
 							<div class="form-grid form-grid-2">
 								<div class="field-span-2">
 									<label for="nombre" class="form-label fw-semibold">Nombre *</label>
-									<input
-										type="text"
-										class="form-control"
-										name="nombre"
-										id="nombre"
-										placeholder="Ej. Pastel de Chocolate"
-										required />
+									<input type="text" class="form-control" name="nombre" id="nombre"
+										placeholder="Ej. Pastel de Chocolate" required />
 								</div>
 								<div>
 									<label for="precio_venta" class="form-label fw-semibold">Precio de venta *</label>
 									<div class="input-group">
 										<span class="input-group-text">$</span>
-										<input
-											type="number"
-											step="0.01"
-											min="0"
-											class="form-control"
-											name="precio_venta"
-											id="precio_venta"
-											placeholder="0.00"
-											required />
+										<input type="number" step="0.01" min="0" class="form-control"
+											name="precio_venta" id="precio_venta" placeholder="0.00" required />
 									</div>
 								</div>
 								<div>
@@ -341,41 +306,22 @@ endfor %}
 									<label for="margen_objetivo_pct" class="form-label fw-semibold">
 										Ganancia % (opcional)
 									</label>
-									<input
-										type="number"
-										step="0.01"
-										min="0.01"
-										max="99.99"
-										class="form-control"
-										name="margen_objetivo_pct"
-										id="margen_objetivo_pct"
-										value="25" />
+									<input type="number" step="0.01" min="0.01" max="99.99" class="form-control"
+										name="margen_objetivo_pct" id="margen_objetivo_pct" value="25" />
 								</div>
 								<div class="field-span-2">
 									<label for="descripcion" class="form-label fw-semibold">Descripción</label>
-									<textarea
-										class="form-control"
-										name="descripcion"
-										id="descripcion"
-										rows="3"
+									<textarea class="form-control" name="descripcion" id="descripcion" rows="3"
 										placeholder="Descripción del producto (opcional)..."></textarea>
 								</div>
 								<div>
 									<label for="imagen_archivo" class="form-label fw-semibold">Imagen</label>
-									<input
-										type="file"
-										class="form-control"
-										name="imagen_archivo"
-										id="imagen_archivo"
+									<input type="file" class="form-control" name="imagen_archivo" id="imagen_archivo"
 										accept="image/*" />
 								</div>
 								<div>
 									<label for="imagen" class="form-label fw-semibold">Emoji / URL</label>
-									<input
-										type="text"
-										class="form-control"
-										name="imagen"
-										id="imagen"
+									<input type="text" class="form-control" name="imagen" id="imagen"
 										placeholder="🍰 o URL imagen" />
 								</div>
 								<div>
@@ -395,9 +341,7 @@ endfor %}
 											Precio sugerido:
 											<strong id="precioSugeridoVista">$0.00</strong>
 										</small>
-										<button
-											type="button"
-											class="btn btn-soft-primary btn-sm"
+										<button type="button" class="btn btn-primary text-white border-0 btn-sm"
 											id="btnAplicarSugerido">
 											Aplicar sugerido
 										</button>
@@ -416,30 +360,16 @@ endfor %}
 									<label for="stock_inicial" class="form-label fw-semibold">
 										Stock inicial / actual
 									</label>
-									<input
-										type="number"
-										step="1"
-										min="0"
-										class="form-control"
-										name="stock_inicial"
-										id="stock_inicial"
-										value="0"
-										required />
+									<input type="number" step="1" min="0" class="form-control" name="stock_inicial"
+										id="stock_inicial" value="0" required />
 									<small class="text-muted">
 										Se actualiza automáticamente por producción y ventas.
 									</small>
 								</div>
 								<div>
 									<label for="stock_minimo" class="form-label fw-semibold">Stock mínimo *</label>
-									<input
-										type="number"
-										step="1"
-										min="0"
-										class="form-control"
-										name="stock_minimo"
-										id="stock_minimo"
-										value="10"
-										required />
+									<input type="number" step="1" min="0" class="form-control" name="stock_minimo"
+										id="stock_minimo" value="10" required />
 									<small class="text-muted">
 										Activa alerta visual cuando el inventario baje del mínimo.
 									</small>
@@ -458,12 +388,12 @@ endfor %}
 						</div>
 					</div>
 				</div>
-				<div class="modal-footer product-modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<div class="modal-footer product-modal-footer border-0">
+					<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-primary" id="btnGuardarProducto">
-						<i class="bi bi-check2-circle me-1"></i>
+					<button type="submit" class="btn btn-success text-white border-0" id="btnGuardarProducto">
+						<i class="bi bi-check2-circle me-1 text-white"></i>
 						Guardar producto
 					</button>
 				</div>

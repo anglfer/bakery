@@ -45,8 +45,8 @@
 					Cada versión conserva trazabilidad, ingredientes y rendimiento base.
 				</p>
 			</div>
-			<button type="button" class="btn btn-sm" onclick="abrirRecetaNueva()">
-				<i class="bi bi-plus-lg me-1"></i>
+			<button type="button" class="btn btn-primary text-white border-0 btn-sm" onclick="abrirRecetaNueva()">
+				<i class="bi bi-plus-lg me-1 text-white"></i>
 				Nueva receta
 			</button>
 		</div>
@@ -54,10 +54,7 @@
 		<div class="ops-toolbar receta-toolbar mt-3">
 			<div class="ops-input-wrap">
 				<i class="bi bi-search"></i>
-				<input
-					type="text"
-					id="recipeSearch"
-					placeholder="Buscar por producto, versión o ingrediente" />
+				<input type="text" id="recipeSearch" placeholder="Buscar por producto, versión o ingrediente" />
 			</div>
 			<select id="recipeStateFilter" class="form-select form-select-sm recipe-filter">
 				<option value="TODOS">Todos los estados</option>
@@ -76,12 +73,9 @@
 	<div class="recipes-grid" id="recipesGrid">
 		{% for receta in recetas %} {% set stock_estado = 'ok' if receta.puede_producir_base else
 		'critico' %}
-		<article
-			class="recipe-card"
-			data-row="receta"
+		<article class="recipe-card" data-row="receta"
 			data-label="{{ (receta.producto_nombre ~ ' ' ~ receta.nombre ~ ' v' ~ receta.version ~ ' ' ~ receta.categoria ~ ' ' ~ receta.descripcion)|lower }}"
-			data-estado="{{ 'ACTIVA' if receta.activa else 'INACTIVA' }}"
-			data-producto="{{ receta.id_producto }}"
+			data-estado="{{ 'ACTIVA' if receta.activa else 'INACTIVA' }}" data-producto="{{ receta.id_producto }}"
 			data-stock="{{ stock_estado|upper }}">
 			<div class="recipe-card-top">
 				<div>
@@ -128,35 +122,27 @@
 			</div>
 
 			<div class="recipe-actions">
-				<button
-					type="button"
-					class="btn btn-outline-secondary btn-sm"
+				<button type="button" class="btn btn-primary text-white border-0 btn-sm"
 					onclick="abrirDetalleReceta({{ receta.id_receta }})">
-					<i class="bi bi-eye me-1"></i>
+					<i class="bi bi-eye me-1 text-white"></i>
 					Ver
 				</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary btn-sm"
+				<button type="button" class="btn btn-primary text-white border-0 btn-sm"
 					onclick="abrirRecetaEdicion({{ receta.id_receta }})">
-					<i class="bi bi-pencil-fill me-1"></i>
+					<i class="bi bi-pencil-fill me-1 text-white"></i>
 					Editar
 				</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary btn-sm"
+				<button type="button" class="btn btn-primary text-white border-0 btn-sm"
 					onclick="abrirVersionesReceta({{ receta.id_producto }})">
-					<i class="bi bi-clock-history me-1"></i>
+					<i class="bi bi-clock-history me-1 text-white"></i>
 					Versiones
 				</button>
-				<button
-					type="button"
-					class="btn btn-sm {{ 'btn-outline-danger' if receta.activa else 'btn-outline-primary' }}"
+				<button type="button"
+					class="btn btn-sm text-white border-0 {{ 'btn-danger' if receta.activa else 'btn-success' }}"
 					data-toggle-url="{{ url_for('production.toggle_receta', id_receta=receta.id_receta) }}"
-					data-toggle-name="{{ receta.producto_nombre | e }}"
-					data-toggle-version="{{ receta.version }}"
+					data-toggle-name="{{ receta.producto_nombre | e }}" data-toggle-version="{{ receta.version }}"
 					data-toggle-active="{{ receta.activa | tojson }}">
-					<i class="bi {{ 'bi-toggle-on' if receta.activa else 'bi-toggle-off' }} me-1"></i>
+					<i class="bi {{ 'bi-toggle-on' if receta.activa else 'bi-toggle-off' }} me-1 text-white"></i>
 					{{ 'Desactivar' if receta.activa else 'Activar' }}
 				</button>
 			</div>
@@ -166,8 +152,8 @@
 			<i class="bi bi-journal-x"></i>
 			<h3>No hay recetas registradas</h3>
 			<p>Crea la primera versión para empezar a explotar materiales y validar stock.</p>
-			<button type="button" class="btn btn-sm" onclick="abrirRecetaNueva()">
-				<i class="bi bi-plus-lg me-1"></i>
+			<button type="button" class="btn btn-success text-white border-0 btn-sm" onclick="abrirRecetaNueva()">
+				<i class="bi bi-plus-lg me-1 text-white"></i>
 				Nueva receta
 			</button>
 		</div>
@@ -194,14 +180,13 @@
 							<i class="bi bi-journal-text me-1"></i>
 							Cabecera de receta
 						</p>
-						<div class="ops-grid recipe-header-grid">
+						<div class="ops-grid recipe-header-grid align-items-start">
 							<div>
 								<label class="form-label fw-semibold" for="recetaProducto">Producto *</label>
 								<select id="recetaProducto" name="id_producto" class="form-select" required>
 									<option value="">Seleccionar producto...</option>
 									{% for producto in productos %}
-									<option
-										value="{{ producto.id_producto }}"
+									<option value="{{ producto.id_producto }}"
 										data-next-version="{{ producto.siguiente_version }}"
 										data-recetas-count="{{ producto.recetas_count }}"
 										data-receta-activa="{{ producto.receta_activa_id or '' }}"
@@ -215,14 +200,8 @@
 								<label class="form-label fw-semibold" for="recetaRendimiento">
 									Cantidad base *
 								</label>
-								<input
-									type="number"
-									step="0.01"
-									min="0.01"
-									name="rendimiento_base"
-									id="recetaRendimiento"
-									placeholder="Ej. 12"
-									required />
+								<input type="number" step="0.01" min="0.01" name="rendimiento_base"
+									id="recetaRendimiento" placeholder="Ej. 12" required />
 								<small class="text-muted d-block mt-1">
 									Piezas o porciones producidas por lote.
 								</small>
@@ -243,11 +222,7 @@
 							</div>
 							<div>
 								<label class="form-label fw-semibold" for="recetaCreacion">Creación</label>
-								<input
-									type="text"
-									id="recetaCreacion"
-									class="form-control"
-									value="Se genera al guardar"
+								<input type="text" id="recetaCreacion" class="form-control" value="Se genera al guardar"
 									readonly />
 							</div>
 						</div>
@@ -267,11 +242,9 @@
 								<p class="ops-meta mb-1">Ingredientes (en unidad base)</p>
 								<h6 class="mb-0">Explosión de materiales</h6>
 							</div>
-							<button
-								type="button"
-								class="btn btn-outline-primary btn-sm"
+							<button type="button" class="btn btn-primary text-white border-0 btn-sm"
 								onclick="agregarIngrediente()">
-								<i class="bi bi-plus-lg me-1"></i>
+								<i class="bi bi-plus-lg me-1 text-white"></i>
 								Agregar ingrediente
 							</button>
 						</div>
@@ -283,8 +256,7 @@
 									<select name="id_materia_prima[]" class="form-select" required>
 										<option value="">Seleccionar...</option>
 										{% for materia in materias %}
-										<option
-											value="{{ materia.id_materia }}"
+										<option value="{{ materia.id_materia }}"
 											data-unidad="{{ materia.unidad_base.abreviatura }}"
 											data-stock="{{ materia.cantidad_disponible }}">
 											{{ materia.nombre }} ({{ materia.unidad_base.abreviatura }})
@@ -295,24 +267,16 @@
 								<div class="recipe-ingredient-qty">
 									<div class="form-label fw-semibold">Cantidad requerida *</div>
 									<div class="input-group">
-										<input
-											type="number"
-											step="0.001"
-											min="0.001"
-											name="cantidad_receta[]"
-											class="form-control"
-											placeholder="0.000"
-											required />
+										<input type="number" step="0.001" min="0.001" name="cantidad_receta[]"
+											class="form-control" placeholder="0.000" required />
 										<span class="input-group-text recipe-unit-suffix">u</span>
 									</div>
 								</div>
 								<div class="recipe-ingredient-action">
 									<div class="form-label fw-semibold d-block">&nbsp;</div>
-									<button
-										type="button"
-										class="btn btn-outline-danger btn-sm w-100"
+									<button type="button" class="btn btn-danger text-white border-0 btn-sm w-100"
 										onclick="quitarIngrediente(this)">
-										<i class="bi bi-x-lg"></i>
+										<i class="bi bi-x-lg text-white"></i>
 									</button>
 								</div>
 							</div>
@@ -328,37 +292,29 @@
 						<div class="ops-grid recipe-extra-grid">
 							<div>
 								<label class="form-label fw-semibold" for="recetaCategoria">Categoría</label>
-								<input
-									type="text"
-									id="recetaCategoria"
-									name="categoria"
-									class="form-control"
+								<input type="text" id="recetaCategoria" name="categoria" class="form-control"
 									placeholder="Ej. Pastelería" />
 							</div>
 							<div>
 								<label class="form-label fw-semibold" for="recetaDescripcion">
 									Descripción corta
 								</label>
-								<textarea
-									id="recetaDescripcion"
-									name="descripcion"
-									class="form-control"
-									rows="2"
+								<textarea id="recetaDescripcion" name="descripcion" class="form-control" rows="2"
 									placeholder="Descripción breve visible en catálogo"></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer border-0 recipe-modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="button" class="btn btn-outline-primary" onclick="verificarStockReceta()">
-						<i class="bi bi-stack me-1"></i>
+					<button type="button" class="btn btn-primary text-white border-0" onclick="verificarStockReceta()">
+						<i class="bi bi-stack me-1 text-white"></i>
 						Verificar stock
 					</button>
-					<button type="submit" class="btn btn-primary" id="btnGuardarReceta">
-						<i class="bi bi-check2 me-1"></i>
+					<button type="submit" class="btn btn-success text-white border-0" id="btnGuardarReceta">
+						<i class="bi bi-check2 me-1 text-white"></i>
 						Guardar receta
 					</button>
 				</div>
@@ -405,7 +361,7 @@
 				</div>
 			</div>
 			<div class="modal-footer border-0 recipe-modal-footer">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 					Cerrar
 				</button>
 			</div>
@@ -427,7 +383,7 @@
 				<div class="recipe-version-list" id="versionesRecetaBody"></div>
 			</div>
 			<div class="modal-footer border-0 recipe-modal-footer">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 					Cerrar
 				</button>
 			</div>
@@ -447,10 +403,11 @@
 			</div>
 			<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
 				<form method="post" id="formToggleReceta">
-					<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary text-white border-0 me-2" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn btn-primary" id="toggleRecetaSubmit">Confirmar</button>
+					<button type="submit" class="btn btn-danger text-white border-0"
+						id="toggleRecetaSubmit">Confirmar</button>
 				</form>
 			</div>
 		</div>
@@ -719,7 +676,7 @@
 		document.getElementById('modalRecetaTitle').innerHTML =
 			'<i class="bi bi-journal-plus me-2"></i>Nueva receta';
 		document.getElementById('btnGuardarReceta').innerHTML =
-			'<i class="bi bi-check2 me-1"></i>Guardar receta';
+			'<i class="bi bi-check2 me-1 text-white"></i>Guardar receta';
 		modalReceta.show();
 	}
 
@@ -731,7 +688,7 @@
 		document.getElementById('modalRecetaTitle').innerHTML =
 			'<i class="bi bi-pencil-fill me-2"></i>Editar receta';
 		document.getElementById('btnGuardarReceta').innerHTML =
-			'<i class="bi bi-check2 me-1"></i>Guardar nueva versión';
+			'<i class="bi bi-check2 me-1 text-white"></i>Guardar nueva versión';
 		modalReceta.show();
 	}
 

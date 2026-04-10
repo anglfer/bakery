@@ -8,9 +8,7 @@
 		{% for p in productos %}
 		<div class="col-12 col-sm-6 col-md-4 col-xl-3">
 			<article class="card product-card h-100 border-0 shadow-sm overflow-hidden">
-				<div
-					class="product-img-wrapper"
-					style="
+				<div class="product-img-wrapper" style="
 						height: 200px;
 						overflow: hidden;
 						background: #fdf6f3;
@@ -20,10 +18,8 @@
 					">
 					{% if p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:') or
 					p.imagen.startswith('img/')) %}
-					<img
-						src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
-						alt="{{ p.nombre }}"
-						style="width: 100%; height: 100%; object-fit: cover" />
+					<img src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
+						alt="{{ p.nombre }}" style="width: 100%; height: 100%; object-fit: cover" />
 					{% else %}
 					<span style="font-size: 5rem">{{ p.imagen or '🍞' }}</span>
 					{% endif %}
@@ -37,19 +33,10 @@
 					</div>
 					{% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre ==
 					'Cliente' %}
-					<form
-						method="post"
-						action="{{ url_for('catalog.carrito_agregar') }}"
-						class="d-flex gap-2 mt-auto">
+					<form method="post" action="{{ url_for('catalog.carrito_agregar') }}" class="d-flex gap-2 mt-auto">
 						<input type="hidden" name="id_producto" value="{{ p.id_producto }}" />
-						<input
-							type="number"
-							name="cantidad"
-							min="1"
-							max="5"
-							value="1"
-							class="form-control form-control-sm text-center"
-							style="width: 70px" />
+						<input type="number" name="cantidad" min="1" max="5" value="1"
+							class="form-control form-control-sm text-center" style="width: 70px" />
 						<button type="submit" class="btn btn-primary btn-sm flex-grow-1">
 							<i class="bi bi-cart-plus"></i>
 							Agregar
@@ -73,4 +60,137 @@
 		{% endfor %}
 	</div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const cartIcon = document.querySelector('.bi-cart3');
+		let badge = null;
+		if (cartIcon) {
+			badge = cartIcon.nextElementSibling;
+			if (badge && badge.classList.contains('badge')) {
+				badge.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+			} else {
+				badge = cartIcon.parentElement.querySelector('.badge');
+				if (badge) {
+					badge.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+				}
+			}
+		}
+
+		document.querySelectorAll('form[action*="carrito/agregar"]').forEach(form => {
+			form.addEventListener('submit', async (e) => {
+				e.preventDefault();
+
+				const submitBtn = form.querySelector('button[type="submit"]');
+				const originalBtnHtml = submitBtn.innerHTML;
+				submitBtn.disabled = true;
+				submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>...';
+
+				const formData = new FormData(form);
+
+				try {
+					const response = await fetch(form.action, {
+						method: 'POST',
+						body: formData,
+						headers: {
+							'X-Requested-With': 'XMLHttpRequest'
+						}
+					});
+
+					const result = await response.json();
+
+					if (response.ok && result.success) {
+						// Elementos para animación
+						const card = form.closest('.product-card');
+						const imgWrapper = card.querySelector('.product-img-wrapper');
+						const visualElement = imgWrapper.querySelector('img') || imgWrapper.querySelector('span');
+
+						if (visualElement && badge) {
+							const elementRect = visualElement.getBoundingClientRect();
+							const cartRect = badge.getBoundingClientRect();
+
+							const clone = visualElement.cloneNode(true);
+							document.body.appendChild(clone);
+
+							clone.style.position = 'fixed';
+							clone.style.top = `${elementRect.top}px`;
+							clone.style.left = `${elementRect.left}px`;
+							clone.style.width = `${elementRect.width}px`;
+							clone.style.height = `${elementRect.height}px`;
+							clone.style.margin = '0';
+							clone.style.zIndex = '9999';
+							clone.style.opacity = '0.9';
+							clone.style.pointerEvents = 'none';
+
+							if (clone.tagName.toLowerCase() === 'img') {
+								clone.style.objectFit = 'cover';
+								clone.style.borderRadius = '50%';
+							} else {
+								clone.style.display = 'flex';
+								clone.style.alignItems = 'center';
+								clone.style.justifyContent = 'center';
+							}
+
+							clone.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+							// Forzar repaint
+							clone.getBoundingClientRect();
+
+							// Iniciar vuelo al badge
+							clone.style.top = `${cartRect.top}px`;
+							clone.style.left = `${cartRect.left}px`;
+							clone.style.width = '20px';
+							clone.style.height = '20px';
+							clone.style.opacity = '0';
+							clone.style.transform = 'scale(0.1)';
+
+							setTimeout(() => {
+								if (document.body.contains(clone)) {
+									document.body.removeChild(clone);
+								}
+
+								// Actualizar contador y animar badge
+								if (result.cart_count !== undefined) {
+									badge.innerText = result.cart_count;
+									if (result.cart_count > 0) {
+										badge.style.display = 'inline-block';
+									} else {
+										badge.style.display = 'none';
+									}
+								}
+
+								badge.style.transform = 'translate(-50%, -50%) scale(1.6)';
+								setTimeout(() => {
+									badge.style.transform = 'translate(-50%, -50%) scale(1)';
+								}, 200);
+
+							}, 600);
+						} else {
+							// Fallback si no hay elementos visuales
+							if (badge && result.cart_count !== undefined) {
+								badge.innerText = result.cart_count;
+								if (result.cart_count > 0) {
+									badge.style.display = 'inline-block';
+								} else {
+									badge.style.display = 'none';
+								}
+							}
+						}
+					} else {
+						alert(result.error || 'Error al agregar el producto');
+					}
+				} catch (error) {
+					console.error('Error:', error);
+					alert('Ocurrió un error de red.');
+				} finally {
+					submitBtn.disabled = false;
+					submitBtn.innerHTML = originalBtnHtml;
+				}
+			});
+		});
+	});
+</script>
 {% endblock %}

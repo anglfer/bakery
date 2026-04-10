@@ -97,7 +97,7 @@
 					Rechazada
 				</option>
 			</select>
-			<button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+			<button type="submit" class="btn btn-sm btn-primary text-white border-0">Filtrar</button>
 		</form>
 
 		<div class="ops-table table-responsive">
@@ -174,7 +174,7 @@
 							<div class="btn-action-group">
 								<button
 									type="button"
-									class="btn btn-sm btn-outline-primary btn-icon-sm js-detalle-solicitud"
+									class="btn btn-sm btn-primary text-white border-0 btn-icon-sm js-detalle-solicitud"
 									title="Ver detalle"
 									data-id="{{ s.id_solicitud }}"
 									data-producto-id="{{ producto.id_producto if producto else '' }}"
@@ -190,11 +190,11 @@
 									data-obs="{{ s.observaciones or '' }}"
 									data-obs-resolucion="{{ s.observaciones_resolucion or '' }}"
 									data-orden="{{ orden_vinculada.id_orden if orden_vinculada else '' }}">
-									<i class="bi bi-eye-fill"></i>
+									<i class="bi bi-eye-fill text-white"></i>
 								</button>
 								<button
 									type="button"
-									class="btn btn-sm btn-outline-warning btn-icon-sm js-resolver-solicitud"
+									class="btn btn-sm btn-warning text-white border-0 btn-icon-sm js-resolver-solicitud"
 									title="Resolver solicitud"
 									data-id="{{ s.id_solicitud }}"
 									data-producto-id="{{ producto.id_producto if producto else '' }}"
@@ -204,19 +204,19 @@
 									data-fecha="{{ s.fecha_solicitud.strftime('%Y-%m-%d') }}"
 									data-estado="{{ s.estado }}"
 									{{ 'disabled' if s.estado != 'PENDIENTE' else '' }}>
-									<i class="bi bi-check2-square"></i>
+									<i class="bi bi-check2-square text-white"></i>
 								</button>
 								{% if s.estado == 'APROBADA' and not orden_vinculada %}
 									<button
 										type="button"
-										class="btn btn-sm btn-outline-success btn-icon-sm js-generar-orden"
+										class="btn btn-sm btn-success text-white border-0 btn-icon-sm js-generar-orden"
 										title="Crear orden"
 										data-id="{{ s.id_solicitud }}"
 										data-producto-id="{{ producto.id_producto if producto else '' }}"
 										data-producto="{{ producto.nombre if producto else 'Producto' }}"
 										data-cantidad="{{ s.cantidad }}"
 										data-solicitante="{{ s.usuario_solicita.persona.nombre if s.usuario_solicita and s.usuario_solicita.persona else (s.usuario_solicita.username if s.usuario_solicita else '—') }}">
-										<i class="bi bi-diagram-3-fill"></i>
+										<i class="bi bi-diagram-3-fill text-white"></i>
 									</button>
 								{% endif %}
 								{% if orden_vinculada %}
@@ -267,7 +267,7 @@
 					<div id="detalleSolicitudOrden"></div>
 				</div>
 				<div class="modal-footer prod-orders-modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+					<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">Cerrar</button>
 				</div>
 			</div>
 		</div>
@@ -322,8 +322,8 @@
 						</div>
 					</div>
 					<div class="modal-footer prod-orders-modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-primary">
+						<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-success text-white border-0">
 							Guardar resolución
 						</button>
 					</div>
@@ -398,9 +398,9 @@
 						</span>
 					</div>
 					<div class="modal-footer prod-orders-modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-cpu-fill me-1"></i>
+						<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-success text-white border-0">
+							<i class="bi bi-cpu-fill me-1 text-white"></i>
 							Crear orden
 						</button>
 					</div>

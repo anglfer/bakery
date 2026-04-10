@@ -20,16 +20,16 @@ PASSWORD_RULE = Regexp(
 
 class LoginForm(FlaskForm):
     username = StringField(
-        "Usuario", validators=[DataRequired(), Length(min=3, max=60)]
+        "Usuario", validators=[DataRequired(message="El usuario es obligatorio"), Length(min=3, max=60)]
     )
-    password = PasswordField("Contrasena", validators=[DataRequired()])
+    password = PasswordField("Contrasena", validators=[DataRequired(message="La contraseña es obligatoria")])
     submit = SubmitField("Iniciar sesion")
 
 
 class Verify2FAForm(FlaskForm):
     code = StringField(
         "Codigo",
-        validators=[DataRequired(), Length(min=6, max=6)],
+        validators=[DataRequired(message="El codigo es obligatorio"), Length(min=6, max=6)],
     )
     submit = SubmitField("Verificar codigo")
 

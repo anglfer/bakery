@@ -48,8 +48,8 @@
 				</p>
 			</div>
 			{% if can_manage %}
-			<button type="button" class="btn btn-sm" id="btnNuevaOrden">
-				<i class="bi bi-plus-lg me-1"></i>
+			<button type="button" class="btn btn-primary text-white border-0 btn-sm" id="btnNuevaOrden">
+				<i class="bi bi-plus-lg me-1 text-white"></i>
 				Nueva orden
 			</button>
 			{% endif %}
@@ -110,7 +110,7 @@
 							<i class="bi bi-info-circle-fill"></i>
 							Datos de la orden
 						</div>
-						<div class="ops-grid prod-orders-header-grid">
+						<div class="ops-grid prod-orders-header-grid align-items-start">
 							<div>
 								<label class="form-label fw-semibold" for="crearOrdenSolicitud">
 									Solicitud aprobada (opcional)
@@ -118,11 +118,10 @@
 								<select id="crearOrdenSolicitud" name="id_solicitud" class="form-select">
 									<option value="">Sin solicitud vinculada</option>
 									{% for solicitud in solicitudes %}
-									<option
-										value="{{ solicitud.id_solicitud }}"
+									<option value="{{ solicitud.id_solicitud }}"
 										data-producto="{{ solicitud.id_producto }}"
-										data-cantidad="{{ solicitud.cantidad }}"
-										{{ 'selected' if id_solicitud_preseleccionada == solicitud.id_solicitud else '' }}>
+										data-cantidad="{{ solicitud.cantidad }}" {{ 'selected' if
+										id_solicitud_preseleccionada==solicitud.id_solicitud else '' }}>
 										SOL-{{ '%03d'|format(solicitud.id_solicitud) }} ·
 										{{ solicitud.producto.nombre }} · {{ solicitud.cantidad }} pzas
 									</option>
@@ -158,27 +157,16 @@
 									Cantidad a producir
 									<span class="text-danger">*</span>
 								</label>
-								<input
-									type="number"
-									id="crearOrdenCantidad"
-									name="cantidad"
-									class="form-control"
-									min="1"
-									step="1"
-									placeholder="Ej. 24"
-									required />
+								<input type="number" id="crearOrdenCantidad" name="cantidad" class="form-control"
+									min="1" step="1" placeholder="Ej. 24" required />
 								<small class="text-muted d-block mt-1" id="crearOrdenRendHint"></small>
 							</div>
 							<div>
 								<label class="form-label fw-semibold" for="crearOrdenObservaciones">
 									Observaciones
 								</label>
-								<input
-									type="text"
-									id="crearOrdenObservaciones"
-									name="observaciones"
-									class="form-control"
-									placeholder="Opcional..." />
+								<input type="text" id="crearOrdenObservaciones" name="observaciones"
+									class="form-control" placeholder="Opcional..." />
 							</div>
 						</div>
 					</div>
@@ -219,15 +207,15 @@
 					</div>
 				</div>
 				<div class="modal-footer border-0 prod-orders-modal-footer">
-					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="button" class="btn btn-outline-primary" id="btnVerificarMateriales">
-						<i class="bi bi-boxes me-1"></i>
+					<button type="button" class="btn btn-primary text-white border-0" id="btnVerificarMateriales">
+						<i class="bi bi-boxes me-1 text-white"></i>
 						Verificar materiales
 					</button>
-					<button type="submit" class="btn btn-primary">
-						<i class="bi bi-check2 me-1"></i>
+					<button type="submit" class="btn btn-success text-white border-0">
+						<i class="bi bi-check2 me-1 text-white"></i>
 						Crear orden
 					</button>
 				</div>
@@ -285,7 +273,7 @@
 				</div>
 			</div>
 			<div class="modal-footer border-0 prod-orders-modal-footer">
-				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+				<button type="button" class="btn btn-primary text-white border-0" data-bs-dismiss="modal">
 					Cerrar
 				</button>
 			</div>
@@ -308,10 +296,10 @@
 				<form method="post" id="formAccionOrden">
 					<input type="hidden" name="id_orden" id="accionOrdenId" />
 					<input type="hidden" name="action" id="accionOrdenTipo" />
-					<button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+					<button type="button" class="btn btn-primary text-white border-0 me-2" data-bs-dismiss="modal">
 						Cancelar
 					</button>
-					<button type="submit" class="btn" id="confirmOrdenBtn"></button>
+					<button type="submit" class="btn text-white border-0" id="confirmOrdenBtn"></button>
 				</form>
 			</div>
 		</div>
@@ -408,9 +396,9 @@
 		const viewButton = `
 			<button
 				type="button"
-				class="btn btn-sm btn-outline-primary"
+				class="btn btn-sm btn-primary text-white border-0"
 				onclick="verDetalleOrden(${orderItem.id_orden})">
-				<i class="bi bi-eye-fill"></i>
+				<i class="bi bi-eye-fill text-white"></i>
 				Ver
 			</button>
 		`;
@@ -424,16 +412,16 @@
 			actionButtons += `
 				<button
 					type="button"
-					class="btn btn-sm btn-outline-success"
+					class="btn btn-sm btn-success text-white border-0"
 					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'iniciar')">
-					<i class="bi bi-play-fill"></i>
+					<i class="bi bi-play-fill text-white"></i>
 					Iniciar
 				</button>
 				<button
 					type="button"
-					class="btn btn-sm btn-outline-danger"
+					class="btn btn-sm btn-danger text-white border-0"
 					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'cancelar')">
-					<i class="bi bi-x-lg"></i>
+					<i class="bi bi-x-lg text-white"></i>
 					Cancelar
 				</button>
 			`;
@@ -443,9 +431,9 @@
 			actionButtons += `
 				<button
 					type="button"
-					class="btn btn-sm btn-outline-secondary"
+					class="btn btn-sm btn-primary text-white border-0"
 					onclick="confirmarAccionOrden(${orderItem.id_orden}, 'finalizar')">
-					<i class="bi bi-check2-all"></i>
+					<i class="bi bi-check2-all text-white"></i>
 					Finalizar
 				</button>
 			`;
@@ -592,20 +580,18 @@
 			</div>
 			<div class="prod-orders-summary-card">
 				<span class="prod-orders-summary-label">Costo</span>
-				<strong>${
-					orderItem.costo_total && Number(orderItem.costo_total) > 0
-						? formatMoney(orderItem.costo_total)
-						: formatMoney(orderItem.costo_estimado)
-				}</strong>
+				<strong>${orderItem.costo_total && Number(orderItem.costo_total) > 0
+				? formatMoney(orderItem.costo_total)
+				: formatMoney(orderItem.costo_estimado)
+			}</strong>
 			</div>
 			<div class="prod-orders-summary-card">
 				<span class="prod-orders-summary-label">Fechas</span>
 				<strong>${orderItem.fecha_inicio_texto || '—'} / ${orderItem.fecha_fin_texto || '—'}</strong>
 			</div>
-			${
-				orderItem.observaciones
-					? `<div class="prod-orders-summary-card prod-orders-summary-wide"><span class="prod-orders-summary-label">Observaciones</span><strong>${orderItem.observaciones}</strong></div>`
-					: ''
+			${orderItem.observaciones
+				? `<div class="prod-orders-summary-card prod-orders-summary-wide"><span class="prod-orders-summary-label">Observaciones</span><strong>${orderItem.observaciones}</strong></div>`
+				: ''
 			}
 		`;
 	}
@@ -618,9 +604,8 @@
 		detailTitle.innerHTML = `<i class="bi bi-eye-fill me-2"></i>${orderItem.producto_nombre} — ${orderItem.folio}`;
 		renderDetailSummary(orderItem);
 		renderDetailRows(orderItem);
-		detailTypeChip.className = `ops-chip ${
-			orderItem.tipo_detalle === 'CONSUMIDO' ? 'success' : 'neutral'
-		}`;
+		detailTypeChip.className = `ops-chip ${orderItem.tipo_detalle === 'CONSUMIDO' ? 'success' : 'neutral'
+			}`;
 		detailTypeChip.textContent =
 			orderItem.tipo_detalle === 'CONSUMIDO'
 				? 'Consumo registrado'
@@ -788,9 +773,8 @@
 							<td>${formatQty(detalleItem.merma_pct)}%</td>
 							<td class="fw-semibold">${formatQty(detalleItem.cantidadReal)} ${detalleItem.unidad}</td>
 							<td>${formatQty(detalleItem.stockActual)} ${detalleItem.unidad}</td>
-							<td><span class="ops-chip ${chipClass}">${
-								detalleItem.suficiente ? 'OK' : 'Insuficiente'
-							}</span></td>
+							<td><span class="ops-chip ${chipClass}">${detalleItem.suficiente ? 'OK' : 'Insuficiente'
+						}</span></td>
 						</tr>
 					`;
 				})
@@ -838,7 +822,7 @@
 					title: '¿Iniciar producción?',
 					message: `Se descontará materia prima con merma para ${orderItem.producto_nombre} (${formatQty(orderItem.cantidad_producir)} pzas).`,
 					iconClass: 'success',
-					buttonClass: 'btn btn-success',
+					buttonClass: 'btn btn-success text-white border-0',
 					buttonText: 'Iniciar',
 				};
 			}
@@ -847,7 +831,7 @@
 					title: '¿Finalizar producción?',
 					message: `Se incrementará inventario de producto terminado para ${orderItem.producto_nombre}.`,
 					iconClass: 'neutral',
-					buttonClass: 'btn btn-primary',
+					buttonClass: 'btn btn-primary text-white border-0',
 					buttonText: 'Finalizar',
 				};
 			}
@@ -855,7 +839,7 @@
 				title: '¿Cancelar orden?',
 				message: `La orden ${orderItem.folio} pasará a estado cancelado.`,
 				iconClass: 'danger',
-				buttonClass: 'btn btn-danger',
+				buttonClass: 'btn btn-danger text-white border-0',
 				buttonText: 'Cancelar orden',
 			};
 		}
