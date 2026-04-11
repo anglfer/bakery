@@ -352,25 +352,20 @@ def _validar_pedido_producido_para_entrega(pedido: Pedido) -> None:
     if not solicitudes_ligadas:
         return
 
-    solicitudes_activas = [
-        solicitud
-        for solicitud in solicitudes_ligadas
-        if solicitud.estado in {"PENDIENTE", "APROBADA"}
-    ]
-    if solicitudes_activas:
-        raise ValueError("El pedido aún tiene solicitudes de producción sin cerrar")
-
-    solicitudes_rechazadas = [
-        solicitud
-        for solicitud in solicitudes_ligadas
-        if solicitud.estado == "RECHAZADA"
-    ]
-    if solicitudes_rechazadas:
-        raise ValueError(
-            "No se puede entregar: existe solicitud de producción rechazada"
-        )
-
     for solicitud in solicitudes_ligadas:
+        if solicitud.estado == "PENDIENTE":
+            raise ValueError("El pedido aún tiene solicitudes de producción sin cerrar")
+
+        if solicitud.estado == "RECHAZADA":
+            raise ValueError(
+                "No se puede entregar: existe solicitud de producción rechazada"
+            )
+
+        if solicitud.estado != "APROBADA":
+            raise ValueError(
+                "No se puede entregar: existe solicitud de producción con estado inválido"
+            )
+
         ordenes_vigentes = [
             orden for orden in solicitud.ordenes if orden.estado != "CANCELADO"
         ]
@@ -379,9 +374,7 @@ def _validar_pedido_producido_para_entrega(pedido: Pedido) -> None:
                 "No se puede entregar: falta la orden de producción vinculada"
             )
         if not any(orden.estado == "FINALIZADO" for orden in ordenes_vigentes):
-            raise ValueError(
-                "No se puede entregar: la producción aún no está finalizada"
-            )
+            raise ValueError("El pedido aún tiene solicitudes de producción sin cerrar")
 
 
 def _reservar_inventario_para_pedido(
@@ -948,8 +941,10 @@ def generar_venta_desde_pedido(
     id_usuario_movimiento = id_usuario_accion or pedido.id_usuario_cliente
     for d in detalles_ordenados:
         producto = _obtener_producto_bloqueado(d.id_producto)
-        if not producto or not producto.activo:
-            raise ValueError("Producto no disponible para entregar")
+        if not producto:
+            raise ValueError(
+                "No se puede entregar: uno de los productos del pedido ya no existe"
+            )
 
         disponible = int(producto.cantidad_disponible or 0)
         reservada = int(producto.cantidad_reservada or 0)

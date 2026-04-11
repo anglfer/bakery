@@ -53,3 +53,4 @@
 2026-04-10 22:02:33,529 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7
 2026-04-10 22:02:34,438 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=10
 2026-04-10 22:02:50,767 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=3; tipo_pago=EN_LINEA
+2026-04-10 22:39:23,113 INFO AUDIT|evento=PEDIDO_ENTREGADO_VENTA_GENERADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_pedido=3; id_venta=12; requiere_ticket=False
