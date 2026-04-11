@@ -54,3 +54,81 @@
 2026-04-10 22:02:34,438 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=10
 2026-04-10 22:02:50,767 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=3; tipo_pago=EN_LINEA
 2026-04-10 22:39:23,113 INFO AUDIT|evento=PEDIDO_ENTREGADO_VENTA_GENERADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_pedido=3; id_venta=12; requiere_ticket=False
+2026-04-10 22:47:32,671 ERROR Excepción no controlada en ruta /carrito
+Traceback (most recent call last):
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\common\security.py", line 57, in wrapped
+    return func(*args, **kwargs)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\routes.py", line 244, in carrito
+    return render_template(
+        "catalog/carrito_productos.html",
+    ...<4 lines>...
+        min_delivery_date=(date.today() + timedelta(days=3)),
+    )
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\templates\catalog\carrito_productos.html", line 1, in top-level template code
+    {% extends "base_template.html" %} {% block title %}Mi Carrito{% endblock %} {% block extra_css %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\templates\base_template.html", line 266, in top-level template code
+    {% endif %} {% endwith %} {% block content %}{% endblock %} {% if not is_staff %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\templates\catalog\carrito_productos.html", line 295, in block 'content'
+    max="{{ max_delivery_date.isoformat() }}" />
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'max_delivery_date' is undefined
+2026-04-10 22:47:37,159 ERROR Excepción no controlada en ruta /carrito
+Traceback (most recent call last):
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\common\security.py", line 57, in wrapped
+    return func(*args, **kwargs)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\routes.py", line 244, in carrito
+    return render_template(
+        "catalog/carrito_productos.html",
+    ...<4 lines>...
+        min_delivery_date=(date.today() + timedelta(days=3)),
+    )
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\templates\catalog\carrito_productos.html", line 1, in top-level template code
+    {% extends "base_template.html" %} {% block title %}Mi Carrito{% endblock %} {% block extra_css %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\templates\base_template.html", line 266, in top-level template code
+    {% endif %} {% endwith %} {% block content %}{% endblock %} {% if not is_staff %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\app\catalog\templates\catalog\carrito_productos.html", line 295, in block 'content'
+    max="{{ max_delivery_date.isoformat() }}" />
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\ferxx\OneDrive\Documentos\GitHub\bakery\.venv\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'max_delivery_date' is undefined

@@ -261,6 +261,7 @@ def checkout():
 
     fecha_entrega_raw = (request.form.get("fecha_entrega") or "").strip()
     tipo_entrega = (request.form.get("tipo_entrega") or "pickup").strip().lower()
+    acepta_privacidad = (request.form.get("acepta_privacidad") or "").strip()
 
     # Regla de negocio: pedidos web se pagan en linea con tarjeta
     # y se recolectan en sucursal.
@@ -291,6 +292,13 @@ def checkout():
 
     if tipo_entrega != "pickup":
         flash("Los pedidos solo pueden recolectarse en sucursal.", "warning")
+        return redirect(url_for("catalog.carrito"))
+
+    if acepta_privacidad != "1":
+        flash(
+            "Debes aceptar las políticas de privacidad para continuar.",
+            "warning",
+        )
         return redirect(url_for("catalog.carrito"))
 
     try:

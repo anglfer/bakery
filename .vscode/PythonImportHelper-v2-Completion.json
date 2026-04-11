@@ -8307,7 +8307,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def checkout():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    fecha_entrega_raw = (request.form.get(\"fecha_entrega\") or \"\").strip()\n    tipo_entrega = (request.form.get(\"tipo_entrega\") or \"pickup\").strip().lower()\n    # Regla de negocio: pedidos web se pagan en linea con tarjeta\n    # y se recolectan en sucursal.\n    tipo_pago_pedido = \"EN_LINEA\"\n    tipo_pago = \"TARJETA\"",
+        "peekOfCode": "def checkout():\n    guard = _guard_cliente_activo()\n    if guard:\n        return guard\n    fecha_entrega_raw = (request.form.get(\"fecha_entrega\") or \"\").strip()\n    tipo_entrega = (request.form.get(\"tipo_entrega\") or \"pickup\").strip().lower()\n    acepta_privacidad = (request.form.get(\"acepta_privacidad\") or \"\").strip()\n    # Regla de negocio: pedidos web se pagan en linea con tarjeta\n    # y se recolectan en sucursal.\n    tipo_pago_pedido = \"EN_LINEA\"",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
