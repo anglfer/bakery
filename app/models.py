@@ -852,7 +852,7 @@ def seed_base_catalog_data() -> None:
         ("Litro", "l", "VOLUMEN", Decimal("1000")),
         ("Mililitro", "ml", "VOLUMEN", Decimal("1")),
         ("Pieza", "pza", "CONTEO", Decimal("1")),
-        ("Costal", "cos", "MASA", Decimal("25000")),
+        ("Costal", "cos", "MASA", Decimal("20000")),
     )
 
     inspector = inspect(db.engine)
@@ -943,47 +943,80 @@ def seed_base_catalog_data() -> None:
                 },
             )
 
+    nombres_legacy = {
+        "Pastel Red Velvet": "Pastel de Red Velvet",
+        "Pastel de Frutos": "Pastel de Frutos Secos",
+        "Pastel Tres Leches": "Pastel de 3 Leches de Durazno",
+    }
+    for nombre_anterior, nombre_nuevo in nombres_legacy.items():
+        legado = Producto.query.filter_by(nombre=nombre_anterior).first()
+        destino = Producto.query.filter_by(nombre=nombre_nuevo).first()
+        if legado and not destino:
+            legado.nombre = nombre_nuevo
+
     productos_base = (
         (
             "Pastel de Chocolate",
-            "Humedo y cremoso, elaborado artesanalmente.",
-            Decimal("450.00"),
+            "Bizcocho de cacao con betun de chocolate semiamargo.",
+            Decimal("480.00"),
+            "img/productos/Pastel_de_chocolate.jpg",
         ),
-        ("Pastel Red Velvet", "Terciopelo rojo clasico con betun.", Decimal("480.00")),
         (
-            "Pastel de Frutos",
-            "Fruta fresca natural sobre bizcocho suave.",
+            "Pastel de Red Velvet",
+            "Terciopelo rojo con queso crema batido.",
+            Decimal("520.00"),
+            "img/productos/Pastel_de_red_velvet.jpg",
+        ),
+        (
+            "Pastel Helado de Oreo",
+            "Pastel frio con galleta Oreo molida y crema.",
+            Decimal("560.00"),
+            "img/productos/Pastel_helado_de_Oreo.jpg",
+        ),
+        (
+            "Pastel de Zanahoria",
+            "Pan especiado de zanahoria con nuez y canela.",
             Decimal("510.00"),
+            "img/productos/Pastel_de_zanahoria.jpg",
         ),
         (
-            "Pastel Tres Leches",
-            "Suave y esponjoso, banado en tres leches.",
-            Decimal("390.00"),
-        ),
-        ("Concha de Vainilla", "Artesanal, horneada cada dia.", Decimal("14.00")),
-        (
-            "Pay de Fresa",
-            "Relleno de crema pastelera y fresa fresca.",
-            Decimal("220.00"),
+            "Pastel de Vainilla",
+            "Bizcocho de vainilla clasico con crema batida.",
+            Decimal("450.00"),
+            "img/productos/Pastel_de_vainilla.jpg",
         ),
         (
-            "Cuernos de Mantequilla",
-            "Hojaldrados con mantequilla francesa.",
-            Decimal("28.00"),
+            "Pastel de Moka",
+            "Pastel de cafe y chocolate estilo moka.",
+            Decimal("540.00"),
+            "img/productos/Pastel_de_moka.jpg",
         ),
         (
-            "Muffin de Vainilla",
-            "Muffin suave de vainilla con chispas.",
-            Decimal("35.00"),
+            "Pastel de Frutos Secos",
+            "Pastel con mezcla de nueces y frutos secos.",
+            Decimal("590.00"),
+            "img/productos/Pastel_de_frutos_secos.jpg",
         ),
         (
-            "Brownie de Chocolate",
-            "Brownie denso de chocolate intenso.",
-            Decimal("42.00"),
+            "Pastel de 3 Leches de Durazno",
+            "Pastel tres leches con durazno en almibar.",
+            Decimal("530.00"),
+            "img/productos/Pastel_de_3_leches_de_durazno.jpg",
         ),
-        ("Galleta de Nuez", "Galleta suave y crujiente de nuez.", Decimal("18.00")),
+        (
+            "Chocoflan con Cajeta",
+            "Flan napolitano con pan de chocolate y cajeta.",
+            Decimal("500.00"),
+            "img/productos/Chocoflan_con_cajeta.jpg",
+        ),
+        (
+            "Cheesecake de Mora Azul",
+            "Cheesecake cremoso con cobertura de mora azul.",
+            Decimal("620.00"),
+            "img/productos/cheesecake_de_mora_azul.jpg",
+        ),
     )
-    for nombre, descripcion, precio in productos_base:
+    for nombre, descripcion, precio, imagen in productos_base:
         exists = Producto.query.filter_by(nombre=nombre).first()
         if not exists:
             db.session.add(
@@ -994,7 +1027,14 @@ def seed_base_catalog_data() -> None:
                     cantidad_disponible=10,
                     stock_minimo=5,
                     activo=True,
+                    imagen=imagen,
                 )
             )
+            continue
+
+        exists.descripcion = descripcion
+        exists.precio_venta = precio
+        exists.imagen = imagen
+        exists.activo = True
 
     db.session.commit()

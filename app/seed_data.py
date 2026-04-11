@@ -48,10 +48,87 @@ MP_HUEVO = "Huevo Fresco"
 PRODUCTO_PASTEL_CHOCOLATE = "Pastel de Chocolate"
 MXN_QUANTIZE = Decimal("0.01")
 
+LEGACY_PRODUCT_NAMES: dict[str, str] = {
+    "Pastel Red Velvet": "Pastel de Red Velvet",
+    "Pastel de Frutos": "Pastel de Frutos Secos",
+    "Pastel Tres Leches": "Pastel de 3 Leches de Durazno",
+}
+
+PRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (
+    (
+        "Pastel de Chocolate",
+        "Bizcocho de cacao con betun de chocolate semiamargo.",
+        Decimal("480.00"),
+        "img/productos/Pastel_de_chocolate.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Pastel de Red Velvet",
+        "Terciopelo rojo con queso crema batido.",
+        Decimal("520.00"),
+        "img/productos/Pastel_de_red_velvet.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Pastel Helado de Oreo",
+        "Pastel frio con galleta Oreo molida y crema.",
+        Decimal("560.00"),
+        "img/productos/Pastel_helado_de_Oreo.jpg",
+        Decimal("32.00"),
+    ),
+    (
+        "Pastel de Zanahoria",
+        "Pan especiado de zanahoria con nuez y canela.",
+        Decimal("510.00"),
+        "img/productos/Pastel_de_zanahoria.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Pastel de Vainilla",
+        "Bizcocho de vainilla clasico con crema batida.",
+        Decimal("450.00"),
+        "img/productos/Pastel_de_vainilla.jpg",
+        Decimal("28.00"),
+    ),
+    (
+        "Pastel de Moka",
+        "Pastel de cafe y chocolate estilo moka.",
+        Decimal("540.00"),
+        "img/productos/Pastel_de_moka.jpg",
+        Decimal("31.00"),
+    ),
+    (
+        "Pastel de Frutos Secos",
+        "Pastel con mezcla de nueces y frutos secos.",
+        Decimal("590.00"),
+        "img/productos/Pastel_de_frutos_secos.jpg",
+        Decimal("32.00"),
+    ),
+    (
+        "Pastel de 3 Leches de Durazno",
+        "Pastel tres leches con durazno en almibar.",
+        Decimal("530.00"),
+        "img/productos/Pastel_de_3_leches_de_durazno.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Chocoflan con Cajeta",
+        "Flan napolitano con pan de chocolate y cajeta.",
+        Decimal("500.00"),
+        "img/productos/Chocoflan_con_cajeta.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Cheesecake de Mora Azul",
+        "Cheesecake cremoso con cobertura de mora azul.",
+        Decimal("620.00"),
+        "img/productos/cheesecake_de_mora_azul.jpg",
+        Decimal("33.00"),
+    ),
+)
+
 DEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {
-    PRODUCTO_PASTEL_CHOCOLATE: Decimal("30.00"),
-    "Pay de Fresa": Decimal("28.00"),
-    "Galleta de Nuez": Decimal("25.00"),
+    nombre: margen for nombre, _, _, _, margen in PRODUCT_CATALOG
 }
 
 
@@ -105,6 +182,7 @@ def seed_full_data() -> None:
     _seed_roles_modules_permissions()
     users = _seed_people_and_users()
     _seed_measurement_units_metadata()
+    _seed_products_catalog_metadata()
     _seed_suppliers()
     _seed_raw_materials()
     _seed_recipes()
@@ -361,7 +439,7 @@ def _seed_measurement_units_metadata() -> None:
         "l": ("Litro", "VOLUMEN", Decimal("1000")),
         "ml": ("Mililitro", "VOLUMEN", Decimal("1")),
         "pza": ("Pieza", "CONTEO", Decimal("1")),
-        "cos": ("Costal", "MASA", Decimal("25000")),
+        "cos": ("Costal", "MASA", Decimal("20000")),
     }
 
     for unit in UnidadMedida.query.all():
@@ -376,13 +454,44 @@ def _seed_measurement_units_metadata() -> None:
     db.session.flush()
 
 
+def _seed_products_catalog_metadata() -> None:
+    for legacy_name, target_name in LEGACY_PRODUCT_NAMES.items():
+        legacy_product = Producto.query.filter_by(nombre=legacy_name).first()
+        target_product = Producto.query.filter_by(nombre=target_name).first()
+        if legacy_product and not target_product:
+            legacy_product.nombre = target_name
+
+    for nombre, descripcion, precio, imagen, _ in PRODUCT_CATALOG:
+        producto = Producto.query.filter_by(nombre=nombre).first()
+        if not producto:
+            db.session.add(
+                Producto(
+                    nombre=nombre,
+                    descripcion=descripcion,
+                    precio_venta=precio,
+                    cantidad_disponible=10,
+                    stock_minimo=5,
+                    activo=True,
+                    imagen=imagen,
+                )
+            )
+            continue
+
+        producto.descripcion = descripcion
+        producto.precio_venta = precio
+        producto.imagen = imagen
+        producto.activo = True
+
+    db.session.flush()
+
+
 def _seed_raw_materials() -> None:
     units = {u.abreviatura: u for u in UnidadMedida.query.all()}
     materials = [
         # name, unidad_base, unidad_compra, factor_conversion, merma%,
         # stock_minimo, stock_inicial, costo_unitario (MXN por unidad_base)
-        (MP_HARINA, "g", "cos", "25000", "2.0", "10000", "2000", "0.03"),
-        (MP_AZUCAR, "g", "cos", "25000", "0.5", "5000", "18000", "0.028"),
+        (MP_HARINA, "g", "cos", "20000", "2.0", "8000", "24000", "0.030"),
+        (MP_AZUCAR, "g", "cos", "20000", "0.5", "5000", "16000", "0.028"),
         (MP_MANTEQUILLA, "g", "kg", "1000", "1.5", "2000", "800", "0.16"),
         ("Cacao en Polvo", "g", "kg", "1000", "1.0", "3000", "3200", "0.22"),
         ("Leche Entera", "ml", "l", "1000", "0.0", "2000", "4500", "0.02"),
@@ -391,25 +500,113 @@ def _seed_raw_materials() -> None:
         ("Polvo de Hornear", "g", "kg", "1000", "0.0", "800", "900", "0.05"),
         ("Fresas Frescas", "g", "kg", "1000", "8.0", "1000", "1200", "0.09"),
         ("Nuez Pecana", "g", "kg", "1000", "3.0", "600", "700", "0.25"),
+        ("Queso Crema", "g", "kg", "1000", "1.0", "1800", "2600", "0.21"),
+        (
+            "Durazno en Almibar",
+            "g",
+            "kg",
+            "1000",
+            "0.5",
+            "1500",
+            "2500",
+            "0.10",
+        ),
+        ("Cafe Espresso", "g", "kg", "1000", "0.0", "400", "650", "0.42"),
+        ("Oreo Molida", "g", "kg", "1000", "0.0", "1200", "1800", "0.12"),
+        (
+            "Zanahoria Rallada",
+            "g",
+            "kg",
+            "1000",
+            "2.0",
+            "2000",
+            "2600",
+            "0.04",
+        ),
+        (
+            "Nuez de Castilla",
+            "g",
+            "kg",
+            "1000",
+            "2.0",
+            "800",
+            "900",
+            "0.29",
+        ),
+        ("Canela Molida", "g", "kg", "1000", "0.0", "200", "300", "0.16"),
+        (
+            "Leche Condensada",
+            "ml",
+            "l",
+            "1000",
+            "0.0",
+            "1200",
+            "2000",
+            "0.08",
+        ),
+        (
+            "Leche Evaporada",
+            "ml",
+            "l",
+            "1000",
+            "0.0",
+            "1200",
+            "2000",
+            "0.07",
+        ),
+        ("Cajeta", "g", "kg", "1000", "0.0", "900", "1400", "0.13"),
+        ("Mora Azul", "g", "kg", "1000", "4.0", "900", "1200", "0.20"),
+        (
+            "Crema para Batir",
+            "ml",
+            "l",
+            "1000",
+            "0.0",
+            "1400",
+            "2000",
+            "0.09",
+        ),
+        (
+            "Gelatina sin Sabor",
+            "g",
+            "kg",
+            "1000",
+            "0.0",
+            "100",
+            "180",
+            "0.35",
+        ),
     ]
 
     for name, base_u, buy_u, factor, merma, minimo, stock, costo in materials:
         exists = MateriaPrima.query.filter_by(nombre=name).first()
-        if exists:
-            continue
-        db.session.add(
-            MateriaPrima(
-                nombre=name,
-                id_unidad_base=units[base_u].id_unidad,
-                id_unidad_compra=units[buy_u].id_unidad,
-                factor_conversion=Decimal(factor),
-                porcentaje_merma=Decimal(merma),
-                costo_unitario=Decimal(costo),
-                stock_minimo=Decimal(minimo),
-                cantidad_disponible=Decimal(stock),
-                activa=True,
+        if not exists:
+            db.session.add(
+                MateriaPrima(
+                    nombre=name,
+                    id_unidad_base=units[base_u].id_unidad,
+                    id_unidad_compra=units[buy_u].id_unidad,
+                    factor_conversion=Decimal(factor),
+                    porcentaje_merma=Decimal(merma),
+                    costo_unitario=Decimal(costo),
+                    stock_minimo=Decimal(minimo),
+                    cantidad_disponible=Decimal(stock),
+                    activa=True,
+                )
             )
+            continue
+
+        exists.id_unidad_base = units[base_u].id_unidad
+        exists.id_unidad_compra = units[buy_u].id_unidad
+        exists.factor_conversion = Decimal(factor)
+        exists.porcentaje_merma = Decimal(merma)
+        exists.costo_unitario = Decimal(costo)
+        exists.stock_minimo = Decimal(minimo)
+        exists.cantidad_disponible = max(
+            Decimal(str(exists.cantidad_disponible)),
+            Decimal(stock),
         )
+        exists.activa = True
     db.session.flush()
 
 
@@ -425,19 +622,96 @@ def _seed_recipes() -> None:
             ("Vainilla Extracto", "5"),
             ("Polvo de Hornear", "8"),
         ],
-        "Pay de Fresa": [
-            (MP_HARINA, "180"),
-            (MP_MANTEQUILLA, "90"),
-            (MP_AZUCAR, "120"),
-            ("Fresas Frescas", "300"),
-            (MP_HUEVO, "2"),
+        "Pastel de Red Velvet": [
+            (MP_HARINA, "250"),
+            (MP_AZUCAR, "220"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "130"),
+            ("Leche Entera", "220"),
+            ("Vainilla Extracto", "5"),
+            ("Cacao en Polvo", "20"),
+            ("Polvo de Hornear", "8"),
+            ("Queso Crema", "180"),
         ],
-        "Galleta de Nuez": [
-            (MP_HARINA, "300"),
-            (MP_AZUCAR, "160"),
-            (MP_MANTEQUILLA, "150"),
+        "Pastel Helado de Oreo": [
+            ("Oreo Molida", "300"),
+            ("Queso Crema", "250"),
+            ("Crema para Batir", "300"),
+            (MP_AZUCAR, "120"),
+            (MP_MANTEQUILLA, "90"),
+            ("Gelatina sin Sabor", "12"),
+        ],
+        "Pastel de Zanahoria": [
+            (MP_HARINA, "260"),
+            (MP_AZUCAR, "210"),
+            (MP_HUEVO, "3"),
+            ("Zanahoria Rallada", "300"),
+            ("Nuez de Castilla", "120"),
+            ("Canela Molida", "5"),
+            ("Polvo de Hornear", "10"),
+            (MP_MANTEQUILLA, "110"),
+        ],
+        "Pastel de Vainilla": [
+            (MP_HARINA, "260"),
+            (MP_AZUCAR, "220"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "120"),
+            ("Leche Entera", "200"),
+            ("Vainilla Extracto", "8"),
+            ("Polvo de Hornear", "8"),
+        ],
+        "Pastel de Moka": [
+            (MP_HARINA, "240"),
+            (MP_AZUCAR, "220"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "120"),
+            ("Leche Entera", "180"),
+            ("Cafe Espresso", "20"),
+            ("Cacao en Polvo", "40"),
+            ("Polvo de Hornear", "8"),
+        ],
+        "Pastel de Frutos Secos": [
+            (MP_HARINA, "250"),
+            (MP_AZUCAR, "200"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "130"),
             ("Nuez Pecana", "100"),
-            (MP_HUEVO, "2"),
+            ("Nuez de Castilla", "80"),
+            ("Canela Molida", "4"),
+            ("Polvo de Hornear", "8"),
+        ],
+        "Pastel de 3 Leches de Durazno": [
+            (MP_HARINA, "230"),
+            (MP_AZUCAR, "180"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "100"),
+            ("Leche Entera", "200"),
+            ("Leche Condensada", "220"),
+            ("Leche Evaporada", "220"),
+            ("Durazno en Almibar", "250"),
+            ("Polvo de Hornear", "8"),
+            ("Vainilla Extracto", "6"),
+        ],
+        "Chocoflan con Cajeta": [
+            (MP_HARINA, "220"),
+            (MP_AZUCAR, "180"),
+            (MP_HUEVO, "4"),
+            (MP_MANTEQUILLA, "100"),
+            ("Leche Entera", "180"),
+            ("Cacao en Polvo", "60"),
+            ("Leche Condensada", "180"),
+            ("Cajeta", "200"),
+            ("Vainilla Extracto", "6"),
+            ("Polvo de Hornear", "8"),
+        ],
+        "Cheesecake de Mora Azul": [
+            ("Queso Crema", "500"),
+            ("Crema para Batir", "220"),
+            (MP_AZUCAR, "180"),
+            (MP_HUEVO, "3"),
+            (MP_MANTEQUILLA, "120"),
+            ("Mora Azul", "250"),
+            ("Gelatina sin Sabor", "10"),
         ],
     }
 
@@ -465,21 +739,26 @@ def _seed_recipes() -> None:
             db.session.flush()
         else:
             recipe.id_producto = product.id_producto
+            recipe.nombre = product.nombre
+            recipe.activa = True
 
         # asociar la receta creada al producto
         product.id_receta = recipe.id_receta
         db.session.add(product)
         db.session.flush()
 
+        ids_materia_receta: set[int] = set()
         for material_name, amount in detail_rows:
             material = materials.get(material_name)
             if not material:
                 continue
+            ids_materia_receta.add(material.id_materia)
             exists = DetalleReceta.query.filter_by(
                 id_receta=recipe.id_receta,
                 id_materia_prima=material.id_materia,
             ).first()
             if exists:
+                exists.cantidad_base = Decimal(amount)
                 continue
             db.session.add(
                 DetalleReceta(
@@ -488,6 +767,13 @@ def _seed_recipes() -> None:
                     cantidad_base=Decimal(amount),
                 )
             )
+
+        detalles_existentes = DetalleReceta.query.filter_by(
+            id_receta=recipe.id_receta
+        ).all()
+        for detalle in detalles_existentes:
+            if detalle.id_materia_prima not in ids_materia_receta:
+                db.session.delete(detalle)
 
     db.session.flush()
 
