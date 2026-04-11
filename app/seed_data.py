@@ -579,149 +579,203 @@ def _seed_raw_materials() -> None:
     ]
 
     for name, base_u, buy_u, factor, merma, minimo, stock, costo in materials:
+        unidad_base = units[base_u]
+        unidad_compra = units[buy_u]
+        es_conteo = (unidad_base.dimension or "CONTEO").upper() == "CONTEO"
+        factor_decimal = Decimal(factor)
+        minimo_decimal = Decimal(minimo)
+        stock_decimal = Decimal(stock)
+
+        if es_conteo:
+            factor_decimal = factor_decimal.to_integral_value(rounding=ROUND_HALF_UP)
+            minimo_decimal = minimo_decimal.to_integral_value(rounding=ROUND_HALF_UP)
+            stock_decimal = stock_decimal.to_integral_value(rounding=ROUND_HALF_UP)
+
         exists = MateriaPrima.query.filter_by(nombre=name).first()
         if not exists:
             db.session.add(
                 MateriaPrima(
                     nombre=name,
-                    id_unidad_base=units[base_u].id_unidad,
-                    id_unidad_compra=units[buy_u].id_unidad,
-                    factor_conversion=Decimal(factor),
+                    id_unidad_base=unidad_base.id_unidad,
+                    id_unidad_compra=unidad_compra.id_unidad,
+                    factor_conversion=factor_decimal,
                     porcentaje_merma=Decimal(merma),
                     costo_unitario=Decimal(costo),
-                    stock_minimo=Decimal(minimo),
-                    cantidad_disponible=Decimal(stock),
+                    stock_minimo=minimo_decimal,
+                    cantidad_disponible=stock_decimal,
                     activa=True,
                 )
             )
             continue
 
-        exists.id_unidad_base = units[base_u].id_unidad
-        exists.id_unidad_compra = units[buy_u].id_unidad
-        exists.factor_conversion = Decimal(factor)
+        exists.id_unidad_base = unidad_base.id_unidad
+        exists.id_unidad_compra = unidad_compra.id_unidad
+        exists.factor_conversion = factor_decimal
         exists.porcentaje_merma = Decimal(merma)
         exists.costo_unitario = Decimal(costo)
-        exists.stock_minimo = Decimal(minimo)
+        exists.stock_minimo = minimo_decimal
         exists.cantidad_disponible = max(
             Decimal(str(exists.cantidad_disponible)),
-            Decimal(stock),
+            stock_decimal,
         )
+        if es_conteo:
+            exists.cantidad_disponible = exists.cantidad_disponible.to_integral_value(
+                rounding=ROUND_HALF_UP
+            )
         exists.activa = True
     db.session.flush()
 
 
 def _seed_recipes() -> None:
-    recipes = {
-        "Pastel de Chocolate": [
-            (MP_HARINA, "250"),
-            ("Cacao en Polvo", "80"),
-            (MP_AZUCAR, "200"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "120"),
-            ("Leche Entera", "180"),
-            ("Vainilla Extracto", "5"),
-            ("Polvo de Hornear", "8"),
-        ],
-        "Pastel de Red Velvet": [
-            (MP_HARINA, "250"),
-            (MP_AZUCAR, "220"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "130"),
-            ("Leche Entera", "220"),
-            ("Vainilla Extracto", "5"),
-            ("Cacao en Polvo", "20"),
-            ("Polvo de Hornear", "8"),
-            ("Queso Crema", "180"),
-        ],
-        "Pastel Helado de Oreo": [
-            ("Oreo Molida", "300"),
-            ("Queso Crema", "250"),
-            ("Crema para Batir", "300"),
-            (MP_AZUCAR, "120"),
-            (MP_MANTEQUILLA, "90"),
-            ("Gelatina sin Sabor", "12"),
-        ],
-        "Pastel de Zanahoria": [
-            (MP_HARINA, "260"),
-            (MP_AZUCAR, "210"),
-            (MP_HUEVO, "3"),
-            ("Zanahoria Rallada", "300"),
-            ("Nuez de Castilla", "120"),
-            ("Canela Molida", "5"),
-            ("Polvo de Hornear", "10"),
-            (MP_MANTEQUILLA, "110"),
-        ],
-        "Pastel de Vainilla": [
-            (MP_HARINA, "260"),
-            (MP_AZUCAR, "220"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "120"),
-            ("Leche Entera", "200"),
-            ("Vainilla Extracto", "8"),
-            ("Polvo de Hornear", "8"),
-        ],
-        "Pastel de Moka": [
-            (MP_HARINA, "240"),
-            (MP_AZUCAR, "220"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "120"),
-            ("Leche Entera", "180"),
-            ("Cafe Espresso", "20"),
-            ("Cacao en Polvo", "40"),
-            ("Polvo de Hornear", "8"),
-        ],
-        "Pastel de Frutos Secos": [
-            (MP_HARINA, "250"),
-            (MP_AZUCAR, "200"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "130"),
-            ("Nuez Pecana", "100"),
-            ("Nuez de Castilla", "80"),
-            ("Canela Molida", "4"),
-            ("Polvo de Hornear", "8"),
-        ],
-        "Pastel de 3 Leches de Durazno": [
-            (MP_HARINA, "230"),
-            (MP_AZUCAR, "180"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "100"),
-            ("Leche Entera", "200"),
-            ("Leche Condensada", "220"),
-            ("Leche Evaporada", "220"),
-            ("Durazno en Almibar", "250"),
-            ("Polvo de Hornear", "8"),
-            ("Vainilla Extracto", "6"),
-        ],
-        "Chocoflan con Cajeta": [
-            (MP_HARINA, "220"),
-            (MP_AZUCAR, "180"),
-            (MP_HUEVO, "4"),
-            (MP_MANTEQUILLA, "100"),
-            ("Leche Entera", "180"),
-            ("Cacao en Polvo", "60"),
-            ("Leche Condensada", "180"),
-            ("Cajeta", "200"),
-            ("Vainilla Extracto", "6"),
-            ("Polvo de Hornear", "8"),
-        ],
-        "Cheesecake de Mora Azul": [
-            ("Queso Crema", "500"),
-            ("Crema para Batir", "220"),
-            (MP_AZUCAR, "180"),
-            (MP_HUEVO, "3"),
-            (MP_MANTEQUILLA, "120"),
-            ("Mora Azul", "250"),
-            ("Gelatina sin Sabor", "10"),
-        ],
+    recipes: dict[str, dict] = {
+        "Pastel de Chocolate": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "250"),
+                ("Cacao en Polvo", "80"),
+                (MP_AZUCAR, "200"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "120"),
+                ("Leche Entera", "180"),
+                ("Vainilla Extracto", "5"),
+                ("Polvo de Hornear", "8"),
+            ],
+        },
+        "Pastel de Red Velvet": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "250"),
+                (MP_AZUCAR, "220"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "130"),
+                ("Leche Entera", "220"),
+                ("Vainilla Extracto", "5"),
+                ("Cacao en Polvo", "20"),
+                ("Polvo de Hornear", "8"),
+                ("Queso Crema", "180"),
+            ],
+        },
+        "Pastel Helado de Oreo": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                ("Oreo Molida", "300"),
+                ("Queso Crema", "250"),
+                ("Crema para Batir", "300"),
+                (MP_MANTEQUILLA, "90"),
+                ("Leche Condensada", "180"),
+                ("Gelatina sin Sabor", "12"),
+            ],
+        },
+        "Pastel de Zanahoria": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "260"),
+                (MP_AZUCAR, "210"),
+                (MP_HUEVO, "3"),
+                ("Zanahoria Rallada", "300"),
+                ("Nuez de Castilla", "120"),
+                ("Canela Molida", "5"),
+                ("Polvo de Hornear", "10"),
+                (MP_MANTEQUILLA, "110"),
+            ],
+        },
+        "Pastel de Vainilla": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "260"),
+                (MP_AZUCAR, "220"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "120"),
+                ("Leche Entera", "200"),
+                ("Vainilla Extracto", "8"),
+                ("Polvo de Hornear", "8"),
+            ],
+        },
+        "Pastel de Moka": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "240"),
+                (MP_AZUCAR, "220"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "120"),
+                ("Leche Entera", "180"),
+                ("Cafe Espresso", "20"),
+                ("Cacao en Polvo", "40"),
+                ("Vainilla Extracto", "4"),
+                ("Polvo de Hornear", "8"),
+            ],
+        },
+        "Pastel de Frutos Secos": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "250"),
+                (MP_AZUCAR, "200"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "130"),
+                ("Nuez Pecana", "100"),
+                ("Nuez de Castilla", "80"),
+                ("Vainilla Extracto", "6"),
+                ("Canela Molida", "4"),
+                ("Polvo de Hornear", "8"),
+            ],
+        },
+        "Pastel de 3 Leches de Durazno": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "230"),
+                (MP_AZUCAR, "180"),
+                (MP_HUEVO, "3"),
+                (MP_MANTEQUILLA, "100"),
+                ("Leche Entera", "200"),
+                ("Leche Condensada", "220"),
+                ("Leche Evaporada", "220"),
+                ("Durazno en Almibar", "250"),
+                ("Polvo de Hornear", "8"),
+                ("Vainilla Extracto", "6"),
+            ],
+        },
+        "Chocoflan con Cajeta": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "220"),
+                (MP_AZUCAR, "180"),
+                (MP_HUEVO, "4"),
+                (MP_MANTEQUILLA, "100"),
+                ("Leche Entera", "180"),
+                ("Cacao en Polvo", "60"),
+                ("Leche Condensada", "180"),
+                ("Leche Evaporada", "160"),
+                ("Queso Crema", "150"),
+                ("Cajeta", "200"),
+                ("Vainilla Extracto", "6"),
+                ("Polvo de Hornear", "8"),
+            ],
+        },
+        "Cheesecake de Mora Azul": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                ("Oreo Molida", "220"),
+                (MP_MANTEQUILLA, "100"),
+                ("Queso Crema", "500"),
+                ("Crema para Batir", "220"),
+                (MP_AZUCAR, "180"),
+                (MP_HUEVO, "3"),
+                ("Mora Azul", "250"),
+                ("Gelatina sin Sabor", "10"),
+            ],
+        },
     }
 
     products = {p.nombre: p for p in Producto.query.all()}
     materials = {m.nombre: m for m in MateriaPrima.query.all()}
 
-    for product_name, detail_rows in recipes.items():
+    for product_name, recipe_data in recipes.items():
         product = products.get(product_name)
         if not product:
             continue
+
+        detail_rows = recipe_data["ingredientes"]
+        rendimiento_base = Decimal(str(recipe_data["rendimiento_base"]))
 
         recipe = Receta.query.filter_by(
             id_producto=product.id_producto,
@@ -732,7 +786,7 @@ def _seed_recipes() -> None:
                 id_producto=product.id_producto,
                 nombre=product.nombre,
                 version=1,
-                rendimiento_base=12,
+                rendimiento_base=rendimiento_base,
                 activa=True,
             )
             db.session.add(recipe)
@@ -740,7 +794,13 @@ def _seed_recipes() -> None:
         else:
             recipe.id_producto = product.id_producto
             recipe.nombre = product.nombre
+            recipe.rendimiento_base = rendimiento_base
             recipe.activa = True
+
+        Receta.query.filter(
+            Receta.id_producto == product.id_producto,
+            Receta.id_receta != recipe.id_receta,
+        ).update({"activa": False}, synchronize_session=False)
 
         # asociar la receta creada al producto
         product.id_receta = recipe.id_receta

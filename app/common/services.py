@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal
 
 from flask import current_app
 
@@ -57,6 +57,15 @@ def _to_mxn(value: Decimal) -> Decimal:
 
 def _to_unit_cost(value: Decimal) -> Decimal:
     return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)
+
+
+def _is_integer_decimal(value: Decimal) -> bool:
+    decimal_value = Decimal(str(value))
+    return decimal_value == decimal_value.to_integral_value()
+
+
+def _as_integer_decimal(value: Decimal) -> Decimal:
+    return Decimal(str(value)).to_integral_value()
 
 
 def _nombre_negocio_ticket() -> str:
@@ -139,6 +148,44 @@ def _inferir_factor_conversion_por_unidades(
     return factor_compra / factor_base
 
 
+def _validar_reglas_conteo_materia(
+    *,
+    id_unidad_base: int,
+    id_unidad_compra: int,
+    factor_conversion: Decimal,
+    stock_minimo: Decimal | None = None,
+    cantidad_inicial: Decimal | None = None,
+) -> tuple[UnidadMedida, UnidadMedida]:
+    unidad_base = UnidadMedida.query.get(id_unidad_base)
+    unidad_compra = UnidadMedida.query.get(id_unidad_compra)
+    if not unidad_base or not unidad_compra:
+        raise ValueError("Debes seleccionar unidades válidas")
+
+    dimension_base = (unidad_base.dimension or "CONTEO").upper()
+    dimension_compra = (unidad_compra.dimension or "CONTEO").upper()
+    if dimension_base != dimension_compra:
+        raise ValueError(
+            "La unidad base y la unidad de compra deben compartir dimensión"
+        )
+
+    factor_decimal = Decimal(str(factor_conversion))
+    if dimension_base == "CONTEO":
+        if not _is_integer_decimal(factor_decimal):
+            raise ValueError(
+                "Para unidades de conteo (pza), el factor de conversión debe ser entero"
+            )
+        if stock_minimo is not None and not _is_integer_decimal(stock_minimo):
+            raise ValueError(
+                "Para unidades de conteo (pza), el stock mínimo debe ser entero"
+            )
+        if cantidad_inicial is not None and not _is_integer_decimal(cantidad_inicial):
+            raise ValueError(
+                "Para unidades de conteo (pza), la cantidad inicial debe ser entera"
+            )
+
+    return unidad_base, unidad_compra
+
+
 def _obtener_pedido_bloqueado(id_pedido: int) -> Pedido | None:
     return Pedido.query.filter_by(id_pedido=id_pedido).with_for_update().first()
 
@@ -212,6 +259,12 @@ def _obtener_consumo_materias_para_orden(
         porcentaje_merma = Decimal(str(materia.porcentaje_merma or 0))
         merma_factor = Decimal("1") + (porcentaje_merma / Decimal("100"))
         cantidad_real = cantidad_necesaria * merma_factor
+        dimension_base = (materia.unidad_base.dimension or "CONTEO").upper()
+        if dimension_base == "CONTEO":
+            cantidad_necesaria = cantidad_necesaria.to_integral_value(
+                rounding=ROUND_CEILING
+            )
+            cantidad_real = cantidad_real.to_integral_value(rounding=ROUND_CEILING)
         stock_previo = Decimal(str(materia.cantidad_disponible or 0))
         consumos.append(
             {
@@ -453,6 +506,12 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
         if precio_unitario < 0:
             raise ValueError("El precio unitario no puede ser negativo")
 
+        dimension_compra = (materia.unidad_compra.dimension or "CONTEO").upper()
+        if dimension_compra == "CONTEO" and not _is_integer_decimal(cantidad_comprada):
+            raise ValueError(
+                f"La materia prima '{materia.nombre}' usa conteo y la cantidad comprada debe ser entera"
+            )
+
         factor_conversion = Decimal(str(materia.factor_conversion))
         if factor_conversion <= 0:
             raise ValueError(
@@ -463,6 +522,14 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
         cantidad_base = cantidad_comprada * factor_conversion
         if cantidad_base <= 0:
             raise ValueError("La cantidad convertida debe ser mayor a cero")
+
+        dimension_base = (materia.unidad_base.dimension or "CONTEO").upper()
+        if dimension_base == "CONTEO":
+            if not _is_integer_decimal(cantidad_base):
+                raise ValueError(
+                    f"La materia prima '{materia.nombre}' requiere conversión entera en unidades de conteo"
+                )
+            cantidad_base = _as_integer_decimal(cantidad_base)
 
         _actualizar_costo_unitario_materia_prima_desde_compra(
             materia=materia,
@@ -484,6 +551,10 @@ def registrar_compra(compra: Compra, detalles: list[dict]) -> Compra:
         materia.cantidad_disponible = (
             Decimal(str(materia.cantidad_disponible)) + cantidad_base
         )
+        if dimension_base == "CONTEO":
+            materia.cantidad_disponible = _as_integer_decimal(
+                materia.cantidad_disponible
+            )
 
         movimiento = MovimientoInventarioMP(
             id_materia_prima=materia.id_materia,
@@ -528,6 +599,15 @@ def crear_materia_prima(
         if not factor_inferido or factor_inferido <= 0:
             raise ValueError("El factor de conversion debe ser mayor a cero")
         factor_conversion = factor_inferido
+
+    _validar_reglas_conteo_materia(
+        id_unidad_base=id_unidad_base,
+        id_unidad_compra=id_unidad_compra,
+        factor_conversion=factor_conversion,
+        stock_minimo=stock_minimo,
+        cantidad_inicial=cantidad_inicial,
+    )
+
     if porcentaje_merma < 0:
         raise ValueError("El porcentaje de merma no puede ser negativo")
     if stock_minimo < 0 or cantidad_inicial < 0:
@@ -543,10 +623,22 @@ def crear_materia_prima(
         nombre=nombre_limpio,
         id_unidad_base=id_unidad_base,
         id_unidad_compra=id_unidad_compra,
-        factor_conversion=factor_conversion,
+        factor_conversion=(
+            _as_integer_decimal(factor_conversion)
+            if _is_integer_decimal(factor_conversion)
+            else factor_conversion
+        ),
         porcentaje_merma=porcentaje_merma,
-        stock_minimo=stock_minimo,
-        cantidad_disponible=cantidad_inicial,
+        stock_minimo=(
+            _as_integer_decimal(stock_minimo)
+            if _is_integer_decimal(stock_minimo)
+            else stock_minimo
+        ),
+        cantidad_disponible=(
+            _as_integer_decimal(cantidad_inicial)
+            if _is_integer_decimal(cantidad_inicial)
+            else cantidad_inicial
+        ),
         activa=True,
     )
     db.session.add(materia)
@@ -594,6 +686,14 @@ def actualizar_materia_prima(
         if not factor_inferido or factor_inferido <= 0:
             raise ValueError("El factor de conversion debe ser mayor a cero")
         factor_conversion = factor_inferido
+
+    _validar_reglas_conteo_materia(
+        id_unidad_base=id_unidad_base,
+        id_unidad_compra=id_unidad_compra,
+        factor_conversion=factor_conversion,
+        stock_minimo=stock_minimo,
+    )
+
     if porcentaje_merma < 0:
         raise ValueError("El porcentaje de merma no puede ser negativo")
     if stock_minimo < 0:
@@ -609,9 +709,17 @@ def actualizar_materia_prima(
     materia.nombre = nombre_limpio
     materia.id_unidad_base = id_unidad_base
     materia.id_unidad_compra = id_unidad_compra
-    materia.factor_conversion = factor_conversion
+    materia.factor_conversion = (
+        _as_integer_decimal(factor_conversion)
+        if _is_integer_decimal(factor_conversion)
+        else factor_conversion
+    )
     materia.porcentaje_merma = porcentaje_merma
-    materia.stock_minimo = stock_minimo
+    materia.stock_minimo = (
+        _as_integer_decimal(stock_minimo)
+        if _is_integer_decimal(stock_minimo)
+        else stock_minimo
+    )
 
     recalcular_costos_productos_afectados_por_materias(ids_materia=[materia.id_materia])
     db.session.commit()

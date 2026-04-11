@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -427,12 +427,31 @@ def inventario_mp():
                 flash("Materia prima no encontrada.", "danger")
                 return redirect(url_for("production.inventario_mp"))
 
+            dimension_base = (
+                materia.unidad_base.dimension if materia.unidad_base else "CONTEO"
+            )
+            dimension_base = (dimension_base or "CONTEO").upper()
+            if dimension_base == "CONTEO" and cantidad != cantidad.to_integral_value():
+                flash(
+                    "Para materias primas por pieza (conteo), la cantidad del movimiento debe ser entera.",
+                    "danger",
+                )
+                return redirect(url_for("production.inventario_mp"))
+
             disponible = Decimal(str(materia.cantidad_disponible))
+            if dimension_base == "CONTEO":
+                disponible = disponible.to_integral_value(rounding=ROUND_HALF_UP)
             nueva_cantidad = disponible
             if tipo == "ENTRADA":
                 nueva_cantidad = disponible + cantidad
             elif tipo in {"SALIDA", "AJUSTE"}:
                 nueva_cantidad = disponible - cantidad
+
+            if dimension_base == "CONTEO":
+                nueva_cantidad = nueva_cantidad.to_integral_value(
+                    rounding=ROUND_HALF_UP
+                )
+                cantidad = cantidad.to_integral_value(rounding=ROUND_HALF_UP)
 
             if nueva_cantidad < 0:
                 flash("La cantidad no puede ser negativa.", "danger")

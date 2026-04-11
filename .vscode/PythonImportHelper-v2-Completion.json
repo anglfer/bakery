@@ -566,6 +566,30 @@
         "documentation": {}
     },
     {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -2233,6 +2257,14 @@
         "documentation": {}
     },
     {
+        "label": "Email",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "EqualTo",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
@@ -2265,7 +2297,7 @@
         "documentation": {}
     },
     {
-        "label": "DataRequired",
+        "label": "InputRequired",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -2282,6 +2314,14 @@
     },
     {
         "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "InputRequired",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -2306,6 +2346,14 @@
     },
     {
         "label": "DataRequired",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "InputRequired",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -3321,6 +3369,14 @@
         "documentation": {}
     },
     {
+        "label": "ROUND_CEILING",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
         "label": "ROUND_HALF_UP",
         "importPath": "decimal",
         "description": "decimal",
@@ -3338,6 +3394,14 @@
     },
     {
         "label": "Decimal",
+        "importPath": "decimal",
+        "description": "decimal",
+        "isExtraImport": true,
+        "detail": "decimal",
+        "documentation": {}
+    },
+    {
+        "label": "ROUND_HALF_UP",
         "importPath": "decimal",
         "description": "decimal",
         "isExtraImport": true,
@@ -3658,6 +3722,14 @@
     },
     {
         "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "make_response",
         "importPath": "flask",
         "description": "flask",
         "isExtraImport": true,
@@ -4009,6 +4081,14 @@
         "documentation": {}
     },
     {
+        "label": "ProveedorForm",
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "isExtraImport": true,
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
         "label": "smtplib",
         "kind": 6,
         "isExtraImport": true,
@@ -4284,6 +4364,14 @@
         "documentation": {}
     },
     {
+        "label": "MateriaPrimaForm",
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "isExtraImport": true,
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
         "label": "secure_filename",
         "importPath": "werkzeug.utils",
         "description": "werkzeug.utils",
@@ -4297,6 +4385,14 @@
         "description": "app.sales",
         "isExtraImport": true,
         "detail": "app.sales",
+        "documentation": {}
+    },
+    {
+        "label": "SalidaEfectivoForm",
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "isExtraImport": true,
+        "detail": "app.sales.forms",
         "documentation": {}
     },
     {
@@ -4386,6 +4482,14 @@
         "description": "config.development",
         "isExtraImport": true,
         "detail": "config.development",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -7834,7 +7938,7 @@
         "kind": 6,
         "importPath": "app.admin.forms",
         "description": "app.admin.forms",
-        "peekOfCode": "class ProveedorForm(FlaskForm):\n    nombre_empresa = StringField(\n        \"Nombre proveedor\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    nombre_contacto = StringField(\n        \"Nombre contacto\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    telefono = StringField(",
+        "peekOfCode": "class ProveedorForm(FlaskForm):\n    nombre_empresa = StringField(\n        \"Nombre proveedor\",\n        validators=[DataRequired(message=\"El nombre del proveedor es obligatorio.\"), Length(max=120, message=\"Máximo 120 caracteres.\")],\n    )\n    nombre_contacto = StringField(\n        \"Nombre contacto\",\n        validators=[DataRequired(message=\"El nombre del contacto es obligatorio.\"), Length(max=120, message=\"Máximo 120 caracteres.\")],\n    )\n    telefono = StringField(",
         "detail": "app.admin.forms",
         "documentation": {}
     },
@@ -7933,7 +8037,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def proveedores():\n    if request.method == \"POST\":\n        if not _can_create_supplier():\n            flash(\"No tienes permiso para registrar proveedores.\", \"danger\")\n            return redirect(url_for(SUPPLIERS_ENDPOINT))\n        nombre = (\n            request.form.get(\"nombre_proveedor\", \"\").strip()\n            or request.form.get(\"nombre_empresa\", \"\").strip()\n        )\n        nombre_contacto = request.form.get(\"nombre_contacto\", \"\").strip()",
+        "peekOfCode": "def proveedores():\n    form = ProveedorForm()\n    if form.validate_on_submit():\n        if not _can_create_supplier():\n            flash(\"No tienes permiso para registrar proveedores.\", \"danger\")\n            return redirect(url_for(SUPPLIERS_ENDPOINT))\n        nombre = form.nombre_empresa.data.strip()\n        nombre_contacto = form.nombre_contacto.data.strip()\n        telefono = form.telefono.data.strip()\n        correo = form.correo.data.strip().lower()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -8041,7 +8145,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(message=\"El usuario es obligatorio\"), Length(min=3, max=60)]\n    )\n    password = PasswordField(\"Contrasena\", validators=[DataRequired(message=\"La contraseña es obligatoria\")])\n    submit = SubmitField(\"Iniciar sesion\")\nclass Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(message=\"El codigo es obligatorio\"), Length(min=6, max=6)],",
+        "peekOfCode": "class LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\",\n        validators=[\n            DataRequired(message=\"El usuario es obligatorio\"),\n            Length(min=3, max=60, message=\"Entre 3 y 60 caracteres.\"),\n        ],\n    )\n    password = PasswordField(\n        \"Contrasena\", validators=[DataRequired(message=\"La contraseña es obligatoria\")]",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8050,7 +8154,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[DataRequired(message=\"El codigo es obligatorio\"), Length(min=6, max=6)],\n    )\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],",
+        "peekOfCode": "class Verify2FAForm(FlaskForm):\n    code = StringField(\n        \"Codigo\",\n        validators=[\n            DataRequired(message=\"El codigo es obligatorio\"),\n            Length(min=6, max=6, message=\"Debe ser de 6 caracteres.\"),\n        ],\n    )\n    submit = SubmitField(\"Verificar codigo\")\nclass RegisterClientForm(FlaskForm):",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8059,7 +8163,7 @@
         "kind": 6,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "class RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(max=100)],\n    )\n    apellidos = StringField(\n        \"Apellido\",\n        validators=[DataRequired(), Length(max=120)],\n    )\n    telefono = StringField(",
+        "peekOfCode": "class RegisterClientForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[\n            DataRequired(message=\"El nombre es obligatorio.\"),\n            Length(max=100, message=\"Máximo 100 caracteres.\"),\n        ],\n    )\n    apellidos = StringField(\n        \"Apellido\",",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8068,7 +8172,7 @@
         "kind": 5,
         "importPath": "app.auth.forms",
         "description": "app.auth.forms",
-        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=(\n        \"Minimo 8 caracteres con mayuscula, minuscula, \" \"numero y caracter especial.\"\n    ),\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\", validators=[DataRequired(message=\"El usuario es obligatorio\"), Length(min=3, max=60)]\n    )",
+        "peekOfCode": "PASSWORD_RULE = Regexp(\n    r\"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$\",\n    message=(\n        \"Minimo 8 caracteres con mayuscula, minuscula, \" \"numero y caracter especial.\"\n    ),\n)\nclass LoginForm(FlaskForm):\n    username = StringField(\n        \"Usuario\",\n        validators=[",
         "detail": "app.auth.forms",
         "documentation": {}
     },
@@ -8086,7 +8190,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def verify_2fa():\n    user_id = session.get(\"pending_2fa_user\")\n    if not user_id:\n        return redirect(url_for(LOGIN_ENDPOINT))\n    usuario = Usuario.query.get(user_id)\n    if not usuario:\n        session.pop(\"pending_2fa_user\", None)\n        return redirect(url_for(LOGIN_ENDPOINT))\n    form = Verify2FAForm()\n    if form.validate_on_submit():",
+        "peekOfCode": "def verify_2fa():\n    user_id = session.get(\"pending_2fa_user\")\n    if not user_id:\n        return redirect(url_for(LOGIN_ENDPOINT))\n    usuario = Usuario.query.get(user_id)\n    if not usuario:\n        session.pop(\"pending_2fa_user\", None)\n        return redirect(url_for(LOGIN_ENDPOINT))\n    form = Verify2FAForm()\n    es_registro_nuevo = session.get(\"es_registro_nuevo\", False)",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -8095,7 +8199,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def registro_cliente():\n    form = RegisterClientForm()\n    if form.validate_on_submit():\n        username = form.username.data.strip()\n        existe_user = Usuario.query.filter(\n            db.func.lower(Usuario.username) == username.lower()\n        ).first()\n        if existe_user:\n            flash(\n                \"El nombre de usuario ya existe. Elige uno diferente.\",",
+        "peekOfCode": "def registro_cliente():\n    form = RegisterClientForm()\n    if form.validate_on_submit():\n        username = form.username.data.strip()\n        correo = form.correo.data.strip()\n        # Verificar que el usuario no exista\n        existe_user = Usuario.query.filter(\n            db.func.lower(Usuario.username) == username.lower()\n        ).first()\n        if existe_user:",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -8149,7 +8253,7 @@
         "kind": 6,
         "importPath": "app.catalog.forms",
         "description": "app.catalog.forms",
-        "peekOfCode": "class CarritoForm(FlaskForm):\n    cantidad = IntegerField(\n        \"Cantidad\", validators=[DataRequired(), NumberRange(min=1, max=5)]\n    )\n    submit = SubmitField(\"Agregar\")",
+        "peekOfCode": "class CarritoForm(FlaskForm):\n    cantidad = IntegerField(\n        \"Cantidad\", validators=[InputRequired(message=\"La cantidad es obligatoria.\"), NumberRange(min=1, max=5, message=\"La cantidad debe ser entre 1 y 5.\")]\n    )\n    submit = SubmitField(\"Agregar\")",
         "detail": "app.catalog.forms",
         "documentation": {}
     },
@@ -8464,7 +8568,7 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _nombre_negocio_ticket() -> str:\n    nombre = current_app.config.get(\"BUSINESS_NAME\", \"SoftBakery\")\n    return str(nombre).strip() or \"SoftBakery\"\ndef _crear_ticket_venta(id_venta: int) -> None:",
+        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nUNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _is_integer_decimal(value: Decimal) -> bool:\n    decimal_value = Decimal(str(value))\n    return decimal_value == decimal_value.to_integral_value()\ndef _as_integer_decimal(value: Decimal) -> Decimal:",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -8473,7 +8577,7 @@
         "kind": 5,
         "importPath": "app.common.services",
         "description": "app.common.services",
-        "peekOfCode": "UNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _nombre_negocio_ticket() -> str:\n    nombre = current_app.config.get(\"BUSINESS_NAME\", \"SoftBakery\")\n    return str(nombre).strip() or \"SoftBakery\"\ndef _crear_ticket_venta(id_venta: int) -> None:\n    folio = f\"SB-{id_venta:06d}\"",
+        "peekOfCode": "UNIT_COST_QUANTIZE = Decimal(\"0.0001\")\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _to_unit_cost(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(UNIT_COST_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _is_integer_decimal(value: Decimal) -> bool:\n    decimal_value = Decimal(str(value))\n    return decimal_value == decimal_value.to_integral_value()\ndef _as_integer_decimal(value: Decimal) -> Decimal:\n    return Decimal(str(value)).to_integral_value()",
         "detail": "app.common.services",
         "documentation": {}
     },
@@ -8482,7 +8586,7 @@
         "kind": 6,
         "importPath": "app.production.forms",
         "description": "app.production.forms",
-        "peekOfCode": "class SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired()])\n    cantidad = IntegerField(\"Cantidad\", validators=[DataRequired(), NumberRange(min=1)])\n    submit = SubmitField(\"Enviar solicitud\")\nclass MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(min=2, max=120)],\n    )\n    id_unidad_base = SelectField(",
+        "peekOfCode": "class SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired(message=\"Este campo es obligatorio.\")])\n    cantidad = IntegerField(\"Cantidad\", validators=[InputRequired(message=\"La cantidad es obligatoria.\"), NumberRange(min=1, message=\"Debe ser mayor o igual a 1.\")])\n    submit = SubmitField(\"Enviar solicitud\")\nclass MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(message=\"El nombre es obligatorio.\"), Length(min=2, max=120, message=\"Entre 2 y 120 caracteres.\")],\n    )\n    id_unidad_base = SelectField(",
         "detail": "app.production.forms",
         "documentation": {}
     },
@@ -8491,7 +8595,7 @@
         "kind": 6,
         "importPath": "app.production.forms",
         "description": "app.production.forms",
-        "peekOfCode": "class MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(), Length(min=2, max=120)],\n    )\n    id_unidad_base = SelectField(\n        \"Unidad base\",\n        coerce=int,\n        validators=[DataRequired()],\n    )",
+        "peekOfCode": "class MateriaPrimaForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre\",\n        validators=[DataRequired(message=\"El nombre es obligatorio.\"), Length(min=2, max=120, message=\"Entre 2 y 120 caracteres.\")],\n    )\n    id_unidad_base = SelectField(\n        \"Unidad base\",\n        coerce=int,\n        validators=[DataRequired(message=\"Este campo es obligatorio.\")],\n    )",
         "detail": "app.production.forms",
         "documentation": {}
     },
@@ -8509,7 +8613,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def inventario_mp():\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\":\n            try:\n                materia = crear_materia_prima(\n                    nombre=request.form.get(\"nombre\", \"\"),\n                    id_unidad_base=_int(request.form.get(\"id_unidad_base\", \"0\")),\n                    id_unidad_compra=_int(request.form.get(\"id_unidad_compra\", \"0\")),\n                    factor_conversion=_decimal(",
+        "peekOfCode": "def inventario_mp():\n    form_mp = MateriaPrimaForm()\n    unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()\n    form_mp.id_unidad_base.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    form_mp.id_unidad_compra.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\" and form_mp.validate_on_submit():\n            try:\n                materia = crear_materia_prima(",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -8581,7 +8685,7 @@
         "kind": 6,
         "importPath": "app.sales.forms",
         "description": "app.sales.forms",
-        "peekOfCode": "class SalidaEfectivoForm(FlaskForm):\n    concepto = StringField(\"Concepto\", validators=[DataRequired()])\n    monto = DecimalField(\"Monto\", validators=[DataRequired(), NumberRange(min=0.01)])\n    tipo = SelectField(\"Tipo\", choices=[(\"GASTO_OPERATIVO\", \"Gasto operativo\"), (\"COMPRA_MATERIA_PRIMA\", \"Compra materia prima\")])\n    submit = SubmitField(\"Registrar salida\")",
+        "peekOfCode": "class SalidaEfectivoForm(FlaskForm):\n    concepto = StringField(\"Concepto\", validators=[DataRequired(message=\"Este campo es obligatorio.\")])\n    monto = DecimalField(\"Monto\", validators=[InputRequired(message=\"El monto es obligatorio.\"), NumberRange(min=0.01, message=\"El monto debe ser de al menos 0.01.\")])\n    tipo = SelectField(\"Tipo\", choices=[(\"GASTO_OPERATIVO\", \"Gasto operativo\"), (\"COMPRA_MATERIA_PRIMA\", \"Compra materia prima\")])\n    submit = SubmitField(\"Registrar salida\")",
         "detail": "app.sales.forms",
         "documentation": {}
     },
@@ -8617,7 +8721,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if request.method == \"POST\":\n        if role_name != \"Ventas\":\n            flash(\n                \"Solo el area de ventas puede registrar solicitudes de produccion.\",\n                \"danger\",\n            )\n            return redirect(url_for(\"sales.solicitudes\"))\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()",
+        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if request.method == \"POST\":\n        if role_name not in {\"Ventas\", \"Administrador\"}:\n            flash(\n                \"Solo ventas y administración pueden registrar solicitudes.\",\n                \"danger\",\n            )\n            return redirect(url_for(\"sales.solicitudes\"))\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8635,7 +8739,16 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def ventas():\n    tab = (request.args.get(\"tab\") or \"nueva\").strip().lower()\n    if tab not in {\"nueva\", \"historial\", \"salidas\", \"corte\"}:\n        tab = \"nueva\"\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"registrar_venta\").strip().lower()\n        if action == \"registrar_venta\":\n            tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n            requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"\n            detalles_json = request.form.get(\"detalles_json\", \"\").strip()",
+        "peekOfCode": "def ventas():\n    tab = (request.args.get(\"tab\") or \"nueva\").strip().lower()\n    if tab not in {\"nueva\", \"historial\", \"salidas\", \"corte\"}:\n        tab = \"nueva\"\n    form_salida = SalidaEfectivoForm()\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"registrar_venta\").strip().lower()\n        if action == \"registrar_venta\":\n            tipo_pago = (request.form.get(\"tipo_pago\") or \"EFECTIVO\").strip().upper()\n            requiere_ticket = request.form.get(\"requiere_ticket\") == \"on\"",
+        "detail": "app.sales.routes",
+        "documentation": {}
+    },
+    {
+        "label": "ver_ticket_venta",
+        "kind": 2,
+        "importPath": "app.sales.routes",
+        "description": "app.sales.routes",
+        "peekOfCode": "def ver_ticket_venta(id_venta: int):\n    venta = (\n        Venta.query.options(\n            selectinload(Venta.detalles).selectinload(DetalleVenta.producto),\n            selectinload(Venta.usuario_cliente).selectinload(Usuario.persona),\n        )\n        .filter(Venta.id_venta == id_venta)\n        .first_or_404()\n    )\n    ticket = _obtener_o_crear_ticket_venta(venta)",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8896,7 +9009,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class SolicitudProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"solicitud_produccion\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad > 0\", name=\"ck_solicitud_cantidad_positiva\"),\n    )\n    id_solicitud = db.Column(db.Integer, primary_key=True)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    cantidad = db.Column(db.Integer, nullable=False)\n    estado = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)\n    fecha_solicitud = db.Column(db.DateTime, default=utc_now, nullable=False)",
+        "peekOfCode": "class SolicitudProduccion(TimestampMixin, db.Model):\n    __tablename__ = \"solicitud_produccion\"\n    __table_args__ = (\n        CheckConstraint(\"cantidad > 0\", name=\"ck_solicitud_cantidad_positiva\"),\n    )\n    id_solicitud = db.Column(db.Integer, primary_key=True)\n    id_producto = db.Column(db.Integer, db.ForeignKey(FK_PRODUCTO), nullable=False)\n    id_pedido = db.Column(db.Integer, db.ForeignKey(\"pedido.id_pedido\"), nullable=True)\n    cantidad = db.Column(db.Integer, nullable=False)\n    estado = db.Column(db.String(20), default=\"PENDIENTE\", nullable=False)",
         "detail": "app.models",
         "documentation": {}
     },
@@ -9175,7 +9288,7 @@
         "kind": 2,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_measurement_units_metadata()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_product_costing()\n    _seed_production_flow(users)",
+        "peekOfCode": "def seed_full_data() -> None:\n    _seed_roles_modules_permissions()\n    users = _seed_people_and_users()\n    _seed_measurement_units_metadata()\n    _seed_products_catalog_metadata()\n    _seed_suppliers()\n    _seed_raw_materials()\n    _seed_recipes()\n    _seed_purchase_and_inventory(users)\n    _seed_product_costing()",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9193,7 +9306,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {",
+        "peekOfCode": "ROLE_SALES = \"Ventas\"\nROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9202,7 +9315,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),",
+        "peekOfCode": "ROLE_PRODUCTION = \"Produccion\"\nROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9211,7 +9324,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "ROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),",
+        "peekOfCode": "ROLE_CLIENT = \"Cliente\"\nMP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9220,7 +9333,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),",
+        "peekOfCode": "MP_HARINA = \"Harina de Trigo\"\nMP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9229,7 +9342,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}",
+        "peekOfCode": "MP_AZUCAR = \"Azucar Refinada\"\nMP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",\n}",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9238,7 +9351,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:",
+        "peekOfCode": "MP_MANTEQUILLA = \"Mantequilla s/sal\"\nMP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",\n}\nPRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9247,7 +9360,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)",
+        "peekOfCode": "MP_HUEVO = \"Huevo Fresco\"\nPRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",\n}\nPRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (\n    (",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9256,7 +9369,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "PRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _resolver_costo_unitario_para_snapshot(producto: Producto) -> Decimal:",
+        "peekOfCode": "PRODUCTO_PASTEL_CHOCOLATE = \"Pastel de Chocolate\"\nMXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",\n}\nPRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (\n    (\n        \"Pastel de Chocolate\",",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9265,7 +9378,7 @@
         "kind": 5,
         "importPath": "app.seed_data",
         "description": "app.seed_data",
-        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nDEFAULT_MARGIN_BY_PRODUCT: dict[str, Decimal] = {\n    PRODUCTO_PASTEL_CHOCOLATE: Decimal(\"30.00\"),\n    \"Pay de Fresa\": Decimal(\"28.00\"),\n    \"Galleta de Nuez\": Decimal(\"25.00\"),\n}\ndef _to_mxn(value: Decimal) -> Decimal:\n    return Decimal(str(value)).quantize(MXN_QUANTIZE, rounding=ROUND_HALF_UP)\ndef _resolver_costo_unitario_para_snapshot(producto: Producto) -> Decimal:\n    costo_actual = Decimal(str(producto.costo_produccion_actual or 0))",
+        "peekOfCode": "MXN_QUANTIZE = Decimal(\"0.01\")\nLEGACY_PRODUCT_NAMES: dict[str, str] = {\n    \"Pastel Red Velvet\": \"Pastel de Red Velvet\",\n    \"Pastel de Frutos\": \"Pastel de Frutos Secos\",\n    \"Pastel Tres Leches\": \"Pastel de 3 Leches de Durazno\",\n}\nPRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (\n    (\n        \"Pastel de Chocolate\",\n        \"Bizcocho de cacao con betun de chocolate semiamargo.\",",
         "detail": "app.seed_data",
         "documentation": {}
     },
@@ -9771,6 +9884,87 @@
         "description": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
         "peekOfCode": "depends_on = None\ndef upgrade():\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {column[\"name\"]: column for column in inspector.get_columns(\"receta\")}\n    if \"id_producto\" not in columns:\n        with op.batch_alter_table(\"receta\", schema=None) as batch_op:\n            batch_op.add_column(sa.Column(\"id_producto\", sa.Integer(), nullable=True))\n    inspector = sa.inspect(bind)\n    foreign_keys = {",
         "detail": "migrations.versions.b7a8c9d0e1f2_add_receta_id_producto",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "def upgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    if not _column_exists(TABLE_NAME, COLUMN_NAME):\n        op.add_column(\n            TABLE_NAME,\n            sa.Column(COLUMN_NAME, sa.Integer(), nullable=True),\n        )\n    if _column_exists(TABLE_NAME, COLUMN_NAME) and not _fk_exists(TABLE_NAME, FK_NAME):\n        op.create_foreign_key(",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "def downgrade() -> None:\n    if not _table_exists(TABLE_NAME):\n        return\n    if _fk_exists(TABLE_NAME, FK_NAME):\n        op.drop_constraint(FK_NAME, TABLE_NAME, type_=\"foreignkey\")\n    if _column_exists(TABLE_NAME, COLUMN_NAME):\n        op.drop_column(TABLE_NAME, COLUMN_NAME)",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "revision = \"b9c1d2e3f4a5\"\ndown_revision = \"a6b7c8d9e0f1\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\nCOLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "down_revision",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "down_revision = \"a6b7c8d9e0f1\"\nbranch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\nCOLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "branch_labels",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "branch_labels = None\ndepends_on = None\nTABLE_NAME = \"solicitud_produccion\"\nCOLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "depends_on",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "depends_on = None\nTABLE_NAME = \"solicitud_produccion\"\nCOLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "TABLE_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "TABLE_NAME = \"solicitud_produccion\"\nCOLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "COLUMN_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "COLUMN_NAME = \"id_pedido\"\nFK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "documentation": {}
+    },
+    {
+        "label": "FK_NAME",
+        "kind": 5,
+        "importPath": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "description": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
+        "peekOfCode": "FK_NAME = \"fk_solicitud_produccion_pedido\"\ndef _table_exists(table_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    return table_name in inspector.get_table_names()\ndef _column_exists(table_name: str, column_name: str) -> bool:\n    bind = op.get_bind()\n    inspector = sa.inspect(bind)\n    columns = {\n        column.get(\"name\")",
+        "detail": "migrations.versions.b9c1d2e3f4a5_rf15_link_solicitud_to_pedido",
         "documentation": {}
     },
     {

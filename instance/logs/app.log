@@ -46,3 +46,10 @@
 2026-04-10 09:44:50,022 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=produccion|rol=Produccion|ip=127.0.0.1|detalle=id_solicitud=6; estado=APROBADA; id_usuario_resuelve=3
 2026-04-10 09:45:24,214 INFO AUDIT|evento=SOLICITUD_PRODUCCION_RESUELTA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_solicitud=7; estado=RECHAZADA; id_usuario_resuelve=1
 2026-04-10 10:39:11,957 INFO AUDIT|evento=VENTA_REGISTRADA|actor=admin|rol=Administrador|ip=127.0.0.1|detalle=id_venta=11; detalles=3; tipo_pago=EFECTIVO; requiere_ticket=True
+2026-04-10 22:02:25,791 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=19; cantidad=1
+2026-04-10 22:02:26,566 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=9; cantidad=1
+2026-04-10 22:02:27,742 INFO AUDIT|evento=CARRITO_AGREGAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=18; cantidad=1
+2026-04-10 22:02:32,665 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=5
+2026-04-10 22:02:33,529 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=7
+2026-04-10 22:02:34,438 INFO AUDIT|evento=CARRITO_ELIMINAR|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_producto=10
+2026-04-10 22:02:50,767 INFO AUDIT|evento=PEDIDO_WEB_CREADO|actor=cliente|rol=Cliente|ip=127.0.0.1|detalle=id_usuario=4; id_pedido=3; tipo_pago=EN_LINEA
