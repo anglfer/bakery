@@ -1,5 +1,6 @@
 {% extends "base_template.html" %}
-{% block title %}Solicitudes de Producción{% endblock %}
+{% from '_macros.html' import campo %}
+{% block title %}Solicitudes de Ventas{% endblock %}
 {% block page_title %}Módulo de Ventas — Solicitudes{% endblock %}
 
 {% block content %}
@@ -236,7 +237,7 @@
 						data-bs-dismiss="modal"
 						aria-label="Cerrar"></button>
 				</div>
-				<form method="post" id="formNuevaSolicitud">
+				<form method="post" id="formNuevaSolicitud" novalidate>
 					<input type="hidden" name="action" value="crear" />
 					<div class="modal-body prod-orders-modal-body">
 						<div class="prod-orders-section-card">
@@ -247,42 +248,16 @@
 							<div class="ops-grid">
 								<div>
 									<label class="form-label fw-semibold" for="nuevoProducto">Producto <span class="text-danger">*</span></label>
-									<select id="nuevoProducto" name="id_producto" class="form-select" required>
-										<option value="">Seleccionar producto...</option>
-										{% for p in productos %}
-										<option
-											value="{{ p.id_producto }}"
-											data-stock="{{ p.cantidad_disponible }}"
-											data-min="{{ p.stock_minimo }}"
-											data-bajo="{{ 1 if productos_bajo_stock.get(p.id_producto) else 0 }}">
-											{{ p.nombre }}
-										</option>
-										{% endfor %}
-									</select>
+									{{ form_crear.id_producto(class="form-select" + (" is-invalid" if form_crear.id_producto.errors else ""), id="nuevoProducto", required=True) }}
+									{% if form_crear.id_producto.errors %}
+									<div class="invalid-feedback">{{ form_crear.id_producto.errors[0] }}</div>
+									{% endif %}
 								</div>
 								<div>
-									<label class="form-label fw-semibold" for="nuevoCantidad">
-										Cantidad solicitada <span class="text-danger">*</span>
-									</label>
-									<input
-										id="nuevoCantidad"
-										type="number"
-										min="1"
-										step="1"
-										name="cantidad"
-										class="form-control"
-										placeholder="Ej. 24"
-										required />
-									<div class="form-hint mt-1">Piezas / porciones requeridas.</div>
+									{{ campo(form_crear.cantidad, id='nuevoCantidad', placeholder='Ej. 24', min='1', step='1') }}
 								</div>
 								<div>
-									<label class="form-label fw-semibold" for="nuevoObs">Observaciones</label>
-									<input
-										id="nuevoObs"
-										type="text"
-										name="observaciones"
-										class="form-control"
-										placeholder="Motivo, pedido especial..." />
+									{{ campo(form_crear.observaciones, id='nuevoObs', placeholder='Motivo, pedido especial...') }}
 								</div>
 						</div>
 						<div id="nuevoStockPreview" class="mt-3" style="display: none;"></div>
@@ -322,9 +297,9 @@
 						data-bs-dismiss="modal"
 						aria-label="Cerrar"></button>
 				</div>
-				<form method="post">
+				<form method="post" novalidate>
 					<input type="hidden" name="action" value="editar" />
-					<input type="hidden" name="id_solicitud" id="editarSolicitudId" />
+					<input type="hidden" name="{{ form_editar.id_solicitud.name }}" id="editarSolicitudId" value="{{ form_editar.id_solicitud.data or '' }}" required />
 					<div class="modal-body prod-orders-modal-body">
 						<div class="prod-orders-section-card mb-3">
 							<div class="prod-orders-section-title">
@@ -335,24 +310,10 @@
 						</div>
 						<div class="ops-grid">
 							<div>
-								<label class="form-label fw-semibold" for="editarSolicitudCantidad">Cantidad</label>
-								<input
-									id="editarSolicitudCantidad"
-									type="number"
-									name="cantidad"
-									min="1"
-									step="1"
-									class="form-control"
-									required />
+								{{ campo(form_editar.cantidad, id='editarSolicitudCantidad', min='1', step='1') }}
 							</div>
 							<div>
-								<label class="form-label fw-semibold" for="editarSolicitudObs">Observaciones</label>
-								<input
-									id="editarSolicitudObs"
-									type="text"
-									name="observaciones"
-									class="form-control"
-									placeholder="Actualiza el contexto..." />
+								{{ campo(form_editar.observaciones, id='editarSolicitudObs', placeholder='Actualiza el contexto...') }}
 							</div>
 						</div>
 						<div class="prod-orders-info-banner mb-0 mt-3">
@@ -370,83 +331,80 @@
 			</div>
 		</div>
 	</div>
+
+	<script type="application/json" id="productosData">
+		[
+		  {% for p in productos %}
+			{
+			  "id_producto": {{ p.id_producto }},
+			  "nombre": "{{ p.nombre|replace('\"', '\\\"') }}",
+			  "stock": {{ p.cantidad_disponible }},
+			  "min": {{ p.stock_minimo }},
+			  "bajo": {{ 1 if productos_bajo_stock.get(p.id_producto) else 0 }}
+			}
+			{% if not loop.last %},{% endif %}
+		  {% endfor %}
+		]
+	</script>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-	const nuevoProducto = document.getElementById('nuevoProducto');
+	const nuevoProductoSelect = document.getElementById('nuevoProducto');
 	const nuevoStockPreview = document.getElementById('nuevoStockPreview');
-	const modalEditarSolicitud = new bootstrap.Modal(
-		document.getElementById('modalEditarSolicitud'),
-	);
-	const modalNuevaSolicitud = document.getElementById('modalNuevaSolicitud');
+	const productosMeta = JSON.parse(document.getElementById('productosData').textContent);
+	const nuevoModal = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
+	const editarModal = new bootstrap.Modal(document.getElementById('modalEditarSolicitud'));
 
-	function actualizarPreviewStock() {
-		if (!nuevoProducto || !nuevoStockPreview) {
-			return;
-		}
-
-		const option = nuevoProducto.options[nuevoProducto.selectedIndex];
-		if (!option || !option.value) {
-			nuevoStockPreview.style.display = 'none';
-			nuevoStockPreview.innerHTML = '';
-			return;
-		}
-
-		const stock = Number(option.dataset.stock || 0);
-		const min = Number(option.dataset.min || 0);
-		const bajo = String(option.dataset.bajo || '0') === '1';
-		const porcentaje = min > 0 ? Math.min(100, Math.round((stock / min) * 100)) : 0;
-		const color = stock <= 0 ? 'danger' : bajo ? 'danger' : 'success';
-		const icon = stock <= 0 ? 'bi-x-circle-fill' : bajo ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill';
-		const titulo = stock <= 0 ? 'Sin stock disponible' : bajo ? 'Stock bajo — justificación de la solicitud' : 'Stock disponible actualmente';
-		const descripcion = `Stock actual: ${stock} pzas · mínimo: ${min} pzas`;
-
-		nuevoStockPreview.className = `prod-orders-alert ${color}`;
-		nuevoStockPreview.style.display = 'flex';
-		nuevoStockPreview.innerHTML = `
-			<i class="bi ${icon}"></i>
-			<div class="w-100">
-				<strong>${titulo}</strong>
-				<div class="small mb-2">${descripcion}</div>
-				<div class="progress" style="height: 7px; background: #eadfd8;">
-					<div
-						class="progress-bar ${stock <= 0 ? 'bg-danger' : bajo ? 'bg-warning' : 'bg-success'}"
-						role="progressbar"
-						style="width: ${porcentaje}%"
-						aria-valuenow="${porcentaje}"
-						aria-valuemin="0"
-						aria-valuemax="100"></div>
-				</div>
-			</div>`;
-	}
-
-	if (nuevoProducto) {
-		nuevoProducto.addEventListener('change', actualizarPreviewStock);
-	}
-
-	document.querySelectorAll('.js-editar-solicitud').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			document.getElementById('editarSolicitudId').value = buttonElement.dataset.id || '';
-			document.getElementById('editarSolicitudProducto').textContent =
-				buttonElement.dataset.producto || '—';
-			document.getElementById('editarSolicitudCantidad').value =
-				buttonElement.dataset.cantidad || '';
-			document.getElementById('editarSolicitudObs').value =
-				buttonElement.dataset.observaciones || '';
-			modalEditarSolicitud.show();
+	function bindEvents() {
+		document.querySelectorAll('.js-editar-solicitud').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				document.getElementById('editarSolicitudId').value = buttonElement.dataset.id || '';
+				document.getElementById('editarSolicitudProducto').textContent = buttonElement.dataset.producto || 'Producto';
+				document.getElementById('editarSolicitudCantidad').value = buttonElement.dataset.cantidad || '';
+				document.getElementById('editarSolicitudObs').value = buttonElement.dataset.observaciones || '';
+				editarModal.show();
+			});
 		});
-	});
+	}
 
-	if (modalNuevaSolicitud) {
-		modalNuevaSolicitud.addEventListener('shown.bs.modal', actualizarPreviewStock);
-		modalNuevaSolicitud.addEventListener('hidden.bs.modal', () => {
-			if (nuevoProducto) {
-				nuevoProducto.value = '';
-			}
-			if (nuevoStockPreview) {
-				nuevoStockPreview.style.display = 'none';
+	document.addEventListener('DOMContentLoaded', () => {
+		bindEvents();
+
+		if (nuevoProductoSelect) {
+			nuevoProductoSelect.addEventListener('change', (e) => {
+				const val = Number(e.target.value);
+				if (!val) {
+					nuevoStockPreview.style.display = 'none';
+					return;
+				}
+				const optionData = productosMeta.find(p => p.id_producto === val) || {};
+				const stock = optionData.stock || 0;
+				const isBajo = optionData.bajo === 1;
+
+				if (isBajo) {
+					nuevoStockPreview.className = 'prod-orders-alert warning';
+					nuevoStockPreview.innerHTML = `
+						<i class="bi bi-exclamation-triangle-fill"></i>
+						<div>El inventario actual (${stock}) está por debajo del mínimo recomendado.</div>`;
+					nuevoStockPreview.style.display = 'flex';
+				} else {
+					nuevoStockPreview.className = 'prod-orders-alert success';
+					nuevoStockPreview.innerHTML = `
+						<i class="bi bi-check-circle-fill"></i>
+						<div>Stock actual saludable: ${stock} piezas.</div>`;
+					nuevoStockPreview.style.display = 'flex';
+				}
+			});
+		}
+
+		{% if open_modal == 'modalNuevaSolicitud' or form_crear.errors %}
+			nuevoModal.show();
+		{% elif open_modal == 'modalEditarSolicitud' or form_editar.errors %}
+			editarModal.show();
+		{% endif %}
+	});
 				nuevoStockPreview.innerHTML = '';
 			}
 		});

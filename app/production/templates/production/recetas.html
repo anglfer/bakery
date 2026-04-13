@@ -1,4 +1,6 @@
-{% extends "base_template.html" %} {% block title %}Recetas{% endblock %} {% block page_title
+{% extends "base_template.html" %}
+{% from '_macros.html' import campo %}
+{% block title %}Catálogo de Recetas{% endblock %} {% block page_title
 %}Recetas{% endblock %} {% block content %}
 <section class="section recetas-page">
 	{% set ns = namespace(total=0, activas=0, inactivas=0, sin_stock=0) %} {% for receta in recetas %}
@@ -182,26 +184,10 @@
 						</p>
 						<div class="ops-grid recipe-header-grid align-items-start">
 							<div>
-								<label class="form-label fw-semibold" for="recetaProducto">Producto *</label>
-								<select id="recetaProducto" name="id_producto" class="form-select" required>
-									<option value="">Seleccionar producto...</option>
-									{% for producto in productos %}
-									<option value="{{ producto.id_producto }}"
-										data-next-version="{{ producto.siguiente_version }}"
-										data-recetas-count="{{ producto.recetas_count }}"
-										data-receta-activa="{{ producto.receta_activa_id or '' }}"
-										data-unidad-venta="{{ producto.unidad_venta }}">
-										{{ producto.nombre }}
-									</option>
-									{% endfor %}
-								</select>
+								{{ campo(form_receta.id_producto, id='recetaProducto', class='form-select') }}
 							</div>
 							<div>
-								<label class="form-label fw-semibold" for="recetaRendimiento">
-									Cantidad base *
-								</label>
-								<input type="number" step="0.01" min="0.01" name="rendimiento_base"
-									id="recetaRendimiento" placeholder="Ej. 12" required />
+								{{ campo(form_receta.rendimiento_base, id='recetaRendimiento', placeholder='Ej. 12', step='0.01', min='0.01') }}
 								<small class="text-muted d-block mt-1">
 									Piezas o porciones producidas por lote.
 								</small>
@@ -214,11 +200,7 @@
 								</small>
 							</div>
 							<div>
-								<label class="form-label fw-semibold" for="recetaEstado">Estado</label>
-								<select id="recetaEstado" name="estado" class="form-select">
-									<option value="ACTIVA">Activa</option>
-									<option value="INACTIVA">Inactiva</option>
-								</select>
+								{{ campo(form_receta.estado, id='recetaEstado', class='form-select') }}
 							</div>
 							<div>
 								<label class="form-label fw-semibold" for="recetaCreacion">Creación</label>
@@ -291,16 +273,10 @@
 						<p class="ops-meta mb-2">Información adicional</p>
 						<div class="ops-grid recipe-extra-grid">
 							<div>
-								<label class="form-label fw-semibold" for="recetaCategoria">Categoría</label>
-								<input type="text" id="recetaCategoria" name="categoria" class="form-control"
-									placeholder="Ej. Pastelería" />
+								{{ campo(form_receta.categoria, id='recetaCategoria', placeholder='Ej. Pastelería') }}
 							</div>
 							<div>
-								<label class="form-label fw-semibold" for="recetaDescripcion">
-									Descripción corta
-								</label>
-								<textarea id="recetaDescripcion" name="descripcion" class="form-control" rows="2"
-									placeholder="Descripción breve visible en catálogo"></textarea>
+								{{ campo(form_receta.descripcion, id='recetaDescripcion', placeholder='Detalles adicionales', rows="1") }}
 							</div>
 						</div>
 					</div>
@@ -922,5 +898,11 @@
 	globalThis.abrirVersionesReceta = abrirVersionesReceta;
 	globalThis.abrirToggleReceta = abrirToggleReceta;
 	globalThis.verificarStockReceta = verificarStockReceta;
+
+	{% if open_modal == 'modalReceta' or form_receta.errors %}
+	document.addEventListener("DOMContentLoaded", function() {
+		new bootstrap.Modal(document.getElementById('modalReceta')).show();
+	});
+	{% endif %}
 </script>
 {% endblock %}

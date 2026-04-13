@@ -1,4 +1,5 @@
 {% extends "base_template.html" %}
+{% from '_macros.html' import campo %}
 {% block title %}Solicitudes{% endblock %}
 {% block page_title %}Módulo de Producción — Solicitudes{% endblock %}
 
@@ -288,35 +289,18 @@
 					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 				</div>
-				<form method="post" id="formResolverSolicitud">
+				<form method="post" id="formResolverSolicitud" novalidate>
+					<input type="hidden" name="{{ form_resolver.id_solicitud.name }}" id="resolverSolicitudId" value="{{ form_resolver.id_solicitud.data or '' }}" required />
 					<div class="modal-body prod-orders-modal-body">
-						<input type="hidden" name="id_solicitud" id="resolverSolicitudId" />
-						<div class="prod-orders-section-card">
-							<div class="prod-orders-section-title">
-								<i class="bi bi-send-fill"></i>
-								Solicitud seleccionada
-							</div>
-							<div class="fw-bold" id="resolverSolicitudProducto">—</div>
-							<div class="small text-secondary" id="resolverSolicitudMeta"></div>
+						<div class="prod-orders-section-card pb-0 border-0">
+							<div class="fw-bold" id="resolverSolicitudMeta"></div>
 						</div>
 						<div class="ops-grid">
 							<div>
-								<label class="form-label fw-semibold" for="resolverSolicitudEstado">Estado</label>
-								<select name="estado" id="resolverSolicitudEstado" class="form-select" required>
-									<option value="APROBADA">Aprobar</option>
-									<option value="RECHAZADA">Rechazar</option>
-								</select>
+								{{ campo(form_resolver.estado, id='resolverSolicitudEstado', class='form-select') }}
 							</div>
 							<div>
-								<label class="form-label fw-semibold" for="resolverSolicitudObs">
-									Observaciones de resolución
-								</label>
-								<input
-									id="resolverSolicitudObs"
-									type="text"
-									name="observaciones_resolucion"
-									class="form-control"
-									placeholder="Motivo o notas de la decisión..." />
+								{{ campo(form_resolver.observaciones_resolucion, id='resolverSolicitudObs', placeholder='Motivo o notas de la decisión...') }}
 							</div>
 						</div>
 						<div class="prod-orders-info-banner mb-0 mt-3">
@@ -510,129 +494,142 @@
 		return '#fff';
 	}
 
-	document.querySelectorAll('.js-detalle-solicitud').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			const data = {
-				id: buttonElement.dataset.id || '',
-				producto: buttonElement.dataset.producto || 'Producto',
-				cantidad: buttonElement.dataset.cantidad || '—',
-				stockActual: buttonElement.dataset.stockActual || '0',
-				stockMinimo: buttonElement.dataset.stockMinimo || '0',
-				solicitante: buttonElement.dataset.solicitante || '—',
-				fecha: buttonElement.dataset.fecha || '—',
-				estado: buttonElement.dataset.estado || '—',
-				resueltoPor: buttonElement.dataset.resueltoPor || '—',
-				fechaResolucion: buttonElement.dataset.fechaResolucion || '',
-				obs: buttonElement.dataset.obs || '',
-				obsResolucion: buttonElement.dataset.obsResolucion || '',
-				orden: buttonElement.dataset.orden || '',
-			};
+	function bindEvents() {
+		document.querySelectorAll('.js-detalle-solicitud').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				const data = {
+					id: buttonElement.dataset.id || '',
+					producto: buttonElement.dataset.producto || 'Producto',
+					cantidad: buttonElement.dataset.cantidad || '—',
+					stockActual: buttonElement.dataset.stockActual || '0',
+					stockMinimo: buttonElement.dataset.stockMinimo || '0',
+					solicitante: buttonElement.dataset.solicitante || '—',
+					fecha: buttonElement.dataset.fecha || '—',
+					estado: buttonElement.dataset.estado || '—',
+					resueltoPor: buttonElement.dataset.resueltoPor || '—',
+					fechaResolucion: buttonElement.dataset.fechaResolucion || '',
+					obs: buttonElement.dataset.obs || '',
+					obsResolucion: buttonElement.dataset.obsResolucion || '',
+					orden: buttonElement.dataset.orden || '',
+				};
 
-			document.getElementById('detalleSolicitudTitle').innerHTML =
-				`<i class="bi bi-eye-fill me-2"></i>${data.producto} — SOL-${String(data.id).padStart(3, '0')}`;
-			document.getElementById('detalleSolicitudBody').innerHTML = `
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">ID solicitud</span>
-					<strong>SOL-${String(data.id).padStart(3, '0')}</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Producto</span>
-					<strong>${data.producto}</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Cantidad solicitada</span>
-					<strong>${data.cantidad} pzas</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Stock actual</span>
-					<strong>${data.stockActual} pzas</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Solicitante</span>
-					<strong>${data.solicitante}</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Fecha solicitud</span>
-					<strong>${data.fecha}</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Estado</span>
-					<strong>${data.estado}</strong>
-				</div>
-				<div class="prod-orders-summary-card">
-					<span class="prod-orders-summary-label">Resuelto por</span>
-					<strong>${data.resueltoPor}</strong>
-				</div>`;
-			document.getElementById('detalleSolicitudTimeline').innerHTML = construirTimeline(data);
-			document.getElementById('detalleSolicitudObs').innerHTML = data.obs
-				? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-chat-dots-fill"></i><span><strong>Observaciones de solicitud:</strong> ${data.obs}</span></div>`
-				: '';
-			document.getElementById('detalleSolicitudOrden').innerHTML = data.orden
-				? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-link-45deg"></i><span>Orden vinculada: <strong>ORD-${String(data.orden).padStart(3, '0')}</strong></span></div>`
-				: '';
-			if (data.fechaResolucion || data.obsResolucion) {
-				document.getElementById('detalleSolicitudObs').innerHTML += `
-					<div class="prod-orders-alert ${data.estado === 'RECHAZADA' ? 'danger' : 'success'} mt-3">
-						<i class="bi ${data.estado === 'RECHAZADA' ? 'bi-x-circle-fill' : 'bi-check-circle-fill'}"></i>
-						<div>
-							<strong>Resolución</strong>
-							<div class="small">${data.fechaResolucion || 'Sin fecha'} · ${data.obsResolucion || 'Sin observaciones'}</div>
-						</div>
+				document.getElementById('detalleSolicitudTitle').innerHTML =
+					`<i class="bi bi-eye-fill me-2"></i>${data.producto} — SOL-${String(data.id).padStart(3, '0')}`;
+				document.getElementById('detalleSolicitudBody').innerHTML = `
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">ID solicitud</span>
+						<strong>SOL-${String(data.id).padStart(3, '0')}</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Producto</span>
+						<strong>${data.producto}</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Cantidad solicitada</span>
+						<strong>${data.cantidad} pzas</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Stock actual</span>
+						<strong>${data.stockActual} pzas</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Solicitante</span>
+						<strong>${data.solicitante}</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Fecha solicitud</span>
+						<strong>${data.fecha}</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Estado</span>
+						<strong>${data.estado}</strong>
+					</div>
+					<div class="prod-orders-summary-card">
+						<span class="prod-orders-summary-label">Resuelto por</span>
+						<strong>${data.resueltoPor}</strong>
 					</div>`;
-			}
-			detalleModal.show();
-		});
-	});
-
-	document.querySelectorAll('.js-resolver-solicitud').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			const producto = buttonElement.dataset.producto || 'Producto';
-			const cantidad = buttonElement.dataset.cantidad || '—';
-			const solicitante = buttonElement.dataset.solicitante || '—';
-			const fecha = buttonElement.dataset.fecha || '—';
-
-			document.getElementById('resolverSolicitudId').value = buttonElement.dataset.id || '';
-			document.getElementById('resolverSolicitudProducto').textContent = producto;
-			document.getElementById('resolverSolicitudMeta').textContent =
-				`SOL-${String(buttonElement.dataset.id || '').padStart(3, '0')} · ${cantidad} pzas · ${solicitante} · ${fecha}`;
-			document.getElementById('resolverSolicitudEstado').value = 'APROBADA';
-			document.getElementById('resolverSolicitudObs').value = '';
-			resolverModal.show();
-		});
-	});
-
-	document.querySelectorAll('.js-generar-orden').forEach((buttonElement) => {
-		buttonElement.addEventListener('click', () => {
-			const idProducto = buttonElement.dataset.productoId || '';
-			const recetas = recetasDeProducto(idProducto);
-			const producto = buttonElement.dataset.producto || 'Producto';
-			const cantidad = buttonElement.dataset.cantidad || '—';
-			const solicitante = buttonElement.dataset.solicitante || '—';
-			const idSolicitud = buttonElement.dataset.id || '';
-
-			document.getElementById('ordenSolicitudId').value = idSolicitud;
-			document.getElementById('ordenProductoId').value = idProducto;
-			document.getElementById('ordenSolicitudProducto').textContent = producto;
-			document.getElementById('ordenSolicitudMeta').textContent =
-				`SOL-${String(idSolicitud).padStart(3, '0')} · ${cantidad} pzas · ${solicitante}`;
-			document.getElementById('ordenCantidad').value = cantidad;
-			document.getElementById('ordenObservaciones').value = `Generada desde SOL-${String(idSolicitud).padStart(3, '0')}`;
-
-			const recipeSelect = document.getElementById('ordenRecetaId');
-			recipeSelect.innerHTML = '';
-			if (recetas.length === 0) {
-				recipeSelect.innerHTML = '<option value="">No hay receta activa para este producto</option>';
-			} else {
-				recipeSelect.innerHTML = recetas
-					.map((receta, index) => {
-						const label = `v${receta.version} · ${receta.nombre}`;
-						return `<option value="${receta.id_receta}" ${index === 0 ? 'selected' : ''}>${label}</option>`;
-					})
-					.join('');
+				document.getElementById('detalleSolicitudTimeline').innerHTML = construirTimeline(data);
+				document.getElementById('detalleSolicitudObs').innerHTML = data.obs
+					? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-chat-dots-fill"></i><span><strong>Observaciones de solicitud:</strong> ${data.obs}</span></div>`
+					: '';
+				document.getElementById('detalleSolicitudOrden').innerHTML = data.orden
+					? `<div class="prod-orders-info-banner mt-3"><i class="bi bi-link-45deg"></i><span>Orden vinculada: <strong>ORD-${String(data.orden).padStart(3, '0')}</strong></span></div>`
+					: '';
+				if (data.fechaResolucion || data.obsResolucion) {
+					document.getElementById('detalleSolicitudObs').innerHTML += `
+						<div class="prod-orders-alert ${data.estado === 'RECHAZADA' ? 'danger' : 'success'} mt-3">
+							<i class="bi ${data.estado === 'RECHAZADA' ? 'bi-x-circle-fill' : 'bi-check-circle-fill'}"></i>
+							<div>
+								<strong>Resolución</strong>
+								<div class="small">${data.fechaResolucion || 'Sin fecha'} · ${data.obsResolucion || 'Sin observaciones'}</div>
+							</div>
+						</div>`;
 				}
-
-			ordenModal.show();
+				detalleModal.show();
+			});
 		});
-	});
+
+		document.querySelectorAll('.js-resolver-solicitud').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				const producto = buttonElement.dataset.producto || 'Producto';
+				const cantidad = buttonElement.dataset.cantidad || '—';
+				const solicitante = buttonElement.dataset.solicitante || '—';
+				const fecha = buttonElement.dataset.fecha || '—';
+
+				document.getElementById('resolverSolicitudId').value = buttonElement.dataset.id || '';
+				document.getElementById('resolverSolicitudMeta').textContent =
+					`SOL-${String(buttonElement.dataset.id || '').padStart(3, '0')} · ${cantidad} pzas · ${solicitante} · ${fecha}`;
+				resolverModal.show();
+			});
+		});
+
+		document.querySelectorAll('.js-generar-orden').forEach((buttonElement) => {
+			buttonElement.addEventListener('click', () => {
+				const idProducto = buttonElement.dataset.productoId || '';
+				const recetas = recetasDeProducto(idProducto);
+				const producto = buttonElement.dataset.producto || 'Producto';
+				const cantidad = buttonElement.dataset.cantidad || '—';
+				const solicitante = buttonElement.dataset.solicitante || '—';
+				const idSolicitud = buttonElement.dataset.id || '';
+
+				document.getElementById('ordenSolicitudId').value = idSolicitud;
+				document.getElementById('ordenProductoId').value = idProducto;
+				document.getElementById('ordenSolicitudProducto').textContent = producto;
+				document.getElementById('ordenSolicitudMeta').textContent =
+					`SOL-${String(idSolicitud).padStart(3, '0')} · ${cantidad} pzas · ${solicitante}`;
+				document.getElementById('ordenCantidad').value = cantidad;
+				document.getElementById('ordenObservaciones').value = `Generada desde SOL-${String(idSolicitud).padStart(3, '0')}`;
+
+				const recipeSelect = document.getElementById('ordenRecetaId');
+				recipeSelect.innerHTML = '';
+				if (recetas.length === 0) {
+					recipeSelect.innerHTML = '<option value="">No hay receta activa para este producto</option>';
+				} else {
+					recipeSelect.innerHTML = recetas
+						.map((receta, index) => {
+							const label = `v${receta.version} · ${receta.nombre}`;
+							return `<option value="${receta.id_receta}" ${index === 0 ? 'selected' : ''}>${label}</option>`;
+						})
+						.join('');
+					}
+
+				ordenModal.show();
+			});
+		});
+	}
+
+	function init() {
+		bindEvents();
+
+		{% if open_modal == 'modalResolver' or form_resolver.errors %}
+			resolverModal.show();
+		{% endif %}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
 </script>
 {% endblock %}

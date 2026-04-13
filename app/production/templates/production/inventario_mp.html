@@ -253,11 +253,11 @@
 				<h5 class="modal-title w-100 text-white" id="modalAjusteTitulo">Ajuste de inventario</h5>
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
-			<form method="post" id="formAjuste">
+			<form method="post" id="formAjuste" novalidate>
 				<input type="hidden" name="action" value="ajuste" />
-				<input type="hidden" name="tipo" id="ajusteTipo" value="ENTRADA" />
+				{{ form_ajuste.hidden_tag() }}
 				<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-					<input type="hidden" name="id_materia" id="ajusteIdMateria" required />
+					<input type="hidden" name="{{ form_ajuste.id_materia.name }}" id="ajusteIdMateria" value="{{ form_ajuste.id_materia.data or '' }}" required />
 					<div class="mb-3">
 						<p class="mb-1 fw-semibold" id="ajusteMateriaNombre">Selecciona una materia prima</p>
 						<p class="text-muted mb-0" id="ajusteExistenciaTexto">Existencia actual: -</p>
@@ -265,29 +265,24 @@
 
 					<p class="form-label fw-semibold d-block mb-2">Tipo de movimiento *</p>
 					<div class="ops-grid mp-grid-3 mb-3">
-						<button type="button" class="btn btn-primary btnTipoAjuste active" data-tipo="ENTRADA">
+						<button type="button" class="btn btn-primary btnTipoAjuste {% if not form_ajuste.tipo.data or form_ajuste.tipo.data == 'ENTRADA' %}active{% endif %}" data-tipo="ENTRADA">
 							<i class="bi bi-box-arrow-in-down me-1"></i>Entrada
 						</button>
-						<button type="button" class="btn btn-primary btnTipoAjuste" data-tipo="SALIDA">
+						<button type="button" class="btn btn-primary btnTipoAjuste {% if form_ajuste.tipo.data == 'SALIDA' %}active{% endif %}" data-tipo="SALIDA">
 							<i class="bi bi-box-arrow-up me-1"></i>Salida
 						</button>
-						<button type="button" class="btn btn-primary btnTipoAjuste" data-tipo="AJUSTE">
+						<button type="button" class="btn btn-primary btnTipoAjuste {% if form_ajuste.tipo.data == 'AJUSTE' %}active{% endif %}" data-tipo="AJUSTE">
 							<i class="bi bi-pencil-square me-1"></i>Ajuste
 						</button>
 					</div>
+					<input type="hidden" name="{{ form_ajuste.tipo.name }}" id="ajusteTipo" value="{{ form_ajuste.tipo.data or 'ENTRADA' }}" />
 
 					<div class="ops-grid mp-grid-2">
 						<div>
-							<label for="ajusteCantidad" class="form-label fw-semibold">
-								Cantidad <span id="ajusteUnidadLabel"></span>
-							</label>
-							<input type="number" step="0.0001" min="0.0001" name="cantidad" id="ajusteCantidad"
-								placeholder="0.00" required />
+							{{ campo(form_ajuste.cantidad, id='ajusteCantidad', placeholder='0.00', step='0.0001', min='0.0001') }}
 						</div>
 						<div>
-							<label for="ajusteReferencia" class="form-label fw-semibold">Referencia / Motivo *</label>
-							<input type="text" name="referencia_id" id="ajusteReferencia"
-								placeholder="Ej. Compra extra · Ajuste por conteo" required />
+							{{ campo(form_ajuste.referencia_id, id='ajusteReferencia', placeholder='Ej. Compra extra · Ajuste por conteo') }}
 						</div>
 					</div>
 				</div>
@@ -656,9 +651,28 @@
 	applyAutoFactorFromUnits(true);
 	updateConversionPreview();
 
-	{% if form_mp.errors %}
+	{% if open_modal == 'modalMateriaPrima' or form_mp.errors %}
 	document.addEventListener("DOMContentLoaded", function() {
 		modalMateria.show();
+	});
+	{% elif open_modal == 'modalInventarioAjuste' or form_ajuste.errors %}
+	document.addEventListener("DOMContentLoaded", function() {
+		{% if ajuste_materia_id %}
+		// Intentar buscar la info de la materia prima si falló
+		const row = document.querySelector(`tr[data-id="{{ ajuste_materia_id }}"]`);
+		if (row) {
+			const nombre = row.dataset.nombre || 'Materia prima';
+			const cantidad = row.dataset.cantidad || '-';
+			const unidad = row.dataset.unidad || '';
+			const cantidadBase = row.dataset.cantidadBase || '-';
+			const unidadBase = row.dataset.unidadBase || '';
+			document.getElementById('modalAjusteTitulo').textContent = `Ajuste de inventario — ${nombre}`;
+			document.getElementById('ajusteMateriaNombre').textContent = nombre;
+			document.getElementById('ajusteExistenciaTexto').textContent =
+				`Existencia actual: ${cantidad} ${unidad} (equiv. ${cantidadBase} ${unidadBase})`;
+		}
+		{% endif %}
+		modalAjuste.show();
 	});
 	{% endif %}
 </script>

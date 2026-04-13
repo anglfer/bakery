@@ -162,37 +162,51 @@
 						aria-label="Close"></button>
 				</div>
 				<form method="post" id="formEditarProveedor" novalidate>
+					{% if form_editar is defined and form_editar %}
+						{{ form_editar.hidden_tag() }}
+					{% else %}
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+					{% endif %}
 					<div class="modal-body">
 						<div class="row g-3">
-							<div class="col-md-6">
-								<label class="form-label">Nombre del proveedor *</label>
-								<input type="text" name="nombre_proveedor" id="editarProveedorNombre" required />
-							</div>
-							<div class="col-md-6">
-								<label class="form-label">Nombre de contacto *</label>
-								<input type="text" name="nombre_contacto" id="editarProveedorContacto" required />
-							</div>
-							<div class="col-md-6">
-								<label class="form-label">Teléfono *</label>
-								<input type="text" name="telefono" id="editarProveedorTelefono"
-									class="form-control tel-format" required />
-							</div>
-							<div class="col-md-6">
-								<label class="form-label">Correo electrónico *</label>
-								<input type="email" name="correo" id="editarProveedorCorreo" required />
-							</div>
-							<div class="col-md-6">
-								<label class="form-label">Ciudad *</label>
-								<input type="text" name="ciudad" id="editarProveedorCiudad" required />
-							</div>
-							<div class="col-md-6">
-								<label class="form-label">Estado *</label>
-								<input type="text" name="estado" id="editarProveedorEstado" required />
-							</div>
-							<div class="col-12">
-								<label class="form-label">Dirección *</label>
-								<input type="text" name="direccion" id="editarProveedorDireccion" required />
-							</div>
+							{% if form_editar is defined and form_editar %}
+								<div class="col-md-6">{{ campo(form_editar.nombre_empresa, placeholder='Ej. Harinera del Centro', class='form-control') }}</div>
+								<div class="col-md-6">{{ campo(form_editar.nombre_contacto, placeholder='Ej. Roberto Sánchez', class='form-control') }}</div>
+								<div class="col-md-6">{{ campo(form_editar.telefono, class='form-control tel-format', placeholder='477-123-4567') }}</div>
+								<div class="col-md-6">{{ campo(form_editar.correo, placeholder='contacto@proveedor.com', class='form-control') }}</div>
+								<div class="col-md-6">{{ campo(form_editar.ciudad, placeholder='León', class='form-control') }}</div>
+								<div class="col-md-6">{{ campo(form_editar.estado, placeholder='Guanajuato', class='form-control') }}</div>
+								<div class="col-12">{{ campo(form_editar.direccion, placeholder='Blvd. Delta 505', class='form-control') }}</div>
+							{% else %}
+								<div class="col-md-6">
+									<label class="form-label">Nombre del proveedor *</label>
+									<input type="text" name="editar-nombre_empresa" id="editarProveedorNombre" class="form-control" required />
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Nombre de contacto *</label>
+									<input type="text" name="editar-nombre_contacto" id="editarProveedorContacto" class="form-control" required />
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Teléfono *</label>
+									<input type="text" name="editar-telefono" id="editarProveedorTelefono" class="form-control tel-format" required />
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Correo electrónico *</label>
+									<input type="email" name="editar-correo" id="editarProveedorCorreo" class="form-control" required />
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Ciudad *</label>
+									<input type="text" name="editar-ciudad" id="editarProveedorCiudad" class="form-control" required />
+								</div>
+								<div class="col-md-6">
+									<label class="form-label">Estado *</label>
+									<input type="text" name="editar-estado" id="editarProveedorEstado" class="form-control" required />
+								</div>
+								<div class="col-12">
+									<label class="form-label">Dirección *</label>
+									<input type="text" name="editar-direccion" id="editarProveedorDireccion" class="form-control" required />
+								</div>
+							{% endif %}
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -283,27 +297,28 @@
 </section>
 {% endblock %} {% block scripts %}
 <script>
-	let proveedorDesactivarId = null;
-	let proveedorActivarId = null;
-
+	{% if open_modal_editar %}
+	document.addEventListener("DOMContentLoaded", function() {
+		document.getElementById('formEditarProveedor').action = `/admin/proveedores/{{ open_modal_editar }}/editar`;
+		new bootstrap.Modal(document.getElementById('modalProveedorEditar')).show();
+	});
+	{% else %}
 	document.querySelectorAll('.js-editar-proveedor').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
 			document.getElementById('formEditarProveedor').action =
 				`/admin/proveedores/${buttonElement.dataset.id}/editar`;
-			document.getElementById('editarProveedorNombre').value =
-				buttonElement.dataset.nombreProveedor || '';
-			document.getElementById('editarProveedorContacto').value =
-				buttonElement.dataset.nombreContacto || '';
-			document.getElementById('editarProveedorCorreo').value = buttonElement.dataset.correo || '';
-			document.getElementById('editarProveedorTelefono').value =
-				buttonElement.dataset.telefono || '';
-			document.getElementById('editarProveedorCiudad').value = buttonElement.dataset.ciudad || '';
-			document.getElementById('editarProveedorEstado').value = buttonElement.dataset.estado || '';
-			document.getElementById('editarProveedorDireccion').value =
-				buttonElement.dataset.direccion || '';
+			const get = (id) => document.getElementById(id);
+			if (get('editarProveedorNombre')) get('editarProveedorNombre').value = buttonElement.dataset.nombreProveedor || '';
+			if (get('editarProveedorContacto')) get('editarProveedorContacto').value = buttonElement.dataset.nombreContacto || '';
+			if (get('editarProveedorCorreo')) get('editarProveedorCorreo').value = buttonElement.dataset.correo || '';
+			if (get('editarProveedorTelefono')) get('editarProveedorTelefono').value = buttonElement.dataset.telefono || '';
+			if (get('editarProveedorCiudad')) get('editarProveedorCiudad').value = buttonElement.dataset.ciudad || '';
+			if (get('editarProveedorEstado')) get('editarProveedorEstado').value = buttonElement.dataset.estado || '';
+			if (get('editarProveedorDireccion')) get('editarProveedorDireccion').value = buttonElement.dataset.direccion || '';
 			new bootstrap.Modal(document.getElementById('modalProveedorEditar')).show();
 		});
 	});
+	{% endif %}
 
 	document.querySelectorAll('.js-desactivar-proveedor').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
@@ -324,24 +339,19 @@
 	});
 
 	document.getElementById('btnConfirmarDesactivarProveedor').addEventListener('click', () => {
-		if (!proveedorDesactivarId) {
-			return;
-		}
+		if (!proveedorDesactivarId) return;
 		document.getElementById(`formDesactivarProveedor${proveedorDesactivarId}`).submit();
 	});
 
 	document.getElementById('btnConfirmarActivarProveedor').addEventListener('click', () => {
-		if (!proveedorActivarId) {
-			return;
-		}
+		if (!proveedorActivarId) return;
 		document.getElementById(`formActivarProveedor${proveedorActivarId}`).submit();
 	});
 
 	// Formateador automático de teléfono (477-123-4567)
-	const telInputs = document.querySelectorAll('.tel-format');
-	telInputs.forEach(input => {
-		input.addEventListener('input', function (e) {
-			let val = this.value.replace(/\D/g, ''); // Quita lo que no sea número
+	document.querySelectorAll('.tel-format').forEach(input => {
+		input.addEventListener('input', function () {
+			let val = this.value.replace(/\D/g, '');
 			if (val.length > 3 && val.length <= 6) {
 				val = val.slice(0, 3) + '-' + val.slice(3);
 			} else if (val.length > 6) {

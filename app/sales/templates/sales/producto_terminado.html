@@ -1,4 +1,6 @@
-{% extends "base_template.html" %} {% block title %}Inventario y Producto Terminado{% endblock %} {%
+{% extends "base_template.html" %}
+{% from '_macros.html' import campo %}
+{% block title %}Inventario y Producto Terminado{% endblock %} {%
 block page_title %}Producto terminado{% endblock %} {% block content %} {% set payload_map = {} %}
 {% for item in productos_payload %} {% set _ = payload_map.update({item.id_producto: item}) %} {%
 endfor %}
@@ -259,10 +261,11 @@ endfor %}
 				</div>
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
-			<form method="post" id="formProducto" enctype="multipart/form-data">
+			<form method="post" id="formProducto" enctype="multipart/form-data" novalidate>
+				{{ form_producto.hidden_tag() }}
 				<div class="modal-body">
-					<input type="hidden" name="action" id="formAction" value="crear" />
-					<input type="hidden" name="id_producto" id="productId" />
+					{{ form_producto.action(id="formAction") }}
+					{{ form_producto.id_producto(id="productId") }}
 					<div class="product-form-grid">
 						<div class="product-form-card">
 							<p class="ops-meta mb-3">
@@ -271,48 +274,25 @@ endfor %}
 							</p>
 							<div class="form-grid form-grid-2">
 								<div class="field-span-2">
-									<label for="nombre" class="form-label fw-semibold">Nombre *</label>
-									<input type="text" class="form-control" name="nombre" id="nombre"
-										placeholder="Ej. Pastel de Chocolate" required />
+									{{ campo(form_producto.nombre, id='nombre', placeholder='Ej. Pastel de Chocolate') }}
 								</div>
 								<div>
-									<label for="precio_venta" class="form-label fw-semibold">Precio de venta *</label>
-									<div class="input-group">
-										<span class="input-group-text">$</span>
-										<input type="number" step="0.01" min="0" class="form-control"
-											name="precio_venta" id="precio_venta" placeholder="0.00" required />
-									</div>
+									{{ campo(form_producto.precio_venta, id='precio_venta', placeholder='0.00') }}
 								</div>
 								<div>
-									<label for="unidad_venta" class="form-label fw-semibold">Unidad de venta *</label>
-									<select class="form-select" name="unidad_venta" id="unidad_venta" required>
-										<option value="Pieza">Pieza</option>
-										<option value="Kg">Kg</option>
-										<option value="Paquete">Paquete</option>
-										<option value="Caja">Caja</option>
-										<option value="Litro">Litro</option>
-									</select>
+									{{ campo(form_producto.unidad_venta, id='unidad_venta') }}
 								</div>
 								<div class="field-span-2">
-									<label for="id_receta" class="form-label fw-semibold">Receta activa (RF08)</label>
-									<select class="form-select" name="id_receta" id="id_receta">
-										<option value="">Sin receta activa</option>
-									</select>
+									{{ campo(form_producto.id_receta, id='id_receta') }}
 									<small class="text-muted" id="recetaHelpText">
 										Asigna la receta activa del producto para cálculo de costo y precio sugerido.
 									</small>
 								</div>
 								<div>
-									<label for="margen_objetivo_pct" class="form-label fw-semibold">
-										Ganancia % (opcional)
-									</label>
-									<input type="number" step="0.01" min="0.01" max="99.99" class="form-control"
-										name="margen_objetivo_pct" id="margen_objetivo_pct" value="25" />
+									{{ campo(form_producto.margen_objetivo_pct, id='margen_objetivo_pct') }}
 								</div>
 								<div class="field-span-2">
-									<label for="descripcion" class="form-label fw-semibold">Descripción</label>
-									<textarea class="form-control" name="descripcion" id="descripcion" rows="3"
-										placeholder="Descripción del producto (opcional)..."></textarea>
+									{{ campo(form_producto.descripcion, id='descripcion', rows='3', placeholder='Descripción del producto (opcional)...') }}
 								</div>
 								<div>
 									<label for="imagen_archivo" class="form-label fw-semibold">Imagen</label>
@@ -320,16 +300,10 @@ endfor %}
 										accept="image/*" />
 								</div>
 								<div>
-									<label for="imagen" class="form-label fw-semibold">Emoji / URL</label>
-									<input type="text" class="form-control" name="imagen" id="imagen"
-										placeholder="🍰 o URL imagen" />
+									{{ campo(form_producto.imagen, id='imagen', placeholder='🍰 o URL imagen') }}
 								</div>
 								<div>
-									<label for="activo" class="form-label fw-semibold">Estado</label>
-									<select class="form-select" name="activo" id="activo">
-										<option value="on">Activo</option>
-										<option value="off">Inactivo</option>
-									</select>
+									{{ campo(form_producto.activo, id='activo') }}
 								</div>
 								<div class="field-span-2">
 									<div class="d-flex flex-wrap gap-2 align-items-center">
@@ -357,19 +331,13 @@ endfor %}
 							</p>
 							<div class="form-grid form-grid-2">
 								<div>
-									<label for="stock_inicial" class="form-label fw-semibold">
-										Stock inicial / actual
-									</label>
-									<input type="number" step="1" min="0" class="form-control" name="stock_inicial"
-										id="stock_inicial" value="0" required />
+									{{ campo(form_producto.stock_inicial, id='stock_inicial') }}
 									<small class="text-muted">
 										Se actualiza automáticamente por producción y ventas.
 									</small>
 								</div>
 								<div>
-									<label for="stock_minimo" class="form-label fw-semibold">Stock mínimo *</label>
-									<input type="number" step="1" min="0" class="form-control" name="stock_minimo"
-										id="stock_minimo" value="10" required />
+									{{ campo(form_producto.stock_minimo, id='stock_minimo') }}
 									<small class="text-muted">
 										Activa alerta visual cuando el inventario baje del mínimo.
 									</small>
@@ -819,81 +787,92 @@ endfor %}
 		button.addEventListener('click', () => handler(Number(button.dataset.id || 0)));
 	}
 
-	document.querySelectorAll('.product-tab').forEach((tab) => {
-		tab.addEventListener('click', () => activateView(tab.dataset.viewTarget));
-	});
-
-	document
-		.querySelectorAll('.btnVerProducto')
-		.forEach((button) => wireButton(button, openDetailModal));
-	document
-		.querySelectorAll('.btnMovimientosProducto')
-		.forEach((button) => wireButton(button, openMovimientosModal));
-	document
-		.querySelectorAll('.btnEditarProducto')
-		.forEach((button) => wireButton(button, openProductModal));
-	document.querySelectorAll('.btnDesactivarProducto').forEach((button) => {
-		button.addEventListener('click', () => {
-			const product = productsData[Number(button.dataset.id || 0)];
-			if (!product) return;
-			if (!confirm(`¿Desactivar ${product.nombre}?`)) return;
-			document.getElementById('desactivarIdProducto').value = product.id_producto;
-			document.getElementById('desactivarNombre').value = product.nombre;
-			document.getElementById('desactivarDescripcion').value = product.descripcion || '';
-			document.getElementById('desactivarPrecio').value = product.precio_venta;
-			document.getElementById('desactivarUnidad').value = product.unidad_venta || 'Pieza';
-			document.getElementById('desactivarStockMinimo').value = product.stock_minimo || 0;
-			document.getElementById('formDesactivarProducto').submit();
+	function bindEvents() {
+		document.querySelectorAll('.product-tab').forEach((tab) => {
+			tab.addEventListener('click', () => activateView(tab.dataset.viewTarget));
 		});
-	});
 
-	if (document.getElementById('btnNuevoProducto')) {
-		document.getElementById('btnNuevoProducto').addEventListener('click', () => {
-			resetProductForm();
-			modalProducto.show();
+		document
+			.querySelectorAll('.btnVerProducto')
+			.forEach((button) => wireButton(button, openDetailModal));
+		document
+			.querySelectorAll('.btnMovimientosProducto')
+			.forEach((button) => wireButton(button, openMovimientosModal));
+		document
+			.querySelectorAll('.btnEditarProducto')
+			.forEach((button) => wireButton(button, openProductModal));
+		document.querySelectorAll('.btnDesactivarProducto').forEach((button) => {
+			button.addEventListener('click', () => {
+				const product = productsData[Number(button.dataset.id || 0)];
+				if (!product) return;
+				if (!confirm(`¿Desactivar ${product.nombre}?`)) return;
+				document.getElementById('desactivarIdProducto').value = product.id_producto;
+				document.getElementById('desactivarNombre').value = product.nombre;
+				document.getElementById('desactivarDescripcion').value = product.descripcion || '';
+				document.getElementById('desactivarPrecio').value = product.precio_venta;
+				document.getElementById('desactivarUnidad').value = product.unidad_venta || 'Pieza';
+				document.getElementById('desactivarStockMinimo').value = product.stock_minimo || 0;
+				document.getElementById('formDesactivarProducto').submit();
+			});
 		});
-	}
-	if (document.getElementById('btnNuevoProductoToolbar')) {
-		document.getElementById('btnNuevoProductoToolbar').addEventListener('click', () => {
-			resetProductForm();
-			modalProducto.show();
-		});
-	}
 
-	if (margenInput) {
-		margenInput.addEventListener('input', refreshPricingAid);
-	}
-
-	if (btnAplicarSugerido) {
-		btnAplicarSugerido.addEventListener('click', () => {
-			const margen = parseNumber(margenInput?.value);
-			if (!(currentCost > 0 && margen > 0 && margen < 100)) {
-				return;
-			}
-			const sugerido = currentCost / (1 - margen / 100);
-			precioInput.value = sugerido.toFixed(2);
-		});
-	}
-
-	if (recetaSelect) {
-		recetaSelect.addEventListener('change', applyCurrentCostFromRecipe);
-	}
-
-	document.getElementById('imagen').addEventListener('input', () => {
-		const imagen = document.getElementById('imagen').value.trim();
-		if (!document.getElementById('imagen_archivo').files.length && imagen) {
-			previewBox.innerHTML = buildMediaMarkup(imagen, 'Vista previa');
+		if (document.getElementById('btnNuevoProducto')) {
+			document.getElementById('btnNuevoProducto').addEventListener('click', () => {
+				resetProductForm();
+				modalProducto.show();
+			});
 		}
+
+		if (margenInput) {
+			margenInput.addEventListener('input', refreshPricingAid);
+		}
+
+		if (btnAplicarSugerido) {
+			btnAplicarSugerido.addEventListener('click', () => {
+				const margen = parseNumber(margenInput?.value);
+				if (!(currentCost > 0 && margen > 0 && margen < 100)) {
+					return;
+				}
+				const sugerido = currentCost / (1 - margen / 100);
+				precioInput.value = sugerido.toFixed(2);
+			});
+		}
+
+		if (recetaSelect) {
+			recetaSelect.addEventListener('change', applyCurrentCostFromRecipe);
+		}
+
+		document.getElementById('imagen').addEventListener('input', () => {
+			const imagen = document.getElementById('imagen').value.trim();
+			if (!document.getElementById('imagen_archivo').files.length && imagen) {
+				previewBox.innerHTML = buildMediaMarkup(imagen, 'Vista previa');
+			}
+		});
+
+		const searchInput = document.getElementById('searchInput');
+		const filterStatus = document.getElementById('filterStatus');
+		const filterStock = document.getElementById('filterStock');
+		searchInput.addEventListener('input', applyFilters);
+		filterStatus.addEventListener('change', applyFilters);
+		filterStock.addEventListener('change', applyFilters);
+	}
+
+	document.addEventListener('DOMContentLoaded', () => {
+		bindEvents();
+		refreshPricingAid();
+		applyFilters();
+
+		{% if open_modal == 'modalProducto_crear' %}
+			modalProducto.show();
+			modalEyebrow.textContent = 'Nuevo producto';
+			productTitle.textContent = 'Nuevo producto terminado';
+			document.getElementById('formAction').value = 'crear';
+		{% elif open_modal == 'modalProducto_editar' %}
+			modalProducto.show();
+			modalEyebrow.textContent = 'Editar producto';
+			productTitle.textContent = 'Editar producto terminado';
+			document.getElementById('formAction').value = 'editar';
+		{% endif %}
 	});
-
-	const searchInput = document.getElementById('searchInput');
-	const filterStatus = document.getElementById('filterStatus');
-	const filterStock = document.getElementById('filterStock');
-	searchInput.addEventListener('input', applyFilters);
-	filterStatus.addEventListener('change', applyFilters);
-	filterStock.addEventListener('change', applyFilters);
-
-	refreshPricingAid();
-	applyFilters();
 </script>
 {% endblock %}

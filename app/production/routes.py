@@ -32,7 +32,7 @@ from app.models import (
     utc_now,
 )
 from app.production import production_bp
-from app.production.forms import MateriaPrimaForm
+from app.production.forms import MateriaPrimaForm, AjusteInventarioForm, RecetaBaseForm, OrdenProduccionForm, ResolverSolicitudForm
 
 
 def _decimal(value: str, default: str = "0") -> Decimal:
@@ -344,6 +344,7 @@ def _serializar_receta_activa_para_orden(receta: Receta) -> dict:
 @require_permission("Inventario MP", "leer")
 def inventario_mp():
     form_mp = MateriaPrimaForm()
+    form_ajuste = AjusteInventarioForm(prefix="ajuste")
     unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()
     form_mp.id_unidad_base.choices = [(u.id_unidad, f"{u.nombre} ({u.abreviatura})") for u in unidades]
     form_mp.id_unidad_compra.choices = [(u.id_unidad, f"{u.nombre} ({u.abreviatura})") for u in unidades]
@@ -406,74 +407,89 @@ def inventario_mp():
             return redirect(url_for("production.inventario_mp"))
 
         if action == "ajuste":
-            id_materia = _int(request.form.get("id_materia", "0"))
-            cantidad = _decimal(request.form.get("cantidad", "0"))
-            tipo = request.form.get("tipo", "AJUSTE").strip().upper()
-            referencia_id = (request.form.get("referencia_id") or "").strip()
-            if tipo not in {"ENTRADA", "SALIDA", "AJUSTE"}:
-                flash("Tipo de movimiento invalido.", "danger")
-                return redirect(url_for("production.inventario_mp"))
+            if form_ajuste.validate_on_submit():
+                id_materia = form_ajuste.id_materia.data
+                cantidad = Decimal(str(form_ajuste.cantidad.data))
+                tipo = form_ajuste.tipo.data.upper()
+                referencia_id = form_ajuste.referencia_id.data
 
-            if cantidad <= 0:
-                flash("La cantidad del movimiento debe ser mayor a cero.", "danger")
-                return redirect(url_for("production.inventario_mp"))
+                materia = MateriaPrima.query.get(id_materia)
+                if not materia:
+                    flash("Materia prima no encontrada.", "danger")
+                    return redirect(url_for("production.inventario_mp"))
 
-            if not referencia_id:
-                flash("Debes indicar una referencia o motivo del movimiento.", "danger")
-                return redirect(url_for("production.inventario_mp"))
+                dimension_base = (
+                    materia.unidad_base.dimension if materia.unidad_base else "CONTEO"
+                ).upper()
+                
+                if dimension_base == "CONTEO" and cantidad != cantidad.to_integral_value():
+                    form_ajuste.cantidad.errors.append("Para materias primas por pieza, la cantidad debe ser entera.")
+                else:
+                    disponible = Decimal(str(materia.cantidad_disponible))
+                    if dimension_base == "CONTEO":
+                        disponible = disponible.to_integral_value(rounding=ROUND_HALF_UP)
+                    
+                    nueva_cantidad = disponible
+                    if tipo == "ENTRADA":
+                        nueva_cantidad = disponible + cantidad
+                    elif tipo in {"SALIDA", "AJUSTE"}:
+                        nueva_cantidad = disponible - cantidad
 
-            materia = MateriaPrima.query.get(id_materia)
-            if not materia:
-                flash("Materia prima no encontrada.", "danger")
-                return redirect(url_for("production.inventario_mp"))
+                    if dimension_base == "CONTEO":
+                        nueva_cantidad = nueva_cantidad.to_integral_value(rounding=ROUND_HALF_UP)
+                        cantidad = cantidad.to_integral_value(rounding=ROUND_HALF_UP)
 
-            dimension_base = (
-                materia.unidad_base.dimension if materia.unidad_base else "CONTEO"
+                    if nueva_cantidad < 0:
+                        form_ajuste.cantidad.errors.append("La cantidad descontada supera la existencia.")
+                    else:
+                        materia.cantidad_disponible = nueva_cantidad
+                        db.session.add(
+                            MovimientoInventarioMP(
+                                id_materia_prima=materia.id_materia,
+                                tipo=tipo,
+                                cantidad=cantidad,
+                                id_usuario=current_user.id_usuario,
+                                referencia_id=referencia_id,
+                            )
+                        )
+                        db.session.commit()
+                        log_audit_event(
+                            "INVENTARIO_MP_AJUSTE",
+                            f"id_materia={materia.id_materia}; tipo={tipo}; cantidad={cantidad}; referencia={referencia_id}",
+                        )
+                        flash("Movimiento registrado.", "success")
+                        return redirect(url_for("production.inventario_mp"))
+
+            # Validacion o lógica de la acción falló, volver a renderizar y abrir el modal
+            materias = MateriaPrima.query.order_by(MateriaPrima.nombre.asc()).all()
+            unidades_meta = [{"id_unidad": u.id_unidad, "abreviatura": u.abreviatura, "dimension": (u.dimension or "CONTEO").upper(), "factor_base": float(u.factor_base)} for u in unidades]
+            movimientos = MovimientoInventarioMP.query.order_by(MovimientoInventarioMP.id_movimiento.desc()).limit(15).all()
+            resumen_stock = {"critico": 0, "bajo": 0, "ok": 0}
+            alertas_stock = []
+            for m in materias:
+                if not m.activa: continue
+                est = (m.estado_stock or "OK").upper()
+                if est == "CRITICO":
+                    resumen_stock["critico"] += 1
+                    alertas_stock.append({"nombre": m.nombre, "cantidad": Decimal(str(m.cantidad_disponible)), "stock_minimo": Decimal(str(m.stock_minimo)), "unidad": m.unidad_base.abreviatura})
+                elif est == "BAJO":
+                    resumen_stock["bajo"] += 1
+                else: resumen_stock["ok"] += 1
+
+            return render_template(
+                "production/inventario_mp.html",
+                materias=materias,
+                unidades=unidades,
+                unidades_meta=unidades_meta,
+                movimientos=movimientos,
+                resumen_stock=resumen_stock,
+                alertas_stock=alertas_stock,
+                form_mp=form_mp,
+                form_ajuste=form_ajuste,
+                open_modal="modalInventarioAjuste" if action == "ajuste" else "modalMateriaPrima",
+                edit_materia_id=request.form.get("id_materia"),
+                ajuste_materia_id=request.form.get(f"ajuste-id_materia"),
             )
-            dimension_base = (dimension_base or "CONTEO").upper()
-            if dimension_base == "CONTEO" and cantidad != cantidad.to_integral_value():
-                flash(
-                    "Para materias primas por pieza (conteo), la cantidad del movimiento debe ser entera.",
-                    "danger",
-                )
-                return redirect(url_for("production.inventario_mp"))
-
-            disponible = Decimal(str(materia.cantidad_disponible))
-            if dimension_base == "CONTEO":
-                disponible = disponible.to_integral_value(rounding=ROUND_HALF_UP)
-            nueva_cantidad = disponible
-            if tipo == "ENTRADA":
-                nueva_cantidad = disponible + cantidad
-            elif tipo in {"SALIDA", "AJUSTE"}:
-                nueva_cantidad = disponible - cantidad
-
-            if dimension_base == "CONTEO":
-                nueva_cantidad = nueva_cantidad.to_integral_value(
-                    rounding=ROUND_HALF_UP
-                )
-                cantidad = cantidad.to_integral_value(rounding=ROUND_HALF_UP)
-
-            if nueva_cantidad < 0:
-                flash("La cantidad no puede ser negativa.", "danger")
-                return redirect(url_for("production.inventario_mp"))
-
-            materia.cantidad_disponible = nueva_cantidad
-            db.session.add(
-                MovimientoInventarioMP(
-                    id_materia_prima=materia.id_materia,
-                    tipo=tipo,
-                    cantidad=cantidad,
-                    id_usuario=current_user.id_usuario,
-                    referencia_id=referencia_id,
-                )
-            )
-            db.session.commit()
-            log_audit_event(
-                "INVENTARIO_MP_AJUSTE",
-                f"id_materia={materia.id_materia}; tipo={tipo}; cantidad={cantidad}; referencia={referencia_id}",
-            )
-            flash("Movimiento registrado.", "success")
-            return redirect(url_for("production.inventario_mp"))
 
     materias = MateriaPrima.query.order_by(MateriaPrima.nombre.asc()).all()
     unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()
@@ -527,6 +543,7 @@ def inventario_mp():
         resumen_stock=resumen_stock,
         alertas_stock=alertas_stock,
         form_mp=form_mp,
+        form_ajuste=form_ajuste,
     )
 
 
@@ -615,6 +632,11 @@ def api_movimientos_inventario():
 @login_required
 @require_permission("Recetas", "leer")
 def recetas():
+    form_receta = RecetaBaseForm(prefix="receta")
+
+    productos = Producto.query.order_by(Producto.nombre.asc()).all()
+    form_receta.id_producto.choices = [(p.id_producto, p.nombre) for p in productos if p.activo]
+
     if request.method == "POST":
         action = (request.form.get("action") or "crear").strip().lower()
 
@@ -632,151 +654,101 @@ def recetas():
         if action == "editar" and (not permiso or not permiso.actualizacion):
             abort(403)
 
-        id_producto = _int(request.form.get("id_producto", "0"))
-        rendimiento = _decimal(
-            request.form.get("rendimiento_base")
-            or request.form.get("rendimiento")
-            or "0"
+        if form_receta.validate_on_submit():
+            id_producto = form_receta.id_producto.data
+            rendimiento = Decimal(str(form_receta.rendimiento_base.data))
+            estado_receta = form_receta.estado.data
+            activa = estado_receta != "INACTIVA"
+            categoria = (form_receta.categoria.data or "").strip() or None
+            descripcion = (form_receta.descripcion.data or "").strip() or None
+            unidad_produccion = (form_receta.unidad_produccion.data or "").strip() or None
+            
+            id_receta_base = _int(request.form.get("id_receta_base", "0"))
+
+            ids_materia = request.form.getlist("id_materia_prima[]")
+            cantidades = request.form.getlist("cantidad_receta[]")
+            detalles_normalizados, error_detalles = _normalizar_detalles_receta(ids_materia, cantidades)
+            if error_detalles:
+                flash(error_detalles, "warning")
+            else:
+                producto = Producto.query.get(id_producto)
+                if not producto or not producto.activo:
+                    flash("Debes seleccionar un producto activo para la receta.", "warning")
+                elif action not in {"crear", "editar"}:
+                    flash("Accion de receta no valida.", "warning")
+                elif action == "editar" and id_receta_base <= 0:
+                    flash("Debes seleccionar una receta base para editar.", "warning")
+                else:
+                    version_actual = Receta.query.filter_by(id_producto=producto.id_producto).order_by(Receta.version.desc()).first()
+                    next_version = 1 if not version_actual else version_actual.version + 1
+
+                    receta_base = None
+                    if id_receta_base > 0:
+                        receta_base = Receta.query.get(id_receta_base)
+                        if not receta_base or receta_base.id_producto != producto.id_producto:
+                            flash("La receta base seleccionada no corresponde al producto.", "warning")
+                            return redirect(url_for("production.recetas"))
+
+                    skip = False
+                    if action == "editar" and receta_base:
+                        firma_nueva = sorted((id_mat, _decimal_text(cant)) for id_mat, cant in detalles_normalizados)
+                        firma_actual = _firma_detalles_receta(receta_base)
+                        rendimiento_actual = Decimal(str(receta_base.rendimiento_base or 0))
+                        if firma_nueva == firma_actual and rendimiento == rendimiento_actual:
+                            flash("No se detectaron cambios significativos en ingredientes o rendimiento para crear una nueva version.", "warning")
+                            skip = True
+                    
+                    if not skip:
+                        receta = Receta()
+                        receta.id_producto = producto.id_producto
+                        receta.nombre = producto.nombre.strip()
+                        receta.descripcion = descripcion
+                        receta.unidad_produccion = unidad_produccion or producto.unidad_venta or "pieza"
+                        receta.categoria = categoria
+                        receta.version = next_version
+                        receta.rendimiento_base = rendimiento
+                        receta.activa = activa
+                        db.session.add(receta)
+                        db.session.flush()
+
+                        materias_validas = True
+                        for id_materia, cantidad in detalles_normalizados:
+                            materia = MateriaPrima.query.get(id_materia)
+                            if not materia or not materia.activa:
+                                db.session.rollback()
+                                flash("No se puede guardar la receta con materias primas inexistentes o inactivas.", "warning")
+                                materias_validas = False
+                                break
+
+                            detalle = DetalleReceta()
+                            detalle.id_receta = receta.id_receta
+                            detalle.id_materia_prima = id_materia
+                            detalle.cantidad_base = cantidad
+                            db.session.add(detalle)
+
+                        if materias_validas:
+                            if action == "editar" and receta_base:
+                                receta_base.activa = False
+
+                            if activa:
+                                producto.receta_activa_id = receta.id_receta
+
+                            db.session.commit()
+                            log_audit_event("RECETA_NUEVA_VERSION" if action == "editar" else "RECETA_CREAR", f"id_receta={receta.id_receta}; producto={producto.id_producto}; version={receta.version}")
+                            flash(f"Receta version {receta.version} registrada correctamente para el producto {producto.nombre}.", "success")
+                            return redirect(url_for("production.recetas"))
+
+        # Si hay errores o la validación falló, llegar aquí para re-renderizar con el modal abierto
+        materias_all = MateriaPrima.query.order_by(MateriaPrima.nombre.asc()).all()
+        recetas_all = Receta.query.options(selectinload(Receta.detalles).selectinload(DetalleReceta.materia_prima)).order_by(Receta.nombre.asc(), Receta.version.desc()).all()
+        return render_template(
+            "production/recetas.html",
+            recetas=_agrupar_recetas_por_producto(recetas_all),
+            materias=materias_all,
+            productos=productos,
+            form_receta=form_receta,
+            open_modal="modalReceta",
         )
-        estado_receta = (request.form.get("estado") or "ACTIVA").strip().upper()
-        activa = estado_receta != "INACTIVA"
-        categoria = (request.form.get("categoria") or "").strip() or None
-        descripcion = (request.form.get("descripcion") or "").strip() or None
-        id_receta_base = _int(request.form.get("id_receta_base", "0"))
-
-        ids_materia = request.form.getlist("id_materia_prima[]")
-        cantidades = request.form.getlist("cantidad_receta[]")
-
-        detalles_normalizados, error_detalles = _normalizar_detalles_receta(
-            ids_materia,
-            cantidades,
-        )
-        if error_detalles:
-            flash(error_detalles, "warning")
-            return redirect(url_for("production.recetas"))
-
-        if rendimiento <= 0:
-            flash("El rendimiento base debe ser mayor a cero.", "warning")
-            return redirect(url_for("production.recetas"))
-
-        producto = Producto.query.get(id_producto)
-        if not producto or not producto.activo:
-            flash(
-                "Debes seleccionar un producto activo para la receta.",
-                "warning",
-            )
-            return redirect(url_for("production.recetas"))
-
-        if action not in {"crear", "editar"}:
-            flash("Accion de receta no valida.", "warning")
-            return redirect(url_for("production.recetas"))
-
-        if action == "editar" and id_receta_base <= 0:
-            flash("Debes seleccionar una receta base para editar.", "warning")
-            return redirect(url_for("production.recetas"))
-
-        version_actual = (
-            Receta.query.filter_by(id_producto=producto.id_producto)
-            .order_by(Receta.version.desc())
-            .first()
-        )
-        next_version = 1 if not version_actual else version_actual.version + 1
-
-        receta_base = None
-        if id_receta_base > 0:
-            receta_base = Receta.query.get(id_receta_base)
-            if not receta_base or receta_base.id_producto != producto.id_producto:
-                flash(
-                    "La receta base seleccionada no corresponde al producto.", "warning"
-                )
-                return redirect(url_for("production.recetas"))
-
-        if action == "editar" and receta_base:
-            firma_nueva = sorted(
-                (id_materia, _decimal_text(cantidad))
-                for id_materia, cantidad in detalles_normalizados
-            )
-            firma_actual = _firma_detalles_receta(receta_base)
-            rendimiento_actual = Decimal(str(receta_base.rendimiento_base or 0))
-            if firma_nueva == firma_actual and rendimiento == rendimiento_actual:
-                flash(
-                    "No se detectaron cambios significativos en ingredientes o rendimiento para crear una nueva version.",
-                    "warning",
-                )
-                return redirect(url_for("production.recetas"))
-
-        receta = Receta()
-        receta.id_producto = producto.id_producto
-        receta.nombre = producto.nombre.strip()
-        receta.descripcion = descripcion
-        receta.unidad_produccion = (
-            request.form.get("unidad_produccion") or producto.unidad_venta or "pieza"
-        ).strip()
-        receta.categoria = categoria
-        receta.version = next_version
-        receta.rendimiento_base = rendimiento
-        receta.activa = activa
-        db.session.add(receta)
-        db.session.flush()
-
-        detalles_validos = 0
-        for id_materia, cantidad in detalles_normalizados:
-            materia = MateriaPrima.query.get(id_materia)
-            if not materia or not materia.activa:
-                db.session.rollback()
-                flash(
-                    "No se puede guardar la receta con materias primas inexistentes o inactivas.",
-                    "warning",
-                )
-                return redirect(url_for("production.recetas"))
-
-            detalle = DetalleReceta()
-            detalle.id_receta = receta.id_receta
-            detalle.id_materia_prima = id_materia
-            detalle.cantidad_base = cantidad
-            db.session.add(detalle)
-            detalles_validos += 1
-
-        if detalles_validos == 0:
-            db.session.rollback()
-            flash("Debes registrar al menos un ingrediente valido.", "warning")
-            return redirect(url_for("production.recetas"))
-
-        if receta.activa:
-            Receta.query.filter(
-                Receta.id_producto == producto.id_producto,
-                Receta.id_receta != receta.id_receta,
-                Receta.activa.is_(True),
-            ).update({"activa": False}, synchronize_session=False)
-            producto.id_receta = receta.id_receta
-            try:
-                recalcular_costo_y_precio_sugerido_producto(
-                    id_producto=producto.id_producto
-                )
-            except ValueError:
-                producto.costo_produccion_actual = Decimal("0")
-                producto.precio_sugerido = None
-                producto.fecha_costo_actualizado = None
-        elif producto.id_receta == receta.id_receta:
-            producto.id_receta = None
-            producto.costo_produccion_actual = Decimal("0")
-            producto.precio_sugerido = None
-            producto.fecha_costo_actualizado = None
-
-        db.session.commit()
-        nombre_evento = "RECETA_EDITADA" if action == "editar" else "RECETA_CREADA"
-        log_audit_event(
-            nombre_evento,
-            (
-                f"id_receta={receta.id_receta}; id_producto={producto.id_producto}; "
-                f"nombre={receta.nombre}; version={receta.version}; activa={receta.activa}"
-            ),
-        )
-        flash(
-            f"Receta version {receta.version} guardada correctamente.",
-            "success",
-        )
-        return redirect(url_for("production.recetas"))
 
     recetas_query = Receta.query.order_by(Receta.id_receta.desc()).all()
     recetas_por_producto: dict[int, list[Receta]] = {}
@@ -829,6 +801,7 @@ def recetas():
         materias=materias,
         productos=productos_payload,
         unidades=UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all(),
+        form_receta=form_receta,
     )
 
 
@@ -897,6 +870,15 @@ def ordenes():
         flash("No tienes acceso a este modulo.", "danger")
         return redirect(url_for("catalog.home"))
 
+    form_orden = OrdenProduccionForm(prefix="orden")
+    
+    # Pre-populate choices for the form (could have done this on GET/POST generically)
+    recetas_activas = Receta.query.filter_by(activa=True).order_by(Receta.id_producto.asc(), Receta.version.desc()).all()
+    form_orden.id_producto.choices = [(r.producto.id_producto, r.producto.nombre) for r in recetas_activas if r.producto and r.producto.activo]
+    form_orden.id_receta.choices = [(r.id_receta, f"{r.nombre} (v{r.version})") for r in recetas_activas]
+    solicitudes_aprobadas = SolicitudProduccion.query.filter_by(estado="APROBADA").order_by(SolicitudProduccion.fecha_solicitud.desc()).all()
+    form_orden.id_solicitud.choices = [(0, "Ninguna (Orden directa)")] + [(s.id_solicitud, f"SOL-{s.id_solicitud:03d} (x{s.cantidad})") for s in solicitudes_aprobadas]
+
     if request.method == "POST":
         if role_name == "Ventas":
             flash("El area de ventas solo puede consultar ordenes.", "warning")
@@ -904,89 +886,97 @@ def ordenes():
 
         action = request.form.get("action", "")
         if action == "crear":
-            id_producto = _int(request.form.get("id_producto", "0"))
-            id_receta = _int(request.form.get("id_receta", "0"))
-            cantidad = _int(request.form.get("cantidad", "0"))
-            id_solicitud = _int(request.form.get("id_solicitud", "0"))
-            if id_producto <= 0 or id_receta <= 0 or cantidad <= 0:
-                flash("Datos invalidos para crear la orden.", "warning")
-                return redirect(url_for("production.ordenes"))
+            if form_orden.validate_on_submit():
+                id_producto = form_orden.id_producto.data
+                id_receta = form_orden.id_receta.data
+                cantidad = form_orden.cantidad.data
+                id_solicitud = form_orden.id_solicitud.data
+                observaciones = form_orden.observaciones.data or ""
+                
+                if id_producto <= 0 or id_receta <= 0 or cantidad <= 0:
+                    flash("Datos invalidos para crear la orden.", "warning")
+                    return redirect(url_for("production.ordenes"))
 
-            try:
-                orden = crear_orden_produccion(
-                    id_receta=id_receta,
-                    cantidad=cantidad,
-                    id_usuario=current_user.id_usuario,
-                    id_producto=id_producto,
-                    id_solicitud=id_solicitud if id_solicitud > 0 else None,
-                    observaciones=request.form.get("observaciones", ""),
-                )
-                log_audit_event(
-                    "ORDEN_PRODUCCION_CREADA",
-                    (
-                        f"id_orden={orden.id_orden}; id_producto={id_producto}; "
-                        f"id_receta={id_receta}; cantidad={cantidad}; "
-                        f"id_solicitud={id_solicitud if id_solicitud > 0 else 'N/A'}"
-                    ),
-                )
-                flash("Orden de produccion creada.", "success")
-            except ValueError as exc:
-                flash(str(exc), "danger")
-            return redirect(url_for("production.ordenes"))
+                try:
+                    orden = crear_orden_produccion(
+                        id_receta=id_receta,
+                        cantidad=cantidad,
+                        id_usuario=current_user.id_usuario,
+                        id_producto=id_producto,
+                        id_solicitud=id_solicitud if id_solicitud > 0 else None,
+                        observaciones=observaciones,
+                    )
+                    log_audit_event(
+                        "ORDEN_PRODUCCION_CREADA",
+                        (
+                            f"id_orden={orden.id_orden}; id_producto={form_orden.id_producto.data}; "
+                            f"id_receta={form_orden.id_receta.data}; cantidad={form_orden.cantidad.data}; "
+                            f"id_solicitud={form_orden.id_solicitud.data if form_orden.id_solicitud.data > 0 else 'N/A'}"
+                        ),
+                    )
+                    flash("Orden de produccion creada.", "success")
+                    return redirect(url_for("production.ordenes"))
+                except ValueError as exc:
+                    flash(str(exc), "danger")
+            
+            # Formulario invalido, continua abajo para renderizar
+            action = "crear_fallido"
 
-        id_orden = _int(request.form.get("id_orden", "0"))
-        orden = OrdenProduccion.query.get_or_404(id_orden)
+        if action != "crear_fallido":
+            id_orden = _int(request.form.get("id_orden", "0"))
+            orden = OrdenProduccion.query.get(id_orden) if id_orden > 0 else None
+            
+            if orden:
+                if action == "iniciar":
+                    if orden.estado != "PENDIENTE":
+                        flash("Solo se pueden iniciar ordenes pendientes.", "warning")
+                        return redirect(url_for("production.ordenes"))
+                    try:
+                        iniciar_orden_produccion(
+                            id_orden=orden.id_orden,
+                            id_usuario=current_user.id_usuario,
+                        )
+                        log_audit_event(
+                            "ORDEN_PRODUCCION_INICIADA",
+                            f"id_orden={orden.id_orden}",
+                        )
+                        flash(
+                            "Orden iniciada correctamente. Se descontaron insumos con merma.",
+                            "success",
+                        )
+                    except ValueError as exc:
+                        flash(str(exc), "danger")
+                    return redirect(url_for("production.ordenes"))
 
-        if action == "iniciar":
-            if orden.estado != "PENDIENTE":
-                flash("Solo se pueden iniciar ordenes pendientes.", "warning")
-                return redirect(url_for("production.ordenes"))
-            try:
-                iniciar_orden_produccion(
-                    id_orden=orden.id_orden,
-                    id_usuario=current_user.id_usuario,
-                )
-                log_audit_event(
-                    "ORDEN_PRODUCCION_INICIADA",
-                    f"id_orden={orden.id_orden}",
-                )
-                flash(
-                    "Orden iniciada correctamente. Se descontaron insumos con merma.",
-                    "success",
-                )
-            except ValueError as exc:
-                flash(str(exc), "danger")
-            return redirect(url_for("production.ordenes"))
+                if action == "finalizar":
+                    try:
+                        orden_actualizada = finalizar_orden_produccion(
+                            id_orden=orden.id_orden,
+                            id_usuario=current_user.id_usuario,
+                        )
+                        log_audit_event(
+                            "ORDEN_PRODUCCION_FINALIZADA",
+                            f"id_orden={orden_actualizada.id_orden}; id_producto={orden_actualizada.id_producto}; cantidad={orden_actualizada.cantidad_producir}",
+                        )
+                        flash(
+                            "Orden finalizada. Se ingreso producto terminado a inventario.",
+                            "success",
+                        )
+                    except ValueError as exc:
+                        flash(str(exc), "warning")
+                    return redirect(url_for("production.ordenes"))
 
-        if action == "finalizar":
-            try:
-                orden_actualizada = finalizar_orden_produccion(
-                    id_orden=orden.id_orden,
-                    id_usuario=current_user.id_usuario,
-                )
-                log_audit_event(
-                    "ORDEN_PRODUCCION_FINALIZADA",
-                    f"id_orden={orden_actualizada.id_orden}; id_producto={orden_actualizada.id_producto}; cantidad={orden_actualizada.cantidad_producir}",
-                )
-                flash(
-                    "Orden finalizada. Se ingreso producto terminado a inventario.",
-                    "success",
-                )
-            except ValueError as exc:
-                flash(str(exc), "warning")
-            return redirect(url_for("production.ordenes"))
-
-        if action == "cancelar":
-            try:
-                orden_cancelada = cancelar_orden_produccion(id_orden=orden.id_orden)
-                log_audit_event(
-                    "ORDEN_PRODUCCION_CANCELADA",
-                    f"id_orden={orden_cancelada.id_orden}",
-                )
-                flash("Orden cancelada.", "success")
-            except ValueError as exc:
-                flash(str(exc), "warning")
-            return redirect(url_for("production.ordenes"))
+                if action == "cancelar":
+                    try:
+                        orden_cancelada = cancelar_orden_produccion(id_orden=orden.id_orden)
+                        log_audit_event(
+                            "ORDEN_PRODUCCION_CANCELADA",
+                            f"id_orden={orden_cancelada.id_orden}",
+                        )
+                        flash("Orden cancelada.", "success")
+                    except ValueError as exc:
+                        flash(str(exc), "warning")
+                    return redirect(url_for("production.ordenes"))
 
     data = OrdenProduccion.query.order_by(OrdenProduccion.id_orden.desc()).all()
     ordenes_payload = [_serializar_orden_produccion(orden) for orden in data]
@@ -1038,6 +1028,8 @@ def ordenes():
         id_solicitud_preseleccionada=id_solicitud_preseleccionada,
         can_manage=can_manage,
         is_readonly=role_name == "Ventas",
+        form_orden=form_orden,
+        open_modal="modalNuevaOrden" if request.method == "POST" and request.form.get("action") == "crear" and not form_orden.validate() else None,
     )
 
 
@@ -1050,37 +1042,31 @@ def solicitudes():
         flash("Solo el area de produccion puede gestionar solicitudes.", "danger")
         return redirect(url_for("catalog.home"))
 
+    form_resolver = ResolverSolicitudForm(prefix="resolver")
+
     if request.method == "POST":
-        id_solicitud = _int(request.form.get("id_solicitud", "0"))
-        estado = request.form.get("estado", "PENDIENTE").strip().upper()
-        solicitud = SolicitudProduccion.query.options(
-            selectinload(SolicitudProduccion.producto),
-            selectinload(SolicitudProduccion.pedido),
-            selectinload(SolicitudProduccion.usuario_solicita),
-            selectinload(SolicitudProduccion.usuario_resuelve),
-            selectinload(SolicitudProduccion.ordenes),
-        ).get_or_404(id_solicitud)
-        if solicitud.estado != "PENDIENTE":
-            flash("Solo se pueden resolver solicitudes pendientes.", "warning")
-            return redirect(url_for("production.solicitudes"))
+        if form_resolver.validate_on_submit():
+            id_solicitud = form_resolver.id_solicitud.data
+            estado = form_resolver.estado.data
+            observaciones_resolucion = form_resolver.observaciones_resolucion.data or None
+            
+            solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)
+            if solicitud.estado != "PENDIENTE":
+                flash("Solo se pueden resolver solicitudes pendientes.", "warning")
+                return redirect(url_for("production.solicitudes"))
 
-        if estado not in {"APROBADA", "RECHAZADA"}:
-            flash("Estado de resolucion invalido.", "danger")
+            solicitud.estado = estado
+            solicitud.id_usuario_resuelve = current_user.id_usuario
+            solicitud.fecha_resolucion = utc_now()
+            solicitud.observaciones_resolucion = observaciones_resolucion
+            
+            db.session.commit()
+            log_audit_event(
+                "SOLICITUD_PRODUCCION_RESUELTA",
+                f"id_solicitud={solicitud.id_solicitud}; estado={solicitud.estado}; id_usuario_resuelve={current_user.id_usuario}",
+            )
+            flash("Solicitud actualizada.", "success")
             return redirect(url_for("production.solicitudes"))
-
-        solicitud.estado = estado
-        solicitud.id_usuario_resuelve = current_user.id_usuario
-        solicitud.fecha_resolucion = utc_now()
-        solicitud.observaciones_resolucion = (
-            request.form.get("observaciones_resolucion", "").strip() or None
-        )
-        db.session.commit()
-        log_audit_event(
-            "SOLICITUD_PRODUCCION_RESUELTA",
-            f"id_solicitud={solicitud.id_solicitud}; estado={solicitud.estado}; id_usuario_resuelve={current_user.id_usuario}",
-        )
-        flash("Solicitud actualizada.", "success")
-        return redirect(url_for("production.solicitudes"))
 
     estado_filtro = (request.args.get("estado") or "TODOS").strip().upper()
     busqueda = (request.args.get("q") or "").strip()
@@ -1122,4 +1108,6 @@ def solicitudes():
         busqueda=busqueda,
         recetas_payload=recetas_payload,
         role_name=role_name,
+        form_resolver=form_resolver,
+        open_modal="modalResolver" if request.method == "POST" and not form_resolver.validate() else None,
     )

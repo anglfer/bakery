@@ -58,7 +58,7 @@ from app.models import (
     utc_today,
 )
 from app.sales import sales_bp
-from app.sales.forms import SalidaEfectivoForm
+from app.sales.forms import SalidaEfectivoForm, ProductoTerminadoForm, SolicitudVentasCrearForm, SolicitudVentasEditarForm
 
 
 def _can_manage_producto_terminado() -> bool:
@@ -657,13 +657,23 @@ def _serializar_producto_terminado(
 @require_permission("Producto Terminado", "leer")
 def producto_terminado():
     can_manage = _can_manage_producto_terminado()
+    form_producto = ProductoTerminadoForm(prefix="producto")
+    
+    # Choices for id_receta are only populated for the form so that WTForms validation works.
+    recetas_activas_all = (
+        Receta.query.filter_by(activa=True)
+        .order_by(Receta.id_producto.asc(), Receta.version.desc())
+        .all()
+    )
+    # We add 0 as a default option just in case
+    form_producto.id_receta.choices = [(0, "Sin receta vinculada")] + [(r.id_receta, f"v{r.version} · {r.nombre}") for r in recetas_activas_all]
 
     if request.method == "POST":
         if not can_manage:
             flash("No tienes permisos para modificar productos.", "warning")
             return redirect(url_for("sales.producto_terminado"))
 
-        action = (request.form.get("action") or "").strip().lower()
+        action = (request.form.get("action") or form_producto.action.data or "").strip().lower()
         image_file = request.files.get("imagen_archivo")
         try:
             image_path = _handle_image_upload(image_file)
@@ -672,185 +682,182 @@ def producto_terminado():
             return redirect(url_for("sales.producto_terminado"))
 
         if action == "crear":
-            try:
-                nombre = request.form.get("nombre", "").strip()
-                descripcion = (
-                    request.form.get("descripcion", "").strip() or "Sin descripcion"
-                )
-                precio = _dec(request.form.get("precio_venta", "0"))
-                margen_objetivo_pct = _dec(
-                    request.form.get("margen_objetivo_pct", "25"), "25"
-                )
-                stock_inicial = max(_int(request.form.get("stock_inicial", "0")), 0)
-                stock_minimo = max(_int(request.form.get("stock_minimo", "10")), 0)
-                unidad_venta = request.form.get("unidad_venta", "Pieza")
-                id_receta = _int(request.form.get("id_receta", "0"))
-                imagen = image_path or request.form.get("imagen", "").strip()
+            if form_producto.validate_on_submit():
+                try:
+                    nombre = form_producto.nombre.data.strip()
+                    descripcion = form_producto.descripcion.data.strip() or "Sin descripcion"
+                    precio = form_producto.precio_venta.data
+                    margen_objetivo_pct = form_producto.margen_objetivo_pct.data or Decimal("25")
+                    stock_inicial = form_producto.stock_inicial.data or 0
+                    stock_minimo = form_producto.stock_minimo.data or 10
+                    unidad_venta = form_producto.unidad_venta.data
+                    id_receta = form_producto.id_receta.data or 0
+                    imagen = image_path or request.form.get("imagen", "").strip()
 
-                if not nombre or not unidad_venta:
-                    raise ValueError("Nombre y unidad de venta son obligatorios.")
-                if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
-                    margen_objetivo_pct = Decimal("25")
-                if id_receta > 0:
-                    raise ValueError(
-                        "Primero crea el producto y luego asocia "
-                        "su receta desde edición o el módulo de Recetas."
-                    )
-
-                receta = None
-                costo_receta = Decimal("0")
-
-                if precio <= 0:
-                    raise ValueError("El precio de venta debe ser mayor a cero.")
-
-                existe = Producto.query.filter(
-                    db.func.lower(Producto.nombre) == nombre.lower()
-                ).first()
-                if existe:
-                    raise ValueError("Ya existe un producto con ese nombre.")
-
-                producto = Producto(
-                    nombre=nombre,
-                    descripcion=descripcion,
-                    precio_venta=precio,
-                    unidad_venta=unidad_venta,
-                    cantidad_disponible=stock_inicial,
-                    stock_minimo=stock_minimo,
-                    costo_produccion_actual=costo_receta,
-                    margen_objetivo_pct=margen_objetivo_pct,
-                    precio_sugerido=_precio_sugerido_desde_costo(
-                        costo_receta, margen_objetivo_pct
-                    ),
-                    fecha_costo_actualizado=utc_now() if receta else None,
-                    id_receta=receta.id_receta if receta else None,
-                    activo=True,
-                    imagen=imagen or None,
-                )
-                db.session.add(producto)
-                db.session.flush()
-
-                if stock_inicial > 0:
-                    db.session.add(
-                        MovimientoInventarioProducto(
-                            id_producto=producto.id_producto,
-                            tipo="ENTRADA",
-                            cantidad=stock_inicial,
-                            stock_anterior=0,
-                            stock_posterior=stock_inicial,
-                            referencia_id=f"ALTA-PROD-{producto.id_producto}",
-                            id_usuario=current_user.id_usuario,
+                    if not nombre or not unidad_venta:
+                        raise ValueError("Nombre y unidad de venta son obligatorios.")
+                    if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
+                        margen_objetivo_pct = Decimal("25")
+                    if id_receta > 0:
+                        raise ValueError(
+                            "Primero crea el producto y luego asocia "
+                            "su receta desde edición o el módulo de Recetas."
                         )
-                    )
 
-                if producto.id_receta:
+                    receta = None
+                    costo_receta = Decimal("0")
+
+                    if precio <= 0:
+                        raise ValueError("El precio de venta debe ser mayor a cero.")
+
+                    existe = Producto.query.filter(
+                        db.func.lower(Producto.nombre) == nombre.lower()
+                    ).first()
+                    if existe:
+                        raise ValueError("Ya existe un producto con ese nombre.")
+
+                    producto = Producto(
+                        nombre=nombre,
+                        descripcion=descripcion,
+                        precio_venta=precio,
+                        unidad_venta=unidad_venta,
+                        cantidad_disponible=stock_inicial,
+                        stock_minimo=stock_minimo,
+                        costo_produccion_actual=costo_receta,
+                        margen_objetivo_pct=margen_objetivo_pct,
+                        precio_sugerido=_precio_sugerido_desde_costo(
+                            costo_receta, margen_objetivo_pct
+                        ),
+                        fecha_costo_actualizado=utc_now() if receta else None,
+                        id_receta=receta.id_receta if receta else None,
+                        activo=True,
+                        imagen=imagen or None,
+                    )
+                    db.session.add(producto)
+                    db.session.flush()
+
+                    if stock_inicial > 0:
+                        db.session.add(
+                            MovimientoInventarioProducto(
+                                id_producto=producto.id_producto,
+                                tipo="ENTRADA",
+                                cantidad=stock_inicial,
+                                stock_anterior=0,
+                                stock_posterior=stock_inicial,
+                                referencia_id=f"ALTA-PROD-{producto.id_producto}",
+                                id_usuario=current_user.id_usuario,
+                            )
+                        )
+
+                    if producto.id_receta:
+                        try:
+                            recalcular_costo_y_precio_sugerido_producto(
+                                id_producto=producto.id_producto
+                            )
+                        except ValueError:
+                            pass
+
+                    db.session.commit()
+                    log_audit_event(
+                        "PRODUCTO_CREADO",
+                        f"id_producto={producto.id_producto}; nombre={producto.nombre}",
+                    )
+                    flash("Producto terminado creado.", "success")
+                    return redirect(url_for("sales.producto_terminado"))
+                except ValueError as exc:
+                    db.session.rollback()
+                    flash(str(exc), "danger")
+            
+            action = "crear_fallido"
+
+        if action == "editar" or action == "editar_fallido":
+            # Using same fallback handling:
+            if not getattr(request, "_editar_handled", False):
+                id_producto = _int(request.form.get("id_producto", "0"))
+                producto = Producto.query.get_or_404(id_producto)
+                
+                if form_producto.validate_on_submit():
                     try:
-                        recalcular_costo_y_precio_sugerido_producto(
-                            id_producto=producto.id_producto
+                        nombre = form_producto.nombre.data.strip()
+                        descripcion = form_producto.descripcion.data.strip()
+                        precio = form_producto.precio_venta.data
+                        margen_objetivo_pct = form_producto.margen_objetivo_pct.data or Decimal("25")
+                        stock_minimo = max(form_producto.stock_minimo.data or 0, 0)
+                        unidad_venta = form_producto.unidad_venta.data
+                        
+                        id_receta_raw = form_producto.id_receta.data
+                        receta = producto.receta_base
+                        receta_auto_asignada = False
+                        if id_receta_raw and id_receta_raw > 0:
+                            receta = Receta.query.get(id_receta_raw)
+                        elif not producto.id_receta:
+                            receta_candidata = (
+                                Receta.query.filter_by(
+                                    id_producto=producto.id_producto,
+                                    activa=True,
+                                )
+                                .order_by(Receta.version.desc())
+                                .first()
+                            )
+                            if receta_candidata:
+                                receta = receta_candidata
+                                receta_auto_asignada = True
+                        
+                        if receta:
+                            if not receta.activa:
+                                raise ValueError("Selecciona una receta activa para el producto.")
+                            if int(receta.id_producto) != int(producto.id_producto):
+                                raise ValueError(
+                                    "La receta seleccionada no corresponde al producto."
+                                )
+
+                        if not nombre or not unidad_venta:
+                            raise ValueError("Nombre y unidad de venta son obligatorios.")
+                        if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
+                            margen_objetivo_pct = Decimal("25")
+
+                        producto.nombre = nombre
+                        producto.descripcion = descripcion or producto.descripcion
+                        producto.precio_venta = precio if precio > 0 else producto.precio_venta
+                        producto.margen_objetivo_pct = margen_objetivo_pct
+                        producto.stock_minimo = stock_minimo
+                        producto.unidad_venta = unidad_venta
+                        producto.id_receta = receta.id_receta if receta else None
+
+                        if image_path:
+                            producto.imagen = image_path
+                        elif request.form.get("imagen"):
+                            producto.imagen = request.form.get("imagen", producto.imagen)
+
+                        producto.activo = form_producto.activo.data == "on"
+
+                        if producto.id_receta:
+                            recalcular_costo_y_precio_sugerido_producto(
+                                id_producto=producto.id_producto
+                            )
+                        else:
+                            producto.costo_produccion_actual = Decimal("0")
+                            producto.precio_sugerido = None
+                            producto.fecha_costo_actualizado = None
+
+                        db.session.commit()
+                        log_audit_event(
+                            "PRODUCTO_EDITADO",
+                            f"id_producto={producto.id_producto}; nombre={producto.nombre}; activo={producto.activo}",
                         )
-                    except ValueError:
-                        pass
-
-                db.session.commit()
-                log_audit_event(
-                    "PRODUCTO_CREADO",
-                    f"id_producto={producto.id_producto}; nombre={producto.nombre}",
-                )
-                flash("Producto terminado creado.", "success")
-            except ValueError as exc:
-                db.session.rollback()
-                flash(str(exc), "danger")
-            return redirect(url_for("sales.producto_terminado"))
-
-        id_producto = _int(request.form.get("id_producto", "0"))
-        producto = Producto.query.get_or_404(id_producto)
-        try:
-            nombre = request.form.get("nombre", producto.nombre).strip()
-            descripcion = request.form.get("descripcion", producto.descripcion).strip()
-            precio = _dec(request.form.get("precio_venta", str(producto.precio_venta)))
-            margen_objetivo_pct = _dec(
-                request.form.get(
-                    "margen_objetivo_pct", str(producto.margen_objetivo_pct or "25")
-                ),
-                "25",
-            )
-            stock_minimo = max(
-                _int(request.form.get("stock_minimo", str(producto.stock_minimo))),
-                0,
-            )
-            unidad_venta = request.form.get("unidad_venta", producto.unidad_venta)
-            id_receta_raw = request.form.get("id_receta", "").strip()
-            receta = producto.receta_base
-            receta_auto_asignada = False
-            if id_receta_raw:
-                id_receta = _int(id_receta_raw, 0)
-                if id_receta > 0:
-                    receta = Receta.query.get(id_receta)
-            elif not producto.id_receta:
-                receta_candidata = (
-                    Receta.query.filter_by(
-                        id_producto=producto.id_producto,
-                        activa=True,
-                    )
-                    .order_by(Receta.version.desc())
-                    .first()
-                )
-                if receta_candidata:
-                    receta = receta_candidata
-                    receta_auto_asignada = True
-            if receta:
-                if not receta.activa:
-                    raise ValueError("Selecciona una receta activa para el producto.")
-                if int(receta.id_producto) != int(producto.id_producto):
-                    raise ValueError(
-                        "La receta seleccionada no corresponde al producto."
-                    )
-
-            if not nombre or not unidad_venta:
-                raise ValueError("Nombre y unidad de venta son obligatorios.")
-            if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
-                margen_objetivo_pct = Decimal("25")
-
-            producto.nombre = nombre
-            producto.descripcion = descripcion or producto.descripcion
-            producto.precio_venta = precio if precio > 0 else producto.precio_venta
-            producto.margen_objetivo_pct = margen_objetivo_pct
-            producto.stock_minimo = stock_minimo
-            producto.unidad_venta = unidad_venta
-            producto.id_receta = receta.id_receta if receta else None
-
-            if image_path:
-                producto.imagen = image_path
-            elif request.form.get("imagen"):
-                producto.imagen = request.form.get("imagen", producto.imagen)
-
-            producto.activo = request.form.get("activo") == "on"
-
-            if producto.id_receta:
-                recalcular_costo_y_precio_sugerido_producto(
-                    id_producto=producto.id_producto
-                )
-            else:
-                producto.costo_produccion_actual = Decimal("0")
-                producto.precio_sugerido = None
-                producto.fecha_costo_actualizado = None
-
-            db.session.commit()
-            log_audit_event(
-                "PRODUCTO_EDITADO",
-                f"id_producto={producto.id_producto}; nombre={producto.nombre}; activo={producto.activo}",
-            )
-            if receta_auto_asignada:
-                flash(
-                    "Producto actualizado. Se vinculó automáticamente "
-                    "la receta activa más reciente.",
-                    "success",
-                )
-            else:
-                flash("Producto actualizado.", "success")
-        except ValueError as exc:
-            db.session.rollback()
-            flash(str(exc), "danger")
-        return redirect(url_for("sales.producto_terminado"))
+                        if receta_auto_asignada:
+                            flash(
+                                "Producto actualizado. Se vinculó automáticamente "
+                                "la receta activa más reciente.",
+                                "success",
+                            )
+                        else:
+                            flash("Producto actualizado.", "success")
+                        return redirect(url_for("sales.producto_terminado"))
+                    except ValueError as exc:
+                        db.session.rollback()
+                        flash(str(exc), "danger")
+                action = "editar_fallido"
 
     productos = Producto.query.order_by(Producto.id_producto.desc()).all()
     recetas_activas = (
@@ -925,6 +932,14 @@ def producto_terminado():
             if producto.activo and not producto.esta_bajo_stock
         ),
     }
+    open_modal = None
+    if request.method == "POST":
+        action = request.form.get("action", "") or (form_producto.action.data if hasattr(form_producto.action, 'data') else "")
+        if action == "crear" and not form_producto.validate():
+            open_modal = "modalProducto_crear"
+        elif action == "editar" and not form_producto.validate():
+            open_modal = "modalProducto_editar"
+            
     return render_template(
         "sales/producto_terminado.html",
         productos=productos,
@@ -935,6 +950,8 @@ def producto_terminado():
         can_manage=can_manage,
         recetas_por_producto=recetas_por_producto,
         utc_now=utc_now,
+        form_producto=form_producto,
+        open_modal=open_modal,
     )
 
 
@@ -971,6 +988,12 @@ def producto_terminado_movimientos(id_producto: int):
 @require_permission("Solicitudes", "leer")
 def solicitudes():
     role_name = current_user.rol.nombre if current_user.rol else ""
+    form_crear = SolicitudVentasCrearForm(prefix="crear")
+    form_editar = SolicitudVentasEditarForm(prefix="editar")
+    
+    # Rellenar opciones de id_producto para validar
+    productos_activos = Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
+    form_crear.id_producto.choices = [(p.id_producto, p.nombre) for p in productos_activos if p.id_receta]
 
     if request.method == "POST":
         if role_name not in {"Ventas", "Administrador"}:
@@ -982,74 +1005,77 @@ def solicitudes():
 
         action = (request.form.get("action") or "crear").strip().lower()
 
-        if action == "editar":
-            id_solicitud = _int(request.form.get("id_solicitud", "0"))
-            solicitud = SolicitudProduccion.query.options(
-                selectinload(SolicitudProduccion.producto),
-                selectinload(SolicitudProduccion.pedido),
-                selectinload(SolicitudProduccion.usuario_solicita),
-                selectinload(SolicitudProduccion.usuario_resuelve),
-                selectinload(SolicitudProduccion.ordenes),
-            ).get_or_404(id_solicitud)
-            if solicitud.id_usuario_solicita != current_user.id_usuario:
-                flash("Solo puedes editar tus propias solicitudes.", "danger")
-                return redirect(url_for("sales.solicitudes"))
+        if action == "editar" or action == "editar_fallido":
+            # Si no ha pasado por un "editar" normal
+            id_solicitud = _int(request.form.get("id_solicitud", "0") or form_editar.id_solicitud.data)
+            solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)
+            
+            if form_editar.validate_on_submit():
+                if solicitud.id_usuario_solicita != current_user.id_usuario:
+                    flash("Solo puedes editar tus propias solicitudes.", "danger")
+                    return redirect(url_for("sales.solicitudes"))
 
-            if solicitud.estado != "PENDIENTE":
-                flash(
-                    "Solo se pueden editar solicitudes en estado PENDIENTE.",
-                    "warning",
+                if solicitud.estado != "PENDIENTE":
+                    flash(
+                        "Solo se pueden editar solicitudes en estado PENDIENTE.",
+                        "warning",
+                    )
+                    return redirect(url_for("sales.solicitudes"))
+
+                cantidad = form_editar.cantidad.data
+                observaciones = form_editar.observaciones.data or None
+                if cantidad <= 0:
+                    flash("La cantidad debe ser mayor a cero.", "warning")
+                    return redirect(url_for("sales.solicitudes"))
+
+                solicitud.cantidad = cantidad
+                solicitud.observaciones = observaciones
+                db.session.commit()
+                log_audit_event(
+                    "SOLICITUD_PRODUCCION_EDITADA",
+                    f"id_solicitud={solicitud.id_solicitud}; id_usuario={current_user.id_usuario}; cantidad={cantidad}",
                 )
+                flash("Solicitud actualizada correctamente.", "success")
                 return redirect(url_for("sales.solicitudes"))
+            
+            action = "editar_fallido"
 
-            cantidad = _int(request.form.get("cantidad", "0"))
-            observaciones = request.form.get("observaciones", "").strip() or None
-            if cantidad <= 0:
-                flash("La cantidad debe ser mayor a cero.", "warning")
+        if action == "crear":
+            if form_crear.validate_on_submit():
+                id_producto = form_crear.id_producto.data
+                cantidad = form_crear.cantidad.data
+                observaciones = form_crear.observaciones.data or None
+                producto = Producto.query.get(id_producto)
+                if not producto or not producto.activo or cantidad <= 0:
+                    flash("Producto o cantidad invalida para solicitud.", "warning")
+                    return redirect(url_for("sales.solicitudes"))
+
+                receta = Receta.query.get(producto.id_receta) if producto.id_receta else None
+                if not receta or not receta.activa:
+                    flash(
+                        "El producto seleccionado no tiene una receta activa para producir.",
+                        "warning",
+                    )
+                    return redirect(url_for("sales.solicitudes"))
+
+                db.session.add(
+                    SolicitudProduccion(
+                        id_producto=id_producto,
+                        cantidad=cantidad,
+                        estado="PENDIENTE",
+                        id_usuario_solicita=current_user.id_usuario,
+                        observaciones=observaciones,
+                    )
+                )
+                db.session.commit()
+                log_audit_event(
+                    "SOLICITUD_PRODUCCION_CREADA",
+                    f"id_usuario={current_user.id_usuario}; id_producto={id_producto}; cantidad={cantidad}",
+                )
+                flash("Solicitud de produccion registrada.", "success")
                 return redirect(url_for("sales.solicitudes"))
-
-            solicitud.cantidad = cantidad
-            solicitud.observaciones = observaciones
-            db.session.commit()
-            log_audit_event(
-                "SOLICITUD_PRODUCCION_EDITADA",
-                f"id_solicitud={solicitud.id_solicitud}; id_usuario={current_user.id_usuario}; cantidad={cantidad}",
-            )
-            flash("Solicitud actualizada correctamente.", "success")
-            return redirect(url_for("sales.solicitudes"))
-
-        id_producto = _int(request.form.get("id_producto", "0"))
-        cantidad = _int(request.form.get("cantidad", "0"))
-        observaciones = request.form.get("observaciones", "").strip() or None
-        producto = Producto.query.get(id_producto)
-        if not producto or not producto.activo or cantidad <= 0:
-            flash("Producto o cantidad invalida para solicitud.", "warning")
-            return redirect(url_for("sales.solicitudes"))
-
-        receta = Receta.query.get(producto.id_receta) if producto.id_receta else None
-        if not receta or not receta.activa:
-            flash(
-                "El producto seleccionado no tiene una receta activa para producir.",
-                "warning",
-            )
-            return redirect(url_for("sales.solicitudes"))
-
-        db.session.add(
-            SolicitudProduccion(
-                id_producto=id_producto,
-                cantidad=cantidad,
-                estado="PENDIENTE",
-                id_usuario_solicita=current_user.id_usuario,
-                observaciones=observaciones,
-            )
-        )
-        db.session.commit()
-        log_audit_event(
-            "SOLICITUD_PRODUCCION_CREADA",
-            f"id_usuario={current_user.id_usuario}; id_producto={id_producto}; cantidad={cantidad}",
-        )
-        flash("Solicitud de produccion registrada.", "success")
-        return redirect(url_for("sales.solicitudes"))
+            
+            action = "crear_fallido"
 
     estado_filtro = (request.args.get("estado") or "TODOS").strip().upper()
     busqueda = (request.args.get("q") or "").strip()
@@ -1093,14 +1119,25 @@ def solicitudes():
         < int(producto.stock_minimo or 0)
         for producto in productos
     }
+    open_modal = None
+    if request.method == "POST":
+        action = request.form.get("action", "") or "crear"
+        if action == "crear_fallido":
+            open_modal = "modalNuevaSolicitud"
+        elif action == "editar_fallido":
+            open_modal = "modalEditarSolicitud"
+
     return render_template(
         "sales/solicitudes.html",
-        productos=productos,
         solicitudes=solicitudes_data,
         estado_filtro=estado_filtro,
         busqueda=busqueda,
-        productos_bajo_stock=productos_bajo_stock,
+        productos=productos,
         role_name=role_name,
+        form_crear=form_crear,
+        form_editar=form_editar,
+        open_modal=open_modal,
+        productos_bajo_stock=productos_bajo_stock,
     )
 
 

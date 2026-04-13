@@ -1,4 +1,6 @@
-{% extends "base_template.html" %} {% block title %}Roles y Permisos{% endblock %} {% block
+{% extends "base_template.html" %}
+{% from '_macros.html' import campo %}
+{% block title %}Roles y Permisos{% endblock %} {% block
 page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 <style>
 	.roles-grid {
@@ -337,25 +339,16 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 					</h5>
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 				</div>
-				<form method="post" action="{{ url_for('admin.roles') }}">
+				<form method="post" action="{{ url_for('admin.roles') }}" novalidate>
+					{{ form_crear.hidden_tag() }}
 					<div class="modal-body">
 						<div class="row g-3">
-							<div class="col-12">
-								<label class="form-label" for="nuevo-rol-nombre">Nombre del rol</label>
-								<input id="nuevo-rol-nombre" type="text" name="nombre" class="form-control" required
-									maxlength="50" pattern="[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9 _\-]+"
-									placeholder="ej. supervisor" />
-							</div>
-							<div class="col-12">
-								<label class="form-label" for="nuevo-rol-descripcion">Descripción</label>
-								<textarea id="nuevo-rol-descripcion" name="descripcion" class="form-control" rows="2"
-									maxlength="255" required></textarea>
-							</div>
+							<div class="col-12">{{ campo(form_crear.nombre, placeholder='ej. Supervisor', class='form-control') }}</div>
+							<div class="col-12">{{ campo(form_crear.descripcion, rows=2, class='form-control') }}</div>
 						</div>
 					</div>
 					<div class="modal-footer border-0">
-						<button type="button" class="btn btn-primary text-white"
-							data-bs-dismiss="modal">Cancelar</button>
+						<button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn btn-sm btn-primary text-white">
 							<i class="bi bi-check2 me-1 text-white"></i>Crear rol
 						</button>
@@ -374,26 +367,32 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 					</h5>
 					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 				</div>
-				<form method="post" id="formEditarRol">
+				<form method="post" id="formEditarRol" novalidate>
+					{% if form_editar is defined and form_editar %}
+						{{ form_editar.hidden_tag() }}
+					{% else %}
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+					{% endif %}
 					<div class="modal-body">
 						<div class="row g-3">
 							<div class="col-12">
-								<label class="form-label" for="edit-rol-desc">Descripción</label>
-								<textarea name="descripcion" id="edit-rol-desc" class="form-control" rows="2"
-									maxlength="255" required></textarea>
+								{% if form_editar is defined and form_editar %}
+									{{ campo(form_editar.descripcion, rows=2, class='form-control', id='edit-rol-desc') }}
+								{% else %}
+									<label class="form-label" for="edit-rol-desc">Descripción</label>
+									<textarea name="editar-descripcion" id="edit-rol-desc" class="form-control" rows="2" maxlength="255" required></textarea>
+								{% endif %}
 							</div>
 							<div class="col-12 d-flex align-items-end">
 								<div class="form-check mb-2">
-									<input class="form-check-input" type="checkbox" name="activo" id="edit-rol-activo"
-										value="on" checked />
+									<input class="form-check-input" type="checkbox" name="activo" id="edit-rol-activo" value="on" checked />
 									<label class="form-check-label" for="edit-rol-activo">Rol Activo</label>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer border-0">
-						<button type="button" class="btn btn-outline-secondary"
-							data-bs-dismiss="modal">Cancelar</button>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn btn-sm btn-primary text-white">
 							<i class="bi bi-save me-1 text-white"></i> Guardar
 						</button>
@@ -507,9 +506,22 @@ page_title %}Roles y Permisos{% endblock %} {% block extra_css %}
 	const MODULOS = JSON.parse(document.getElementById('datosModulos').textContent);
 	const ROLES = JSON.parse(document.getElementById('datosRoles').textContent);
 
+	// ─── Abrir modal si el servidor devuelve errores ───
+	{% if open_modal == 'modalNuevoRol' %}
+	document.addEventListener('DOMContentLoaded', function() {
+		new bootstrap.Modal(document.getElementById('modalNuevoRol')).show();
+	});
+	{% elif open_modal and open_modal.startswith('modalEditarRol-') %}
+	document.addEventListener('DOMContentLoaded', function() {
+		document.getElementById('formEditarRol').action = `/admin/roles/{{ edit_rol_id }}/editar`;
+		new bootstrap.Modal(document.getElementById('modalEditarRol')).show();
+	});
+	{% endif %}
+
 	function abrirEditarRol(idRol, desc, activo) {
 		document.getElementById('formEditarRol').action = `/admin/roles/${idRol}/editar`;
-		document.getElementById('edit-rol-desc').value = desc || '';
+		const descEl = document.getElementById('edit-rol-desc');
+		if (descEl) descEl.value = desc || '';
 		document.getElementById('edit-rol-activo').checked = !!activo;
 		new bootstrap.Modal(document.getElementById('modalEditarRol')).show();
 	}

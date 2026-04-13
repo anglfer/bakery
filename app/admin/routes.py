@@ -24,7 +24,7 @@ from app.models import (
     Venta,
     utc_today,
 )
-from app.admin.forms import ProveedorForm
+from app.admin.forms import ProveedorForm, RolCrearForm, RolEditarForm, UsuarioCrearForm, UsuarioEditarForm
 
 
 BASE_ROLES = {"Administrador", "Ventas", "Produccion"}
@@ -295,62 +295,74 @@ def dashboard():
 @login_required
 @require_permission("Usuarios", "leer")
 def usuarios():
-    if request.method == "POST":
+    roles = Rol.query.filter_by(activo=True).order_by(Rol.nombre.asc()).all()
+    form_crear = UsuarioCrearForm(prefix="crear")
+    form_crear.id_rol.choices = [(r.id_rol, r.nombre) for r in roles]
+
+    if request.method == "POST" and "crear-username" in request.form:
         if not _can_create_user():
             flash("No tienes permiso para crear usuarios.", "danger")
             return redirect(url_for(USERS_ENDPOINT))
 
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        id_rol = _parse_int(request.form.get("id_rol", "0"))
-        nombre = request.form.get("nombre", "").strip()
-        apellidos = request.form.get("apellidos", "").strip()
-        telefono = request.form.get("telefono", "").strip()
-        correo = request.form.get("correo", "").strip().lower()
-        direccion = request.form.get("direccion", "").strip() or "N/A"
-        ciudad = request.form.get("ciudad", "").strip() or "N/A"
+        if form_crear.validate_on_submit():
+            username = form_crear.username.data.strip()
+            password = form_crear.password.data
+            id_rol = form_crear.id_rol.data
+            nombre = form_crear.nombre.data.strip()
+            apellidos = form_crear.apellidos.data.strip()
+            telefono = form_crear.telefono.data.strip()
+            correo = form_crear.correo.data.strip().lower()
+            direccion = (form_crear.direccion.data or "").strip() or "N/A"
+            ciudad = (form_crear.ciudad.data or "").strip() or "N/A"
 
-        if not all([username, password, nombre, apellidos, telefono, correo, id_rol]):
-            flash("Completa todos los campos obligatorios.", "warning")
-            return redirect(url_for(USERS_ENDPOINT))
+            if is_password_insecure(password):
+                form_crear.password.errors.append(
+                    "La contraseña es demasiado común o insegura. Elige una diferente."
+                )
+            elif Usuario.query.filter_by(username=username).first():
+                form_crear.username.errors.append("El nombre de usuario ya existe.")
+            elif Persona.query.filter_by(correo=correo).first():
+                form_crear.correo.errors.append("El correo ya está registrado.")
+            else:
+                persona = Persona(
+                    nombre=nombre,
+                    apellidos=apellidos,
+                    telefono=telefono,
+                    correo=correo,
+                    direccion=direccion,
+                    ciudad=ciudad,
+                )
+                db_user = Usuario(
+                    persona=persona, id_rol=id_rol, username=username, activo=True
+                )
+                db_user.set_password(password)
+                db.session.add(persona)
+                db.session.add(db_user)
+                db.session.commit()
+                log_audit_event(
+                    "USUARIO_CREADO",
+                    f"id_usuario={db_user.id_usuario}; username={db_user.username}; id_rol={db_user.id_rol}",
+                )
+                flash("Usuario creado correctamente.", "success")
+                return redirect(url_for(USERS_ENDPOINT))
 
-        if is_password_insecure(password):
-            flash(
-                "La contraseña es demasiado común o insegura. Elige una diferente.",
-                "danger",
+        # Validation failed — reopen modal with errors
+        search = request.args.get("q", "").strip().lower()
+        query = Usuario.query.join(Persona).order_by(Usuario.id_usuario.desc())
+        if search:
+            query = query.filter(
+                (Usuario.username.ilike(f"%{search}%"))
+                | (Persona.nombre.ilike(f"%{search}%"))
+                | (Persona.apellidos.ilike(f"%{search}%"))
             )
-            return redirect(url_for(USERS_ENDPOINT))
-
-        if Usuario.query.filter_by(username=username).first():
-            flash("El usuario ya existe.", "danger")
-            return redirect(url_for(USERS_ENDPOINT))
-
-        if Persona.query.filter_by(correo=correo).first():
-            flash("El correo ya esta registrado.", "danger")
-            return redirect(url_for(USERS_ENDPOINT))
-
-        persona = Persona(
-            nombre=nombre,
-            apellidos=apellidos,
-            telefono=telefono,
-            correo=correo,
-            direccion=direccion,
-            ciudad=ciudad,
+        return render_template(
+            "admin/usuarios.html",
+            usuarios=query.all(),
+            roles=roles,
+            q=search,
+            form_crear=form_crear,
+            open_modal="modalNuevoUsuario",
         )
-        db_user = Usuario(
-            persona=persona, id_rol=id_rol, username=username, activo=True
-        )
-        db_user.set_password(password)
-
-        db.session.add(persona)
-        db.session.add(db_user)
-        db.session.commit()
-        log_audit_event(
-            "USUARIO_CREADO",
-            f"id_usuario={db_user.id_usuario}; username={db_user.username}; id_rol={db_user.id_rol}",
-        )
-        flash("Usuario creado correctamente.", "success")
-        return redirect(url_for(USERS_ENDPOINT))
 
     search = request.args.get("q", "").strip().lower()
     query = Usuario.query.join(Persona).order_by(Usuario.id_usuario.desc())
@@ -362,12 +374,12 @@ def usuarios():
         )
 
     data = query.all()
-    roles = Rol.query.filter_by(activo=True).order_by(Rol.nombre.asc()).all()
     return render_template(
         "admin/usuarios.html",
         usuarios=data,
         roles=roles,
         q=search,
+        form_crear=form_crear,
     )
 
 
@@ -380,24 +392,40 @@ def editar_usuario(id_usuario: int):
         flash("No puedes editarte a ti mismo desde este formulario.", "warning")
         return redirect(url_for(USERS_ENDPOINT))
 
-    user.id_rol = _parse_int(request.form.get("id_rol", str(user.id_rol)), user.id_rol)
-    user.activo = _to_bool(request.form.get("activo", "on"))
-    user.persona.nombre = request.form.get("nombre", user.persona.nombre).strip()
-    user.persona.apellidos = request.form.get(
-        "apellidos", user.persona.apellidos
-    ).strip()
-    user.persona.telefono = request.form.get("telefono", user.persona.telefono).strip()
-    user.persona.ciudad = request.form.get("ciudad", user.persona.ciudad).strip()
-    user.persona.direccion = request.form.get(
-        "direccion", user.persona.direccion
-    ).strip()
-    db.session.commit()
-    log_audit_event(
-        "USUARIO_EDITADO",
-        f"id_usuario={user.id_usuario}; username={user.username}; id_rol={user.id_rol}; activo={user.activo}",
+    roles = Rol.query.filter_by(activo=True).order_by(Rol.nombre.asc()).all()
+    form_editar = UsuarioEditarForm(prefix="editar")
+    form_editar.id_rol.choices = [(r.id_rol, r.nombre) for r in roles]
+
+    if form_editar.validate_on_submit():
+        user.id_rol = form_editar.id_rol.data
+        user.persona.nombre = form_editar.nombre.data.strip()
+        user.persona.apellidos = form_editar.apellidos.data.strip()
+        user.persona.telefono = form_editar.telefono.data.strip()
+        user.persona.ciudad = (form_editar.ciudad.data or "").strip()
+        user.persona.direccion = (form_editar.direccion.data or "").strip()
+        db.session.commit()
+        log_audit_event(
+            "USUARIO_EDITADO",
+            f"id_usuario={user.id_usuario}; username={user.username}; id_rol={user.id_rol}",
+        )
+        flash("Usuario actualizado.", "success")
+        return redirect(url_for(USERS_ENDPOINT))
+
+    # Validation failed — reopen the edit modal
+    search = request.args.get("q", "").strip().lower()
+    query = Usuario.query.join(Persona).order_by(Usuario.id_usuario.desc())
+    form_crear = UsuarioCrearForm(prefix="crear")
+    form_crear.id_rol.choices = [(r.id_rol, r.nombre) for r in roles]
+    return render_template(
+        "admin/usuarios.html",
+        usuarios=query.all(),
+        roles=roles,
+        q=search,
+        form_crear=form_crear,
+        form_editar=form_editar,
+        open_modal=f"modalEditarUsuario-{id_usuario}",
+        edit_usuario_id=id_usuario,
     )
-    flash("Usuario actualizado.", "success")
-    return redirect(url_for(USERS_ENDPOINT))
 
 
 @admin_bp.post("/usuarios/<int:id_usuario>/desactivar")
@@ -423,27 +451,42 @@ def desactivar_usuario(id_usuario: int):
 @login_required
 @require_permission("Roles", "leer")
 def roles():
-    if request.method == "POST":
-        nombre = request.form.get("nombre", "").strip()
-        descripcion = request.form.get("descripcion", "").strip()
-        if not nombre or not descripcion:
-            flash("Nombre y descripcion son obligatorios.", "warning")
-            return redirect(url_for(ROLES_ENDPOINT))
+    form_crear = RolCrearForm(prefix="crear")
 
-        if Rol.query.filter_by(nombre=nombre).first():
-            flash("El rol ya existe.", "danger")
-            return redirect(url_for(ROLES_ENDPOINT))
+    if request.method == "POST" and "crear-nombre" in request.form:
+        if form_crear.validate_on_submit():
+            nombre = form_crear.nombre.data.strip()
+            descripcion = form_crear.descripcion.data.strip()
 
-        db.session.add(Rol(nombre=nombre, descripcion=descripcion, es_base=False))
-        db.session.commit()
-        role = Rol.query.filter_by(nombre=nombre).first()
-        if role:
-            log_audit_event(
-                "ROL_CREADO",
-                f"id_rol={role.id_rol}; nombre={role.nombre}",
-            )
-        flash("Rol creado correctamente.", "success")
-        return redirect(url_for(ROLES_ENDPOINT))
+            if Rol.query.filter_by(nombre=nombre).first():
+                form_crear.nombre.errors.append("Ya existe un rol con ese nombre.")
+            else:
+                db.session.add(Rol(nombre=nombre, descripcion=descripcion, es_base=False))
+                db.session.commit()
+                role = Rol.query.filter_by(nombre=nombre).first()
+                if role:
+                    log_audit_event(
+                        "ROL_CREADO",
+                        f"id_rol={role.id_rol}; nombre={role.nombre}",
+                    )
+                flash("Rol creado correctamente.", "success")
+                return redirect(url_for(ROLES_ENDPOINT))
+
+        # Validation failed — reopen modal
+        data = Rol.query.order_by(Rol.id_rol.asc()).all()
+        modulos_data = Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
+        modulos = [{"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None} for m in modulos_data]
+        usuarios_activos_por_rol = {
+            r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count() for r in data
+        }
+        return render_template(
+            "admin/roles.html",
+            roles=data,
+            modulos=modulos,
+            usuarios_activos_por_rol=usuarios_activos_por_rol,
+            form_crear=form_crear,
+            open_modal="modalNuevoRol",
+        )
 
     data = Rol.query.order_by(Rol.id_rol.asc()).all()
     modulos_data = (
@@ -467,6 +510,7 @@ def roles():
         roles=data,
         modulos=modulos,
         usuarios_activos_por_rol=usuarios_activos_por_rol,
+        form_crear=form_crear,
     )
 
 
@@ -475,16 +519,38 @@ def roles():
 @require_permission("Roles", "editar")
 def editar_rol(id_rol: int):
     role = Rol.query.get_or_404(id_rol)
-    role.descripcion = request.form.get("descripcion", role.descripcion).strip()
-    if role.nombre not in BASE_ROLES:
-        role.activo = _to_bool(request.form.get("activo", "on"))
-    db.session.commit()
-    log_audit_event(
-        "ROL_EDITADO",
-        f"id_rol={role.id_rol}; nombre={role.nombre}; activo={role.activo}",
+    form_editar = RolEditarForm(prefix="editar")
+
+    if form_editar.validate_on_submit():
+        role.descripcion = form_editar.descripcion.data.strip()
+        if role.nombre not in BASE_ROLES:
+            role.activo = _to_bool(request.form.get("activo", "on"))
+        db.session.commit()
+        log_audit_event(
+            "ROL_EDITADO",
+            f"id_rol={role.id_rol}; nombre={role.nombre}; activo={role.activo}",
+        )
+        flash("Rol actualizado.", "success")
+        return redirect(url_for(ROLES_ENDPOINT))
+
+    # Validation failed — reopen edit modal
+    data = Rol.query.order_by(Rol.id_rol.asc()).all()
+    modulos_data = Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
+    modulos = [{"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None} for m in modulos_data]
+    usuarios_activos_por_rol = {
+        r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count() for r in data
+    }
+    form_crear = RolCrearForm(prefix="crear")
+    return render_template(
+        "admin/roles.html",
+        roles=data,
+        modulos=modulos,
+        usuarios_activos_por_rol=usuarios_activos_por_rol,
+        form_crear=form_crear,
+        form_editar=form_editar,
+        open_modal=f"modalEditarRol-{id_rol}",
+        edit_rol_id=id_rol,
     )
-    flash("Rol actualizado.", "success")
-    return redirect(url_for(ROLES_ENDPOINT))
 
 
 @admin_bp.post("/roles/<int:id_rol>/desactivar")
@@ -685,66 +751,62 @@ def proveedores():
 @require_permission("Proveedores", "editar")
 def editar_proveedor(id_proveedor: int):
     proveedor = Proveedor.query.get_or_404(id_proveedor)
+    form_editar = ProveedorForm(prefix="editar")
 
-    nombre = (
-        request.form.get("nombre_proveedor", "").strip()
-        or request.form.get("nombre_empresa", proveedor.nombre_empresa).strip()
+    if form_editar.validate_on_submit():
+        nombre = form_editar.nombre_empresa.data.strip()
+        nombre_contacto = form_editar.nombre_contacto.data.strip()
+        telefono = form_editar.telefono.data.strip()
+        correo = form_editar.correo.data.strip().lower()
+        ciudad = form_editar.ciudad.data.strip()
+        estado = form_editar.estado.data.strip()
+        direccion = form_editar.direccion.data.strip()
+
+        proveedor_existente = Proveedor.query.filter(
+            db.func.lower(Proveedor.nombre_empresa) == nombre.lower(),
+            Proveedor.id_proveedor != proveedor.id_proveedor,
+        ).first()
+        if proveedor_existente:
+            form_editar.nombre_empresa.errors.append("Ya existe un proveedor con ese nombre.")
+        else:
+            correo_existente = Proveedor.query.filter(
+                db.func.lower(Proveedor.correo) == correo.lower(),
+                Proveedor.id_proveedor != proveedor.id_proveedor,
+            ).first()
+            if correo_existente:
+                form_editar.correo.errors.append("El correo ya está registrado en otro proveedor.")
+            else:
+                proveedor.nombre_empresa = nombre
+                proveedor.nombre_contacto = nombre_contacto
+                proveedor.telefono = telefono
+                proveedor.correo = correo
+                proveedor.ciudad = ciudad
+                proveedor.estado = estado
+                proveedor.direccion = direccion
+                if "editar-activo" in request.form:
+                    proveedor.activo = _to_bool(request.form.get("editar-activo", "off"))
+                db.session.commit()
+                log_audit_event(
+                    "PROVEEDOR_EDITADO",
+                    f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}; activo={proveedor.activo}",
+                )
+                flash("Proveedor actualizado.", "success")
+                return redirect(url_for(SUPPLIERS_ENDPOINT))
+
+    # Validation failed — reopen edit modal
+    form_crear = ProveedorForm()
+    search = request.args.get("q", "").strip().lower()
+    query = Proveedor.query.order_by(Proveedor.id_proveedor.desc())
+    if search:
+        query = query.filter(Proveedor.nombre_empresa.ilike(f"%{search}%"))
+    return render_template(
+        "admin/proveedores.html",
+        proveedores=query.all(),
+        q=search,
+        form=form_crear,
+        form_editar=form_editar,
+        open_modal_editar=id_proveedor,
     )
-    nombre_contacto = request.form.get(
-        "nombre_contacto", proveedor.nombre_contacto
-    ).strip()
-    telefono = request.form.get("telefono", proveedor.telefono).strip()
-    correo = request.form.get("correo", proveedor.correo).strip().lower()
-    ciudad = request.form.get("ciudad", proveedor.ciudad).strip()
-    estado = request.form.get("estado", proveedor.estado).strip()
-    direccion = request.form.get("direccion", proveedor.direccion).strip()
-
-    error_message = _validate_supplier_payload(
-        nombre_proveedor=nombre,
-        nombre_contacto=nombre_contacto,
-        telefono=telefono,
-        correo=correo,
-        ciudad=ciudad,
-        estado=estado,
-        direccion=direccion,
-    )
-    if error_message:
-        flash(error_message, "warning")
-        return redirect(url_for(SUPPLIERS_ENDPOINT))
-
-    proveedor_existente = Proveedor.query.filter(
-        db.func.lower(Proveedor.nombre_empresa) == nombre.lower(),
-        Proveedor.id_proveedor != proveedor.id_proveedor,
-    ).first()
-    if proveedor_existente:
-        flash("Ya existe un proveedor con ese nombre.", "danger")
-        return redirect(url_for(SUPPLIERS_ENDPOINT))
-
-    correo_existente = Proveedor.query.filter(
-        db.func.lower(Proveedor.correo) == correo.lower(),
-        Proveedor.id_proveedor != proveedor.id_proveedor,
-    ).first()
-    if correo_existente:
-        flash("El correo ya esta registrado en otro proveedor.", "danger")
-        return redirect(url_for(SUPPLIERS_ENDPOINT))
-
-    proveedor.nombre_empresa = nombre
-    proveedor.nombre_contacto = nombre_contacto
-    proveedor.telefono = telefono
-    proveedor.correo = correo
-    proveedor.ciudad = ciudad
-    proveedor.estado = estado
-    proveedor.direccion = direccion
-    if "activo" in request.form:
-        proveedor.activo = _to_bool(request.form.get("activo", "off"))
-
-    db.session.commit()
-    log_audit_event(
-        "PROVEEDOR_EDITADO",
-        f"id_proveedor={proveedor.id_proveedor}; nombre_empresa={proveedor.nombre_empresa}; activo={proveedor.activo}",
-    )
-    flash("Proveedor actualizado.", "success")
-    return redirect(url_for(SUPPLIERS_ENDPOINT))
 
 
 @admin_bp.post("/proveedores/<int:id_proveedor>/desactivar")
