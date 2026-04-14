@@ -2081,7 +2081,31 @@
         "documentation": {}
     },
     {
+        "label": "BooleanField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
         "label": "EmailField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "SelectField",
         "importPath": "wtforms",
         "description": "wtforms",
         "isExtraImport": true,
@@ -2098,6 +2122,14 @@
     },
     {
         "label": "SubmitField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "TextAreaField",
         "importPath": "wtforms",
         "description": "wtforms",
         "isExtraImport": true,
@@ -2153,6 +2185,14 @@
         "documentation": {}
     },
     {
+        "label": "HiddenField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
         "label": "IntegerField",
         "importPath": "wtforms",
         "description": "wtforms",
@@ -2185,7 +2225,31 @@
         "documentation": {}
     },
     {
+        "label": "TextAreaField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
         "label": "DecimalField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "HiddenField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
+        "label": "IntegerField",
         "importPath": "wtforms",
         "description": "wtforms",
         "isExtraImport": true,
@@ -2217,6 +2281,14 @@
         "documentation": {}
     },
     {
+        "label": "TextAreaField",
+        "importPath": "wtforms",
+        "description": "wtforms",
+        "isExtraImport": true,
+        "detail": "wtforms",
+        "documentation": {}
+    },
+    {
         "label": "DataRequired",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
@@ -2233,7 +2305,23 @@
         "documentation": {}
     },
     {
+        "label": "EqualTo",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "Length",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -2345,6 +2433,14 @@
         "documentation": {}
     },
     {
+        "label": "Optional",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "DataRequired",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
@@ -2361,7 +2457,23 @@
         "documentation": {}
     },
     {
+        "label": "Length",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
         "label": "NumberRange",
+        "importPath": "wtforms.validators",
+        "description": "wtforms.validators",
+        "isExtraImport": true,
+        "detail": "wtforms.validators",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
         "importPath": "wtforms.validators",
         "description": "wtforms.validators",
         "isExtraImport": true,
@@ -4089,6 +4201,38 @@
         "documentation": {}
     },
     {
+        "label": "RolCrearForm",
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "isExtraImport": true,
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RolEditarForm",
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "isExtraImport": true,
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "UsuarioCrearForm",
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "isExtraImport": true,
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "UsuarioEditarForm",
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "isExtraImport": true,
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
         "label": "smtplib",
         "kind": 6,
         "isExtraImport": true,
@@ -4372,6 +4516,38 @@
         "documentation": {}
     },
     {
+        "label": "AjusteInventarioForm",
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "isExtraImport": true,
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RecetaBaseForm",
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "isExtraImport": true,
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccionForm",
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "isExtraImport": true,
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "ResolverSolicitudForm",
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "isExtraImport": true,
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
         "label": "secure_filename",
         "importPath": "werkzeug.utils",
         "description": "werkzeug.utils",
@@ -4388,7 +4564,31 @@
         "documentation": {}
     },
     {
+        "label": "ProductoTerminadoForm",
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "isExtraImport": true,
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
         "label": "SalidaEfectivoForm",
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "isExtraImport": true,
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudVentasCrearForm",
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "isExtraImport": true,
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudVentasEditarForm",
         "importPath": "app.sales.forms",
         "description": "app.sales.forms",
         "isExtraImport": true,
@@ -7943,6 +8143,42 @@
         "documentation": {}
     },
     {
+        "label": "UsuarioCrearForm",
+        "kind": 6,
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "peekOfCode": "class UsuarioCrearForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre(s)\",\n        validators=[DataRequired(message=\"El nombre es obligatorio.\"), Length(max=80, message=\"Máximo 80 caracteres.\")],\n    )\n    apellidos = StringField(\n        \"Apellidos\",\n        validators=[DataRequired(message=\"Los apellidos son obligatorios.\"), Length(max=80, message=\"Máximo 80 caracteres.\")],\n    )\n    telefono = StringField(",
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "UsuarioEditarForm",
+        "kind": 6,
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "peekOfCode": "class UsuarioEditarForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre(s)\",\n        validators=[DataRequired(message=\"El nombre es obligatorio.\"), Length(max=80)],\n    )\n    apellidos = StringField(\n        \"Apellidos\",\n        validators=[DataRequired(message=\"Los apellidos son obligatorios.\"), Length(max=80)],\n    )\n    telefono = StringField(",
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RolCrearForm",
+        "kind": 6,
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "peekOfCode": "class RolCrearForm(FlaskForm):\n    nombre = StringField(\n        \"Nombre del rol\",\n        validators=[\n            DataRequired(message=\"El nombre es obligatorio.\"),\n            Length(min=2, max=50, message=\"Entre 2 y 50 caracteres.\"),\n            Regexp(r\"^[\\w\\s\\-áéíóúÁÉÍÓÚñÑüÜ]+$\", message=\"Solo letras, números, espacios y guiones.\"),\n        ],\n    )\n    descripcion = TextAreaField(",
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
+        "label": "RolEditarForm",
+        "kind": 6,
+        "importPath": "app.admin.forms",
+        "description": "app.admin.forms",
+        "peekOfCode": "class RolEditarForm(FlaskForm):\n    descripcion = TextAreaField(\n        \"Descripción\",\n        validators=[DataRequired(message=\"La descripción es obligatoria.\"), Length(max=255, message=\"Máximo 255 caracteres.\")],\n    )\n    submit = SubmitField(\"Guardar cambios\")",
+        "detail": "app.admin.forms",
+        "documentation": {}
+    },
+    {
         "label": "__all__",
         "kind": 5,
         "importPath": "app.admin.models",
@@ -7965,7 +8201,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def usuarios():\n    if request.method == \"POST\":\n        if not _can_create_user():\n            flash(\"No tienes permiso para crear usuarios.\", \"danger\")\n            return redirect(url_for(USERS_ENDPOINT))\n        username = request.form.get(\"username\", \"\").strip()\n        password = request.form.get(\"password\", \"\")\n        id_rol = _parse_int(request.form.get(\"id_rol\", \"0\"))\n        nombre = request.form.get(\"nombre\", \"\").strip()\n        apellidos = request.form.get(\"apellidos\", \"\").strip()",
+        "peekOfCode": "def usuarios():\n    roles = Rol.query.filter_by(activo=True).order_by(Rol.nombre.asc()).all()\n    form_crear = UsuarioCrearForm(prefix=\"crear\")\n    form_crear.id_rol.choices = [(r.id_rol, r.nombre) for r in roles]\n    if request.method == \"POST\" and \"crear-username\" in request.form:\n        if not _can_create_user():\n            flash(\"No tienes permiso para crear usuarios.\", \"danger\")\n            return redirect(url_for(USERS_ENDPOINT))\n        if form_crear.validate_on_submit():\n            username = form_crear.username.data.strip()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7974,7 +8210,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def editar_usuario(id_usuario: int):\n    user = Usuario.query.get_or_404(id_usuario)\n    if user.id_usuario == current_user.id_usuario:\n        flash(\"No puedes editarte a ti mismo desde este formulario.\", \"warning\")\n        return redirect(url_for(USERS_ENDPOINT))\n    user.id_rol = _parse_int(request.form.get(\"id_rol\", str(user.id_rol)), user.id_rol)\n    user.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    user.persona.nombre = request.form.get(\"nombre\", user.persona.nombre).strip()\n    user.persona.apellidos = request.form.get(\n        \"apellidos\", user.persona.apellidos",
+        "peekOfCode": "def editar_usuario(id_usuario: int):\n    user = Usuario.query.get_or_404(id_usuario)\n    if user.id_usuario == current_user.id_usuario:\n        flash(\"No puedes editarte a ti mismo desde este formulario.\", \"warning\")\n        return redirect(url_for(USERS_ENDPOINT))\n    roles = Rol.query.filter_by(activo=True).order_by(Rol.nombre.asc()).all()\n    form_editar = UsuarioEditarForm(prefix=\"editar\")\n    form_editar.id_rol.choices = [(r.id_rol, r.nombre) for r in roles]\n    if form_editar.validate_on_submit():\n        user.id_rol = form_editar.id_rol.data",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -7992,7 +8228,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def roles():\n    if request.method == \"POST\":\n        nombre = request.form.get(\"nombre\", \"\").strip()\n        descripcion = request.form.get(\"descripcion\", \"\").strip()\n        if not nombre or not descripcion:\n            flash(\"Nombre y descripcion son obligatorios.\", \"warning\")\n            return redirect(url_for(ROLES_ENDPOINT))\n        if Rol.query.filter_by(nombre=nombre).first():\n            flash(\"El rol ya existe.\", \"danger\")\n            return redirect(url_for(ROLES_ENDPOINT))",
+        "peekOfCode": "def roles():\n    form_crear = RolCrearForm(prefix=\"crear\")\n    if request.method == \"POST\" and \"crear-nombre\" in request.form:\n        if form_crear.validate_on_submit():\n            nombre = form_crear.nombre.data.strip()\n            descripcion = form_crear.descripcion.data.strip()\n            if Rol.query.filter_by(nombre=nombre).first():\n                form_crear.nombre.errors.append(\"Ya existe un rol con ese nombre.\")\n            else:\n                db.session.add(Rol(nombre=nombre, descripcion=descripcion, es_base=False))",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -8001,7 +8237,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def editar_rol(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    role.descripcion = request.form.get(\"descripcion\", role.descripcion).strip()\n    if role.nombre not in BASE_ROLES:\n        role.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n    db.session.commit()\n    log_audit_event(\n        \"ROL_EDITADO\",\n        f\"id_rol={role.id_rol}; nombre={role.nombre}; activo={role.activo}\",\n    )",
+        "peekOfCode": "def editar_rol(id_rol: int):\n    role = Rol.query.get_or_404(id_rol)\n    form_editar = RolEditarForm(prefix=\"editar\")\n    if form_editar.validate_on_submit():\n        role.descripcion = form_editar.descripcion.data.strip()\n        if role.nombre not in BASE_ROLES:\n            role.activo = _to_bool(request.form.get(\"activo\", \"on\"))\n        db.session.commit()\n        log_audit_event(\n            \"ROL_EDITADO\",",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -8046,7 +8282,7 @@
         "kind": 2,
         "importPath": "app.admin.routes",
         "description": "app.admin.routes",
-        "peekOfCode": "def editar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    nombre = (\n        request.form.get(\"nombre_proveedor\", \"\").strip()\n        or request.form.get(\"nombre_empresa\", proveedor.nombre_empresa).strip()\n    )\n    nombre_contacto = request.form.get(\n        \"nombre_contacto\", proveedor.nombre_contacto\n    ).strip()\n    telefono = request.form.get(\"telefono\", proveedor.telefono).strip()",
+        "peekOfCode": "def editar_proveedor(id_proveedor: int):\n    proveedor = Proveedor.query.get_or_404(id_proveedor)\n    form_editar = ProveedorForm(prefix=\"editar\")\n    if form_editar.validate_on_submit():\n        nombre = form_editar.nombre_empresa.data.strip()\n        nombre_contacto = form_editar.nombre_contacto.data.strip()\n        telefono = form_editar.telefono.data.strip()\n        correo = form_editar.correo.data.strip().lower()\n        ciudad = form_editar.ciudad.data.strip()\n        estado = form_editar.estado.data.strip()",
         "detail": "app.admin.routes",
         "documentation": {}
     },
@@ -8181,7 +8417,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def login():\n    if current_user.is_authenticated:\n        return _redirect_authenticated_user()\n    form = LoginForm()\n    if form.validate_on_submit():\n        usuario = Usuario.query.filter_by(\n            username=form.username.data.strip(), activo=True\n        ).first()\n        if not usuario:\n            flash(\"Credenciales invalidas\", \"danger\")",
+        "peekOfCode": "def login():\n    if current_user.is_authenticated:\n        return _redirect_authenticated_user()\n    form = LoginForm()\n    if form.validate_on_submit():\n        username_input = form.username.data.strip()\n        ip_origen = request.headers.get(\"X-Forwarded-For\", request.remote_addr or \"-\")\n        usuario = Usuario.query.filter_by(username=username_input, activo=True).first()\n        if not usuario:\n            current_app.logger.warning(",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -8190,7 +8426,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def verify_2fa():\n    user_id = session.get(\"pending_2fa_user\")\n    if not user_id:\n        return redirect(url_for(LOGIN_ENDPOINT))\n    usuario = Usuario.query.get(user_id)\n    if not usuario:\n        session.pop(\"pending_2fa_user\", None)\n        return redirect(url_for(LOGIN_ENDPOINT))\n    form = Verify2FAForm()\n    es_registro_nuevo = session.get(\"es_registro_nuevo\", False)",
+        "peekOfCode": "def verify_2fa():\n    user_id = session.get(\"pending_2fa_user\")\n    if not user_id:\n        current_app.logger.warning(\n            \"AUTH_2FA_FAIL|reason=session_missing|path=%s\",\n            request.path,\n        )\n        return redirect(url_for(LOGIN_ENDPOINT))\n    usuario = Usuario.query.get(user_id)\n    if not usuario:",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -8217,7 +8453,7 @@
         "kind": 2,
         "importPath": "app.auth.routes",
         "description": "app.auth.routes",
-        "peekOfCode": "def logout():\n    logout_user()\n    flash(\"Sesion finalizada\", \"info\")\n    return redirect(url_for(\"catalog.home\"))",
+        "peekOfCode": "def logout():\n    current_app.logger.info(\n        \"AUTH_LOGOUT|user=%s\",\n        current_user.username if current_user.is_authenticated else \"anonimo\",\n    )\n    logout_user()\n    flash(\"Sesion finalizada\", \"info\")\n    return redirect(url_for(\"catalog.home\"))",
         "detail": "app.auth.routes",
         "documentation": {}
     },
@@ -8280,7 +8516,7 @@
         "kind": 2,
         "importPath": "app.catalog.routes",
         "description": "app.catalog.routes",
-        "peekOfCode": "def catalogo():\n    productos = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(Producto.nombre.asc())\n        .all()\n    )\n    return render_template(",
+        "peekOfCode": "def catalogo():\n    productos = (\n        Producto.query.filter(\n            Producto.activo.is_(True),\n            (Producto.cantidad_disponible - Producto.cantidad_reservada) > 0,\n        )\n        .order_by(Producto.nombre.asc())\n        .all()\n    )\n    catalogo_story = {",
         "detail": "app.catalog.routes",
         "documentation": {}
     },
@@ -8582,6 +8818,15 @@
         "documentation": {}
     },
     {
+        "label": "RecetaBaseForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class RecetaBaseForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired(message=\"Seleccionar producto.\")])\n    rendimiento_base = DecimalField(\"Cantidad base\", validators=[InputRequired(message=\"Cantidad requerida.\"), NumberRange(min=0.01)], places=2)\n    estado = SelectField(\"Estado\", choices=[(\"ACTIVA\", \"Activa\"), (\"INACTIVA\", \"Inactiva\")])\n    categoria = StringField(\"Categoría\", validators=[Optional(), Length(max=100)])\n    descripcion = StringField(\"Descripción corta\", validators=[Optional(), Length(max=255)])\n    unidad_produccion = StringField(\"Unidad de producción\", validators=[Optional(), Length(max=50)])\nclass SolicitudProduccionForm(FlaskForm):\n    id_producto = SelectField(\"Producto\", coerce=int, validators=[DataRequired(message=\"Este campo es obligatorio.\")])\n    cantidad = IntegerField(\"Cantidad\", validators=[InputRequired(message=\"La cantidad es obligatoria.\"), NumberRange(min=1, message=\"Debe ser mayor o igual a 1.\")])",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
         "label": "SolicitudProduccionForm",
         "kind": 6,
         "importPath": "app.production.forms",
@@ -8600,6 +8845,33 @@
         "documentation": {}
     },
     {
+        "label": "AjusteInventarioForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class AjusteInventarioForm(FlaskForm):\n    id_materia = HiddenField(\"ID Materia\")\n    tipo = HiddenField(\"Tipo\", default=\"ENTRADA\")\n    cantidad = DecimalField(\n        \"Cantidad\",\n        validators=[\n            InputRequired(message=\"La cantidad es obligatoria.\"),\n            NumberRange(min=0.0001, message=\"La cantidad debe ser mayor a cero.\"),\n        ],\n        places=4,",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "OrdenProduccionForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class OrdenProduccionForm(FlaskForm):\n    id_solicitud = SelectField(\n        \"Solicitud aprobada (opcional)\",\n        coerce=int,\n        validators=[Optional()],\n    )\n    id_producto = SelectField(\n        \"Producto\",\n        coerce=int,\n        validators=[DataRequired(message=\"Selecciona un producto.\")],",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
+        "label": "ResolverSolicitudForm",
+        "kind": 6,
+        "importPath": "app.production.forms",
+        "description": "app.production.forms",
+        "peekOfCode": "class ResolverSolicitudForm(FlaskForm):\n    id_solicitud = HiddenField(\"ID Solicitud\")\n    estado = SelectField(\n        \"Estado\",\n        choices=[(\"APROBADA\", \"Aprobar\"), (\"RECHAZADA\", \"Rechazar\")],\n        validators=[DataRequired(message=\"Selecciona un estado.\")],\n    )\n    observaciones_resolucion = StringField(\n        \"Observaciones de resolución\",\n        validators=[Optional(), Length(max=255)],",
+        "detail": "app.production.forms",
+        "documentation": {}
+    },
+    {
         "label": "__all__",
         "kind": 5,
         "importPath": "app.production.models",
@@ -8613,7 +8885,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def inventario_mp():\n    form_mp = MateriaPrimaForm()\n    unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()\n    form_mp.id_unidad_base.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    form_mp.id_unidad_compra.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\" and form_mp.validate_on_submit():\n            try:\n                materia = crear_materia_prima(",
+        "peekOfCode": "def inventario_mp():\n    form_mp = MateriaPrimaForm()\n    form_ajuste = AjusteInventarioForm(prefix=\"ajuste\")\n    unidades = UnidadMedida.query.order_by(UnidadMedida.nombre.asc()).all()\n    form_mp.id_unidad_base.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    form_mp.id_unidad_compra.choices = [(u.id_unidad, f\"{u.nombre} ({u.abreviatura})\") for u in unidades]\n    if request.method == \"POST\":\n        action = request.form.get(\"action\", \"\")\n        if action == \"crear\" and form_mp.validate_on_submit():\n            try:",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -8649,7 +8921,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def recetas():\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()\n        modulo = Modulo.query.filter_by(nombre=\"Recetas\").first()\n        permiso = (\n            Permiso.query.filter_by(\n                id_rol=current_user.id_rol,\n                id_modulo=modulo.id_modulo if modulo else None,\n            ).first()\n            if modulo",
+        "peekOfCode": "def recetas():\n    form_receta = RecetaBaseForm(prefix=\"receta\")\n    productos = Producto.query.order_by(Producto.nombre.asc()).all()\n    form_receta.id_producto.choices = [(p.id_producto, p.nombre) for p in productos if p.activo]\n    if request.method == \"POST\":\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()\n        modulo = Modulo.query.filter_by(nombre=\"Recetas\").first()\n        permiso = (\n            Permiso.query.filter_by(\n                id_rol=current_user.id_rol,",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -8667,7 +8939,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def ordenes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\", \"Ventas\"}:\n        flash(\"No tienes acceso a este modulo.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    if request.method == \"POST\":\n        if role_name == \"Ventas\":\n            flash(\"El area de ventas solo puede consultar ordenes.\", \"warning\")\n            return redirect(url_for(\"production.ordenes\"))\n        action = request.form.get(\"action\", \"\")",
+        "peekOfCode": "def ordenes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\", \"Ventas\"}:\n        flash(\"No tienes acceso a este modulo.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    form_orden = OrdenProduccionForm(prefix=\"orden\")\n    # Pre-populate choices for the form (could have done this on GET/POST generically)\n    recetas_activas = Receta.query.filter_by(activa=True).order_by(Receta.id_producto.asc(), Receta.version.desc()).all()\n    form_orden.id_producto.choices = [(r.producto.id_producto, r.producto.nombre) for r in recetas_activas if r.producto and r.producto.activo]\n    form_orden.id_receta.choices = [(r.id_receta, f\"{r.nombre} (v{r.version})\") for r in recetas_activas]",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -8676,7 +8948,7 @@
         "kind": 2,
         "importPath": "app.production.routes",
         "description": "app.production.routes",
-        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\"}:\n        flash(\"Solo el area de produccion puede gestionar solicitudes.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    if request.method == \"POST\":\n        id_solicitud = _int(request.form.get(\"id_solicitud\", \"0\"))\n        estado = request.form.get(\"estado\", \"PENDIENTE\").strip().upper()\n        solicitud = SolicitudProduccion.query.options(\n            selectinload(SolicitudProduccion.producto),",
+        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if role_name not in {\"Administrador\", \"Produccion\"}:\n        flash(\"Solo el area de produccion puede gestionar solicitudes.\", \"danger\")\n        return redirect(url_for(\"catalog.home\"))\n    form_resolver = ResolverSolicitudForm(prefix=\"resolver\")\n    if request.method == \"POST\":\n        if form_resolver.validate_on_submit():\n            id_solicitud = form_resolver.id_solicitud.data\n            estado = form_resolver.estado.data",
         "detail": "app.production.routes",
         "documentation": {}
     },
@@ -8685,7 +8957,34 @@
         "kind": 6,
         "importPath": "app.sales.forms",
         "description": "app.sales.forms",
-        "peekOfCode": "class SalidaEfectivoForm(FlaskForm):\n    concepto = StringField(\"Concepto\", validators=[DataRequired(message=\"Este campo es obligatorio.\")])\n    monto = DecimalField(\"Monto\", validators=[InputRequired(message=\"El monto es obligatorio.\"), NumberRange(min=0.01, message=\"El monto debe ser de al menos 0.01.\")])\n    tipo = SelectField(\"Tipo\", choices=[(\"GASTO_OPERATIVO\", \"Gasto operativo\"), (\"COMPRA_MATERIA_PRIMA\", \"Compra materia prima\")])\n    submit = SubmitField(\"Registrar salida\")",
+        "peekOfCode": "class SalidaEfectivoForm(FlaskForm):\n    concepto = StringField(\n        \"Concepto\", validators=[DataRequired(message=\"Este campo es obligatorio.\")]\n    )\n    monto = DecimalField(\n        \"Monto\",\n        validators=[\n            InputRequired(message=\"El monto es obligatorio.\"),\n            NumberRange(min=0.01, message=\"El monto debe ser de al menos 0.01.\"),\n        ],",
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "ProductoTerminadoForm",
+        "kind": 6,
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "peekOfCode": "class ProductoTerminadoForm(FlaskForm):\n    id_producto = HiddenField(\"ID Producto\")\n    action = HiddenField(\"Action\")\n    nombre = StringField(\n        \"Nombre\",\n        validators=[\n            DataRequired(message=\"El nombre del producto es obligatorio.\"),\n            Length(max=120, message=\"Máximo 120 caracteres.\"),\n        ],\n    )",
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudVentasCrearForm",
+        "kind": 6,
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "peekOfCode": "class SolicitudVentasCrearForm(FlaskForm):\n    id_producto = SelectField(\n        \"Producto\",\n        coerce=int,\n        validators=[DataRequired(message=\"Selecciona un producto.\")],\n    )\n    cantidad = IntegerField(\n        \"Cantidad solicitada\",\n        validators=[\n            InputRequired(message=\"La cantidad es obligatoria.\"),",
+        "detail": "app.sales.forms",
+        "documentation": {}
+    },
+    {
+        "label": "SolicitudVentasEditarForm",
+        "kind": 6,
+        "importPath": "app.sales.forms",
+        "description": "app.sales.forms",
+        "peekOfCode": "class SolicitudVentasEditarForm(FlaskForm):\n    id_solicitud = HiddenField(\"ID Solicitud\")\n    cantidad = IntegerField(\n        \"Cantidad\",\n        validators=[\n            InputRequired(message=\"La cantidad es obligatoria.\"),\n            NumberRange(min=1, message=\"Debe ser al menos 1.\"),\n        ],\n    )\n    observaciones = StringField(",
         "detail": "app.sales.forms",
         "documentation": {}
     },
@@ -8703,7 +9002,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def producto_terminado():\n    can_manage = _can_manage_producto_terminado()\n    if request.method == \"POST\":\n        if not can_manage:\n            flash(\"No tienes permisos para modificar productos.\", \"warning\")\n            return redirect(url_for(\"sales.producto_terminado\"))\n        action = (request.form.get(\"action\") or \"\").strip().lower()\n        image_file = request.files.get(\"imagen_archivo\")\n        try:\n            image_path = _handle_image_upload(image_file)",
+        "peekOfCode": "def producto_terminado():\n    can_manage = _can_manage_producto_terminado()\n    form_producto = ProductoTerminadoForm(prefix=\"producto\")\n    # Choices for id_receta are only populated for the form so that WTForms validation works.\n    recetas_activas_all = (\n        Receta.query.filter_by(activa=True)\n        .order_by(Receta.id_producto.asc(), Receta.version.desc())\n        .all()\n    )\n    # We add 0 as a default option just in case",
         "detail": "app.sales.routes",
         "documentation": {}
     },
@@ -8721,7 +9020,7 @@
         "kind": 2,
         "importPath": "app.sales.routes",
         "description": "app.sales.routes",
-        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    if request.method == \"POST\":\n        if role_name not in {\"Ventas\", \"Administrador\"}:\n            flash(\n                \"Solo ventas y administración pueden registrar solicitudes.\",\n                \"danger\",\n            )\n            return redirect(url_for(\"sales.solicitudes\"))\n        action = (request.form.get(\"action\") or \"crear\").strip().lower()",
+        "peekOfCode": "def solicitudes():\n    role_name = current_user.rol.nombre if current_user.rol else \"\"\n    form_crear = SolicitudVentasCrearForm(prefix=\"crear\")\n    form_editar = SolicitudVentasEditarForm(prefix=\"editar\")\n    # Rellenar opciones de id_producto para validar\n    productos_activos = (\n        Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()\n    )\n    form_crear.id_producto.choices = [\n        (p.id_producto, p.nombre) for p in productos_activos if p.id_receta",
         "detail": "app.sales.routes",
         "documentation": {}
     },

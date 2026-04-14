@@ -1,46 +1,109 @@
-{% extends "base_template.html" %} {% block title %}Catalogo{% endblock %} {% block content %}
+{% extends "base_template.html" %} {% block title %}Catálogo{% endblock %} {% block content %}
 <section class="section">
-	<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-		<h2 class="mb-0">Catalogo de productos</h2>
-		<span class="text-secondary">Explora todos los productos disponibles</span>
+	<div class="portal-shop-header mb-4">
+		<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+			<div>
+				<span class="badge text-bg-light border mb-2 px-3 py-2">Portal de clientes</span>
+				<h2 class="portal-section-title mb-1">Catálogo de productos</h2>
+				<p class="portal-section-subtitle mb-0">
+					Explora sabores, consulta ingredientes y agenda tu pedido con anticipación.
+				</p>
+			</div>
+			<div class="d-flex align-items-center gap-2">
+				{% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre ==
+				'Cliente' %}
+				<a class="btn btn-outline-dark rounded-pill px-3" href="{{ url_for('catalog.carrito') }}">
+					<i class="bi bi-cart3 me-1"></i>
+					Ir al carrito
+				</a>
+				{% else %}
+				<a class="btn btn-outline-dark rounded-pill px-3" href="{{ url_for('auth.login') }}">
+					Inicia sesión para comprar
+				</a>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="portal-shop-toolbar mt-3">
+			<div class="input-group">
+				<span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+				<input
+					type="search"
+					id="catalogSearch"
+					class="form-control"
+					placeholder="Buscar pastel por nombre o descripción..."
+					aria-label="Buscar producto" />
+			</div>
+			<small class="text-secondary">{{ productos|length }} productos disponibles</small>
+		</div>
 	</div>
-	<div class="row g-4 mt-3">
-		{% for p in productos %}
-		<div class="col-12 col-sm-6 col-md-4 col-xl-3">
-			<article class="card product-card h-100 border-0 shadow-sm overflow-hidden">
-				<div
-					class="product-img-wrapper"
-					style="
-						height: 200px;
-						overflow: hidden;
-						background: #fdf6f3;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-					">
+
+	<div class="row g-3 mt-1" id="catalogGrid">
+		{% for p in productos %} {% set story = catalogo_story.get(p.id_producto, {}) %} {% set
+		ingredientes = story.get('ingredientes', []) %} {% set pasos = story.get('pasos', []) %} {% set
+		resumen = story.get('resumen', p.descripcion) %}
+		<div
+			class="col-12 col-sm-6 col-xl-4 col-xxl-3"
+			data-catalog-item
+			data-name="{{ (p.nombre or '')|lower }}"
+			data-desc="{{ (p.descripcion or '')|lower }}">
+			<article class="card h-100 border-0 shadow-sm portal-shop-card">
+				<div class="portal-shop-media">
 					{% if p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:') or
 					p.imagen.startswith('img/')) %}
 					<img
 						src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
-						alt="{{ p.nombre }}"
-						style="width: 100%; height: 100%; object-fit: cover" />
+						alt="{{ p.nombre }}" />
 					{% else %}
-					<span style="font-size: 5rem">{{ p.imagen or '🍞' }}</span>
+					<span class="portal-shop-emoji">{{ p.imagen or '🍰' }}</span>
 					{% endif %}
 				</div>
-				<div class="p-3 d-flex flex-column h-100">
-					<h3 class="h5 mb-2">{{ p.nombre }}</h3>
-					<p class="text-muted small mb-3 flex-grow-1">{{ p.descripcion }}</p>
-					<div class="d-flex justify-content-between align-items-center mb-3">
-						<span class="badge bg-secondary">Pedido programado</span>
-						<p class="price h5 mb-0 text-primary fw-bold">${{ '%.2f'|format(p.precio_venta) }}</p>
+
+				<div class="card-body d-flex flex-column gap-2">
+					<div class="d-flex justify-content-between align-items-start gap-2">
+						<span class="portal-chip">
+							<i class="bi bi-calendar-check"></i>
+							Pedido programado
+						</span>
+						{% if story.get('tiene_receta') %}
+						<span
+							class="badge text-bg-success-subtle border border-success-subtle text-success-emphasis">
+							Con receta
+						</span>
+						{% endif %}
 					</div>
+
+					<h3 class="portal-product-title mb-0">{{ p.nombre }}</h3>
+					<p class="portal-product-desc mb-1">{{ p.descripcion }}</p>
+
+					<div class="d-flex flex-wrap gap-1 mb-1">
+						{% for ingrediente in ingredientes[:3] %}
+						<span class="badge rounded-pill text-bg-light border">{{ ingrediente }}</span>
+						{% endfor %} {% if ingredientes|length > 3 %}
+						<span class="badge rounded-pill text-bg-light border">
+							+{{ ingredientes|length - 3 }} ingredientes
+						</span>
+						{% endif %}
+					</div>
+
+					<div class="d-flex justify-content-between align-items-end mt-auto pt-1">
+						<span class="portal-price">${{ '%.2f'|format(p.precio_venta) }}</span>
+						<button
+							type="button"
+							class="btn btn-outline-secondary btn-sm rounded-pill"
+							data-bs-toggle="modal"
+							data-bs-target="#modalProducto{{ p.id_producto }}">
+							<i class="bi bi-card-text me-1"></i>
+							Ver descripción
+						</button>
+					</div>
+
 					{% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre ==
 					'Cliente' %}
 					<form
 						method="post"
 						action="{{ url_for('catalog.carrito_agregar') }}"
-						class="d-flex gap-2 mt-auto">
+						class="d-flex align-items-center gap-2 mt-1">
 						<input type="hidden" name="id_producto" value="{{ p.id_producto }}" />
 						<input
 							type="number"
@@ -49,34 +112,129 @@
 							max="5"
 							value="1"
 							class="form-control form-control-sm text-center"
-							style="width: 70px" />
-						<button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-							<i class="bi bi-cart-plus"></i>
-							Agregar
+							style="width: 72px" />
+						<button type="submit" class="btn btn-primary btn-sm w-100">
+							<i class="bi bi-cart-plus me-1"></i>
+							Agregar al carrito
 						</button>
 					</form>
 					{% else %}
-					<div class="mt-auto small text-secondary">
-						<a href="{{ url_for('auth.login') }}" class="text-decoration-none">Inicia sesión</a>
-						para comprar.
+					<div class="small text-secondary mt-2">
+						<a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">
+							Inicia sesión
+						</a>
+						para comprar este producto.
 					</div>
 					{% endif %}
 				</div>
 			</article>
 		</div>
+
+		<div class="modal fade" id="modalProducto{{ p.id_producto }}" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+				<div class="modal-content portal-product-modal">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							<i class="bi bi-cake2 me-1"></i>
+							{{ p.nombre }}
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row g-3">
+							<div class="col-md-5">
+								<div class="portal-product-modal-media">
+									{% if p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:') or
+									p.imagen.startswith('img/')) %}
+									<img
+										src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
+										alt="{{ p.nombre }}" />
+									{% else %}
+									<span class="portal-shop-emoji">{{ p.imagen or '🍰' }}</span>
+									{% endif %}
+								</div>
+								<div class="alert alert-light border mt-3 mb-0 small">
+									<strong>Precio:</strong>
+									${{ '%.2f'|format(p.precio_venta) }} ·
+									<span class="text-secondary">Pedido programado</span>
+								</div>
+							</div>
+
+							<div class="col-md-7">
+								<h6 class="fw-bold mb-2">Descripción del pastel</h6>
+								<p class="text-secondary mb-3">{{ resumen }}</p>
+
+								<h6 class="fw-bold mb-2">Ingredientes base (sin cantidades)</h6>
+								{% if ingredientes %}
+								<div class="d-flex flex-wrap gap-2 mb-3">
+									{% for ingrediente in ingredientes %}
+									<span class="badge rounded-pill text-bg-light border">{{ ingrediente }}</span>
+									{% endfor %}
+								</div>
+								{% else %}
+								<p class="small text-secondary mb-3">
+									Estamos completando el detalle de ingredientes para este pastel.
+								</p>
+								{% endif %}
+
+								<h6 class="fw-bold mb-2">¿Cómo se crea?</h6>
+								<ol class="small text-secondary ps-3 mb-0">
+									{% for paso in pasos %}
+									<li class="mb-1">{{ paso }}</li>
+									{% else %}
+									<li>Preparación artesanal según receta y validación de calidad.</li>
+									{% endfor %}
+								</ol>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							Cerrar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 		{% else %}
 		<div class="col-12">
-			<div class="panel p-4 text-center text-muted">
-				No hay productos disponibles en este momento.
+			<div class="portal-empty">
+				<i class="bi bi-emoji-frown" style="font-size: 2rem"></i>
+				<p class="mb-0 mt-2">No hay productos disponibles en este momento.</p>
 			</div>
 		</div>
 		{% endfor %}
 	</div>
+
+	<div id="catalogNoResults" class="portal-empty mt-3 d-none" role="status" aria-live="polite">
+		<i class="bi bi-search" style="font-size: 1.6rem"></i>
+		<p class="mb-0 mt-2">No encontramos pasteles con ese criterio de búsqueda.</p>
+	</div>
 </section>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="catalogToast" class="toast align-items-center text-bg-dark border-0" role="alert">
+		<div class="d-flex">
+			<div class="toast-body" id="catalogToastBody">Producto agregado al carrito.</div>
+			<button
+				type="button"
+				class="btn-close btn-close-white me-2 m-auto"
+				data-bs-dismiss="toast"></button>
+		</div>
+	</div>
+</div>
 {% endblock %} {% block scripts %} {{ super() }}
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
-		const cartIcon = document.querySelector('.bi-cart3');
+		const cartLink = document.querySelector('.app-cart-link');
+		const cartIcon = document.querySelector('.app-cart-link .bi-cart3');
+		const searchInput = document.getElementById('catalogSearch');
+		const catalogItems = Array.from(document.querySelectorAll('[data-catalog-item]'));
+		const noResults = document.getElementById('catalogNoResults');
+		const toastElement = document.getElementById('catalogToast');
+		const toastBody = document.getElementById('catalogToastBody');
+		const toast = toastElement ? new bootstrap.Toast(toastElement) : null;
+
 		let badge = null;
 		if (cartIcon) {
 			badge = cartIcon.nextElementSibling;
@@ -88,6 +246,50 @@
 					badge.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
 				}
 			}
+		}
+
+		const updateBadgeCount = (count) => {
+			if (!badge || typeof count !== 'number') {
+				return;
+			}
+			badge.innerText = count;
+			badge.classList.toggle('d-none', count <= 0);
+		};
+
+		const pulseBadge = () => {
+			if (!badge) {
+				return;
+			}
+			badge.style.transform = 'translate(-50%, -50%) scale(1.6)';
+			setTimeout(() => {
+				badge.style.transform = 'translate(-50%, -50%) scale(1)';
+			}, 200);
+		};
+
+		const applySearchFilter = () => {
+			if (!searchInput) {
+				return;
+			}
+			const term = searchInput.value.trim().toLowerCase();
+			let visibleCount = 0;
+
+			catalogItems.forEach((item) => {
+				const name = item.dataset.name || '';
+				const desc = item.dataset.desc || '';
+				const matches = !term || name.includes(term) || desc.includes(term);
+				item.classList.toggle('d-none', !matches);
+				if (matches) {
+					visibleCount += 1;
+				}
+			});
+
+			if (noResults) {
+				noResults.classList.toggle('d-none', visibleCount > 0);
+			}
+		};
+
+		if (searchInput) {
+			searchInput.addEventListener('input', applySearchFilter);
 		}
 
 		document.querySelectorAll('form[action*="carrito/agregar"]').forEach((form) => {
@@ -115,14 +317,14 @@
 
 					if (response.ok && result.success) {
 						// Elementos para animación
-						const card = form.closest('.product-card');
-						const imgWrapper = card.querySelector('.product-img-wrapper');
-						const visualElement =
-							imgWrapper.querySelector('img') || imgWrapper.querySelector('span');
+						const card = form.closest('.portal-shop-card') || form.closest('.card');
+						const imgWrapper = card ? card.querySelector('.portal-shop-media') : null;
+						const visualElement = imgWrapper ? imgWrapper.querySelector('img, span') : null;
 
-						if (visualElement && badge) {
+						if (visualElement && cartLink) {
 							const elementRect = visualElement.getBoundingClientRect();
-							const cartRect = badge.getBoundingClientRect();
+							const flyTarget = badge && !badge.classList.contains('d-none') ? badge : cartLink;
+							const cartRect = flyTarget.getBoundingClientRect();
 
 							const clone = visualElement.cloneNode(true);
 							document.body.appendChild(clone);
@@ -144,6 +346,8 @@
 								clone.style.display = 'flex';
 								clone.style.alignItems = 'center';
 								clone.style.justifyContent = 'center';
+								clone.style.background = '#fff';
+								clone.style.borderRadius = '50%';
 							}
 
 							clone.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -166,36 +370,35 @@
 
 								// Actualizar contador y animar badge
 								if (result.cart_count !== undefined) {
-									badge.innerText = result.cart_count;
-									if (result.cart_count > 0) {
-										badge.style.display = 'inline-block';
-									} else {
-										badge.style.display = 'none';
-									}
+									updateBadgeCount(result.cart_count);
 								}
 
-								badge.style.transform = 'translate(-50%, -50%) scale(1.6)';
-								setTimeout(() => {
-									badge.style.transform = 'translate(-50%, -50%) scale(1)';
-								}, 200);
+								pulseBadge();
 							}, 600);
 						} else {
 							// Fallback si no hay elementos visuales
 							if (badge && result.cart_count !== undefined) {
-								badge.innerText = result.cart_count;
-								if (result.cart_count > 0) {
-									badge.style.display = 'inline-block';
-								} else {
-									badge.style.display = 'none';
-								}
+								updateBadgeCount(result.cart_count);
+								pulseBadge();
 							}
 						}
+
+						if (toast && toastBody) {
+							toastBody.textContent = result.message || 'Producto agregado al carrito.';
+							toast.show();
+						}
 					} else {
-						alert(result.error || 'Error al agregar el producto');
+						if (toast && toastBody) {
+							toastBody.textContent = result.error || 'Error al agregar el producto.';
+							toast.show();
+						}
 					}
 				} catch (error) {
 					console.error('Error:', error);
-					alert('Ocurrió un error de red.');
+					if (toast && toastBody) {
+						toastBody.textContent = 'Ocurrió un error de red.';
+						toast.show();
+					}
 				} finally {
 					submitBtn.disabled = false;
 					submitBtn.innerHTML = originalBtnHtml;

@@ -7,7 +7,11 @@ is_home else current_path.startswith(href) %}
 	<i class="bi {{ icon }}"></i>
 	<span>{{ label }}</span>
 </a>
-{%- endmacro %} {% macro nav_shell(user, current_path) -%}
+{%- endmacro %} {% macro nav_shell(user, current_path) -%} {% set home_href =
+url_for('catalog.home') %} {% set catalog_href = url_for('catalog.catalogo') %} {% set carrito_href
+= url_for('catalog.carrito') %} {% set is_home_active = current_path == home_href %} {% set
+is_catalog_active = current_path.startswith(catalog_href) or current_path.startswith(carrito_href)
+or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 <header class="app-header sticky-top shadow-sm bg-white">
 	<nav class="navbar navbar-expand-lg border-bottom py-3">
 		<div class="container-fluid app-container">
@@ -15,8 +19,14 @@ is_home else current_path.startswith(href) %}
 			<a
 				class="navbar-brand app-brand d-flex align-items-center"
 				href="{{ url_for('catalog.home') }}">
-				<i class="bi bi-cake2 me-2"></i>
-				SOFTBAKERY
+				<img
+					src="{{ url_for('static', filename='img/productos/logo.png') }}"
+					class="app-brand-logo me-2"
+					alt="SoftBakery" />
+				<span class="app-brand-text-wrap">
+					<span>SOFTBAKERY</span>
+					<small class="app-brand-subtext">Sistema interno</small>
+				</span>
 			</a>
 
 			<!-- Toggle for mobile -->
@@ -34,45 +44,49 @@ is_home else current_path.startswith(href) %}
 					class="navbar-nav mx-auto mb-2 mb-lg-0 text-center gap-2 gap-lg-4"
 					style="font-size: 0.9rem; text-transform: uppercase">
 					<li class="nav-item">
-						<a class="nav-link app-navbar-link text-dark" href="{{ url_for('catalog.home') }}">
+						<a
+							class="nav-link app-navbar-link {{ 'active' if is_home_active else '' }}"
+							href="{{ url_for('catalog.home') }}">
 							Inicio
 						</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link app-navbar-link text-dark" href="{{ url_for('catalog.catalogo') }}">
-							Catálogo
-						</a>
-					</li>
-					<li class="nav-item">
 						<a
-							class="nav-link app-navbar-link text-dark"
-							href="{{ url_for('catalog.home') }}#nosotros">
-							Nosotros
+							class="nav-link app-navbar-link {{ 'active' if is_catalog_active else '' }}"
+							href="{{ url_for('catalog.catalogo') }}">
+							Catálogo
 						</a>
 					</li>
 				</ul>
 
 				<!-- Right side Icons -->
-				<div class="d-flex align-items-center justify-content-center gap-3 mt-3 mt-lg-0">
-					<!-- Search -->
-					<a href="#" class="text-dark fs-5" aria-label="Buscar" title="Buscar">
-						<i class="bi bi-search"></i>
+				<div class="d-flex align-items-center justify-content-center gap-2 mt-3 mt-lg-0">
+					{% if user.is_authenticated %}
+					<a
+						href="{{ url_for('auth.mi_cuenta') if user.rol and user.rol.nombre == 'Cliente' else '#' }}"
+						class="app-user-pill text-decoration-none">
+						<i class="bi bi-person-circle"></i>
+						<span class="d-none d-md-inline">
+							{{ user.persona.nombre if user.persona else user.username }}
+						</span>
 					</a>
+					{% else %}
+					<a
+						href="{{ url_for('auth.login') }}"
+						class="btn btn-outline-dark btn-sm rounded-pill px-3">
+						Ingresar
+					</a>
+					{% endif %}
 
 					<!-- User Dropdown -->
 					<div class="dropdown">
 						<a
 							href="#"
-							class="text-dark fs-5 d-flex align-items-center text-decoration-none dropdown-toggle"
+							class="text-dark fs-5 d-flex align-items-center text-decoration-none dropdown-toggle app-user-menu-toggle"
 							id="userMenu"
 							data-bs-toggle="dropdown"
 							aria-expanded="false">
 							<i class="bi bi-person"></i>
-							{% if user.is_authenticated %}
-							<span class="ms-1 fs-6 d-none d-lg-inline fw-normal text-capitalize">
-								{{ user.persona.nombre if user.persona else user.username }}
-							</span>
-							{% endif %}
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
 							{% if user.is_authenticated %}
@@ -136,13 +150,13 @@ is_home else current_path.startswith(href) %}
 					<!-- Cart -->
 					<a
 						href="{{ url_for('catalog.carrito') }}"
-						class="text-dark fs-5 position-relative"
+						class="text-dark fs-5 position-relative app-cart-link"
 						aria-label="Carrito"
 						title="Carrito de compras">
 						<i class="bi bi-cart3"></i>
 						<span
-							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-							style="font-size: 0.6rem; display: {{ 'none' if cart_count == 0 else 'inline-block' }};">
+							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ 'd-none' if cart_count == 0 else 'd-inline-block' }}"
+							style="font-size: 0.6rem">
 							{{ cart_count }}
 						</span>
 					</a>
@@ -258,22 +272,15 @@ get_flashed_messages(with_categories=true) %} {% if messages %}
 	</div>
 	{% endfor %}
 </section>
-{% endif %} {% endwith %} {%- endmacro %}
-
-{# ── campo(field) ─────────────────────────────────────────────
-   Igual al camposNuevos del ejemplo de clase.
-   Renderiza: label + widget del field + errores en rojo.
-   Uso: {{ campo(form.nombre) }}
-        {{ campo(form.correo, class='form-control') }}
-──────────────────────────────────────────────────────────────── #}
-{% macro campo(field) %}
+{% endif %} {% endwith %} {%- endmacro %} {# ── campo(field)
+───────────────────────────────────────────── Igual al camposNuevos del ejemplo de clase. Renderiza:
+label + widget del field + errores en rojo. Uso: {{ campo(form.nombre) }} {{ campo(form.correo,
+class='form-control') }} ──────────────────────────────────────────────────────────────── #} {%
+macro campo(field) %}
 <div class="mb-2">
-  {{ field.label(class='form-label') }}
-  {{ field(class=kwargs.pop('class', 'form-control'), **kwargs) }}
-  {% if field.errors %}
-    {% for error in field.errors %}
-      <span class="text-danger" style="font-size:.78rem;">{{ error }}</span>
-    {% endfor %}
-  {% endif %}
+	{{ field.label(class='form-label') }} {{ field(class=kwargs.pop('class', 'form-control'),
+	**kwargs) }} {% if field.errors %} {% for error in field.errors %}
+	<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>
+	{% endfor %} {% endif %}
 </div>
 {% endmacro %}

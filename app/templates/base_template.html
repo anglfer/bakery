@@ -17,6 +17,13 @@
 		<link
 			href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Poppins:wght@300;400;500;600&display=swap"
 			rel="stylesheet" />
+		<link
+			rel="icon"
+			type="image/png"
+			href="{{ url_for('static', filename='img/productos/logo.png') }}" />
+		<link
+			rel="apple-touch-icon"
+			href="{{ url_for('static', filename='img/productos/logo.png') }}" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
 		<meta name="csrf-token" content="{{ csrf_token() }}" />
 		{% block extra_css %}{% endblock %}
@@ -201,7 +208,13 @@
 				aria-label="Abrir menu">
 				<i class="bi bi-list"></i>
 			</button>
-			<span class="topbar-title">{% block page_title %}Panel{% endblock %}</span>
+			<span class="topbar-title d-flex align-items-center gap-2">
+				<img
+					src="{{ url_for('static', filename='img/productos/logo.png') }}"
+					class="topbar-brand-logo"
+					alt="SoftBakery" />
+				<span>{% block page_title %}Panel{% endblock %}</span>
+			</span>
 			<div class="topbar-right">
 				<span class="topbar-time d-none d-md-block"><span id="reloj">--:--</span></span>
 				<div class="dropdown">
@@ -268,13 +281,58 @@
 			{% endif %}
 		</main>
 
+		{% if not is_staff %}
+		<footer class="site-footer" role="contentinfo">
+			<div class="site-footer-inner">
+				<div class="site-footer-brand">
+					<h3>SoftBakery</h3>
+					<p>
+						Pastelería artesanal con una experiencia de compra clara, visual y confiable. Pedidos
+						programados, inventario real y atención cuidada.
+					</p>
+				</div>
+				<div class="site-footer-col">
+					<h4>Explorar</h4>
+					<div class="site-footer-links">
+						<a href="{{ url_for('catalog.home') }}">Inicio</a>
+						<a href="{{ url_for('catalog.catalogo') }}">Catálogo</a>
+						{% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre ==
+						'Cliente' %}
+						<a href="{{ url_for('catalog.carrito') }}">Carrito</a>
+						<a href="{{ url_for('catalog.mis_pedidos') }}">Mis pedidos</a>
+						{% endif %}
+					</div>
+				</div>
+				<div class="site-footer-col">
+					<h4>Contacto</h4>
+					<p>
+						<i class="bi bi-geo-alt me-1"></i>
+						Atención en sucursal y pedidos web
+					</p>
+					<p>
+						<i class="bi bi-clock me-1"></i>
+						Horario según operación interna
+					</p>
+					<p>
+						<i class="bi bi-shield-check me-1"></i>
+						Compra segura y validación de pedidos
+					</p>
+				</div>
+			</div>
+			<div class="site-footer-bottom">
+				<span>© 2026 SoftBakery</span>
+				<span>Hecho para verse bien en móvil y escritorio.</span>
+			</div>
+		</footer>
+		{% endif %}
+
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 			crossorigin="anonymous"></script>
 		<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 		<script>
-			window.CSRF_TOKEN = {{ csrf_token() | tojson }};
+			window.CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 			(function injectCsrfTokenToPostForms() {
 				const token = window.CSRF_TOKEN;
 				if (!token) {
@@ -324,19 +382,49 @@
 				document.body.style.overflow = '';
 			}
 
-			document.querySelectorAll('.nav-group-toggle').forEach(function (toggle) {
+			const navGroupToggles = Array.from(document.querySelectorAll('.nav-group-toggle'));
+
+			function closeNavGroup(toggleElement) {
+				toggleElement.classList.remove('open');
+				const submenu = toggleElement.nextElementSibling;
+				if (submenu) {
+					submenu.classList.remove('open');
+				}
+			}
+
+			navGroupToggles.forEach(function (toggle) {
 				toggle.addEventListener('click', function () {
 					const sub = this.nextElementSibling;
 					if (!sub) return;
-					this.classList.toggle('open');
-					sub.classList.toggle('open');
+
+					const shouldOpen = !sub.classList.contains('open');
+
+					navGroupToggles.forEach(function (otherToggle) {
+						if (otherToggle !== toggle) {
+							closeNavGroup(otherToggle);
+						}
+					});
+
+					toggle.classList.toggle('open', shouldOpen);
+					sub.classList.toggle('open', shouldOpen);
 				});
-				const sub = toggle.nextElementSibling;
-				if (sub && sub.querySelector('.active')) {
-					toggle.classList.add('open');
-					sub.classList.add('open');
-				}
 			});
+
+			const activeToggle = navGroupToggles.find(function (toggle) {
+				const sub = toggle.nextElementSibling;
+				return sub && sub.querySelector('.active');
+			});
+
+			if (activeToggle) {
+				navGroupToggles.forEach(function (toggle) {
+					if (toggle !== activeToggle) {
+						closeNavGroup(toggle);
+					}
+				});
+
+				activeToggle.classList.add('open');
+				activeToggle.nextElementSibling?.classList.add('open');
+			}
 		</script>
 		{% endif %} {% block scripts %}{% endblock %}
 	</body>

@@ -1,175 +1,122 @@
 {% extends "base_template.html" %} {% block title %}Inicio{% endblock %} {% block content %}
-<section
-	class="hero-banner rounded-4 shadow-sm position-relative overflow-hidden mb-5"
-	id="inicio"
-	style="
-		min-height: 450px;
-		background: url('https://images.unsplash.com/photo-1559620192-032c4bc4674e?auto=format&fit=crop&w=1800&q=80')
-			center / cover;
-	">
-	<div
-		class="position-absolute top-0 start-0 w-100 h-100"
-		style="
-			background: linear-gradient(135deg, rgba(44, 24, 16, 0.85) 0%, rgba(158, 59, 59, 0.6) 100%);
-		"></div>
-	<div
-		class="hero-overlay position-relative text-white h-100 d-flex align-items-center"
-		style="padding: 5rem 2rem">
-		<div class="container hero-content">
-			<p
-				class="hero-kicker text-uppercase fw-bold mb-2"
-				style="color: #f7b267; letter-spacing: 2px">
-				Pastelería Artesanal
+<section class="portal-hero" id="inicio">
+	<div class="portal-hero-body">
+		<div class="portal-hero-copy">
+			<span class="portal-hero-kicker">
+				<i class="bi bi-stars"></i>
+				Pastelería artesanal
+			</span>
+			<h1 class="portal-hero-title">Postres que hacen especial cualquier día.</h1>
+			<p class="portal-hero-text">
+				Explora nuestro catálogo, elige tus favoritos y programa tu pedido con anticipación. Todo
+				conectado a inventario real para que recibas justo lo que esperas.
 			</p>
-			<h1
-				class="display-3 fw-bold mb-3 font-playfair"
-				style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3)">
-				Regálate un dulce momento
-			</h1>
-			<p class="lead mb-4 fw-light" style="max-width: 600px">
-				Ordena en línea, descubre nuestros sabores exclusivos y recoge en tu sucursal favorita sin
-				hacer filas.
-			</p>
-			<a
-				class="btn btn-primary btn-lg px-5 rounded-pill shadow"
-				href="{{ url_for('catalog.catalogo') }}">
-				Comprar Ahora
-				<i class="bi bi-arrow-right ms-2"></i>
-			</a>
+			<div class="portal-hero-actions">
+				<a class="btn btn-warning rounded-pill px-4" href="{{ url_for('catalog.catalogo') }}">
+					Ver catálogo
+					<i class="bi bi-arrow-right ms-1"></i>
+				</a>
+			</div>
+		</div>
+		<div class="portal-hero-visual">
+			<img
+				src="{{ url_for('static', filename='img/productos/Pastel_de_chocolate.jpg') }}"
+				alt="Pastel de chocolate artesanal" />
+			<div class="portal-hero-visual-badge">
+				<i class="bi bi-award-fill"></i>
+				Hecho para lucir bien y saber mejor
+			</div>
 		</div>
 	</div>
 </section>
 
-<section class="container mb-5" id="productos">
-	<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2">
-		<h2 class="font-playfair mb-0 text-primary">Favoritos de la semana</h2>
-		<a href="{{ url_for('catalog.catalogo') }}" class="text-decoration-none fw-semibold">
-			Ver catálogo completo
-			<i class="bi bi-chevron-right"></i>
+<section class="portal-values-grid" aria-label="Diferenciales de SoftBakery">
+	<article class="portal-value-card">
+		<span class="portal-value-icon"><i class="bi bi-clock-history"></i></span>
+		<div>
+			<p class="portal-value-title">Pedido fácil</p>
+			<p class="portal-value-text">Programa tu entrega en minutos.</p>
+		</div>
+	</article>
+	<article class="portal-value-card">
+		<span class="portal-value-icon"><i class="bi bi-bag-check"></i></span>
+		<div>
+			<p class="portal-value-title">Inventario real</p>
+			<p class="portal-value-text">Solo mostramos productos disponibles.</p>
+		</div>
+	</article>
+	<article class="portal-value-card">
+		<span class="portal-value-icon"><i class="bi bi-shield-check"></i></span>
+		<div>
+			<p class="portal-value-title">Pago seguro</p>
+			<p class="portal-value-text">Proceso protegido y validado.</p>
+		</div>
+	</article>
+	<article class="portal-value-card">
+		<span class="portal-value-icon"><i class="bi bi-award"></i></span>
+		<div>
+			<p class="portal-value-title">Calidad constante</p>
+			<p class="portal-value-text">Recetas controladas y producción diaria.</p>
+		</div>
+	</article>
+</section>
+
+<section class="section" id="productos">
+	<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+		<div>
+			<h2 class="portal-section-title">Favoritos de la semana</h2>
+			<p class="portal-section-subtitle mb-0">Selección destacada por nuestros clientes</p>
+		</div>
+		<a
+			href="{{ url_for('catalog.catalogo') }}"
+			class="btn btn-outline-dark btn-sm rounded-pill px-3">
+			Ver todo
 		</a>
 	</div>
 
-	<div class="row g-4">
-		<!-- Destacado Principal -->
-		<div class="col-12 col-lg-5">
-			{% if destacados and destacados|length > 0 %} {% set top_p = destacados[0] %} {% set top_img =
-			url_for('static', filename=top_p.imagen) if top_p.imagen and top_p.imagen.startswith('img/')
-			else (top_p.imagen if top_p.imagen and (top_p.imagen.startswith('http') or
-			top_p.imagen.startswith('data:')) else
-			'https://images.unsplash.com/photo-1542826438-bd32f43d626f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')
-			%}
-			<div
-				class="card bg-dark text-white rounded-4 overflow-hidden border-0 shadow h-100 d-flex flex-column justify-content-end"
-				style="min-height: 350px; background: url('{{ top_img }}') center / cover;">
-				<div
-					class="position-absolute top-0 start-0 w-100 h-100"
-					style="background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent)"></div>
-				<div class="card-body position-relative z-1 d-flex flex-column justify-content-end p-4">
-					<span class="badge bg-warning text-dark mb-2 align-self-start">MÁS VENDIDO</span>
-					<h3 class="card-title font-playfair display-6">{{ top_p.nombre }}</h3>
-					<p class="card-text text-light mb-3">{{ top_p.descripcion }}</p>
-					<div class="d-flex justify-content-between align-items-center">
-						<span class="fs-4 fw-bold text-white">${{ '%.2f'|format(top_p.precio_venta) }}</span>
-						<a href="{{ url_for('catalog.catalogo') }}" class="btn btn-light rounded-pill px-4">
-							Ordenar
+	{% if destacados %}
+	<div class="row g-3">
+		{% for p in destacados %} {% set p_img = url_for('static', filename=p.imagen) if p.imagen and
+		p.imagen.startswith('img/') else (p.imagen if p.imagen and (p.imagen.startswith('http') or
+		p.imagen.startswith('data:')) else
+		'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=80')
+		%}
+		<div class="col-12 col-sm-6 col-xl-4 col-xxl-3">
+			<article class="portal-product-card">
+				<div class="portal-product-media">
+					{% if p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:') or
+					p.imagen.startswith('img/')) %}
+					<img
+						src="{{ url_for('static', filename=p.imagen) if p.imagen.startswith('img/') else p.imagen }}"
+						alt="{{ p.nombre }}" />
+					{% else %}
+					<span style="font-size: 4rem">{{ p.imagen or '🍰' }}</span>
+					{% endif %}
+				</div>
+				<div class="portal-product-body">
+					<span class="portal-chip">
+						<i class="bi bi-heart-fill"></i>
+						Recomendado
+					</span>
+					<h3 class="portal-product-title">{{ p.nombre }}</h3>
+					<p class="portal-product-desc">{{ p.descripcion }}</p>
+					<div class="portal-price-row">
+						<span class="portal-price">${{ '%.2f'|format(p.precio_venta) }}</span>
+						<a href="{{ url_for('catalog.catalogo') }}" class="btn btn-primary btn-sm px-3">
+							Ver detalle
 						</a>
 					</div>
 				</div>
-			</div>
-			{% endif %}
+			</article>
 		</div>
-
-		<!-- Otros Destacados -->
-		<div class="col-12 col-lg-7">
-			<div class="row g-3">
-				{% for p in destacados[1:5] %} {% set p_img = url_for('static', filename=p.imagen) if
-				p.imagen and p.imagen.startswith('img/') else (p.imagen if p.imagen and
-				(p.imagen.startswith('http') or p.imagen.startswith('data:')) else
-				'https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80')
-				%}
-				<div class="col-12 col-md-6">
-					<div
-						class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-row align-items-center">
-						<div
-							class="ms-3 rounded-3 mt-3 mb-3 ms-3"
-							style="width: 90px; height: 90px; background: url('{{ p_img }}') center / cover; flex-shrink: 0;"></div>
-						<div class="card-body py-3 d-flex flex-column justify-content-center">
-							<h5 class="card-title fw-bold mb-1 fs-6 text-truncate" title="{{ p.nombre }}">
-								{{ p.nombre }}
-							</h5>
-							<p class="card-text small text-muted mb-2 text-truncate" title="{{ p.descripcion }}">
-								{{ p.descripcion }}
-							</p>
-							<div class="d-flex justify-content-between align-items-center mt-auto">
-								<span class="text-primary fw-bold">${{ '%.2f'|format(p.precio_venta) }}</span>
-								<a
-									href="{{ url_for('catalog.catalogo') }}"
-									class="btn btn-sm btn-outline-primary rounded-pill">
-									<i class="bi bi-cart-plus"></i>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-				{% endfor %}
-			</div>
-		</div>
+		{% endfor %}
 	</div>
+	{% else %}
+	<div class="portal-empty">
+		<i class="bi bi-cake2" style="font-size: 2rem"></i>
+		<p class="mb-0 mt-2">No hay destacados disponibles por el momento.</p>
+	</div>
+	{% endif %}
 </section>
 
-<section class="container" id="nosotros">
-	<div class="row g-4 align-items-center bg-white rounded-4 shadow-sm border p-4 p-md-5">
-		<div class="col-12 col-md-7 pe-md-5">
-			<span class="text-uppercase fw-bold text-muted small tracking-widest mb-2 d-block">
-				Sobre Nosotros
-			</span>
-			<h2 class="font-playfair text-primary mb-4">Hecho en SoftBakery</h2>
-			<p class="lead text-secondary opacity-75 mb-4">
-				Cada producto conecta ventas, recetas y producción. Lo que ves en el catálogo nace de una
-				receta meticulosamente versionada, horneada diariamente y controlada por un inventario real
-				para asegurar la máxima frescura.
-			</p>
-			<ul class="list-unstyled mb-0 d-flex flex-column gap-3 text-secondary">
-				<li>
-					<i class="bi bi-check-circle-fill text-success me-2"></i>
-					Ingredientes 100% naturales
-				</li>
-				<li>
-					<i class="bi bi-check-circle-fill text-success me-2"></i>
-					Recetas originales
-				</li>
-				<li>
-					<i class="bi bi-check-circle-fill text-success me-2"></i>
-					Calidad garantizada
-				</li>
-			</ul>
-		</div>
-		<div class="col-12 col-md-5">
-			<div
-				class="p-5 rounded-4 text-center position-relative overflow-hidden shadow"
-				style="background: linear-gradient(135deg, #1e0715, #4d1731)">
-				<div class="position-relative z-1">
-					<i class="bi bi-stars text-warning display-4 mb-3"></i>
-					<h3 class="text-white font-playfair mb-3">Promo de Temporada</h3>
-					<p class="text-light opacity-75 mb-4 px-2">
-						Obtén
-						<strong class="text-warning">20% de descuento</strong>
-						en pasteles seleccionados al ordenar desde nuestro portal de clientes.
-					</p>
-					<a
-						class="btn btn-warning rounded-pill px-4 fw-bold"
-						href="{{ url_for('catalog.catalogo') }}">
-						Aprovechar Oferta
-					</a>
-				</div>
-				<!-- Decoración de fondo -->
-				<div
-					class="position-absolute top-0 end-0 opacity-10"
-					style="transform: translate(30%, -30%)">
-					<i class="bi bi-cake2-fill" style="font-size: 15rem"></i>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
 {% endblock %}

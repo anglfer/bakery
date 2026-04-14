@@ -1,52 +1,81 @@
-{% extends "base_template.html" %}
-{% block title %}Mis pedidos{% endblock %}
-{% block content %}
+{% extends "base_template.html" %} {% block title %}Mis pedidos{% endblock %} {% block content %}
 <section class="section">
-	<div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-		<h2 class="mb-0">Mis pedidos</h2>
-		<a class="btn btn-sm" href="{{ url_for('catalog.catalogo') }}">Volver al catálogo</a>
+	<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+		<div>
+			<h2 class="portal-section-title mb-1">Mis pedidos</h2>
+			<p class="portal-section-subtitle mb-0">Consulta fechas, estados y detalle de cada compra.</p>
+		</div>
+		<a
+			class="btn btn-outline-dark btn-sm rounded-pill px-3"
+			href="{{ url_for('catalog.catalogo') }}">
+			Volver al catálogo
+		</a>
 	</div>
 
-	<div class="card p-3">
-		<div class="table-responsive">
-			<table>
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Fecha</th>
-						<th>Entrega</th>
-						<th>Total</th>
-						<th>Estado</th>
-						<th>Pago</th>
-						<th>Detalle</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for p in pedidos %}
-					<tr>
-						<td>{{ p.id_pedido }}</td>
-						<td>{{ p.fecha_pedido.strftime('%Y-%m-%d') }}</td>
-						<td>{{ p.fecha_entrega.strftime('%Y-%m-%d') }}</td>
-						<td>${{ '%.2f'|format(p.total) }}</td>
-						<td><span class="badge text-bg-secondary">{{ p.estado_pedido }}</span></td>
-						<td><span class="badge text-bg-light">{{ p.estado_pago }}</span></td>
-						<td>
-							{% for d in p.detalles %}
-							<div>{{ d.producto.nombre }} x {{ d.cantidad }}</div>
-							{% else %}
-							<div class="text-secondary">Sin detalle</div>
-							{% endfor %}
-						</td>
-					</tr>
+	{% if pedidos %}
+	<div class="accordion d-grid gap-3" id="pedidosClienteAccordion">
+		{% for p in pedidos %} {% set estado = (p.estado_pedido or 'default')|lower|replace(' ', '-') %}
+		{% set estado_pago = (p.estado_pago or 'default')|lower|replace(' ', '-') %}
+		<article class="portal-order-card accordion-item border-0 shadow-sm">
+			<div class="portal-order-header">
+				<h3 class="portal-order-id">Pedido #{{ p.id_pedido }}</h3>
+				<div class="d-flex flex-wrap gap-2">
+					<span class="order-status-badge estado-{{ estado }}">{{ p.estado_pedido }}</span>
+					<span class="order-status-badge estado-{{ estado_pago }}">Pago: {{ p.estado_pago }}</span>
+				</div>
+			</div>
+
+			<div class="portal-order-meta">
+				<div>
+					<strong>Fecha de pedido:</strong>
+					{{ p.fecha_pedido.strftime('%d/%m/%Y') }}
+				</div>
+				<div>
+					<strong>Entrega:</strong>
+					{{ p.fecha_entrega.strftime('%d/%m/%Y') }}
+				</div>
+				<div>
+					<strong>Total:</strong>
+					${{ '%.2f'|format(p.total) }}
+				</div>
+			</div>
+
+			<div class="accordion-header" id="pedidoHeading{{ p.id_pedido }}">
+				<button
+					class="accordion-button collapsed py-2 px-3"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#pedidoCollapse{{ p.id_pedido }}"
+					aria-expanded="false"
+					aria-controls="pedidoCollapse{{ p.id_pedido }}">
+					Ver detalle del pedido
+				</button>
+			</div>
+			<div
+				id="pedidoCollapse{{ p.id_pedido }}"
+				class="accordion-collapse collapse"
+				aria-labelledby="pedidoHeading{{ p.id_pedido }}"
+				data-bs-parent="#pedidosClienteAccordion">
+				<div class="portal-order-detail">
+					<strong>Productos:</strong>
+					{% for d in p.detalles %}
+					<div>{{ d.producto.nombre }} · {{ d.cantidad }} pieza(s)</div>
 					{% else %}
-					<tr>
-						<td colspan="7">Aún no tienes pedidos.</td>
-					</tr>
+					<div class="text-secondary">Sin detalle disponible.</div>
 					{% endfor %}
-				</tbody>
-			</table>
-		</div>
+				</div>
+			</div>
+		</article>
+		{% endfor %}
 	</div>
+	{% else %}
+	<div class="portal-empty">
+		<i class="bi bi-receipt-cutoff" style="font-size: 2rem"></i>
+		<p class="mb-2 mt-2">Aún no tienes pedidos registrados.</p>
+		<a href="{{ url_for('catalog.catalogo') }}" class="btn btn-primary btn-sm px-3">
+			Hacer mi primer pedido
+		</a>
+	</div>
+	{% endif %}
 </section>
 {% endblock %}
-

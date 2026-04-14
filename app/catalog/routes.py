@@ -13,7 +13,13 @@ from app.common.services import (
     crear_pedido_desde_carrito,
 )
 from app.extensions import db
-from app.models import Carrito, DetalleCarrito, Pedido, Producto, Usuario
+from app.models import (
+    Carrito,
+    DetalleCarrito,
+    Pedido,
+    Producto,
+    Usuario,
+)
 
 
 def _validar_pago_en_linea_tarjeta(
@@ -66,6 +72,72 @@ def _guard_cliente_activo():
     return None
 
 
+def _build_catalog_story(producto: Producto) -> dict[str, object]:
+    receta = producto.receta_base
+    ingredientes: list[str] = []
+    if receta and receta.detalles:
+        for detalle in receta.detalles:
+            if not detalle.materia_prima or not detalle.materia_prima.nombre:
+                continue
+
+            nombre_materia = detalle.materia_prima.nombre.strip()
+            if not nombre_materia or nombre_materia in ingredientes:
+                continue
+
+            ingredientes.append(nombre_materia)
+            if len(ingredientes) >= 8:
+                break
+
+    resumen = (
+        receta.descripcion
+        if receta and receta.descripcion
+        else producto.descripcion or ""
+    ).strip()
+    if not resumen:
+        resumen = "Pastel artesanal preparado " "con estándares de calidad SoftBakery."
+
+    pasos: list[str] = []
+    descripcion_producto = (producto.descripcion or "").strip()
+    if descripcion_producto:
+        pasos.append("Definición del estilo del pastel: " f"{descripcion_producto}")
+
+    descripcion_receta = (
+        receta.descripcion if receta and receta.descripcion else ""
+    ).strip()
+    if descripcion_receta:
+        pasos.append(f"Perfil de preparación: {descripcion_receta}")
+
+    pasos.extend(
+        [
+            (
+                "Preparación de mezcla y horneado "
+                "con control de tiempos y temperatura."
+            ),
+            (
+                "Montaje final con rellenos, cubierta y decoración "
+                "según el diseño del producto."
+            ),
+            (
+                "Revisión de calidad, reserva en inventario "
+                "y programación para entrega."
+            ),
+        ]
+    )
+
+    pasos_unicos: list[str] = []
+    for paso in pasos:
+        if paso in pasos_unicos:
+            continue
+        pasos_unicos.append(paso)
+
+    return {
+        "resumen": resumen,
+        "ingredientes": ingredientes,
+        "pasos": pasos_unicos[:4],
+        "tiene_receta": bool(receta),
+    }
+
+
 @catalog_bp.route("/")
 def home():
     destacados = (
@@ -93,9 +165,13 @@ def catalogo():
         .order_by(Producto.nombre.asc())
         .all()
     )
+    catalogo_story = {
+        producto.id_producto: _build_catalog_story(producto) for producto in productos
+    }
     return render_template(
         "catalog/catalogo_productos.html",
         productos=productos,
+        catalogo_story=catalogo_story,
     )
 
 

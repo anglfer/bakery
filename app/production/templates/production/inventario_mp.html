@@ -3,7 +3,7 @@
 {% block title %}Inventario MP{% endblock %}
 
 {% block content %}
-<section class="section">
+<section class="section inventario-mp-page">
 	<div class="ops-hero">
 		<p class="ops-meta mb-1">Panel de producción</p>
 		<h2 class="ops-hero-title">Inventario de materia prima</h2>
@@ -48,28 +48,34 @@
 		</article>
 	</div>
 
-	<div class="ops-toolbar">
-		<div class="ops-input-wrap">
-			<i class="bi bi-search"></i>
-			<input type="text" id="inventarioSearch" placeholder="Buscar materia prima" />
+	<div class="ops-toolbar inventario-toolbar">
+		<div class="inventario-toolbar-search">
+			<div class="input-group input-group-sm">
+				<span class="input-group-text"><i class="bi bi-search"></i></span>
+				<input type="text" id="inventarioSearch" class="form-control" placeholder="Buscar materia prima" />
+			</div>
 		</div>
-		<select id="filtroEstado" class="form-select form-select-sm" style="max-width: 170px">
-			<option value="todos">Todos los estados</option>
-			<option value="activa">Activas</option>
-			<option value="inactiva">Inactivas</option>
-		</select>
-		<select id="filtroStock" class="form-select form-select-sm" style="max-width: 160px">
-			<option value="todos">Todo el stock</option>
-			<option value="critico">Crítico</option>
-			<option value="bajo">Bajo</option>
-			<option value="ok">OK</option>
-		</select>
-		<button type="button" class="btn btn-secondary text-white border-0 btn-sm" id="btnHistorialGlobal">
-			<i class="bi bi-clock-history me-1 text-white"></i>Movimientos
-		</button>
-		<button type="button" class="btn btn-primary text-white border-0 btn-sm" id="btnNuevaMateria">
-			<i class="bi bi-plus-lg me-1 text-white"></i>Nueva materia prima
-		</button>
+		<div class="inventario-toolbar-filters">
+			<select id="filtroEstado" class="form-select form-select-sm">
+				<option value="todos">Todos los estados</option>
+				<option value="activa">Activas</option>
+				<option value="inactiva">Inactivas</option>
+			</select>
+			<select id="filtroStock" class="form-select form-select-sm">
+				<option value="todos">Todo el stock</option>
+				<option value="critico">Crítico</option>
+				<option value="bajo">Bajo</option>
+				<option value="ok">OK</option>
+			</select>
+		</div>
+		<div class="inventario-toolbar-actions">
+			<button type="button" class="btn btn-secondary text-white border-0 btn-sm" id="btnHistorialGlobal">
+				<i class="bi bi-clock-history me-1 text-white"></i>Movimientos
+			</button>
+			<button type="button" class="btn btn-primary text-white border-0 btn-sm" id="btnNuevaMateria">
+				<i class="bi bi-plus-lg me-1 text-white"></i>Nueva materia prima
+			</button>
+		</div>
 	</div>
 
 	<div class="ops-card">
@@ -78,7 +84,19 @@
 			<span class="ops-chip neutral" id="tablaCount">{{ materias|length }} registros</span>
 		</div>
 		<div class="ops-table table-responsive">
-			<table class="table table-hover align-middle mb-0" id="tablaMaterias">
+			<table class="table table-hover table-sm align-middle mb-0 table-mp" id="tablaMaterias">
+				<colgroup>
+					<col style="width: 14%" />
+					<col style="width: 8%" />
+					<col style="width: 8%" />
+					<col style="width: 9%" />
+					<col style="width: 7%" />
+					<col style="width: 16%" />
+					<col style="width: 14%" />
+					<col style="width: 8%" />
+					<col style="width: 7%" />
+					<col style="width: 9%" />
+				</colgroup>
 				<thead>
 					<tr>
 						<th>Nombre</th>
