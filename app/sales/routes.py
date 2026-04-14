@@ -58,7 +58,12 @@ from app.models import (
     utc_today,
 )
 from app.sales import sales_bp
-from app.sales.forms import SalidaEfectivoForm, ProductoTerminadoForm, SolicitudVentasCrearForm, SolicitudVentasEditarForm
+from app.sales.forms import (
+    ProductoTerminadoForm,
+    SalidaEfectivoForm,
+    SolicitudVentasCrearForm,
+    SolicitudVentasEditarForm,
+)
 
 
 def _can_manage_producto_terminado() -> bool:
@@ -658,7 +663,7 @@ def _serializar_producto_terminado(
 def producto_terminado():
     can_manage = _can_manage_producto_terminado()
     form_producto = ProductoTerminadoForm(prefix="producto")
-    
+
     # Choices for id_receta are only populated for the form so that WTForms validation works.
     recetas_activas_all = (
         Receta.query.filter_by(activa=True)
@@ -666,14 +671,43 @@ def producto_terminado():
         .all()
     )
     # We add 0 as a default option just in case
-    form_producto.id_receta.choices = [(0, "Sin receta vinculada")] + [(r.id_receta, f"v{r.version} · {r.nombre}") for r in recetas_activas_all]
+    form_producto.id_receta.choices = [(0, "Sin receta vinculada")] + [
+        (r.id_receta, f"v{r.version} · {r.nombre}") for r in recetas_activas_all
+    ]
+
+    def _resolve_producto_action() -> str:
+        """Resuelve action considerando campos duplicados/prefijados del form."""
+        action_values: list[str] = []
+
+        for key in ("action", form_producto.action.name):
+            try:
+                values = request.form.getlist(key)
+            except Exception:
+                values = [request.form.get(key)]
+
+            for value in values:
+                if isinstance(value, str) and value.strip():
+                    action_values.append(value.strip().lower())
+
+        form_action_data = getattr(form_producto.action, "data", None)
+        if isinstance(form_action_data, str) and form_action_data.strip():
+            action_values.append(form_action_data.strip().lower())
+
+        action = action_values[-1] if action_values else ""
+
+        # Fallback: si viene el formulario prefijado de producto pero sin action,
+        # asumimos creación para poder mostrar errores correctamente.
+        if not action and any(k.startswith("producto-") for k in request.form.keys()):
+            action = "crear"
+
+        return action
 
     if request.method == "POST":
         if not can_manage:
             flash("No tienes permisos para modificar productos.", "warning")
             return redirect(url_for("sales.producto_terminado"))
 
-        action = (request.form.get("action") or form_producto.action.data or "").strip().lower()
+        action = _resolve_producto_action()
         image_file = request.files.get("imagen_archivo")
         try:
             image_path = _handle_image_upload(image_file)
@@ -685,9 +719,13 @@ def producto_terminado():
             if form_producto.validate_on_submit():
                 try:
                     nombre = form_producto.nombre.data.strip()
-                    descripcion = form_producto.descripcion.data.strip() or "Sin descripcion"
+                    descripcion = (
+                        form_producto.descripcion.data.strip() or "Sin descripcion"
+                    )
                     precio = form_producto.precio_venta.data
-                    margen_objetivo_pct = form_producto.margen_objetivo_pct.data or Decimal("25")
+                    margen_objetivo_pct = (
+                        form_producto.margen_objetivo_pct.data or Decimal("25")
+                    )
                     stock_inicial = form_producto.stock_inicial.data or 0
                     stock_minimo = form_producto.stock_minimo.data or 10
                     unidad_venta = form_producto.unidad_venta.data
@@ -767,7 +805,11 @@ def producto_terminado():
                 except ValueError as exc:
                     db.session.rollback()
                     flash(str(exc), "danger")
-            
+            else:
+                for field_errors in form_producto.errors.values():
+                    for error in field_errors:
+                        flash(error, "warning")
+
             action = "crear_fallido"
 
         if action == "editar" or action == "editar_fallido":
@@ -775,16 +817,18 @@ def producto_terminado():
             if not getattr(request, "_editar_handled", False):
                 id_producto = _int(request.form.get("id_producto", "0"))
                 producto = Producto.query.get_or_404(id_producto)
-                
+
                 if form_producto.validate_on_submit():
                     try:
                         nombre = form_producto.nombre.data.strip()
                         descripcion = form_producto.descripcion.data.strip()
                         precio = form_producto.precio_venta.data
-                        margen_objetivo_pct = form_producto.margen_objetivo_pct.data or Decimal("25")
+                        margen_objetivo_pct = (
+                            form_producto.margen_objetivo_pct.data or Decimal("25")
+                        )
                         stock_minimo = max(form_producto.stock_minimo.data or 0, 0)
                         unidad_venta = form_producto.unidad_venta.data
-                        
+
                         id_receta_raw = form_producto.id_receta.data
                         receta = producto.receta_base
                         receta_auto_asignada = False
@@ -802,23 +846,29 @@ def producto_terminado():
                             if receta_candidata:
                                 receta = receta_candidata
                                 receta_auto_asignada = True
-                        
+
                         if receta:
                             if not receta.activa:
-                                raise ValueError("Selecciona una receta activa para el producto.")
+                                raise ValueError(
+                                    "Selecciona una receta activa para el producto."
+                                )
                             if int(receta.id_producto) != int(producto.id_producto):
                                 raise ValueError(
                                     "La receta seleccionada no corresponde al producto."
                                 )
 
                         if not nombre or not unidad_venta:
-                            raise ValueError("Nombre y unidad de venta son obligatorios.")
+                            raise ValueError(
+                                "Nombre y unidad de venta son obligatorios."
+                            )
                         if margen_objetivo_pct <= 0 or margen_objetivo_pct >= 100:
                             margen_objetivo_pct = Decimal("25")
 
                         producto.nombre = nombre
                         producto.descripcion = descripcion or producto.descripcion
-                        producto.precio_venta = precio if precio > 0 else producto.precio_venta
+                        producto.precio_venta = (
+                            precio if precio > 0 else producto.precio_venta
+                        )
                         producto.margen_objetivo_pct = margen_objetivo_pct
                         producto.stock_minimo = stock_minimo
                         producto.unidad_venta = unidad_venta
@@ -827,7 +877,9 @@ def producto_terminado():
                         if image_path:
                             producto.imagen = image_path
                         elif request.form.get("imagen"):
-                            producto.imagen = request.form.get("imagen", producto.imagen)
+                            producto.imagen = request.form.get(
+                                "imagen", producto.imagen
+                            )
 
                         producto.activo = form_producto.activo.data == "on"
 
@@ -934,12 +986,12 @@ def producto_terminado():
     }
     open_modal = None
     if request.method == "POST":
-        action = request.form.get("action", "") or (form_producto.action.data if hasattr(form_producto.action, 'data') else "")
+        action = _resolve_producto_action()
         if action == "crear" and not form_producto.validate():
             open_modal = "modalProducto_crear"
         elif action == "editar" and not form_producto.validate():
             open_modal = "modalProducto_editar"
-            
+
     return render_template(
         "sales/producto_terminado.html",
         productos=productos,
@@ -990,10 +1042,14 @@ def solicitudes():
     role_name = current_user.rol.nombre if current_user.rol else ""
     form_crear = SolicitudVentasCrearForm(prefix="crear")
     form_editar = SolicitudVentasEditarForm(prefix="editar")
-    
+
     # Rellenar opciones de id_producto para validar
-    productos_activos = Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
-    form_crear.id_producto.choices = [(p.id_producto, p.nombre) for p in productos_activos if p.id_receta]
+    productos_activos = (
+        Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
+    )
+    form_crear.id_producto.choices = [
+        (p.id_producto, p.nombre) for p in productos_activos if p.id_receta
+    ]
 
     if request.method == "POST":
         if role_name not in {"Ventas", "Administrador"}:
@@ -1007,9 +1063,11 @@ def solicitudes():
 
         if action == "editar" or action == "editar_fallido":
             # Si no ha pasado por un "editar" normal
-            id_solicitud = _int(request.form.get("id_solicitud", "0") or form_editar.id_solicitud.data)
+            id_solicitud = _int(
+                request.form.get("id_solicitud", "0") or form_editar.id_solicitud.data
+            )
             solicitud = SolicitudProduccion.query.get_or_404(id_solicitud)
-            
+
             if form_editar.validate_on_submit():
                 if solicitud.id_usuario_solicita != current_user.id_usuario:
                     flash("Solo puedes editar tus propias solicitudes.", "danger")
@@ -1037,7 +1095,7 @@ def solicitudes():
                 )
                 flash("Solicitud actualizada correctamente.", "success")
                 return redirect(url_for("sales.solicitudes"))
-            
+
             action = "editar_fallido"
 
         if action == "crear":
@@ -1050,7 +1108,9 @@ def solicitudes():
                     flash("Producto o cantidad invalida para solicitud.", "warning")
                     return redirect(url_for("sales.solicitudes"))
 
-                receta = Receta.query.get(producto.id_receta) if producto.id_receta else None
+                receta = (
+                    Receta.query.get(producto.id_receta) if producto.id_receta else None
+                )
                 if not receta or not receta.activa:
                     flash(
                         "El producto seleccionado no tiene una receta activa para producir.",
@@ -1074,7 +1134,7 @@ def solicitudes():
                 )
                 flash("Solicitud de produccion registrada.", "success")
                 return redirect(url_for("sales.solicitudes"))
-            
+
             action = "crear_fallido"
 
     estado_filtro = (request.args.get("estado") or "TODOS").strip().upper()

@@ -8,17 +8,38 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional
+from wtforms.validators import (
+    DataRequired,
+    InputRequired,
+    Length,
+    NumberRange,
+    Optional,
+)
 
 
 class SalidaEfectivoForm(FlaskForm):
-    concepto = StringField("Concepto", validators=[DataRequired(message="Este campo es obligatorio.")])
-    monto = DecimalField("Monto", validators=[InputRequired(message="El monto es obligatorio."), NumberRange(min=0.01, message="El monto debe ser de al menos 0.01.")])
-    tipo = SelectField("Tipo", choices=[("GASTO_OPERATIVO", "Gasto operativo"), ("COMPRA_MATERIA_PRIMA", "Compra materia prima")])
+    concepto = StringField(
+        "Concepto", validators=[DataRequired(message="Este campo es obligatorio.")]
+    )
+    monto = DecimalField(
+        "Monto",
+        validators=[
+            InputRequired(message="El monto es obligatorio."),
+            NumberRange(min=0.01, message="El monto debe ser de al menos 0.01."),
+        ],
+    )
+    tipo = SelectField(
+        "Tipo",
+        choices=[
+            ("GASTO_OPERATIVO", "Gasto operativo"),
+            ("COMPRA_MATERIA_PRIMA", "Compra materia prima"),
+        ],
+    )
     submit = SubmitField("Registrar salida")
 
 
 # ─────────────────────────── Producto Terminado ────────────────────────────
+
 
 class ProductoTerminadoForm(FlaskForm):
     id_producto = HiddenField("ID Producto")
@@ -74,11 +95,16 @@ class ProductoTerminadoForm(FlaskForm):
     id_receta = SelectField(
         "Receta activa",
         coerce=int,
-        validators=[Optional()]
+        validators=[Optional()],
+        validate_choice=False,
     )
     descripcion = TextAreaField(
         "Descripción",
         validators=[Optional(), Length(max=500)],
+    )
+    imagen = StringField(
+        "Emoji o URL imagen",
+        validators=[Optional(), Length(max=255)],
     )
     activo = SelectField(
         "Estado",
@@ -88,6 +114,7 @@ class ProductoTerminadoForm(FlaskForm):
 
 
 # ─────────────────────────── Solicitudes de Ventas ────────────────────────────
+
 
 class SolicitudVentasCrearForm(FlaskForm):
     id_producto = SelectField(

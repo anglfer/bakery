@@ -1,9 +1,7 @@
-{% extends "base_template.html" %}
-{% from '_macros.html' import campo %}
-{% block title %}Inventario y Producto Terminado{% endblock %} {%
-block page_title %}Producto terminado{% endblock %} {% block content %} {% set payload_map = {} %}
-{% for item in productos_payload %} {% set _ = payload_map.update({item.id_producto: item}) %} {%
-endfor %}
+{% extends "base_template.html" %} {% from '_macros.html' import campo %} {% block title
+%}Inventario y Producto Terminado{% endblock %} {% block page_title %}Producto terminado{% endblock
+%} {% block content %} {% set payload_map = {} %} {% for item in productos_payload %} {% set _ =
+payload_map.update({item.id_producto: item}) %} {% endfor %}
 
 <section class="product-shell">
 	<header class="product-hero">
@@ -20,7 +18,10 @@ endfor %}
 				Último acceso: {{ utc_now().strftime('%d/%m/%Y — %I:%M %p') }}
 			</div>
 			{% if can_manage %}
-			<button type="button" class="btn btn-primary text-white border-0 product-hero-action" id="btnNuevoProducto">
+			<button
+				type="button"
+				class="btn btn-primary text-white border-0 product-hero-action"
+				id="btnNuevoProducto">
 				<i class="bi bi-plus-lg me-2 text-white"></i>
 				Nuevo producto
 			</button>
@@ -68,34 +69,60 @@ endfor %}
 			<option value="low">Stock bajo</option>
 			<option value="available">Disponible</option>
 		</select>
-
 	</div>
 
 	<div class="product-view" id="catalogView">
 		<div class="product-grid">
 			{% for p in productos %} {% set m = metricas_producto.get(p.id_producto, {}) %}
-			<article class="product-card" data-product-item data-status="{{ 'active' if p.activo else 'inactive' }}"
-				data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}" data-name="{{ p.nombre|lower }}">
-				<div class="product-card-media" style="height: 190px; position: relative;">
+			<article
+				class="product-card"
+				data-product-item
+				data-status="{{ 'active' if p.activo else 'inactive' }}"
+				data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
+				data-name="{{ p.nombre|lower }}">
+				<div class="product-card-media" style="height: 190px; position: relative">
 					{% if not p.activo %}
-					<span class="product-status-badge neutral"
-						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Inactivo</span>
+					<span
+						class="product-status-badge neutral"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2">
+						Inactivo
+					</span>
 					{% elif p.esta_bajo_stock %}
-					<span class="product-status-badge warning"
-						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Stock bajo</span>
+					<span
+						class="product-status-badge warning"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2">
+						Stock bajo
+					</span>
 					{% else %}
-					<span class="product-status-badge success"
-						style="position: absolute; top: 10px; right: 10px; z-index: 2;">Disponible</span>
+					<span
+						class="product-status-badge success"
+						style="position: absolute; top: 10px; right: 10px; z-index: 2">
+						Disponible
+					</span>
 					{% endif %}
 
-					<div class="product-emoji"
-						style="font-size: 5.5rem; height: 130px; width: 130px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px;">
+					<div
+						class="product-emoji"
+						style="
+							font-size: 5.5rem;
+							height: 130px;
+							width: 130px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							overflow: hidden;
+							border-radius: 8px;
+						">
 						{% if p.imagen and p.imagen.startswith('img/') %}
-						<img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}"
-							style="width: 100%; height: 100%; object-fit: contain;" />
+						<img
+							src="{{ url_for('static', filename=p.imagen) }}"
+							alt="{{ p.nombre }}"
+							style="width: 100%; height: 100%; object-fit: contain" />
 						{% elif p.imagen and (p.imagen.startswith('http') or p.imagen.startswith('data:')) %}
-						<img src="{{ p.imagen }}" alt="{{ p.nombre }}"
-							style="width: 100%; height: 100%; object-fit: contain;" />
+						<img
+							src="{{ p.imagen }}"
+							alt="{{ p.nombre }}"
+							style="width: 100%; height: 100%; object-fit: contain" />
 						{% else %}
 						<span>{{ p.imagen or '🍰' }}</span>
 						{% endif %}
@@ -125,28 +152,39 @@ endfor %}
 						<strong>{{ p.cantidad_disponible }} / mín. {{ p.stock_minimo }}</strong>
 					</div>
 					<div class="product-stock-bar">
-						<div class="product-stock-fill {{ 'warning' if p.esta_bajo_stock else 'success' }}"></div>
+						<div
+							class="product-stock-fill {{ 'warning' if p.esta_bajo_stock else 'success' }}"></div>
 					</div>
 
-					<div class="product-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
+					<div
+						class="product-actions"
+						style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+						<button
+							type="button"
+							class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
 							data-id="{{ p.id_producto }}">
 							<i class="bi bi-eye-fill me-1 text-white"></i>
 							Ver
 						</button>
-						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnMovimientosProducto"
+						<button
+							type="button"
+							class="btn btn-primary text-white border-0 btn-sm btnMovimientosProducto"
 							data-id="{{ p.id_producto }}">
 							<i class="bi bi-arrow-left-right me-1 text-white"></i>
 							Movim.
 						</button>
 						{% if can_manage %}
-						<button type="button" class="btn btn-primary text-white border-0 btn-sm btnEditarProducto"
+						<button
+							type="button"
+							class="btn btn-primary text-white border-0 btn-sm btnEditarProducto"
 							data-id="{{ p.id_producto }}">
 							<i class="bi bi-pencil-fill me-1 text-white"></i>
 							Editar
 						</button>
 						{% if p.activo %}
-						<button type="button" class="btn btn-danger text-white border-0 btn-sm btnDesactivarProducto"
+						<button
+							type="button"
+							class="btn btn-danger text-white border-0 btn-sm btnDesactivarProducto"
 							data-id="{{ p.id_producto }}">
 							<i class="bi bi-archive-fill me-1 text-white"></i>
 							Desac.
@@ -182,8 +220,12 @@ endfor %}
 				</thead>
 				<tbody>
 					{% for p in productos %}
-					<tr class="product-row" data-product-item data-status="{{ 'active' if p.activo else 'inactive' }}"
-						data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}" data-name="{{ p.nombre|lower }}">
+					<tr
+						class="product-row"
+						data-product-item
+						data-status="{{ 'active' if p.activo else 'inactive' }}"
+						data-stock="{{ 'low' if p.esta_bajo_stock else 'available' }}"
+						data-name="{{ p.nombre|lower }}">
 						<td class="text-muted">P-{{ '%03d'|format(p.id_producto) }}</td>
 						<td>
 							<div class="d-flex align-items-center gap-3">
@@ -225,17 +267,21 @@ endfor %}
 						</td>
 						<td class="text-end">
 							<div class="product-actions justify-content-end">
-								<button type="button" class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
+								<button
+									type="button"
+									class="btn btn-primary text-white border-0 btn-sm btnVerProducto"
 									data-id="{{ p.id_producto }}">
 									<i class="bi bi-eye-fill text-white"></i>
 								</button>
-								<button type="button"
+								<button
+									type="button"
 									class="btn btn-primary text-white border-0 btn-sm btnMovimientosProducto"
 									data-id="{{ p.id_producto }}">
 									<i class="bi bi-arrow-left-right text-white"></i>
 								</button>
 								{% if can_manage %}
-								<button type="button"
+								<button
+									type="button"
 									class="btn btn-primary text-white border-0 btn-sm btnEditarProducto"
 									data-id="{{ p.id_producto }}">
 									<i class="bi bi-pencil-fill text-white"></i>
@@ -262,10 +308,10 @@ endfor %}
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
 			<form method="post" id="formProducto" enctype="multipart/form-data" novalidate>
-				{{ form_producto.hidden_tag() }}
+				{{ form_producto.csrf_token }}
 				<div class="modal-body">
-					{{ form_producto.action(id="formAction") }}
-					{{ form_producto.id_producto(id="productId") }}
+					{{ form_producto.action(id="formAction") }} {{ form_producto.id_producto(id="productId")
+					}}
 					<div class="product-form-grid">
 						<div class="product-form-card">
 							<p class="ops-meta mb-3">
@@ -274,37 +320,37 @@ endfor %}
 							</p>
 							<div class="form-grid form-grid-2">
 								<div class="field-span-2">
-									{{ campo(form_producto.nombre, id='nombre', placeholder='Ej. Pastel de Chocolate') }}
+									{{ campo(form_producto.nombre, id='nombre', placeholder='Ej. Pastel de Chocolate')
+									}}
 								</div>
 								<div>
 									{{ campo(form_producto.precio_venta, id='precio_venta', placeholder='0.00') }}
 								</div>
-								<div>
-									{{ campo(form_producto.unidad_venta, id='unidad_venta') }}
-								</div>
+								<div>{{ campo(form_producto.unidad_venta, id='unidad_venta') }}</div>
 								<div class="field-span-2">
 									{{ campo(form_producto.id_receta, id='id_receta') }}
 									<small class="text-muted" id="recetaHelpText">
 										Asigna la receta activa del producto para cálculo de costo y precio sugerido.
 									</small>
 								</div>
-								<div>
-									{{ campo(form_producto.margen_objetivo_pct, id='margen_objetivo_pct') }}
-								</div>
+								<div>{{ campo(form_producto.margen_objetivo_pct, id='margen_objetivo_pct') }}</div>
 								<div class="field-span-2">
-									{{ campo(form_producto.descripcion, id='descripcion', rows='3', placeholder='Descripción del producto (opcional)...') }}
+									{{ campo(form_producto.descripcion, id='descripcion', rows='3',
+									placeholder='Descripción del producto (opcional)...') }}
 								</div>
 								<div>
 									<label for="imagen_archivo" class="form-label fw-semibold">Imagen</label>
-									<input type="file" class="form-control" name="imagen_archivo" id="imagen_archivo"
+									<input
+										type="file"
+										class="form-control"
+										name="imagen_archivo"
+										id="imagen_archivo"
 										accept="image/*" />
 								</div>
 								<div>
 									{{ campo(form_producto.imagen, id='imagen', placeholder='🍰 o URL imagen') }}
 								</div>
-								<div>
-									{{ campo(form_producto.activo, id='activo') }}
-								</div>
+								<div>{{ campo(form_producto.activo, id='activo') }}</div>
 								<div class="field-span-2">
 									<div class="d-flex flex-wrap gap-2 align-items-center">
 										<small class="text-muted">
@@ -315,7 +361,9 @@ endfor %}
 											Precio sugerido:
 											<strong id="precioSugeridoVista">$0.00</strong>
 										</small>
-										<button type="button" class="btn btn-primary text-white border-0 btn-sm"
+										<button
+											type="button"
+											class="btn btn-primary text-white border-0 btn-sm"
 											id="btnAplicarSugerido">
 											Aplicar sugerido
 										</button>
@@ -599,10 +647,10 @@ endfor %}
 
 	function populateRecipeOptions(productId, selectedRecipeId = null) {
 		if (!recetaSelect) return;
-		recetaSelect.innerHTML = '<option value="">Sin receta activa</option>';
+		recetaSelect.innerHTML = '<option value="0">Sin receta activa</option>';
 
 		if (!productId) {
-			recetaSelect.value = '';
+			recetaSelect.value = '0';
 			recetaSelect.disabled = true;
 			if (recetaHelpText) {
 				recetaHelpText.textContent =
@@ -614,7 +662,7 @@ endfor %}
 		const recipes = getRecipeListForProduct(productId);
 		recetaSelect.disabled = false;
 		if (!recipes.length) {
-			recetaSelect.value = '';
+			recetaSelect.value = '0';
 			if (recetaHelpText) {
 				recetaHelpText.textContent =
 					'Este producto aún no tiene receta activa. Créala en el módulo Recetas (RF08).';
