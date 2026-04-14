@@ -3,8 +3,8 @@
 <div class="login-wrapper">
 	<div class="login-container portal-auth-card">
 		<div class="text-center mb-3">
-			<i class="bi bi-cake2-fill logo-icon"></i>
-			<h2 class="login-title mt-1">SoftBakery</h2>
+			<img src="{{ url_for('static', filename='img/productos/logo.png') }}" class="logo-image" alt="SoftBakery Logo" />
+			<h2 class="login-title mt-2">SoftBakery</h2>
 			<p class="subtitle mb-0">Portal de Clientes</p>
 		</div>
 
@@ -25,33 +25,66 @@
 			{{ form.hidden_tag() }}
 
 			<div class="row-fields mb-3">
-				<div>{{ campo(form.nombre, placeholder='Laura') }}</div>
-				<div>{{ campo(form.apellidos, placeholder='Martínez') }}</div>
+				<div>
+					<label class="form-label">Nombre</label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+						{{ form.nombre(class='form-control', placeholder='Laura') }}
+					</div>
+					{% if form.nombre.errors %}{% for error in form.nombre.errors %}<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>{% endfor %}{% endif %}
+				</div>
+				<div>
+					<label class="form-label">Apellidos</label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+						{{ form.apellidos(class='form-control', placeholder='Martínez') }}
+					</div>
+					{% if form.apellidos.errors %}{% for error in form.apellidos.errors %}<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>{% endfor %}{% endif %}
+				</div>
 			</div>
 
-			<div class="mb-3">{{ campo(form.telefono, placeholder='477-100-0001') }}</div>
-
 			<div class="mb-3">
-				{{ campo(form.correo, placeholder='laura.martinez@example.com', type='email') }}
+				<label class="form-label">Teléfono</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+					{{ form.telefono(class='form-control', placeholder='477-100-0001') }}
+				</div>
+				{% if form.telefono.errors %}{% for error in form.telefono.errors %}<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>{% endfor %}{% endif %}
 			</div>
 
 			<div class="mb-3">
-				{{ campo(form.username, placeholder='laura_martinez') }}
+				<label class="form-label">Correo</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+					{{ form.correo(class='form-control', placeholder='laura.martinez@example.com', type='email') }}
+				</div>
+				{% if form.correo.errors %}{% for error in form.correo.errors %}<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>{% endfor %}{% endif %}
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label">Usuario</label>
+				<div class="input-group">
+					<span class="input-group-text"><i class="bi bi-at"></i></span>
+					{{ form.username(class='form-control', placeholder='laura_martinez') }}
+				</div>
 				<div class="field-msg" id="usernameHelp" aria-live="polite"></div>
 			</div>
 
 			<div class="mb-3">
+				<label class="form-label">Contraseña</label>
 				<div class="position-relative">
-					{{ campo(form.password, id='password', placeholder='Mínimo 8 caracteres',
-					autocomplete='new-password') }}
-					<span
-						class="toggle-password"
-						data-target="password"
-						role="button"
-						tabindex="0"
-						style="position: absolute; right: 10px; top: 38px; z-index: 10">
-						<i class="bi bi-eye-slash"></i>
-					</span>
+					<div class="input-group" style="margin-bottom: 0;">
+						<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+						{{ form.password(class='form-control', id='password', placeholder='Mínimo 8 caracteres', autocomplete='new-password') }}
+						<span
+							class="toggle-password"
+							data-target="password"
+							role="button"
+							tabindex="0"
+							style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: transparent; border: none; padding: 0 0.5rem; color: #a18b84;">
+							<i class="bi bi-eye-slash"></i>
+						</span>
+					</div>
 				</div>
 				<div class="pwd-rules-title">Tu contraseña debe incluir:</div>
 				<div class="pwd-rules" id="passwordRules">
@@ -84,17 +117,20 @@
 			</div>
 
 			<div class="mb-3">
+				<label class="form-label">Confirmar Contraseña</label>
 				<div class="position-relative">
-					{{ campo(form.confirm_password, id='confirmPassword', placeholder='Repite tu contraseña',
-					autocomplete='new-password') }}
-					<span
-						class="toggle-password"
-						data-target="confirmPassword"
-						role="button"
-						tabindex="0"
-						style="position: absolute; right: 10px; top: 38px; z-index: 10">
-						<i class="bi bi-eye-slash"></i>
-					</span>
+					<div class="input-group" style="margin-bottom: 0;">
+						<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+						{{ form.confirm_password(class='form-control', id='confirmPassword', placeholder='Repite tu contraseña', autocomplete='new-password') }}
+						<span
+							class="toggle-password"
+							data-target="confirmPassword"
+							role="button"
+							tabindex="0"
+							style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: transparent; border: none; padding: 0 0.5rem; color: #a18b84;">
+							<i class="bi bi-eye-slash"></i>
+						</span>
+					</div>
 				</div>
 				<div class="field-msg" id="confirmHelp" aria-live="polite"></div>
 			</div>

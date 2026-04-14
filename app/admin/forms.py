@@ -57,7 +57,7 @@ class ProveedorForm(FlaskForm):
     submit = SubmitField("Guardar")
 
 
-# ─────────────────────────── Usuarios ────────────────────────────
+# Usuarios 
 
 class UsuarioCrearForm(FlaskForm):
     nombre = StringField(
@@ -151,7 +151,7 @@ class UsuarioEditarForm(FlaskForm):
     submit = SubmitField("Guardar cambios")
 
 
-# ─────────────────────────── Roles ────────────────────────────
+#  Roles
 
 class RolCrearForm(FlaskForm):
     nombre = StringField(

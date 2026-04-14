@@ -1,9 +1,7 @@
 {% macro _nav_link(label, endpoint, current_path, icon='bi-circle') -%} {% set href =
 url_for(endpoint) %} {% set is_home = href == '/' %} {% set is_active = (current_path == href) if
 is_home else current_path.startswith(href) %}
-<a
-	class="list-group-item list-group-item-action app-side-link {{ 'active' if is_active else '' }}"
-	href="{{ href }}">
+<a class="list-group-item list-group-item-action app-side-link {{ 'active' if is_active else '' }}" href="{{ href }}">
 	<i class="bi {{ icon }}"></i>
 	<span>{{ label }}</span>
 </a>
@@ -16,43 +14,32 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 	<nav class="navbar navbar-expand-lg border-bottom py-3">
 		<div class="container-fluid app-container">
 			<!-- Logo -->
-			<a
-				class="navbar-brand app-brand d-flex align-items-center"
-				href="{{ url_for('catalog.home') }}">
-				<img
-					src="{{ url_for('static', filename='img/productos/logo.png') }}"
-					class="app-brand-logo me-2"
+			<a class="navbar-brand app-brand d-flex align-items-center" href="{{ url_for('catalog.home') }}">
+				<img src="{{ url_for('static', filename='img/productos/logo.png') }}" class="app-brand-logo me-2"
 					alt="SoftBakery" />
 				<span class="app-brand-text-wrap">
 					<span>SOFTBAKERY</span>
-					<small class="app-brand-subtext">Sistema interno</small>
+					<small class="app-brand-subtext"></small>
 				</span>
 			</a>
 
 			<!-- Toggle for mobile -->
-			<button
-				class="navbar-toggler border-0"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#mainMenu">
+			<button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
 			<!-- Center Links -->
 			<div class="collapse navbar-collapse" id="mainMenu">
-				<ul
-					class="navbar-nav mx-auto mb-2 mb-lg-0 text-center gap-2 gap-lg-4"
+				<ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-center gap-2 gap-lg-4"
 					style="font-size: 0.9rem; text-transform: uppercase">
 					<li class="nav-item">
-						<a
-							class="nav-link app-navbar-link {{ 'active' if is_home_active else '' }}"
+						<a class="nav-link app-navbar-link {{ 'active' if is_home_active else '' }}"
 							href="{{ url_for('catalog.home') }}">
 							Inicio
 						</a>
 					</li>
 					<li class="nav-item">
-						<a
-							class="nav-link app-navbar-link {{ 'active' if is_catalog_active else '' }}"
+						<a class="nav-link app-navbar-link {{ 'active' if is_catalog_active else '' }}"
 							href="{{ url_for('catalog.catalogo') }}">
 							Catálogo
 						</a>
@@ -62,8 +49,7 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 				<!-- Right side Icons -->
 				<div class="d-flex align-items-center justify-content-center gap-2 mt-3 mt-lg-0">
 					{% if user.is_authenticated %}
-					<a
-						href="{{ url_for('auth.mi_cuenta') if user.rol and user.rol.nombre == 'Cliente' else '#' }}"
+					<a href="{{ url_for('auth.mi_cuenta') if user.rol and user.rol.nombre == 'Cliente' else '#' }}"
 						class="app-user-pill text-decoration-none">
 						<i class="bi bi-person-circle"></i>
 						<span class="d-none d-md-inline">
@@ -71,21 +57,16 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 						</span>
 					</a>
 					{% else %}
-					<a
-						href="{{ url_for('auth.login') }}"
-						class="btn btn-outline-dark btn-sm rounded-pill px-3">
+					<a href="{{ url_for('auth.login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
 						Ingresar
 					</a>
 					{% endif %}
 
 					<!-- User Dropdown -->
 					<div class="dropdown">
-						<a
-							href="#"
+						<a href="#"
 							class="text-dark fs-5 d-flex align-items-center text-decoration-none dropdown-toggle app-user-menu-toggle"
-							id="userMenu"
-							data-bs-toggle="dropdown"
-							aria-expanded="false">
+							id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
 							<i class="bi bi-person"></i>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
@@ -107,10 +88,11 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 								</span>
 							</li>
 							{% endif %}
-							<li><hr class="dropdown-divider" /></li>
 							<li>
-								<a
-									class="dropdown-item"
+								<hr class="dropdown-divider" />
+							</li>
+							<li>
+								<a class="dropdown-item"
 									href="{{ url_for('auth.mi_cuenta') if user.rol and user.rol.nombre == 'Cliente' else '#' }}">
 									<i class="bi bi-person-circle me-2"></i>
 									Mi perfil
@@ -148,11 +130,8 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 					</div>
 
 					<!-- Cart -->
-					<a
-						href="{{ url_for('catalog.carrito') }}"
-						class="text-dark fs-5 position-relative app-cart-link"
-						aria-label="Carrito"
-						title="Carrito de compras">
+					<a href="{{ url_for('catalog.carrito') }}" class="text-dark fs-5 position-relative app-cart-link"
+						aria-label="Carrito" title="Carrito de compras">
 						<i class="bi bi-cart3"></i>
 						<span
 							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ 'd-none' if cart_count == 0 else 'd-inline-block' }}"
@@ -163,12 +142,8 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 
 					<!-- Admin / Employee Menu Trigger -->
 					{% if user.is_authenticated and user.rol and user.rol.nombre != 'Cliente' %}
-					<button
-						class="btn btn-outline-dark btn-sm ms-2 d-flex align-items-center gap-1"
-						type="button"
-						data-bs-toggle="offcanvas"
-						data-bs-target="#appRoleMenu"
-						aria-controls="appRoleMenu">
+					<button class="btn btn-outline-dark btn-sm ms-2 d-flex align-items-center gap-1" type="button"
+						data-bs-toggle="offcanvas" data-bs-target="#appRoleMenu" aria-controls="appRoleMenu">
 						<i class="bi bi-grid-3x3-gap-fill"></i>
 						<span class="d-none d-lg-inline">Panel</span>
 					</button>
@@ -180,11 +155,7 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 </header>
 
 {% if user.is_authenticated and user.rol and user.rol.nombre != 'Cliente' %}
-<div
-	class="offcanvas offcanvas-start"
-	tabindex="-1"
-	id="appRoleMenu"
-	aria-labelledby="appRoleMenuLabel">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="appRoleMenu" aria-labelledby="appRoleMenuLabel">
 	<div class="offcanvas-header border-bottom">
 		<h5 class="offcanvas-title" id="appRoleMenuLabel">Panel de {{ user.rol.nombre }}</h5>
 		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -194,18 +165,12 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 			{% if user.rol and user.rol.nombre == 'Administrador' %}
 			<div class="accordion-item">
 				<h2 class="accordion-header">
-					<button
-						class="accordion-button"
-						type="button"
-						data-bs-toggle="collapse"
+					<button class="accordion-button" type="button" data-bs-toggle="collapse"
 						data-bs-target="#adminGeneral">
 						General
 					</button>
 				</h2>
-				<div
-					id="adminGeneral"
-					class="accordion-collapse collapse show"
-					data-bs-parent="#sidebarAccordion">
+				<div id="adminGeneral" class="accordion-collapse collapse show" data-bs-parent="#sidebarAccordion">
 					<div class="list-group list-group-flush">
 						{{ _nav_link('Dashboard', 'admin.dashboard', current_path, 'bi-speedometer2') }} {{
 						_nav_link('Usuarios', 'admin.usuarios', current_path, 'bi-people') }} {{
@@ -216,18 +181,12 @@ or current_path.startswith(url_for('catalog.mis_pedidos')) %}
 			</div>
 			<div class="accordion-item">
 				<h2 class="accordion-header">
-					<button
-						class="accordion-button collapsed"
-						type="button"
-						data-bs-toggle="collapse"
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
 						data-bs-target="#adminOperacion">
 						Operacion
 					</button>
 				</h2>
-				<div
-					id="adminOperacion"
-					class="accordion-collapse collapse"
-					data-bs-parent="#sidebarAccordion">
+				<div id="adminOperacion" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
 					<div class="list-group list-group-flush">
 						{{ _nav_link('Compras MP', 'sales.compras_mp', current_path, 'bi-bag-check') }} {{
 						_nav_link('Ventas', 'sales.ventas', current_path, 'bi-cash-stack') }} {{

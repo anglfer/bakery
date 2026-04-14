@@ -3,8 +3,8 @@
 <div class="login-wrapper">
 	<div class="login-container portal-auth-card">
 		<div class="text-center mb-3">
-			<i class="bi bi-cake2-fill logo-icon"></i>
-			<h2 class="login-title mt-1">SoftBakery</h2>
+			<img src="{{ url_for('static', filename='img/productos/logo.png') }}" class="logo-image" alt="SoftBakery Logo" />
+			<h2 class="login-title mt-2">SoftBakery</h2>
 			<p class="subtitle mb-0">Iniciar sesión</p>
 		</div>
 
@@ -25,16 +25,36 @@
 			{{ form.hidden_tag() }}
 
 			<div class="mb-3">
-				{{ campo(form.username, placeholder='Ingresa tu usuario', autocomplete='username') }}
+				<label class="form-label">Usuario</label>
+				<div class="input-group">
+					<span class="input-group-text">
+						<i class="bi bi-person-fill"></i>
+					</span>
+					{{ form.username(class='form-control', placeholder='Ingresa tu usuario', autocomplete='username') }}
+				</div>
+				{% if form.username.errors %}
+				{% for error in form.username.errors %}
+				<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>
+				{% endfor %}
+				{% endif %}
 			</div>
 
 			<div class="mb-2">
-				<div class="position-relative">
-					{{ campo(form.password, id='password', placeholder='Ingresa tu contraseña', autocomplete='current-password') }}
-					<span class="toggle-password" id="togglePassword" role="button" tabindex="0" style="position: absolute; right: 10px; top: 38px; z-index: 10;">
+				<label class="form-label">Contraseña</label>
+				<div class="input-group position-relative">
+					<span class="input-group-text">
+						<i class="bi bi-lock-fill"></i>
+					</span>
+					{{ form.password(class='form-control', id='password', placeholder='Ingresa tu contraseña', autocomplete='current-password') }}
+					<span class="toggle-password" id="togglePassword" role="button" tabindex="0" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: transparent; border: none; padding: 0; color: #a18b84; cursor: pointer;">
 						<i class="bi bi-eye-slash"></i>
 					</span>
 				</div>
+				{% if form.password.errors %}
+				{% for error in form.password.errors %}
+				<span class="text-danger" style="font-size: 0.78rem">{{ error }}</span>
+				{% endfor %}
+				{% endif %}
 			</div>
 
 			{% if show_captcha %}

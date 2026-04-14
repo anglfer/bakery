@@ -91,6 +91,7 @@
 						<button
 							type="button"
 							class="btn btn-outline-secondary btn-sm rounded-pill"
+							style="color: white; border-color: white;"
 							data-bs-toggle="modal"
 							data-bs-target="#modalProducto{{ p.id_producto }}">
 							<i class="bi bi-card-text me-1"></i>
@@ -119,11 +120,11 @@
 						</button>
 					</form>
 					{% else %}
-					<div class="small text-secondary mt-2">
-						<a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">
-							Inicia sesión
+					<div class="catalog-login-prompt mt-2">
+						<a href="{{ url_for('auth.login') }}" class="btn btn-catalog-login btn-sm w-100">
+							<i class="bi bi-cart-plus me-2"></i>
+							Agregar al carrito
 						</a>
-						para comprar este producto.
 					</div>
 					{% endif %}
 				</div>
@@ -189,7 +190,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="color: white; border-color: white;">
 							Cerrar
 						</button>
 					</div>
