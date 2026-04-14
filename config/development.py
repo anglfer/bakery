@@ -27,3 +27,8 @@ class DevelopmentConfig:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
     AUTO_DB_INIT = os.getenv("AUTO_DB_INIT", "false").lower() == "true"
+    MONGO_LOGS_ENABLED = os.getenv("MONGO_LOGS_ENABLED", "false").lower() == "true"
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
+    MONGO_LOGS_DB = os.getenv("MONGO_LOGS_DB", "softbakery")
+    MONGO_LOGS_COLLECTION = os.getenv("MONGO_LOGS_COLLECTION", "app_logs")
+    MONGO_LOGS_TIMEOUT_MS = int(os.getenv("MONGO_LOGS_TIMEOUT_MS", "2000"))

@@ -41,10 +41,26 @@ def require_permission(modulo_nombre: str, accion: str):
         @wraps(func)
         def wrapped(*args, **kwargs):
             if not current_user.is_authenticated:
+                current_app.logger.warning(
+                    "PERMISSION_DENIED|reason=unauthenticated|"
+                    "module=%s|action=%s|path=%s|ip=%s",
+                    modulo_nombre,
+                    accion,
+                    request.path,
+                    request.headers.get("X-Forwarded-For", request.remote_addr or "-"),
+                )
                 abort(401)
 
             module = Modulo.query.filter_by(nombre=modulo_nombre).first()
             if not module:
+                current_app.logger.warning(
+                    "PERMISSION_DENIED|reason=module_not_found|"
+                    "module=%s|action=%s|user=%s|path=%s",
+                    modulo_nombre,
+                    accion,
+                    current_user.username,
+                    request.path,
+                )
                 abort(403)
 
             permission = Permiso.query.filter_by(
@@ -52,6 +68,15 @@ def require_permission(modulo_nombre: str, accion: str):
                 id_modulo=module.id_modulo,
             ).first()
             if not permission or not getattr(permission, field_name):
+                current_app.logger.warning(
+                    "PERMISSION_DENIED|reason=missing_permission|"
+                    "module=%s|action=%s|user=%s|role=%s|path=%s",
+                    modulo_nombre,
+                    accion,
+                    current_user.username,
+                    current_user.rol.nombre if current_user.rol else "sin_rol",
+                    request.path,
+                )
                 abort(403)
 
             return func(*args, **kwargs)

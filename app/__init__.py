@@ -1,11 +1,17 @@
+import importlib
 import logging
 import os
-from logging.handlers import RotatingFileHandler
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request
+from flask import Flask, has_request_context, render_template, request
 from flask_wtf.csrf import CSRFError
 from werkzeug.exceptions import HTTPException
+
+try:
+    MongoClient = getattr(importlib.import_module("pymongo"), "MongoClient")
+except Exception:
+    MongoClient = None
 
 from app.admin import admin_bp
 from app.auth import auth_bp
@@ -38,33 +44,153 @@ def create_app(config_object: str | None = None) -> Flask:
     return app
 
 
-def configure_logging(app: Flask) -> None:
-    os.makedirs(app.instance_path, exist_ok=True)
-    log_dir = os.path.join(app.instance_path, "logs")
-    os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, "app.log")
+class MongoDBLogHandler(logging.Handler):
+    def __init__(
+        self,
+        *,
+        mongo_uri: str,
+        database_name: str,
+        collection_name: str,
+        environment: str,
+        timeout_ms: int,
+    ) -> None:
+        super().__init__()
+        if MongoClient is None:
+            raise RuntimeError("pymongo no está instalado")
 
-    handler_exists = any(
-        isinstance(handler, RotatingFileHandler)
-        and getattr(handler, "baseFilename", "") == log_file
+        self.database_name = database_name
+        self.collection_name = collection_name
+        self.environment = environment
+
+        self._client = MongoClient(
+            mongo_uri,
+            serverSelectionTimeoutMS=timeout_ms,
+        )
+        self._collection = self._client[database_name][collection_name]
+        try:
+            self._collection.create_index([("timestamp_utc", -1)])
+            self._collection.create_index([("level", 1), ("timestamp_utc", -1)])
+        except Exception:
+            # No bloquear el arranque por índices.
+            pass
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            payload = {
+                "timestamp_utc": datetime.fromtimestamp(
+                    record.created,
+                    tz=timezone.utc,
+                ),
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+                "formatted_message": self.format(record),
+                "module": record.module,
+                "function": record.funcName,
+                "line": record.lineno,
+                "path": record.pathname,
+                "environment": self.environment,
+            }
+
+            if record.exc_info:
+                formatter = self.formatter or logging.Formatter()
+                payload["exception"] = formatter.formatException(record.exc_info)
+
+            if has_request_context():
+                payload["request"] = {
+                    "path": request.path,
+                    "method": request.method,
+                    "remote_addr": request.remote_addr,
+                    "forwarded_for": request.headers.get("X-Forwarded-For"),
+                    "user_agent": request.user_agent.string,
+                }
+
+            self._collection.insert_one(payload)
+        except Exception:
+            self.handleError(record)
+
+    def close(self) -> None:
+        try:
+            self._client.close()
+        finally:
+            super().close()
+
+
+def configure_logging(app: Flask) -> None:
+    _remove_file_handlers(app)
+    app.logger.setLevel(logging.INFO)
+    configure_mongo_logging(app)
+
+
+def _remove_file_handlers(app: Flask) -> None:
+    handlers_to_remove = [
+        handler
         for handler in app.logger.handlers
-    )
-    if handler_exists:
+        if isinstance(handler, logging.FileHandler)
+    ]
+    for handler in handlers_to_remove:
+        app.logger.removeHandler(handler)
+        try:
+            handler.close()
+        except Exception:
+            pass
+
+
+def configure_mongo_logging(app: Flask) -> None:
+    if not app.config.get("MONGO_LOGS_ENABLED", False):
         return
 
-    file_handler = RotatingFileHandler(
-        log_file,
-        maxBytes=1_048_576,
-        backupCount=3,
-        encoding="utf-8",
-    )
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(
-        logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    if MongoClient is None:
+        app.logger.warning(
+            "MONGO_LOGS_ENABLED=True pero pymongo no está instalado; "
+            "no se habilitó logging en MongoDB."
+        )
+        return
+
+    mongo_uri = str(app.config.get("MONGO_URI", "")).strip()
+    if not mongo_uri:
+        app.logger.warning(
+            "MONGO_LOGS_ENABLED=True pero MONGO_URI está vacío; "
+            "no se habilitó logging en MongoDB."
+        )
+        return
+
+    database_name = str(app.config.get("MONGO_LOGS_DB", "softbakery")).strip()
+    collection_name = str(app.config.get("MONGO_LOGS_COLLECTION", "app_logs")).strip()
+    timeout_ms = int(app.config.get("MONGO_LOGS_TIMEOUT_MS", 2000))
+    environment = str(
+        app.config.get("FLASK_ENV", os.getenv("FLASK_ENV", "development"))
     )
 
-    app.logger.addHandler(file_handler)
-    app.logger.setLevel(logging.INFO)
+    mongo_handler_exists = any(
+        isinstance(handler, MongoDBLogHandler)
+        and getattr(handler, "database_name", None) == database_name
+        and getattr(handler, "collection_name", None) == collection_name
+        for handler in app.logger.handlers
+    )
+    if mongo_handler_exists:
+        return
+
+    try:
+        mongo_handler = MongoDBLogHandler(
+            mongo_uri=mongo_uri,
+            database_name=database_name,
+            collection_name=collection_name,
+            environment=environment,
+            timeout_ms=timeout_ms,
+        )
+        mongo_handler.setLevel(logging.INFO)
+        mongo_handler.setFormatter(
+            logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+        )
+        app.logger.addHandler(mongo_handler)
+        app.logger.info(
+            "Logging MongoDB habilitado en %s.%s",
+            database_name,
+            collection_name,
+        )
+    except Exception:
+        app.logger.exception("No se pudo habilitar el logging en MongoDB.")
 
 
 def init_extensions(app: Flask) -> None:

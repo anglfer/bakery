@@ -137,10 +137,15 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        usuario = Usuario.query.filter_by(
-            username=form.username.data.strip(), activo=True
-        ).first()
+        username_input = form.username.data.strip()
+        ip_origen = request.headers.get("X-Forwarded-For", request.remote_addr or "-")
+        usuario = Usuario.query.filter_by(username=username_input, activo=True).first()
         if not usuario:
+            current_app.logger.warning(
+                "AUTH_LOGIN_FAIL|reason=user_not_found|username=%s|ip=%s",
+                username_input,
+                ip_origen,
+            )
             flash("Credenciales invalidas", "danger")
             return render_template(
                 LOGIN_TEMPLATE,
@@ -154,6 +159,11 @@ def login():
         # but we preserve the condition if it needs to be implemented.
 
         if usuario.is_locked():
+            current_app.logger.warning(
+                "AUTH_LOGIN_FAIL|reason=user_locked|user=%s|ip=%s",
+                usuario.username,
+                ip_origen,
+            )
             flash(
                 "Usuario temporalmente bloqueado por intentos fallidos",
                 "warning",
@@ -170,6 +180,11 @@ def login():
         if needs_captcha:
             captcha_token = request.form.get("g-recaptcha-response", "")
             if not _verify_recaptcha(captcha_token):
+                current_app.logger.warning(
+                    "AUTH_LOGIN_FAIL|reason=recaptcha_invalid|user=%s|ip=%s",
+                    usuario.username,
+                    ip_origen,
+                )
                 flash("Por favor completa el reCAPTCHA", "danger")
                 return render_template(
                     LOGIN_TEMPLATE,
@@ -184,6 +199,12 @@ def login():
             usuario.register_failed_login()
             _registrar_bitacora(usuario, False, "Contrasena incorrecta")
             db.session.commit()
+            current_app.logger.warning(
+                "AUTH_LOGIN_FAIL|reason=wrong_password|" "user=%s|ip=%s|attempts=%s",
+                usuario.username,
+                ip_origen,
+                usuario.intentos_fallidos,
+            )
             flash("Credenciales invalidas", "danger")
             return render_template(
                 LOGIN_TEMPLATE,
@@ -196,12 +217,25 @@ def login():
         usuario.token_2fa = f"{random.randint(0, 999999):06d}"
         usuario.expiracion_2fa = utc_now() + timedelta(minutes=5)
         db.session.commit()
+        current_app.logger.info(
+            "AUTH_LOGIN_OK_PASSWORD|user=%s|ip=%s|2fa_required=true",
+            usuario.username,
+            ip_origen,
+        )
 
         session["pending_2fa_user"] = usuario.id_usuario
         sent = _send_2fa_code_email(usuario)
         if sent:
+            current_app.logger.info(
+                "AUTH_2FA_SENT|user=%s|channel=email",
+                usuario.username,
+            )
             flash("Te enviamos un codigo de verificacion a tu correo.", "info")
         else:
+            current_app.logger.warning(
+                "AUTH_2FA_EMAIL_FAIL|user=%s|fallback=onscreen",
+                usuario.username,
+            )
             flash(f"Codigo 2FA temporal: {usuario.token_2fa}", "info")
         return redirect(url_for("auth.verify_2fa"))
 
@@ -217,10 +251,18 @@ def login():
 def verify_2fa():
     user_id = session.get("pending_2fa_user")
     if not user_id:
+        current_app.logger.warning(
+            "AUTH_2FA_FAIL|reason=session_missing|path=%s",
+            request.path,
+        )
         return redirect(url_for(LOGIN_ENDPOINT))
 
     usuario = Usuario.query.get(user_id)
     if not usuario:
+        current_app.logger.warning(
+            "AUTH_2FA_FAIL|reason=user_not_found|pending_user_id=%s",
+            user_id,
+        )
         session.pop("pending_2fa_user", None)
         return redirect(url_for(LOGIN_ENDPOINT))
 
@@ -230,10 +272,18 @@ def verify_2fa():
     if form.validate_on_submit():
         now = utc_now()
         if not usuario.expiracion_2fa or now > usuario.expiracion_2fa:
+            current_app.logger.warning(
+                "AUTH_2FA_FAIL|reason=code_expired|user=%s",
+                usuario.username,
+            )
             flash("El codigo 2FA expiro", "danger")
             return redirect(url_for(LOGIN_ENDPOINT))
 
         if form.code.data != usuario.token_2fa:
+            current_app.logger.warning(
+                "AUTH_2FA_FAIL|reason=wrong_code|user=%s",
+                usuario.username,
+            )
             flash("Codigo 2FA incorrecto", "danger")
             return render_template(
                 "auth/verificacion_2fa.html",
@@ -260,6 +310,11 @@ def verify_2fa():
         login_user(usuario)
         session.permanent = True
         session.pop("pending_2fa_user", None)
+        current_app.logger.info(
+            "AUTH_LOGIN_SUCCESS|user=%s|id_usuario=%s",
+            usuario.username,
+            usuario.id_usuario,
+        )
 
         if es_registro_nuevo:
             flash("Bienvenido a SoftBakery. Tu cuenta ha sido activada.", "success")
@@ -284,6 +339,10 @@ def registro_cliente():
             db.func.lower(Usuario.username) == username.lower()
         ).first()
         if existe_user:
+            current_app.logger.warning(
+                "AUTH_REGISTER_FAIL|reason=username_exists|username=%s",
+                username,
+            )
             flash(
                 "El nombre de usuario ya existe. Elige uno diferente.",
                 "danger",
@@ -295,6 +354,10 @@ def registro_cliente():
             db.func.lower(Persona.correo) == correo.lower()
         ).first()
         if existe_correo:
+            current_app.logger.warning(
+                "AUTH_REGISTER_FAIL|reason=email_exists|correo=%s",
+                correo,
+            )
             flash(
                 "El correo ya está registrado. Usa otro correo.",
                 "danger",
@@ -306,6 +369,7 @@ def registro_cliente():
             activo=True,
         ).first()
         if not rol_cliente:
+            current_app.logger.error("AUTH_REGISTER_FAIL|reason=missing_cliente_role")
             flash(
                 "No fue posible crear la cuenta: rol Cliente no configurado.",
                 "danger",
@@ -317,6 +381,10 @@ def registro_cliente():
         telefono = form.telefono.data.strip()
 
         if not (_is_valid_person_name(nombre) and _is_valid_person_name(apellidos)):
+            current_app.logger.warning(
+                "AUTH_REGISTER_FAIL|reason=invalid_person_name|username=%s",
+                username,
+            )
             flash("Nombre o apellido invalido.", "danger")
             return render_template(REGISTER_TEMPLATE, form=form)
 
@@ -341,6 +409,11 @@ def registro_cliente():
         db.session.add(persona)
         db.session.add(usuario)
         db.session.commit()
+        current_app.logger.info(
+            "AUTH_REGISTER_CREATED|user=%s|id_usuario=%s",
+            usuario.username,
+            usuario.id_usuario,
+        )
 
         # Intentar enviar código por email
         sent = _send_2fa_code_email(usuario)
@@ -348,6 +421,10 @@ def registro_cliente():
             log_audit_event(
                 "CLIENTE_REGISTRADO_PENDIENTE_VERIFICACION",
                 f"id_usuario={usuario.id_usuario}; username={usuario.username}",
+            )
+            current_app.logger.info(
+                "AUTH_REGISTER_2FA_SENT|user=%s",
+                usuario.username,
             )
             session["pending_2fa_user"] = usuario.id_usuario
             session["es_registro_nuevo"] = True
@@ -360,6 +437,10 @@ def registro_cliente():
             # Si no se puede enviar email, mostrar error y marcarlo como no activo
             usuario.activo = False
             db.session.commit()
+            current_app.logger.warning(
+                "AUTH_REGISTER_2FA_EMAIL_FAIL|" "user=%s|account_deactivated=true",
+                usuario.username,
+            )
             flash(
                 "Error al enviar correo de verificación. Contacta a soporte.",
                 "danger",
@@ -421,6 +502,10 @@ def mi_cuenta():
 @auth_bp.route("/logout")
 @login_required
 def logout():
+    current_app.logger.info(
+        "AUTH_LOGOUT|user=%s",
+        current_user.username if current_user.is_authenticated else "anonimo",
+    )
     logout_user()
     flash("Sesion finalizada", "info")
     return redirect(url_for("catalog.home"))
