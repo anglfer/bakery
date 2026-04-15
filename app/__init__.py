@@ -2,6 +2,7 @@ import importlib
 import logging
 import os
 from datetime import datetime, timezone
+from logging.handlers import RotatingFileHandler
 
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, render_template, request
@@ -119,6 +120,7 @@ class MongoDBLogHandler(logging.Handler):
 def configure_logging(app: Flask) -> None:
     _remove_file_handlers(app)
     app.logger.setLevel(logging.INFO)
+    configure_file_logging(app)
     configure_mongo_logging(app)
 
 
@@ -134,6 +136,35 @@ def _remove_file_handlers(app: Flask) -> None:
             handler.close()
         except Exception:
             pass
+
+
+def configure_file_logging(app: Flask) -> None:
+    log_path = os.path.join(app.instance_path, "logs", "app.log")
+    log_dir = os.path.dirname(log_path)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
+
+    file_handler_exists = any(
+        isinstance(handler, logging.FileHandler)
+        and os.path.abspath(getattr(handler, "baseFilename", "")) == log_path
+        for handler in app.logger.handlers
+    )
+    if file_handler_exists:
+        return
+
+    file_handler = RotatingFileHandler(
+        filename=log_path,
+        maxBytes=5 * 1024 * 1024,
+        backupCount=3,
+        encoding="utf-8",
+    )
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+        )
+    )
+    app.logger.addHandler(file_handler)
 
 
 def configure_mongo_logging(app: Flask) -> None:

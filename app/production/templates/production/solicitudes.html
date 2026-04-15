@@ -332,9 +332,10 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 				</div>
 				<form method="post" action="{{ url_for('production.ordenes') }}" id="formGenerarOrden">
+					{{ form_orden.hidden_tag() }}
 					<input type="hidden" name="action" value="crear" />
-					<input type="hidden" name="id_solicitud" id="ordenSolicitudId" />
-					<input type="hidden" name="id_producto" id="ordenProductoId" />
+					<input type="hidden" name="{{ form_orden.id_solicitud.name }}" id="ordenSolicitudId" />
+					<input type="hidden" name="{{ form_orden.id_producto.name }}" id="ordenProductoId" />
 					<div class="modal-body prod-orders-modal-body">
 						<div class="prod-orders-section-card">
 							<div class="prod-orders-section-title">
@@ -352,7 +353,7 @@
 							<div class="ops-grid">
 								<div>
 									<label class="form-label fw-semibold" for="ordenRecetaId">Receta activa</label>
-									<select name="id_receta" id="ordenRecetaId" class="form-select" required>
+									<select name="{{ form_orden.id_receta.name }}" id="ordenRecetaId" class="form-select" required>
 										<option value="">Selecciona una solicitud primero...</option>
 									</select>
 									<div class="form-hint mt-1">Solo aparecen recetas activas del producto.</div>
@@ -362,7 +363,7 @@
 									<input
 										id="ordenCantidad"
 										type="number"
-										name="cantidad"
+										name="{{ form_orden.cantidad.name }}"
 										min="1"
 										step="1"
 										class="form-control"
@@ -374,7 +375,7 @@
 									<input
 										id="ordenObservaciones"
 										type="text"
-										name="observaciones"
+										name="{{ form_orden.observaciones.name }}"
 										class="form-control"
 										placeholder="Referencia a solicitud o notas operativas..." />
 								</div>

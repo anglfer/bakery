@@ -63,14 +63,24 @@
 									data-id-rol="{{ u.id_rol }}" data-activo="{{ '1' if u.activo else '0' }}">
 									<i class="bi bi-pencil-fill text-white"></i>
 								</button>
+								{% if u.activo %}
 								<button type="button"
-									class="btn btn-sm btn-dark text-white border-0 btn-icon-sm js-desactivar-usuario"
-									data-id="{{ u.id_usuario }}" data-nombre="{{ u.username }}" {{ 'disabled' if not
-									u.activo else '' }}>
+									class="btn btn-sm btn-danger text-white border-0 btn-icon-sm js-desactivar-usuario"
+									data-id="{{ u.id_usuario }}" data-nombre="{{ u.username }}"
+									title="Desactivar usuario">
 									<i class="bi bi-slash-circle-fill text-white"></i>
 								</button>
+								{% else %}
+								<button type="button"
+									class="btn btn-sm btn-success text-white border-0 btn-icon-sm js-activar-usuario"
+									data-id="{{ u.id_usuario }}" data-nombre="{{ u.username }}" title="Activar usuario">
+									<i class="bi bi-person-check-fill text-white"></i>
+								</button>
+								{% endif %}
 								<form method="post" id="formDesactivarUsuario{{ u.id_usuario }}"
 									action="{{ url_for('admin.desactivar_usuario', id_usuario=u.id_usuario) }}"></form>
+								<form method="post" id="formActivarUsuario{{ u.id_usuario }}"
+									action="{{ url_for('admin.activar_usuario', id_usuario=u.id_usuario) }}"></form>
 							</div>
 						</td>
 					</tr>
@@ -99,45 +109,62 @@
 					{{ form_crear.hidden_tag() }}
 					<div class="modal-body">
 						<div class="row g-3">
-							<div class="col-md-6">{{ campo(form_crear.nombre, placeholder='Nombre', class='form-control') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.apellidos, placeholder='Apellidos', class='form-control') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.telefono, placeholder='477-123-4567', class='form-control tel-format') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.correo, placeholder='correo@empresa.com', class='form-control') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.ciudad, placeholder='Ciudad', class='form-control') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.direccion, placeholder='Dirección', class='form-control') }}</div>
-							<div class="col-md-6">{{ campo(form_crear.username, placeholder='Nombre de usuario', class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.nombre, placeholder='Nombre',
+								class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.apellidos, placeholder='Apellidos',
+								class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.telefono, placeholder='477-123-4567',
+								class='form-control tel-format') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.correo, placeholder='correo@empresa.com',
+								class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.ciudad, placeholder='Ciudad',
+								class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.direccion, placeholder='Dirección',
+								class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_crear.username, placeholder='Nombre de usuario',
+								class='form-control') }}</div>
 							<div class="col-md-6">{{ campo(form_crear.id_rol, class='form-control') }}</div>
 							<div class="col-12">
 								<div class="mb-2">
 									{{ form_crear.password.label(class='form-label') }}
 									<div class="input-group">
 										<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-										{{ form_crear.password(id='userPassword', class='form-control', placeholder='Mínimo 8 caracteres', autocomplete='new-password') }}
-										<span class="input-group-text toggle-password" data-target="userPassword" role="button" tabindex="0">
+										{{ form_crear.password(id='userPassword', class='form-control',
+										placeholder='Mínimo 8 caracteres', autocomplete='new-password') }}
+										<span class="input-group-text toggle-password" data-target="userPassword"
+											role="button" tabindex="0">
 											<i class="bi bi-eye-slash"></i>
 										</span>
 									</div>
 									{% if form_crear.password.errors %}
-										{% for err in form_crear.password.errors %}
-											<span class="text-danger" style="font-size:.78rem;">{{ err }}</span>
-										{% endfor %}
+									{% for err in form_crear.password.errors %}
+									<span class="text-danger" style="font-size:.78rem;">{{ err }}</span>
+									{% endfor %}
 									{% endif %}
 								</div>
 								<div class="pwd-rules-title mt-2">Tu contraseña debe incluir:</div>
 								<div class="pwd-rules" id="passwordRulesUser">
-									<div class="pwd-rule" data-rule="len"><i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Mínimo 8 caracteres</div>
-									<div class="pwd-rule" data-rule="upper"><i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos una mayúscula</div>
-									<div class="pwd-rule" data-rule="lower"><i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos una minúscula</div>
-									<div class="pwd-rule" data-rule="number"><i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos un número</div>
-									<div class="pwd-rule" data-rule="special"><i class="bi bi-x-circle err-ic"></i><i class="bi bi-check-circle ok-ic"></i>Al menos un carácter especial</div>
+									<div class="pwd-rule" data-rule="len"><i class="bi bi-x-circle err-ic"></i><i
+											class="bi bi-check-circle ok-ic"></i>Mínimo 8 caracteres</div>
+									<div class="pwd-rule" data-rule="upper"><i class="bi bi-x-circle err-ic"></i><i
+											class="bi bi-check-circle ok-ic"></i>Al menos una mayúscula</div>
+									<div class="pwd-rule" data-rule="lower"><i class="bi bi-x-circle err-ic"></i><i
+											class="bi bi-check-circle ok-ic"></i>Al menos una minúscula</div>
+									<div class="pwd-rule" data-rule="number"><i class="bi bi-x-circle err-ic"></i><i
+											class="bi bi-check-circle ok-ic"></i>Al menos un número</div>
+									<div class="pwd-rule" data-rule="special"><i class="bi bi-x-circle err-ic"></i><i
+											class="bi bi-check-circle ok-ic"></i>Al menos un carácter especial</div>
 								</div>
 							</div>
-							<div class="col-12">{{ campo(form_crear.password_confirm, placeholder='Repite la contraseña', class='form-control') }}</div>
+							<div class="col-12">{{ campo(form_crear.password_confirm, placeholder='Repite la
+								contraseña', class='form-control') }}</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">Cancelar</button>
-						<button type="submit" class="btn btn-sm text-white"><i class="bi bi-plus-lg me-1 text-white"></i> Crear usuario</button>
+						<button type="button" class="btn btn-primary text-white"
+							data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-sm text-white"><i
+								class="bi bi-plus-lg me-1 text-white"></i> Crear usuario</button>
 					</div>
 				</form>
 			</div>
@@ -158,53 +185,59 @@
 				</div>
 				<form method="post" id="formEditarUsuario" novalidate>
 					{% if form_editar is defined and form_editar %}
-						{{ form_editar.hidden_tag() }}
+					{{ form_editar.hidden_tag() }}
 					{% else %}
-						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 					{% endif %}
 					<div class="modal-body">
 						<div class="row g-3">
 							{% if form_editar is defined and form_editar %}
-								<div class="col-md-6">{{ campo(form_editar.nombre, class='form-control') }}</div>
-								<div class="col-md-6">{{ campo(form_editar.apellidos, class='form-control') }}</div>
-								<div class="col-md-6">{{ campo(form_editar.telefono, class='form-control tel-format') }}</div>
-								<div class="col-md-6">{{ campo(form_editar.ciudad, class='form-control') }}</div>
-								<div class="col-12">{{ campo(form_editar.direccion, class='form-control') }}</div>
-								<div class="col-md-6">{{ campo(form_editar.id_rol, class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_editar.nombre, class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_editar.apellidos, class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_editar.telefono, class='form-control tel-format') }}
+							</div>
+							<div class="col-md-6">{{ campo(form_editar.ciudad, class='form-control') }}</div>
+							<div class="col-12">{{ campo(form_editar.direccion, class='form-control') }}</div>
+							<div class="col-md-6">{{ campo(form_editar.id_rol, class='form-control') }}</div>
 							{% else %}
-								<div class="col-md-6">
-									<label class="form-label">Nombre *</label>
-									<input type="text" class="form-control" name="editar-nombre" id="editarUsuarioNombre" required />
-								</div>
-								<div class="col-md-6">
-									<label class="form-label">Apellidos *</label>
-									<input type="text" class="form-control" name="editar-apellidos" id="editarUsuarioApellidos" required />
-								</div>
-								<div class="col-md-6">
-									<label class="form-label">Teléfono *</label>
-									<input type="text" class="form-control tel-format" name="editar-telefono" id="editarUsuarioTelefono" required />
-								</div>
-								<div class="col-md-6">
-									<label class="form-label">Ciudad</label>
-									<input type="text" class="form-control" name="editar-ciudad" id="editarUsuarioCiudad" />
-								</div>
-								<div class="col-12">
-									<label class="form-label">Dirección</label>
-									<input type="text" class="form-control" name="editar-direccion" id="editarUsuarioDireccion" />
-								</div>
-								<div class="col-md-6">
-									<label class="form-label">Rol *</label>
-									<select class="form-control" name="editar-id_rol" id="editarUsuarioRol" required>
-										{% for rol in roles %}
-										<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
-										{% endfor %}
-									</select>
-								</div>
+							<div class="col-md-6">
+								<label class="form-label">Nombre *</label>
+								<input type="text" class="form-control" name="editar-nombre" id="editarUsuarioNombre"
+									required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Apellidos *</label>
+								<input type="text" class="form-control" name="editar-apellidos"
+									id="editarUsuarioApellidos" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono *</label>
+								<input type="text" class="form-control tel-format" name="editar-telefono"
+									id="editarUsuarioTelefono" required />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ciudad</label>
+								<input type="text" class="form-control" name="editar-ciudad" id="editarUsuarioCiudad" />
+							</div>
+							<div class="col-12">
+								<label class="form-label">Dirección</label>
+								<input type="text" class="form-control" name="editar-direccion"
+									id="editarUsuarioDireccion" />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Rol *</label>
+								<select class="form-control" name="editar-id_rol" id="editarUsuarioRol" required>
+									{% for rol in roles %}
+									<option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+									{% endfor %}
+								</select>
+							</div>
 							{% endif %}
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">Cancelar</button>
+						<button type="button" class="btn btn-primary text-white"
+							data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn btn-sm text-white"><i class="bi bi-save me-1 text-white"></i>
 							Guardar cambios</button>
 					</div>
@@ -227,8 +260,32 @@
 					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoDesactivarUsuario"></p>
 				</div>
 				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
-					<button type="button" class="bbtn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
 					<button type="button" class="btn btn-sm btn-danger text-white" id="btnConfirmarDesactivarUsuario">
+						<i class="bi bi-check-lg me-1 text-white"></i> Confirmar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{# ─── Modal: Activar Usuario ─── #}
+	<div class="modal fade" id="modalUsuarioActivar" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-sm modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body text-center py-4">
+					<div
+						style="width: 60px; height: 60px; border-radius: 50%; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1rem;">
+						<i class="bi bi-person-check-fill"></i>
+					</div>
+					<h5 style="font-family: 'Playfair Display', serif; font-size: 1.05rem">
+						¿Activar usuario?
+					</h5>
+					<p style="font-size: 0.9rem; color: var(--sb-muted)" id="textoActivarUsuario"></p>
+				</div>
+				<div class="modal-footer justify-content-center border-0 pt-0 pb-3">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-sm btn-success text-white" id="btnConfirmarActivarUsuario">
 						<i class="bi bi-check-lg me-1 text-white"></i> Confirmar
 					</button>
 				</div>
@@ -252,7 +309,7 @@
 	{% endif %}
 
 	// ─── Llenado dinámico del modal Editar (cuando no viene del servidor con errores) ───
-	{% if not (open_modal and open_modal.startswith('modalEditarUsuario-')) %}
+	{% if not(open_modal and open_modal.startswith('modalEditarUsuario-')) %}
 	document.querySelectorAll('.js-editar-usuario').forEach((buttonElement) => {
 		buttonElement.addEventListener('click', () => {
 			const id = buttonElement.dataset.id;
@@ -296,6 +353,23 @@
 	document.getElementById('btnConfirmarDesactivarUsuario').addEventListener('click', () => {
 		if (!usuarioDesactivarId) return;
 		document.getElementById(`formDesactivarUsuario${usuarioDesactivarId}`).submit();
+	});
+
+	// ─── Modal Activar Usuario ───
+	let usuarioActivarId = null;
+
+	document.querySelectorAll('.js-activar-usuario').forEach((buttonElement) => {
+		buttonElement.addEventListener('click', () => {
+			usuarioActivarId = buttonElement.dataset.id;
+			document.getElementById('textoActivarUsuario').innerHTML =
+				`El usuario <strong>${buttonElement.dataset.nombre}</strong> volverá a estar <em>activo</em> y podrá iniciar sesión.`;
+			new bootstrap.Modal(document.getElementById('modalUsuarioActivar')).show();
+		});
+	});
+
+	document.getElementById('btnConfirmarActivarUsuario').addEventListener('click', () => {
+		if (!usuarioActivarId) return;
+		document.getElementById(`formActivarUsuario${usuarioActivarId}`).submit();
 	});
 
 	// ─── Teléfono: formato automático ───

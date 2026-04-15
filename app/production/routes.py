@@ -1043,6 +1043,7 @@ def solicitudes():
         return redirect(url_for("catalog.home"))
 
     form_resolver = ResolverSolicitudForm(prefix="resolver")
+    form_orden = OrdenProduccionForm(prefix="orden")
 
     if request.method == "POST":
         if form_resolver.validate_on_submit():
@@ -1109,5 +1110,6 @@ def solicitudes():
         recetas_payload=recetas_payload,
         role_name=role_name,
         form_resolver=form_resolver,
+        form_orden=form_orden,
         open_modal="modalResolver" if request.method == "POST" and not form_resolver.validate() else None,
     )

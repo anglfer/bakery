@@ -105,6 +105,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<form method="post" id="formCrearOrden" novalidate>
+				{{ form_orden.hidden_tag() }}
 				<input type="hidden" name="action" value="crear" />
 				<div class="modal-body prod-orders-modal-body">
 					<div class="prod-orders-section-card">
@@ -117,8 +118,9 @@
 								<label class="form-label fw-semibold" for="crearOrdenSolicitud">
 									Solicitud aprobada (opcional)
 								</label>
-								<select id="crearOrdenSolicitud" name="id_solicitud" class="form-select">
-									<option value="">Sin solicitud vinculada</option>
+								<select id="crearOrdenSolicitud" name="{{ form_orden.id_solicitud.name }}"
+									class="form-select">
+									<option value="0">Sin solicitud vinculada</option>
 									{% for solicitud in solicitudes %}
 									<option value="{{ solicitud.id_solicitud }}"
 										data-producto="{{ solicitud.id_producto }}"
@@ -135,7 +137,9 @@
 									Producto
 									<span class="text-danger">*</span>
 								</label>
-								<select id="crearOrdenProducto" name="{{ form_orden.id_producto.name }}" class="form-select {% if form_orden.id_producto.errors %}is-invalid{% endif %}" required>
+								<select id="crearOrdenProducto" name="{{ form_orden.id_producto.name }}"
+									class="form-select {% if form_orden.id_producto.errors %}is-invalid{% endif %}"
+									required>
 									<option value="">Seleccionar producto...</option>
 									{% for producto in productos %}
 									<option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
@@ -150,7 +154,9 @@
 									Receta activa
 									<span class="text-danger">*</span>
 								</label>
-								<select id="crearOrdenReceta" name="{{ form_orden.id_receta.name }}" class="form-select {% if form_orden.id_receta.errors %}is-invalid{% endif %}" required>
+								<select id="crearOrdenReceta" name="{{ form_orden.id_receta.name }}"
+									class="form-select {% if form_orden.id_receta.errors %}is-invalid{% endif %}"
+									required>
 									<option value="">Selecciona primero un producto...</option>
 								</select>
 								{% if form_orden.id_receta.errors %}
@@ -161,11 +167,13 @@
 								</small>
 							</div>
 							<div>
-								{{ campo(form_orden.cantidad, id='crearOrdenCantidad', placeholder='Ej. 24', min='1', step='1') }}
+								{{ campo(form_orden.cantidad, id='crearOrdenCantidad', placeholder='Ej. 24', min='1',
+								step='1') }}
 								<small class="text-muted d-block mt-1" id="crearOrdenRendHint"></small>
 							</div>
 							<div>
-								{{ campo(form_orden.observaciones, id='crearOrdenObservaciones', placeholder='Opcional...') }}
+								{{ campo(form_orden.observaciones, id='crearOrdenObservaciones',
+								placeholder='Opcional...') }}
 							</div>
 						</div>
 					</div>
@@ -664,7 +672,7 @@
 		}
 
 		function syncFromSolicitud() {
-			if (!solicitudSelect || !solicitudSelect.value) {
+			if (!solicitudSelect || !solicitudSelect.value || solicitudSelect.value === '0') {
 				return;
 			}
 			const selected = solicitudSelect.options[solicitudSelect.selectedIndex];
@@ -804,14 +812,9 @@
 			if (productId <= 0 || recipeId <= 0 || cantidad <= 0) {
 				return 'Selecciona producto, receta activa y cantidad mayor a cero.';
 			}
-
-			const result = calcularExplosion();
-			if (!result) {
-				return 'No se pudo calcular la explosión de materiales.';
-			}
-			if (!result.stockOk) {
-				return 'No hay suficiente materia prima para crear la orden.';
-			}
+			// El stock insuficiente es solo una advertencia; la orden
+			// se crea en estado PENDIENTE y el inventario se descuenta
+			// únicamente al Iniciar la orden, no al crearla.
 			return null;
 		}
 
@@ -911,6 +914,12 @@
 			formCrearOrden.addEventListener('submit', (event) => {
 				const error = validarFormularioCrearOrden();
 				if (!error) {
+					// Si el stock es insuficiente, mostrar advertencia pero
+					// permitir el envío (la orden queda PENDIENTE).
+					const result = calcularExplosion();
+					if (result && !result.stockOk) {
+						renderExplosion(result);
+					}
 					return;
 				}
 				event.preventDefault();
@@ -921,8 +930,15 @@
 	}
 
 	{% if open_modal == 'modalNuevaOrden' or form_orden.errors %}
-	document.addEventListener("DOMContentLoaded", function() {
+	document.addEventListener("DOMContentLoaded", function () {
 		new bootstrap.Modal(document.getElementById('modalNuevaOrden')).show();
+		// Repoblar recetas si hay un producto pre-seleccionado
+		if (typeof populateRecipesByProduct === 'function') {
+			populateRecipesByProduct();
+		}
+		if (typeof syncFromSolicitud === 'function') {
+			syncFromSolicitud();
+		}
 	});
 	{% endif %}
 </script>

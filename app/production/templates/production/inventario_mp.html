@@ -273,9 +273,9 @@
 			</div>
 			<form method="post" id="formAjuste" novalidate>
 				<input type="hidden" name="action" value="ajuste" />
-				{{ form_ajuste.hidden_tag() }}
+				{{ form_ajuste.csrf_token }}
 				<div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-					<input type="hidden" name="{{ form_ajuste.id_materia.name }}" id="ajusteIdMateria" value="{{ form_ajuste.id_materia.data or '' }}" required />
+					{{ form_ajuste.id_materia(id='ajusteIdMateria', required=True) }}
 					<div class="mb-3">
 						<p class="mb-1 fw-semibold" id="ajusteMateriaNombre">Selecciona una materia prima</p>
 						<p class="text-muted mb-0" id="ajusteExistenciaTexto">Existencia actual: -</p>
@@ -293,7 +293,7 @@
 							<i class="bi bi-pencil-square me-1"></i>Ajuste
 						</button>
 					</div>
-					<input type="hidden" name="{{ form_ajuste.tipo.name }}" id="ajusteTipo" value="{{ form_ajuste.tipo.data or 'ENTRADA' }}" />
+					{{ form_ajuste.tipo(id='ajusteTipo', value=form_ajuste.tipo.data or 'ENTRADA') }}
 
 					<div class="ops-grid mp-grid-2">
 						<div>
@@ -558,9 +558,10 @@
 			document.getElementById('ajusteMateriaNombre').textContent = nombre;
 			document.getElementById('ajusteExistenciaTexto').textContent =
 				`Existencia actual: ${cantidad} ${unidad} (equiv. ${cantidadBase} ${unidadBase})`;
-			document.getElementById('ajusteUnidadLabel').textContent = unidadBase
-				? `(${unidadBase})`
-				: '';
+			const ajusteUnidadLabel = document.getElementById('ajusteUnidadLabel');
+			if (ajusteUnidadLabel) {
+				ajusteUnidadLabel.textContent = unidadBase ? `(${unidadBase})` : '';
+			}
 
 			document.getElementById('ajusteTipo').value = 'ENTRADA';
 			document.querySelectorAll('.btnTipoAjuste').forEach((tipoBtn) => {

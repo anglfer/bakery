@@ -730,7 +730,7 @@ def producto_terminado():
                     stock_minimo = form_producto.stock_minimo.data or 10
                     unidad_venta = form_producto.unidad_venta.data
                     id_receta = form_producto.id_receta.data or 0
-                    imagen = image_path or request.form.get("imagen", "").strip()
+                    imagen = image_path or (form_producto.imagen.data or "").strip()
 
                     if not nombre or not unidad_venta:
                         raise ValueError("Nombre y unidad de venta son obligatorios.")
@@ -815,7 +815,9 @@ def producto_terminado():
         if action == "editar" or action == "editar_fallido":
             # Using same fallback handling:
             if not getattr(request, "_editar_handled", False):
-                id_producto = _int(request.form.get("id_producto", "0"))
+                id_producto = form_producto.id_producto.data or _int(
+                    request.form.get("id_producto", "0")
+                )
                 producto = Producto.query.get_or_404(id_producto)
 
                 if form_producto.validate_on_submit():
@@ -876,10 +878,8 @@ def producto_terminado():
 
                         if image_path:
                             producto.imagen = image_path
-                        elif request.form.get("imagen"):
-                            producto.imagen = request.form.get(
-                                "imagen", producto.imagen
-                            )
+                        elif (form_producto.imagen.data or "").strip():
+                            producto.imagen = (form_producto.imagen.data or "").strip()
 
                         producto.activo = form_producto.activo.data == "on"
 

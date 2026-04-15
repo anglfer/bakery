@@ -447,6 +447,21 @@ def desactivar_usuario(id_usuario: int):
     return redirect(url_for(USERS_ENDPOINT))
 
 
+@admin_bp.post("/usuarios/<int:id_usuario>/activar")
+@login_required
+@require_permission("Usuarios", "editar")
+def activar_usuario(id_usuario: int):
+    user = Usuario.query.get_or_404(id_usuario)
+    user.activo = True
+    db.session.commit()
+    log_audit_event(
+        "USUARIO_ACTIVADO",
+        f"id_usuario={user.id_usuario}; username={user.username}",
+    )
+    flash("Usuario activado correctamente.", "success")
+    return redirect(url_for(USERS_ENDPOINT))
+
+
 @admin_bp.route("/roles", methods=["GET", "POST"])
 @login_required
 @require_permission("Roles", "leer")

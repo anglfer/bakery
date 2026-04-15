@@ -307,7 +307,7 @@ payload_map.update({item.id_producto: item}) %} {% endfor %}
 				</div>
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
 			</div>
-			<form method="post" id="formProducto" enctype="multipart/form-data" novalidate>
+			<form method="post" id="formProducto" action="{{ url_for('sales.producto_terminado') }}" enctype="multipart/form-data" novalidate>
 				{{ form_producto.csrf_token }}
 				<div class="modal-body">
 					{{ form_producto.action(id="formAction") }} {{ form_producto.id_producto(id="productId")
@@ -345,7 +345,7 @@ payload_map.update({item.id_producto: item}) %} {% endfor %}
 										class="form-control"
 										name="imagen_archivo"
 										id="imagen_archivo"
-										accept="image/*" />
+										accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
 								</div>
 								<div>
 									{{ campo(form_producto.imagen, id='imagen', placeholder='🍰 o URL imagen') }}
@@ -691,7 +691,7 @@ payload_map.update({item.id_producto: item}) %} {% endfor %}
 
 	function resetProductForm() {
 		formProducto.reset();
-		formProducto.action = '';
+		formProducto.action = '{{ url_for("sales.producto_terminado") }}';
 		document.getElementById('formAction').value = 'crear';
 		document.getElementById('productId').value = '';
 		modalEyebrow.textContent = 'Nuevo producto';
