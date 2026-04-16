@@ -456,7 +456,7 @@ def _seed_roles_modules_permissions() -> None:
             "Catalogo Web": (True, True, True, False),
             "Carrito": (True, True, True, True),
             "Producto Terminado": (True, True, True, False),
-            "Compras MP": (True, True, True, False),
+            "Compras MP": (False, False, False, False),
             "Costos y Utilidad": (True, False, False, False),
         },
         ROLE_PRODUCTION: {
