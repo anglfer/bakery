@@ -946,7 +946,10 @@ def seed_base_catalog_data() -> None:
     nombres_legacy = {
         "Pastel Red Velvet": "Pastel de Red Velvet",
         "Pastel de Frutos": "Pastel de Frutos Secos",
-        "Pastel Tres Leches": "Pastel de 3 Leches de Durazno",
+        "Pastel Tres Leches": "Pastel de Tres Leches con Durazno",
+        "Pastel de Vainilla": "Pastel de Vainilla con Fresas",
+        "Pastel de Moka": "Pastel Tipo Moka",
+        "Chocoflan con Cajeta": "Chocoflan de Cajeta",
     }
     for nombre_anterior, nombre_nuevo in nombres_legacy.items():
         legado = Producto.query.filter_by(nombre=nombre_anterior).first()
@@ -956,64 +959,64 @@ def seed_base_catalog_data() -> None:
 
     productos_base = (
         (
-            "Pastel de Chocolate",
-            "Bizcocho de cacao con betun de chocolate semiamargo.",
-            Decimal("480.00"),
-            "img/productos/Pastel_de_chocolate.jpg",
-        ),
-        (
-            "Pastel de Red Velvet",
-            "Terciopelo rojo con queso crema batido.",
-            Decimal("520.00"),
-            "img/productos/Pastel_de_red_velvet.jpg",
-        ),
-        (
-            "Pastel Helado de Oreo",
-            "Pastel frio con galleta Oreo molida y crema.",
-            Decimal("560.00"),
-            "img/productos/Pastel_helado_de_Oreo.jpg",
-        ),
-        (
             "Pastel de Zanahoria",
-            "Pan especiado de zanahoria con nuez y canela.",
+            "Bizcocho de zanahoria con crema de queso.",
             Decimal("510.00"),
             "img/productos/Pastel_de_zanahoria.jpg",
         ),
         (
-            "Pastel de Vainilla",
-            "Bizcocho de vainilla clasico con crema batida.",
-            Decimal("450.00"),
-            "img/productos/Pastel_de_vainilla.jpg",
+            "Pastel de Chocolate",
+            "Bizcocho de cacao con cobertura de chocolate semiamargo.",
+            Decimal("480.00"),
+            "img/productos/Pastel_de_chocolate.jpg",
         ),
         (
-            "Pastel de Moka",
-            "Pastel de cafe y chocolate estilo moka.",
-            Decimal("540.00"),
-            "img/productos/Pastel_de_moka.jpg",
-        ),
-        (
-            "Pastel de Frutos Secos",
-            "Pastel con mezcla de nueces y frutos secos.",
-            Decimal("590.00"),
-            "img/productos/Pastel_de_frutos_secos.jpg",
-        ),
-        (
-            "Pastel de 3 Leches de Durazno",
-            "Pastel tres leches con durazno en almibar.",
+            "Pastel de Tres Leches con Durazno",
+            "Pastel esponjoso bañado con tres leches y durazno.",
             Decimal("530.00"),
             "img/productos/Pastel_de_3_leches_de_durazno.jpg",
         ),
         (
-            "Chocoflan con Cajeta",
-            "Flan napolitano con pan de chocolate y cajeta.",
+            "Cheesecake de Mora Azul",
+            "Cheesecake cremoso con topping de mora azul.",
+            Decimal("620.00"),
+            "img/productos/cheesecake_de_mora_azul.jpg",
+        ),
+        (
+            "Chocoflan de Cajeta",
+            "Flan napolitano con bizcocho de chocolate y cajeta.",
             Decimal("500.00"),
             "img/productos/Chocoflan_con_cajeta.jpg",
         ),
         (
-            "Cheesecake de Mora Azul",
-            "Cheesecake cremoso con cobertura de mora azul.",
-            Decimal("620.00"),
-            "img/productos/cheesecake_de_mora_azul.jpg",
+            "Pastel de Frutos Secos",
+            "Pastel con frutos secos y crema suave.",
+            Decimal("590.00"),
+            "img/productos/Pastel_de_frutos_secos.jpg",
+        ),
+        (
+            "Pastel Tipo Moka",
+            "Bizcocho de cafe y cacao con crema moka.",
+            Decimal("540.00"),
+            "img/productos/Pastel_de_moka.jpg",
+        ),
+        (
+            "Pastel de Red Velvet",
+            "Bizcocho red velvet con crema de queso.",
+            Decimal("520.00"),
+            "img/productos/Pastel_de_red_velvet.jpg",
+        ),
+        (
+            "Pastel de Vainilla con Fresas",
+            "Bizcocho de vainilla con fresas y crema batida.",
+            Decimal("450.00"),
+            "img/productos/Pastel_de_vainilla.jpg",
+        ),
+        (
+            "Pastel Helado de Oreo",
+            "Pastel frio de galleta Oreo con crema.",
+            Decimal("560.00"),
+            "img/productos/Pastel_helado_de_Oreo.jpg",
         ),
     )
     for nombre, descripcion, precio, imagen in productos_base:

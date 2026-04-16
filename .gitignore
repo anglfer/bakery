@@ -10,3 +10,5 @@ instance/*.db
 .vscode
 .vscode/*
 .vscode/PythonImportHelper-v2-Completion.json
+instance\logs\app.log
+.vscode/PythonImportHelper-v2-Completion.json

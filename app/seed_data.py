@@ -42,88 +42,334 @@ ROLE_PRODUCTION = "Produccion"
 ROLE_CLIENT = "Cliente"
 
 MP_HARINA = "Harina de Trigo"
-MP_AZUCAR = "Azucar Refinada"
-MP_MANTEQUILLA = "Mantequilla s/sal"
-MP_HUEVO = "Huevo Fresco"
-PRODUCTO_PASTEL_CHOCOLATE = "Pastel de Chocolate"
+MP_AZUCAR = "Azúcar Refinada"
+MP_HUEVO = "Huevo Blanco"
+MP_MANTEQUILLA = "Mantequilla"
+MP_QUESO_CREMA = "Queso Crema"
+MP_CREMA_BATIR = "Crema para Batir"
+MP_LECHE_CONDENSADA = "Leche Condensada"
+MP_LECHE_EVAPORADA = "Leche Evaporada"
+MP_CHOCOLATE = "Chocolate Semiamargo"
+MP_CAJETA = "Cajeta Envinada"
+MP_MORA_AZUL = "Mora Azul"
+MP_DURAZNO = "Durazno en Almíbar"
+MP_FRUTOS_SECOS = "Frutos Secos"
+MP_OREO = "Galleta Oreo Molida"
+MP_GALLETA_MARIA = "Galleta María Molida"
+MP_ACEITE = "Aceite Vegetal"
+MP_VAINILLA = "Vainilla"
+MP_POLVO_HORNEAR = "Polvo para hornear"
+MP_COCOA = "Cocoa en Polvo"
+MP_FRESA = "Fresa fresca"
+MP_CAFE = "Café soluble"
+MP_ZANAHORIA = "Zanahoria"
+PRODUCTO_PASTEL_ZANAHORIA = "Pastel de Zanahoria"
 MXN_QUANTIZE = Decimal("0.01")
 
 LEGACY_PRODUCT_NAMES: dict[str, str] = {
     "Pastel Red Velvet": "Pastel de Red Velvet",
     "Pastel de Frutos": "Pastel de Frutos Secos",
-    "Pastel Tres Leches": "Pastel de 3 Leches de Durazno",
+    "Pastel Tres Leches": "Pastel de Tres Leches con Durazno",
+    "Pastel de Vainilla": "Pastel de Vainilla con Fresas",
+    "Pastel de Moka": "Pastel Tipo Moka",
+    "Chocoflan con Cajeta": "Chocoflan de Cajeta",
 }
+
+RAW_MATERIAL_CATALOG: tuple[
+    tuple[str, str, str, Decimal, Decimal, Decimal, Decimal, Decimal], ...
+] = (
+    (
+        MP_HARINA,
+        "g",
+        "cos",
+        Decimal("20000"),
+        Decimal("3.0"),
+        Decimal("3.5"),
+        Decimal("1.0"),
+        Decimal("0.030"),
+    ),
+    (
+        MP_AZUCAR,
+        "g",
+        "cos",
+        Decimal("20000"),
+        Decimal("2.0"),
+        Decimal("3.0"),
+        Decimal("1.0"),
+        Decimal("0.028"),
+    ),
+    (
+        MP_HUEVO,
+        "pza",
+        "pza",
+        Decimal("1"),
+        Decimal("5.0"),
+        Decimal("600"),
+        Decimal("200"),
+        Decimal("4.00"),
+    ),
+    (
+        MP_MANTEQUILLA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("2.0"),
+        Decimal("8.0"),
+        Decimal("4.0"),
+        Decimal("0.16"),
+    ),
+    (
+        MP_QUESO_CREMA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("5.0"),
+        Decimal("9.0"),
+        Decimal("4.0"),
+        Decimal("0.21"),
+    ),
+    (
+        MP_CREMA_BATIR,
+        "ml",
+        "l",
+        Decimal("1000"),
+        Decimal("8.0"),
+        Decimal("20.0"),
+        Decimal("8.0"),
+        Decimal("0.09"),
+    ),
+    (
+        MP_LECHE_CONDENSADA,
+        "ml",
+        "l",
+        Decimal("1000"),
+        Decimal("2.0"),
+        Decimal("8.0"),
+        Decimal("3.0"),
+        Decimal("0.08"),
+    ),
+    (
+        MP_LECHE_EVAPORADA,
+        "ml",
+        "l",
+        Decimal("1000"),
+        Decimal("2.0"),
+        Decimal("10.0"),
+        Decimal("3.0"),
+        Decimal("0.07"),
+    ),
+    (
+        MP_CHOCOLATE,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("2.0"),
+        Decimal("5.0"),
+        Decimal("2.5"),
+        Decimal("0.22"),
+    ),
+    (
+        MP_CAJETA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("3.0"),
+        Decimal("4.0"),
+        Decimal("2.0"),
+        Decimal("0.13"),
+    ),
+    (
+        MP_MORA_AZUL,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("10.0"),
+        Decimal("4.0"),
+        Decimal("1.5"),
+        Decimal("0.20"),
+    ),
+    (
+        MP_DURAZNO,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("5.0"),
+        Decimal("6.0"),
+        Decimal("3.0"),
+        Decimal("0.10"),
+    ),
+    (
+        MP_FRUTOS_SECOS,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("2.0"),
+        Decimal("4.0"),
+        Decimal("2.0"),
+        Decimal("0.25"),
+    ),
+    (
+        MP_OREO,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("8.0"),
+        Decimal("5.0"),
+        Decimal("2.0"),
+        Decimal("0.12"),
+    ),
+    (
+        MP_GALLETA_MARIA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("5.0"),
+        Decimal("3.0"),
+        Decimal("1.0"),
+        Decimal("0.11"),
+    ),
+    (
+        MP_ACEITE,
+        "ml",
+        "l",
+        Decimal("1000"),
+        Decimal("1.0"),
+        Decimal("15.0"),
+        Decimal("5.0"),
+        Decimal("0.08"),
+    ),
+    (
+        MP_VAINILLA,
+        "ml",
+        "l",
+        Decimal("1000"),
+        Decimal("1.0"),
+        Decimal("3.0"),
+        Decimal("1.5"),
+        Decimal("0.35"),
+    ),
+    (
+        MP_POLVO_HORNEAR,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("1.0"),
+        Decimal("1.5"),
+        Decimal("0.5"),
+        Decimal("0.05"),
+    ),
+    (
+        MP_COCOA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("3.0"),
+        Decimal("3.0"),
+        Decimal("1.5"),
+        Decimal("0.22"),
+    ),
+    (
+        MP_FRESA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("15.0"),
+        Decimal("5.0"),
+        Decimal("2.0"),
+        Decimal("0.09"),
+    ),
+    (
+        MP_CAFE,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("1.0"),
+        Decimal("0.5"),
+        Decimal("0.2"),
+        Decimal("0.42"),
+    ),
+    (
+        MP_ZANAHORIA,
+        "g",
+        "kg",
+        Decimal("1000"),
+        Decimal("15.0"),
+        Decimal("4.0"),
+        Decimal("2.0"),
+        Decimal("0.04"),
+    ),
+)
 
 PRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (
     (
+        "Pastel de Zanahoria",
+        "Bizcocho de zanahoria con crema de queso.",
+        Decimal("510.00"),
+        "img/productos/Pastel_de_zanahoria.jpg",
+        Decimal("28.00"),
+    ),
+    (
         "Pastel de Chocolate",
-        "Bizcocho de cacao con betun de chocolate semiamargo.",
+        "Bizcocho de cacao con cobertura de chocolate semiamargo.",
         Decimal("480.00"),
         "img/productos/Pastel_de_chocolate.jpg",
         Decimal("30.00"),
     ),
     (
-        "Pastel de Red Velvet",
-        "Terciopelo rojo con queso crema batido.",
-        Decimal("520.00"),
-        "img/productos/Pastel_de_red_velvet.jpg",
-        Decimal("30.00"),
-    ),
-    (
-        "Pastel Helado de Oreo",
-        "Pastel frio con galleta Oreo molida y crema.",
-        Decimal("560.00"),
-        "img/productos/Pastel_helado_de_Oreo.jpg",
-        Decimal("32.00"),
-    ),
-    (
-        "Pastel de Zanahoria",
-        "Pan especiado de zanahoria con nuez y canela.",
-        Decimal("510.00"),
-        "img/productos/Pastel_de_zanahoria.jpg",
-        Decimal("30.00"),
-    ),
-    (
-        "Pastel de Vainilla",
-        "Bizcocho de vainilla clasico con crema batida.",
-        Decimal("450.00"),
-        "img/productos/Pastel_de_vainilla.jpg",
-        Decimal("28.00"),
-    ),
-    (
-        "Pastel de Moka",
-        "Pastel de cafe y chocolate estilo moka.",
-        Decimal("540.00"),
-        "img/productos/Pastel_de_moka.jpg",
-        Decimal("31.00"),
-    ),
-    (
-        "Pastel de Frutos Secos",
-        "Pastel con mezcla de nueces y frutos secos.",
-        Decimal("590.00"),
-        "img/productos/Pastel_de_frutos_secos.jpg",
-        Decimal("32.00"),
-    ),
-    (
-        "Pastel de 3 Leches de Durazno",
-        "Pastel tres leches con durazno en almibar.",
+        "Pastel de Tres Leches con Durazno",
+        "Pastel esponjoso bañado con tres leches y durazno.",
         Decimal("530.00"),
         "img/productos/Pastel_de_3_leches_de_durazno.jpg",
         Decimal("30.00"),
     ),
     (
-        "Chocoflan con Cajeta",
-        "Flan napolitano con pan de chocolate y cajeta.",
+        "Cheesecake de Mora Azul",
+        "Cheesecake cremoso con topping de mora azul.",
+        Decimal("620.00"),
+        "img/productos/cheesecake_de_mora_azul.jpg",
+        Decimal("33.00"),
+    ),
+    (
+        "Chocoflan de Cajeta",
+        "Flan napolitano con bizcocho de chocolate y cajeta.",
         Decimal("500.00"),
         "img/productos/Chocoflan_con_cajeta.jpg",
         Decimal("30.00"),
     ),
     (
-        "Cheesecake de Mora Azul",
-        "Cheesecake cremoso con cobertura de mora azul.",
-        Decimal("620.00"),
-        "img/productos/cheesecake_de_mora_azul.jpg",
-        Decimal("33.00"),
+        "Pastel de Frutos Secos",
+        "Pastel con frutos secos y crema suave.",
+        Decimal("590.00"),
+        "img/productos/Pastel_de_frutos_secos.jpg",
+        Decimal("32.00"),
+    ),
+    (
+        "Pastel Tipo Moka",
+        "Bizcocho de cafe y cacao con crema moka.",
+        Decimal("540.00"),
+        "img/productos/Pastel_de_moka.jpg",
+        Decimal("31.00"),
+    ),
+    (
+        "Pastel de Red Velvet",
+        "Bizcocho red velvet con crema de queso.",
+        Decimal("520.00"),
+        "img/productos/Pastel_de_red_velvet.jpg",
+        Decimal("30.00"),
+    ),
+    (
+        "Pastel de Vainilla con Fresas",
+        "Bizcocho de vainilla con fresas y crema batida.",
+        Decimal("450.00"),
+        "img/productos/Pastel_de_vainilla.jpg",
+        Decimal("28.00"),
+    ),
+    (
+        "Pastel Helado de Oreo",
+        "Pastel frio de galleta Oreo con crema.",
+        Decimal("560.00"),
+        "img/productos/Pastel_helado_de_Oreo.jpg",
+        Decimal("32.00"),
     ),
 )
 
@@ -413,7 +659,15 @@ def _seed_suppliers() -> None:
             "Av. Comercio 300",
         ),
     ]
-    for nombre, contacto, telefono, correo, ciudad, estado, direccion in suppliers:
+    for (
+        nombre,
+        contacto,
+        telefono,
+        correo,
+        ciudad,
+        estado,
+        direccion,
+    ) in suppliers:
         exists = Proveedor.query.filter_by(nombre_empresa=nombre).first()
         if exists:
             continue
@@ -487,104 +741,22 @@ def _seed_products_catalog_metadata() -> None:
 
 def _seed_raw_materials() -> None:
     units = {u.abreviatura: u for u in UnidadMedida.query.all()}
-    materials = [
-        # name, unidad_base, unidad_compra, factor_conversion, merma%,
-        # stock_minimo, stock_inicial, costo_unitario (MXN por unidad_base)
-        (MP_HARINA, "g", "cos", "20000", "2.0", "8000", "24000", "0.030"),
-        (MP_AZUCAR, "g", "cos", "20000", "0.5", "5000", "16000", "0.028"),
-        (MP_MANTEQUILLA, "g", "kg", "1000", "1.5", "2000", "800", "0.16"),
-        ("Cacao en Polvo", "g", "kg", "1000", "1.0", "3000", "3200", "0.22"),
-        ("Leche Entera", "ml", "l", "1000", "0.0", "2000", "4500", "0.02"),
-        (MP_HUEVO, "pza", "pza", "1", "0.0", "30", "48", "4.00"),
-        ("Vainilla Extracto", "ml", "l", "1000", "0.0", "500", "600", "0.35"),
-        ("Polvo de Hornear", "g", "kg", "1000", "0.0", "800", "900", "0.05"),
-        ("Fresas Frescas", "g", "kg", "1000", "8.0", "1000", "1200", "0.09"),
-        ("Nuez Pecana", "g", "kg", "1000", "3.0", "600", "700", "0.25"),
-        ("Queso Crema", "g", "kg", "1000", "1.0", "1800", "2600", "0.21"),
-        (
-            "Durazno en Almibar",
-            "g",
-            "kg",
-            "1000",
-            "0.5",
-            "1500",
-            "2500",
-            "0.10",
-        ),
-        ("Cafe Espresso", "g", "kg", "1000", "0.0", "400", "650", "0.42"),
-        ("Oreo Molida", "g", "kg", "1000", "0.0", "1200", "1800", "0.12"),
-        (
-            "Zanahoria Rallada",
-            "g",
-            "kg",
-            "1000",
-            "2.0",
-            "2000",
-            "2600",
-            "0.04",
-        ),
-        (
-            "Nuez de Castilla",
-            "g",
-            "kg",
-            "1000",
-            "2.0",
-            "800",
-            "900",
-            "0.29",
-        ),
-        ("Canela Molida", "g", "kg", "1000", "0.0", "200", "300", "0.16"),
-        (
-            "Leche Condensada",
-            "ml",
-            "l",
-            "1000",
-            "0.0",
-            "1200",
-            "2000",
-            "0.08",
-        ),
-        (
-            "Leche Evaporada",
-            "ml",
-            "l",
-            "1000",
-            "0.0",
-            "1200",
-            "2000",
-            "0.07",
-        ),
-        ("Cajeta", "g", "kg", "1000", "0.0", "900", "1400", "0.13"),
-        ("Mora Azul", "g", "kg", "1000", "4.0", "900", "1200", "0.20"),
-        (
-            "Crema para Batir",
-            "ml",
-            "l",
-            "1000",
-            "0.0",
-            "1400",
-            "2000",
-            "0.09",
-        ),
-        (
-            "Gelatina sin Sabor",
-            "g",
-            "kg",
-            "1000",
-            "0.0",
-            "100",
-            "180",
-            "0.35",
-        ),
-    ]
-
-    for name, base_u, buy_u, factor, merma, minimo, stock, costo in materials:
+    for (
+        name,
+        base_u,
+        buy_u,
+        factor,
+        merma,
+        stock_purchase,
+        stock_min_purchase,
+        costo,
+    ) in RAW_MATERIAL_CATALOG:
         unidad_base = units[base_u]
         unidad_compra = units[buy_u]
         es_conteo = (unidad_base.dimension or "CONTEO").upper() == "CONTEO"
-        factor_decimal = Decimal(factor)
-        minimo_decimal = Decimal(minimo)
-        stock_decimal = Decimal(stock)
+        factor_decimal = Decimal(str(factor))
+        minimo_decimal = Decimal(str(stock_min_purchase)) * factor_decimal
+        stock_decimal = Decimal(str(stock_purchase)) * factor_decimal
 
         if es_conteo:
             factor_decimal = factor_decimal.to_integral_value(rounding=ROUND_HALF_UP)
@@ -599,8 +771,8 @@ def _seed_raw_materials() -> None:
                     id_unidad_base=unidad_base.id_unidad,
                     id_unidad_compra=unidad_compra.id_unidad,
                     factor_conversion=factor_decimal,
-                    porcentaje_merma=Decimal(merma),
-                    costo_unitario=Decimal(costo),
+                    porcentaje_merma=Decimal(str(merma)),
+                    costo_unitario=Decimal(str(costo)),
                     stock_minimo=minimo_decimal,
                     cantidad_disponible=stock_decimal,
                     activa=True,
@@ -611,8 +783,8 @@ def _seed_raw_materials() -> None:
         exists.id_unidad_base = unidad_base.id_unidad
         exists.id_unidad_compra = unidad_compra.id_unidad
         exists.factor_conversion = factor_decimal
-        exists.porcentaje_merma = Decimal(merma)
-        exists.costo_unitario = Decimal(costo)
+        exists.porcentaje_merma = Decimal(str(merma))
+        exists.costo_unitario = Decimal(str(costo))
         exists.stock_minimo = minimo_decimal
         exists.cantidad_disponible = max(
             Decimal(str(exists.cantidad_disponible)),
@@ -628,140 +800,144 @@ def _seed_raw_materials() -> None:
 
 def _seed_recipes() -> None:
     recipes: dict[str, dict] = {
+        "Pastel de Zanahoria": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "240"),
+                (MP_AZUCAR, "260"),
+                (MP_HUEVO, "4"),
+                (MP_ACEITE, "120"),
+                (MP_ZANAHORIA, "300"),
+                (MP_VAINILLA, "15"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_QUESO_CREMA, "250"),
+                (MP_CREMA_BATIR, "100"),
+            ],
+        },
         "Pastel de Chocolate": {
             "rendimiento_base": 1,
             "ingredientes": [
                 (MP_HARINA, "250"),
-                ("Cacao en Polvo", "80"),
                 (MP_AZUCAR, "200"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "120"),
-                ("Leche Entera", "180"),
-                ("Vainilla Extracto", "5"),
-                ("Polvo de Hornear", "8"),
-            ],
-        },
-        "Pastel de Red Velvet": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "250"),
-                (MP_AZUCAR, "220"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "130"),
-                ("Leche Entera", "220"),
-                ("Vainilla Extracto", "5"),
-                ("Cacao en Polvo", "20"),
-                ("Polvo de Hornear", "8"),
-                ("Queso Crema", "180"),
-            ],
-        },
-        "Pastel Helado de Oreo": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                ("Oreo Molida", "300"),
-                ("Queso Crema", "250"),
-                ("Crema para Batir", "300"),
-                (MP_MANTEQUILLA, "90"),
-                ("Leche Condensada", "180"),
-                ("Gelatina sin Sabor", "12"),
-            ],
-        },
-        "Pastel de Zanahoria": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "260"),
-                (MP_AZUCAR, "210"),
-                (MP_HUEVO, "3"),
-                ("Zanahoria Rallada", "300"),
-                ("Nuez de Castilla", "120"),
-                ("Canela Molida", "5"),
-                ("Polvo de Hornear", "10"),
-                (MP_MANTEQUILLA, "110"),
-            ],
-        },
-        "Pastel de Vainilla": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "260"),
-                (MP_AZUCAR, "220"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "120"),
-                ("Leche Entera", "200"),
-                ("Vainilla Extracto", "8"),
-                ("Polvo de Hornear", "8"),
-            ],
-        },
-        "Pastel de Moka": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "240"),
-                (MP_AZUCAR, "220"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "120"),
-                ("Leche Entera", "180"),
-                ("Cafe Espresso", "20"),
-                ("Cacao en Polvo", "40"),
-                ("Vainilla Extracto", "4"),
-                ("Polvo de Hornear", "8"),
-            ],
-        },
-        "Pastel de Frutos Secos": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "250"),
-                (MP_AZUCAR, "200"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "130"),
-                ("Nuez Pecana", "100"),
-                ("Nuez de Castilla", "80"),
-                ("Vainilla Extracto", "6"),
-                ("Canela Molida", "4"),
-                ("Polvo de Hornear", "8"),
-            ],
-        },
-        "Pastel de 3 Leches de Durazno": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "230"),
-                (MP_AZUCAR, "180"),
-                (MP_HUEVO, "3"),
-                (MP_MANTEQUILLA, "100"),
-                ("Leche Entera", "200"),
-                ("Leche Condensada", "220"),
-                ("Leche Evaporada", "220"),
-                ("Durazno en Almibar", "250"),
-                ("Polvo de Hornear", "8"),
-                ("Vainilla Extracto", "6"),
-            ],
-        },
-        "Chocoflan con Cajeta": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "220"),
-                (MP_AZUCAR, "180"),
+                (MP_COCOA, "50"),
                 (MP_HUEVO, "4"),
-                (MP_MANTEQUILLA, "100"),
-                ("Leche Entera", "180"),
-                ("Cacao en Polvo", "60"),
-                ("Leche Condensada", "180"),
-                ("Leche Evaporada", "160"),
-                ("Queso Crema", "150"),
-                ("Cajeta", "200"),
-                ("Vainilla Extracto", "6"),
-                ("Polvo de Hornear", "8"),
+                (MP_ACEITE, "120"),
+                (MP_LECHE_EVAPORADA, "200"),
+                (MP_VAINILLA, "10"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_CREMA_BATIR, "300"),
+                (MP_CHOCOLATE, "200"),
+            ],
+        },
+        "Pastel de Tres Leches con Durazno": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "200"),
+                (MP_AZUCAR, "180"),
+                (MP_HUEVO, "5"),
+                (MP_VAINILLA, "10"),
+                (MP_POLVO_HORNEAR, "8"),
+                (MP_LECHE_EVAPORADA, "250"),
+                (MP_LECHE_CONDENSADA, "250"),
+                (MP_CREMA_BATIR, "200"),
+                (MP_DURAZNO, "250"),
             ],
         },
         "Cheesecake de Mora Azul": {
             "rendimiento_base": 1,
             "ingredientes": [
-                ("Oreo Molida", "220"),
+                (MP_GALLETA_MARIA, "200"),
                 (MP_MANTEQUILLA, "100"),
-                ("Queso Crema", "500"),
-                ("Crema para Batir", "220"),
-                (MP_AZUCAR, "180"),
+                (MP_QUESO_CREMA, "400"),
+                (MP_AZUCAR, "230"),
                 (MP_HUEVO, "3"),
-                ("Mora Azul", "250"),
-                ("Gelatina sin Sabor", "10"),
+                (MP_CREMA_BATIR, "200"),
+                (MP_VAINILLA, "10"),
+                (MP_MORA_AZUL, "250"),
+            ],
+        },
+        "Chocoflan de Cajeta": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "150"),
+                (MP_AZUCAR, "120"),
+                (MP_COCOA, "40"),
+                (MP_HUEVO, "6"),
+                (MP_ACEITE, "80"),
+                (MP_LECHE_EVAPORADA, "420"),
+                (MP_LECHE_CONDENSADA, "250"),
+                (MP_VAINILLA, "15"),
+                (MP_POLVO_HORNEAR, "8"),
+                (MP_CAJETA, "180"),
+            ],
+        },
+        "Pastel de Frutos Secos": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "230"),
+                (MP_AZUCAR, "220"),
+                (MP_HUEVO, "4"),
+                (MP_MANTEQUILLA, "120"),
+                (MP_CREMA_BATIR, "420"),
+                (MP_LECHE_EVAPORADA, "120"),
+                (MP_VAINILLA, "10"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_FRUTOS_SECOS, "150"),
+            ],
+        },
+        "Pastel Tipo Moka": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "220"),
+                (MP_AZUCAR, "180"),
+                (MP_COCOA, "40"),
+                (MP_HUEVO, "4"),
+                (MP_ACEITE, "100"),
+                (MP_LECHE_EVAPORADA, "180"),
+                (MP_CAFE, "15"),
+                (MP_VAINILLA, "10"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_CREMA_BATIR, "300"),
+                (MP_CHOCOLATE, "150"),
+            ],
+        },
+        "Pastel de Red Velvet": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "220"),
+                (MP_AZUCAR, "320"),
+                (MP_COCOA, "15"),
+                (MP_HUEVO, "4"),
+                (MP_ACEITE, "120"),
+                (MP_LECHE_EVAPORADA, "200"),
+                (MP_VAINILLA, "15"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_QUESO_CREMA, "400"),
+                (MP_CREMA_BATIR, "300"),
+            ],
+        },
+        "Pastel de Vainilla con Fresas": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_HARINA, "220"),
+                (MP_AZUCAR, "290"),
+                (MP_HUEVO, "4"),
+                (MP_ACEITE, "100"),
+                (MP_LECHE_EVAPORADA, "200"),
+                (MP_VAINILLA, "15"),
+                (MP_POLVO_HORNEAR, "10"),
+                (MP_FRESA, "400"),
+                (MP_CREMA_BATIR, "300"),
+            ],
+        },
+        "Pastel Helado de Oreo": {
+            "rendimiento_base": 1,
+            "ingredientes": [
+                (MP_OREO, "550"),
+                (MP_MANTEQUILLA, "120"),
+                (MP_CREMA_BATIR, "700"),
+                (MP_LECHE_CONDENSADA, "350"),
+                (MP_VAINILLA, "10"),
             ],
         },
     }
@@ -943,13 +1119,17 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
     sales_user = users.get(ROLE_SALES)
     prod_user = users.get(ROLE_PRODUCTION)
     product = Producto.query.filter_by(
-        nombre=PRODUCTO_PASTEL_CHOCOLATE,
+        nombre=PRODUCTO_PASTEL_ZANAHORIA,
     ).first()
-    recipe = Receta.query.filter_by(activa=True).first()
+    recipe = Receta.query.filter_by(
+        id_producto=product.id_producto if product else None,
+        activa=True,
+    ).first()
     if not sales_user or not prod_user or not product or not recipe:
         return
 
-    if not SolicitudProduccion.query.first():
+    existing_request = SolicitudProduccion.query.first()
+    if not existing_request:
         approved_request = SolicitudProduccion(
             id_producto=product.id_producto,
             cantidad=24,
@@ -985,7 +1165,7 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
                 cantidad=16,
                 estado="PENDIENTE",
                 id_usuario_solicita=sales_user.id_usuario,
-                observaciones=("Pedido para evento corporativo del fin de semana."),
+                observaciones=("Pedido para evento corporativo " "del fin de semana."),
             )
         )
         db.session.add(
@@ -995,7 +1175,7 @@ def _seed_production_flow(users: dict[str, Usuario]) -> None:
                 estado="RECHAZADA",
                 id_usuario_solicita=sales_user.id_usuario,
                 id_usuario_resuelve=prod_user.id_usuario,
-                observaciones=("Se agotó temporalmente la cobertura de insumos."),
+                observaciones=("Se agotó temporalmente la cobertura " "de insumos."),
                 observaciones_resolucion=(
                     "Se programa reapertura cuando ingrese materia prima."
                 ),
