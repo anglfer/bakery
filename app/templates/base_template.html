@@ -95,6 +95,12 @@
 					<i class="bi bi-truck"></i>
 					Proveedores
 				</a>
+				<a
+					href="{{ url_for('sales.compras_mp') }}"
+					class="nav-link-side {% if request.endpoint == 'sales.compras_mp' %}active{% endif %}">
+					<i class="bi bi-cart-check-fill"></i>
+					Compras
+				</a>
 				{% endif %} {% if rol in ['Administrador', 'Produccion'] %}
 				<a
 					href="{{ url_for('production.inventario_mp') }}"
