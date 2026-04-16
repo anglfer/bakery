@@ -20,7 +20,6 @@ from app.models import (
     MateriaPrima,
     Modulo,
     MovimientoInventarioMP,
-    OrdenProduccion,
     Permiso,
     Persona,
     Producto,
@@ -28,7 +27,6 @@ from app.models import (
     Receta,
     Rol,
     SalidaEfectivo,
-    SolicitudProduccion,
     UnidadMedida,
     Usuario,
     Venta,
@@ -62,8 +60,6 @@ MP_POLVO_HORNEAR = "Polvo para hornear"
 MP_COCOA = "Cocoa en Polvo"
 MP_FRESA = "Fresa fresca"
 MP_CAFE = "Café soluble"
-MP_ZANAHORIA = "Zanahoria"
-PRODUCTO_PASTEL_ZANAHORIA = "Pastel de Zanahoria"
 MXN_QUANTIZE = Decimal("0.01")
 
 LEGACY_PRODUCT_NAMES: dict[str, str] = {
@@ -288,26 +284,9 @@ RAW_MATERIAL_CATALOG: tuple[
         Decimal("0.2"),
         Decimal("0.42"),
     ),
-    (
-        MP_ZANAHORIA,
-        "g",
-        "kg",
-        Decimal("1000"),
-        Decimal("15.0"),
-        Decimal("4.0"),
-        Decimal("2.0"),
-        Decimal("0.04"),
-    ),
 )
 
 PRODUCT_CATALOG: tuple[tuple[str, str, Decimal, str, Decimal], ...] = (
-    (
-        "Pastel de Zanahoria",
-        "Bizcocho de zanahoria con crema de queso.",
-        Decimal("510.00"),
-        "img/productos/Pastel_de_zanahoria.jpg",
-        Decimal("28.00"),
-    ),
     (
         "Pastel de Chocolate",
         "Bizcocho de cacao con cobertura de chocolate semiamargo.",
@@ -800,20 +779,6 @@ def _seed_raw_materials() -> None:
 
 def _seed_recipes() -> None:
     recipes: dict[str, dict] = {
-        "Pastel de Zanahoria": {
-            "rendimiento_base": 1,
-            "ingredientes": [
-                (MP_HARINA, "240"),
-                (MP_AZUCAR, "260"),
-                (MP_HUEVO, "4"),
-                (MP_ACEITE, "120"),
-                (MP_ZANAHORIA, "300"),
-                (MP_VAINILLA, "15"),
-                (MP_POLVO_HORNEAR, "10"),
-                (MP_QUESO_CREMA, "250"),
-                (MP_CREMA_BATIR, "100"),
-            ],
-        },
         "Pastel de Chocolate": {
             "rendimiento_base": 1,
             "ingredientes": [
@@ -1118,70 +1083,8 @@ def _seed_product_costing() -> None:
 def _seed_production_flow(users: dict[str, Usuario]) -> None:
     sales_user = users.get(ROLE_SALES)
     prod_user = users.get(ROLE_PRODUCTION)
-    product = Producto.query.filter_by(
-        nombre=PRODUCTO_PASTEL_ZANAHORIA,
-    ).first()
-    recipe = Receta.query.filter_by(
-        id_producto=product.id_producto if product else None,
-        activa=True,
-    ).first()
-    if not sales_user or not prod_user or not product or not recipe:
+    if not sales_user or not prod_user:
         return
-
-    existing_request = SolicitudProduccion.query.first()
-    if not existing_request:
-        approved_request = SolicitudProduccion(
-            id_producto=product.id_producto,
-            cantidad=24,
-            estado="APROBADA",
-            id_usuario_solicita=sales_user.id_usuario,
-            id_usuario_resuelve=prod_user.id_usuario,
-            observaciones="Stock bajo en mostrador.",
-            observaciones_resolucion="Se aprueba para cubrir demanda del día.",
-            fecha_resolucion=utc_now(),
-        )
-        db.session.add(approved_request)
-        db.session.flush()
-
-        db.session.add(
-            OrdenProduccion(
-                id_solicitud=approved_request.id_solicitud,
-                id_receta=recipe.id_receta,
-                id_producto=product.id_producto,
-                cantidad_producir=24,
-                estado="FINALIZADO",
-                fecha_inicio=utc_now(),
-                fecha_fin=utc_now(),
-                id_usuario_responsable=prod_user.id_usuario,
-                costo_total=_to_mxn(
-                    _resolver_costo_unitario_para_snapshot(product) * Decimal("24")
-                ),
-            )
-        )
-
-        db.session.add(
-            SolicitudProduccion(
-                id_producto=product.id_producto,
-                cantidad=16,
-                estado="PENDIENTE",
-                id_usuario_solicita=sales_user.id_usuario,
-                observaciones=("Pedido para evento corporativo " "del fin de semana."),
-            )
-        )
-        db.session.add(
-            SolicitudProduccion(
-                id_producto=product.id_producto,
-                cantidad=12,
-                estado="RECHAZADA",
-                id_usuario_solicita=sales_user.id_usuario,
-                id_usuario_resuelve=prod_user.id_usuario,
-                observaciones=("Se agotó temporalmente la cobertura " "de insumos."),
-                observaciones_resolucion=(
-                    "Se programa reapertura cuando ingrese materia prima."
-                ),
-                fecha_resolucion=utc_now(),
-            )
-        )
 
     db.session.flush()
 

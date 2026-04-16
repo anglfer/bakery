@@ -959,12 +959,6 @@ def seed_base_catalog_data() -> None:
 
     productos_base = (
         (
-            "Pastel de Zanahoria",
-            "Bizcocho de zanahoria con crema de queso.",
-            Decimal("510.00"),
-            "img/productos/Pastel_de_zanahoria.jpg",
-        ),
-        (
             "Pastel de Chocolate",
             "Bizcocho de cacao con cobertura de chocolate semiamargo.",
             Decimal("480.00"),
