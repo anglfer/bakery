@@ -1,11 +1,14 @@
 import importlib
 import logging
 import os
+import re
+import time
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 
 from dotenv import load_dotenv
 from flask import Flask, has_request_context, render_template, request
+from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 from werkzeug.exceptions import HTTPException
 
@@ -23,6 +26,8 @@ from app.sales import sales_bp
 from app.seed_data import seed_full_data
 from instance.config import get_config_path
 
+LOG_KEY_VALUE_RE = re.compile(r"(?P<key>[a-zA-Z_][a-zA-Z0-9_]*)=(?P<value>[^|]+)")
+
 
 def create_app(config_object: str | None = None) -> Flask:
     load_dotenv()
@@ -34,6 +39,7 @@ def create_app(config_object: str | None = None) -> Flask:
     register_blueprints(app)
     register_error_handlers(app)
     register_cli_commands(app)
+    configure_request_logging(app)
 
     if app.config.get("AUTO_DB_INIT", False):
         with app.app_context():
@@ -71,12 +77,18 @@ class MongoDBLogHandler(logging.Handler):
         try:
             self._collection.create_index([("timestamp_utc", -1)])
             self._collection.create_index([("level", 1), ("timestamp_utc", -1)])
+            self._collection.create_index([("event", 1), ("timestamp_utc", -1)])
+            self._collection.create_index([("actor", 1), ("timestamp_utc", -1)])
+            self._collection.create_index([("user", 1), ("timestamp_utc", -1)])
+            self._collection.create_index([("role", 1), ("timestamp_utc", -1)])
         except Exception:
             # No bloquear el arranque por índices.
             pass
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
+            message = record.getMessage()
+            extracted_fields = _extract_fields_from_log_message(message)
             payload = {
                 "timestamp_utc": datetime.fromtimestamp(
                     record.created,
@@ -84,13 +96,19 @@ class MongoDBLogHandler(logging.Handler):
                 ),
                 "level": record.levelname,
                 "logger": record.name,
-                "message": record.getMessage(),
+                "message": message,
                 "formatted_message": self.format(record),
                 "module": record.module,
                 "function": record.funcName,
                 "line": record.lineno,
                 "path": record.pathname,
                 "environment": self.environment,
+                "event": extracted_fields.get("event"),
+                "actor": extracted_fields.get("actor"),
+                "user": extracted_fields.get("user"),
+                "role": extracted_fields.get("role"),
+                "ip": extracted_fields.get("ip"),
+                "fields": extracted_fields.get("fields", {}),
             }
 
             if record.exc_info:
@@ -122,6 +140,96 @@ def configure_logging(app: Flask) -> None:
     app.logger.setLevel(logging.INFO)
     configure_file_logging(app)
     configure_mongo_logging(app)
+
+
+def _extract_fields_from_log_message(message: str) -> dict:
+    if not message:
+        return {"fields": {}}
+
+    raw_parts = [part.strip() for part in message.split("|") if part.strip()]
+    fields: dict[str, str] = {}
+    event = None
+    for index, part in enumerate(raw_parts):
+        if "=" not in part and index == 0:
+            event = part
+            continue
+
+        match = LOG_KEY_VALUE_RE.fullmatch(part)
+        if not match:
+            continue
+
+        key = match.group("key").lower()
+        value = match.group("value").strip()
+        fields[key] = value
+
+    actor = fields.get("actor") or fields.get("usuario")
+    user = fields.get("user") or fields.get("username") or actor
+    role = fields.get("rol") or fields.get("role")
+    ip = fields.get("ip") or fields.get("remote_addr")
+
+    return {
+        "event": event,
+        "actor": actor,
+        "user": user,
+        "role": role,
+        "ip": ip,
+        "fields": fields,
+    }
+
+
+def _resolve_current_actor() -> tuple[str, str]:
+    if not current_user.is_authenticated:
+        return "anonimo", "sin_rol"
+
+    actor = getattr(current_user, "username", "anonimo") or "anonimo"
+    role_name = "sin_rol"
+    if getattr(current_user, "rol", None):
+        role_name = current_user.rol.nombre or "sin_rol"
+    return actor, role_name
+
+
+def configure_request_logging(app: Flask) -> None:
+    @app.before_request
+    def log_request_start() -> None:
+        if request.endpoint == "static":
+            return
+
+        actor, role_name = _resolve_current_actor()
+        request.environ["sb_request_start"] = time.perf_counter()
+        app.logger.info(
+            "REQUEST_START|method=%s|path=%s|endpoint=%s|user=%s|role=%s",
+            request.method,
+            request.path,
+            request.endpoint or "unknown",
+            actor,
+            role_name,
+        )
+
+    @app.after_request
+    def log_request_end(response):
+        if request.endpoint == "static":
+            return response
+
+        actor, role_name = _resolve_current_actor()
+        started_at = request.environ.get("sb_request_start")
+        elapsed_ms = 0.0
+        if isinstance(started_at, float):
+            elapsed_ms = (time.perf_counter() - started_at) * 1000
+
+        app.logger.info(
+            (
+                "REQUEST_END|method=%s|path=%s|endpoint=%s|status=%s|"
+                "duration_ms=%.2f|user=%s|role=%s"
+            ),
+            request.method,
+            request.path,
+            request.endpoint or "unknown",
+            response.status_code,
+            elapsed_ms,
+            actor,
+            role_name,
+        )
+        return response
 
 
 def _remove_file_handlers(app: Flask) -> None:
@@ -160,9 +268,7 @@ def configure_file_logging(app: Flask) -> None:
     )
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-        )
+        logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     )
     app.logger.addHandler(file_handler)
 

@@ -1,13 +1,29 @@
 from __future__ import annotations
 
+import importlib
 import re
-from datetime import datetime
+from datetime import datetime, time, timedelta, timezone
 from decimal import Decimal
 
-from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required
 
 from app.admin import admin_bp
+from app.admin.forms import (
+    ProveedorForm,
+    RolCrearForm,
+    RolEditarForm,
+    UsuarioCrearForm,
+    UsuarioEditarForm,
+)
 from app.common.passwords import is_password_insecure
 from app.common.security import log_audit_event, require_permission
 from app.extensions import db
@@ -24,8 +40,6 @@ from app.models import (
     Venta,
     utc_today,
 )
-from app.admin.forms import ProveedorForm, RolCrearForm, RolEditarForm, UsuarioCrearForm, UsuarioEditarForm
-
 
 BASE_ROLES = {"Administrador", "Ventas", "Produccion"}
 DASHBOARD_ALLOWED_ROLES = {"Administrador", "Ventas", "Produccion"}
@@ -35,6 +49,176 @@ ROLES_ENDPOINT = "admin.roles"
 SUPPLIERS_ENDPOINT = "admin.proveedores"
 SUPPLIER_PHONE_RE = re.compile(r"^[0-9\s\-\(\)\+]+$")
 SUPPLIER_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+LOG_LEVEL_OPTIONS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
+DEFAULT_LOGS_PAGE_SIZE = 100
+
+
+def _get_mongo_client_class():
+    try:
+        module = importlib.import_module("pymongo")
+        return getattr(module, "MongoClient")
+    except Exception:
+        return None
+
+
+def _is_admin_user() -> bool:
+    if not current_user.is_authenticated:
+        return False
+
+    return bool(current_user.rol and current_user.rol.nombre == "Administrador")
+
+
+def _parse_logs_date(value: str | None):
+    if not value:
+        return utc_today()
+
+    try:
+        return datetime.strptime(value.strip(), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return utc_today()
+
+
+def _build_logs_filter(
+    *,
+    selected_date,
+    level_name: str,
+    username: str,
+    text_query: str,
+) -> dict:
+    start_dt = datetime.combine(selected_date, time.min, tzinfo=timezone.utc)
+    end_dt = start_dt + timedelta(days=1)
+
+    filter_doc: dict = {
+        "timestamp_utc": {"$gte": start_dt, "$lt": end_dt},
+    }
+    if level_name:
+        filter_doc["level"] = level_name
+
+    regex_clauses = []
+    if username:
+        escaped_user = re.escape(username)
+        regex_clauses.extend(
+            [
+                {"actor": {"$regex": escaped_user, "$options": "i"}},
+                {"user": {"$regex": escaped_user, "$options": "i"}},
+                {
+                    "message": {
+                        "$regex": rf"user={escaped_user}",
+                        "$options": "i",
+                    }
+                },
+                {
+                    "message": {
+                        "$regex": rf"actor={escaped_user}",
+                        "$options": "i",
+                    }
+                },
+            ]
+        )
+
+    if text_query:
+        escaped_text = re.escape(text_query)
+        regex_clauses.extend(
+            [
+                {"message": {"$regex": escaped_text, "$options": "i"}},
+                {
+                    "formatted_message": {
+                        "$regex": escaped_text,
+                        "$options": "i",
+                    }
+                },
+                {"event": {"$regex": escaped_text, "$options": "i"}},
+            ]
+        )
+
+    if regex_clauses:
+        filter_doc["$and"] = [{"$or": regex_clauses}]
+
+    return filter_doc
+
+
+def _query_logs_from_mongo(
+    *,
+    selected_date,
+    level_name: str,
+    username: str,
+    text_query: str,
+    page: int,
+):
+    if not current_app.config.get("MONGO_LOGS_ENABLED", False):
+        return [], 0, ("El logging en MongoDB está deshabilitado " "por configuración.")
+
+    mongo_client_class = _get_mongo_client_class()
+    if mongo_client_class is None:
+        return [], 0, "No se pudo cargar pymongo en el entorno actual."
+
+    mongo_uri = str(current_app.config.get("MONGO_URI", "")).strip()
+    if not mongo_uri:
+        return [], 0, "MONGO_URI no está configurado."
+
+    database_name = str(current_app.config.get("MONGO_LOGS_DB", "softbakery")).strip()
+    collection_name = str(
+        current_app.config.get("MONGO_LOGS_COLLECTION", "app_logs")
+    ).strip()
+    timeout_ms = int(current_app.config.get("MONGO_LOGS_TIMEOUT_MS", 2000))
+
+    filter_doc = _build_logs_filter(
+        selected_date=selected_date,
+        level_name=level_name,
+        username=username,
+        text_query=text_query,
+    )
+
+    skip = (page - 1) * DEFAULT_LOGS_PAGE_SIZE
+    try:
+        with mongo_client_class(
+            mongo_uri,
+            serverSelectionTimeoutMS=timeout_ms,
+        ) as client:
+            collection = client[database_name][collection_name]
+            total_rows = collection.count_documents(
+                filter_doc,
+                maxTimeMS=timeout_ms,
+            )
+            cursor = collection.find(
+                filter_doc,
+                sort=[("timestamp_utc", -1)],
+                skip=skip,
+                limit=DEFAULT_LOGS_PAGE_SIZE,
+                max_time_ms=timeout_ms,
+            )
+            docs = list(cursor)
+    except Exception:
+        current_app.logger.exception("LOGS_VIEW_FAIL|reason=mongo_query_error")
+        return [], 0, "No fue posible consultar logs en MongoDB."
+
+    normalized = []
+    for doc in docs:
+        timestamp = doc.get("timestamp_utc")
+        timestamp_display = "-"
+        if isinstance(timestamp, datetime):
+            timestamp_display = timestamp.astimezone(timezone.utc).strftime(
+                "%Y-%m-%d %H:%M:%S UTC"
+            )
+
+        normalized.append(
+            {
+                "id": str(doc.get("_id", "")),
+                "timestamp_display": timestamp_display,
+                "level": doc.get("level", "INFO"),
+                "event": doc.get("event") or "-",
+                "actor": doc.get("actor") or doc.get("user") or "-",
+                "role": doc.get("role") or "-",
+                "ip": doc.get("ip")
+                or (doc.get("request", {}) or {}).get("remote_addr")
+                or "-",
+                "path": (doc.get("request", {}) or {}).get("path") or "-",
+                "method": (doc.get("request", {}) or {}).get("method") or "-",
+                "message": doc.get("message", ""),
+            }
+        )
+
+    return normalized, total_rows, None
 
 
 def _to_bool(value: str | None) -> bool:
@@ -291,6 +475,70 @@ def dashboard():
     )
 
 
+@admin_bp.route("/logs")
+@login_required
+def logs_view():
+    if not _is_admin_user():
+        flash(
+            "Solo administración puede consultar logs del sistema.",
+            "danger",
+        )
+        return redirect(url_for("admin.dashboard"))
+
+    selected_date = _parse_logs_date(request.args.get("fecha"))
+    username = (request.args.get("usuario") or "").strip()
+    text_query = (request.args.get("q") or "").strip()
+    level_requested = (request.args.get("nivel") or "").strip().upper()
+    level_name = level_requested if level_requested in LOG_LEVEL_OPTIONS else ""
+    page = max(_parse_int(request.args.get("page", "1"), 1), 1)
+
+    logs_rows, total_rows, error_message = _query_logs_from_mongo(
+        selected_date=selected_date,
+        level_name=level_name,
+        username=username,
+        text_query=text_query,
+        page=page,
+    )
+    total_pages = max(
+        (total_rows + DEFAULT_LOGS_PAGE_SIZE - 1) // DEFAULT_LOGS_PAGE_SIZE,
+        1,
+    )
+    has_prev = page > 1
+    has_next = page < total_pages
+
+    current_app.logger.info(
+        "LOGS_VIEW|user=%s|date=%s|level=%s|rows=%s|page=%s",
+        current_user.username,
+        selected_date.isoformat(),
+        level_name or "ALL",
+        len(logs_rows),
+        page,
+    )
+    log_audit_event(
+        "LOGS_CONSULTA",
+        (
+            f"fecha={selected_date.isoformat()}; nivel={level_name or 'ALL'}; "
+            f"usuario={username or '-'}; q={text_query or '-'}; pagina={page}"
+        ),
+    )
+
+    return render_template(
+        "admin/logs.html",
+        logs_rows=logs_rows,
+        error_message=error_message,
+        fecha_consulta_iso=selected_date.isoformat(),
+        nivel_consulta=level_name,
+        usuario_consulta=username,
+        texto_consulta=text_query,
+        level_options=LOG_LEVEL_OPTIONS,
+        total_rows=total_rows,
+        total_pages=total_pages,
+        current_page=page,
+        has_prev=has_prev,
+        has_next=has_next,
+    )
+
+
 @admin_bp.route("/usuarios", methods=["GET", "POST"])
 @login_required
 @require_permission("Usuarios", "leer")
@@ -476,7 +724,9 @@ def roles():
             if Rol.query.filter_by(nombre=nombre).first():
                 form_crear.nombre.errors.append("Ya existe un rol con ese nombre.")
             else:
-                db.session.add(Rol(nombre=nombre, descripcion=descripcion, es_base=False))
+                db.session.add(
+                    Rol(nombre=nombre, descripcion=descripcion, es_base=False)
+                )
                 db.session.commit()
                 role = Rol.query.filter_by(nombre=nombre).first()
                 if role:
@@ -489,10 +739,16 @@ def roles():
 
         # Validation failed — reopen modal
         data = Rol.query.order_by(Rol.id_rol.asc()).all()
-        modulos_data = Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
-        modulos = [{"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None} for m in modulos_data]
+        modulos_data = (
+            Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
+        )
+        modulos = [
+            {"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None}
+            for m in modulos_data
+        ]
         usuarios_activos_por_rol = {
-            r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count() for r in data
+            r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count()
+            for r in data
         }
         return render_template(
             "admin/roles.html",
@@ -550,10 +806,16 @@ def editar_rol(id_rol: int):
 
     # Validation failed — reopen edit modal
     data = Rol.query.order_by(Rol.id_rol.asc()).all()
-    modulos_data = Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
-    modulos = [{"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None} for m in modulos_data]
+    modulos_data = (
+        Modulo.query.filter_by(activo=True).order_by(Modulo.nombre.asc()).all()
+    )
+    modulos = [
+        {"id_modulo": m.id_modulo, "nombre": m.nombre, "descripcion": None}
+        for m in modulos_data
+    ]
     usuarios_activos_por_rol = {
-        r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count() for r in data
+        r.id_rol: Usuario.query.filter_by(id_rol=r.id_rol, activo=True).count()
+        for r in data
     }
     form_crear = RolCrearForm(prefix="crear")
     return render_template(
@@ -782,14 +1044,18 @@ def editar_proveedor(id_proveedor: int):
             Proveedor.id_proveedor != proveedor.id_proveedor,
         ).first()
         if proveedor_existente:
-            form_editar.nombre_empresa.errors.append("Ya existe un proveedor con ese nombre.")
+            form_editar.nombre_empresa.errors.append(
+                "Ya existe un proveedor con ese nombre."
+            )
         else:
             correo_existente = Proveedor.query.filter(
                 db.func.lower(Proveedor.correo) == correo.lower(),
                 Proveedor.id_proveedor != proveedor.id_proveedor,
             ).first()
             if correo_existente:
-                form_editar.correo.errors.append("El correo ya está registrado en otro proveedor.")
+                form_editar.correo.errors.append(
+                    "El correo ya está registrado en otro proveedor."
+                )
             else:
                 proveedor.nombre_empresa = nombre
                 proveedor.nombre_contacto = nombre_contacto
@@ -799,7 +1065,9 @@ def editar_proveedor(id_proveedor: int):
                 proveedor.estado = estado
                 proveedor.direccion = direccion
                 if "editar-activo" in request.form:
-                    proveedor.activo = _to_bool(request.form.get("editar-activo", "off"))
+                    proveedor.activo = _to_bool(
+                        request.form.get("editar-activo", "off")
+                    )
                 db.session.commit()
                 log_audit_event(
                     "PROVEEDOR_EDITADO",

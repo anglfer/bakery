@@ -3,7 +3,15 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required, logout_user
 
 from app.catalog import catalog_bp
@@ -18,7 +26,9 @@ from app.models import (
     DetalleCarrito,
     Pedido,
     Producto,
+    TicketVenta,
     Usuario,
+    Venta,
 )
 
 
@@ -136,6 +146,77 @@ def _build_catalog_story(producto: Producto) -> dict[str, object]:
         "pasos": pasos_unicos[:4],
         "tiene_receta": bool(receta),
     }
+
+
+def _obtener_o_crear_ticket_cliente(venta: Venta) -> TicketVenta:
+    ticket = TicketVenta.query.filter_by(id_venta=venta.id_venta).first()
+    if ticket:
+        return ticket
+
+    nombre_negocio = (
+        str(current_app.config.get("BUSINESS_NAME", "SoftBakery")).strip()
+        or "SoftBakery"
+    )
+    ticket = TicketVenta()
+    ticket.id_venta = venta.id_venta
+    ticket.folio = f"SB-{venta.id_venta:06d}"
+    ticket.nombre_negocio = nombre_negocio
+    db.session.add(ticket)
+    if not venta.requiere_ticket:
+        venta.requiere_ticket = True
+    db.session.commit()
+    return ticket
+
+
+def _nombre_cliente_actual() -> str:
+    cliente = current_user.username
+    if current_user.persona:
+        cliente = (
+            f"{current_user.persona.nombre} {current_user.persona.apellidos}"
+        ).strip()
+    return cliente
+
+
+def _render_ticket_pedido_pagado(pedido: Pedido, *, download_mode: bool):
+    folio_pedido = f"PED-TKT-{pedido.id_pedido:06d}"
+    detalles_pedido = list(getattr(pedido, "detalles", []) or [])
+    total_detalle = sum(Decimal(str(d.subtotal or 0)) for d in detalles_pedido)
+    if total_detalle <= 0:
+        total_detalle = Decimal(str(pedido.total or 0))
+
+    html = render_template(
+        "sales/ticket_venta.html",
+        venta=None,
+        ticket=None,
+        pedido=pedido,
+        ticket_folio=folio_pedido,
+        ticket_fecha=pedido.fecha_pedido,
+        nombre_negocio=(
+            str(current_app.config.get("BUSINESS_NAME", "SoftBakery")).strip()
+            or "SoftBakery"
+        ),
+        cliente=_nombre_cliente_actual(),
+        medio_pago=(pedido.pago.tipo_pago if pedido.pago else pedido.tipo_pago),
+        total_detalle=total_detalle,
+        download_mode=download_mode,
+        download_url=url_for(
+            "catalog.ver_ticket_pedido_cliente",
+            id_pedido=pedido.id_pedido,
+            download=1,
+        ),
+        back_url=url_for("catalog.mis_pedidos"),
+        back_label="Volver a mis pedidos",
+    )
+
+    if download_mode:
+        response = make_response(html)
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="ticket-{folio_pedido}.html"'
+        )
+        return response
+
+    return html
 
 
 @catalog_bp.route("/")
@@ -427,4 +508,129 @@ def mis_pedidos():
         .order_by(Pedido.id_pedido.desc())
         .all()
     )
-    return render_template("catalog/mis_pedidos.html", pedidos=pedidos)
+
+    ventas_cliente = (
+        Venta.query.filter(
+            Venta.id_usuario_cliente == current_user.id_usuario,
+            Venta.id_pedido.isnot(None),
+        )
+        .order_by(Venta.id_venta.desc())
+        .all()
+    )
+
+    ids_venta = [venta.id_venta for venta in ventas_cliente]
+    tickets = []
+    if ids_venta:
+        tickets = TicketVenta.query.filter(TicketVenta.id_venta.in_(ids_venta)).all()
+    ticket_por_venta = {ticket.id_venta: ticket for ticket in tickets}
+
+    venta_por_pedido = {
+        venta.id_pedido: venta for venta in ventas_cliente if venta.id_pedido
+    }
+    tickets_por_pedido: dict[int, dict] = {}
+    for venta in ventas_cliente:
+        if not venta.id_pedido or venta.id_pedido in tickets_por_pedido:
+            continue
+
+        ticket = ticket_por_venta.get(venta.id_venta)
+        tickets_por_pedido[venta.id_pedido] = {
+            "id_venta": venta.id_venta,
+            "folio": ticket.folio if ticket else None,
+            "tipo": "VENTA",
+        }
+
+    for pedido in pedidos:
+        if pedido.id_pedido in tickets_por_pedido:
+            continue
+
+        estado_pago = (pedido.estado_pago or "").upper()
+        if estado_pago != "PAGADO":
+            continue
+
+        if pedido.id_pedido not in venta_por_pedido:
+            tickets_por_pedido[pedido.id_pedido] = {
+                "id_venta": None,
+                "folio": f"PED-TKT-{pedido.id_pedido:06d}",
+                "tipo": "PEDIDO",
+                "provisional": True,
+            }
+
+    return render_template(
+        "catalog/mis_pedidos.html",
+        pedidos=pedidos,
+        tickets_por_pedido=tickets_por_pedido,
+    )
+
+
+@catalog_bp.get("/mis-pedidos/<int:id_pedido>/ticket")
+@login_required
+@require_permission("Pedidos Clientes", "leer")
+def ver_ticket_pedido_cliente(id_pedido: int):
+    guard = _guard_cliente_activo()
+    if guard:
+        return guard
+
+    pedido = Pedido.query.filter_by(
+        id_pedido=id_pedido,
+        id_usuario_cliente=current_user.id_usuario,
+    ).first()
+    if not pedido:
+        flash("Pedido no encontrado.", "warning")
+        return redirect(url_for("catalog.mis_pedidos"))
+
+    venta = (
+        Venta.query.filter(
+            Venta.id_pedido == id_pedido,
+            Venta.id_usuario_cliente == current_user.id_usuario,
+        )
+        .order_by(Venta.id_venta.desc())
+        .first()
+    )
+
+    download_mode = request.args.get("download") == "1"
+    if not venta and (pedido.estado_pago or "").upper() == "PAGADO":
+        return _render_ticket_pedido_pagado(
+            pedido,
+            download_mode=download_mode,
+        )
+
+    if not venta:
+        flash(
+            "Aún no hay ticket disponible para ese pedido.",
+            "warning",
+        )
+        return redirect(url_for("catalog.mis_pedidos"))
+
+    ticket = _obtener_o_crear_ticket_cliente(venta)
+    cliente = _nombre_cliente_actual()
+
+    total_detalle = sum(Decimal(str(d.subtotal or 0)) for d in venta.detalles)
+    if total_detalle <= 0:
+        total_detalle = Decimal(str(venta.total or 0))
+
+    html = render_template(
+        "sales/ticket_venta.html",
+        venta=venta,
+        ticket=ticket,
+        pedido=pedido,
+        cliente=cliente,
+        total_detalle=total_detalle,
+        download_mode=download_mode,
+        download_url=url_for(
+            "catalog.ver_ticket_pedido_cliente",
+            id_pedido=id_pedido,
+            download=1,
+        ),
+        back_url=url_for("catalog.mis_pedidos"),
+        back_label="Volver a mis pedidos",
+    )
+
+    if download_mode:
+        response = make_response(html)
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="ticket-{ticket.folio}.html"'
+        )
+        return response
+
+    return html

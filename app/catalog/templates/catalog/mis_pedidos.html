@@ -16,6 +16,7 @@
 	<div class="accordion d-grid gap-3" id="pedidosClienteAccordion">
 		{% for p in pedidos %} {% set estado = (p.estado_pedido or 'default')|lower|replace(' ', '-') %}
 		{% set estado_pago = (p.estado_pago or 'default')|lower|replace(' ', '-') %}
+		{% set ticket_meta = tickets_por_pedido.get(p.id_pedido) %}
 		<article class="portal-order-card accordion-item border-0 shadow-sm">
 			<div class="portal-order-header">
 				<h3 class="portal-order-id">Pedido #{{ p.id_pedido }}</h3>
@@ -38,7 +39,30 @@
 					<strong>Total:</strong>
 					${{ '%.2f'|format(p.total) }}
 				</div>
+				{% if ticket_meta %}
+				<div>
+					<strong>Ticket:</strong>
+					{{ ticket_meta.folio or 'Se genera al abrir' }}
+				</div>
+				{% endif %}
 			</div>
+
+			{% if ticket_meta %}
+			<div class="d-flex flex-wrap gap-2 px-3 pb-2">
+				<a
+					class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+					href="{{ url_for('catalog.ver_ticket_pedido_cliente', id_pedido=p.id_pedido) }}"
+					target="_blank"
+					rel="noopener">
+					Ver ticket
+				</a>
+				<a
+					class="btn btn-outline-dark btn-sm rounded-pill px-3"
+					href="{{ url_for('catalog.ver_ticket_pedido_cliente', id_pedido=p.id_pedido, download=1) }}">
+					Descargar ticket
+				</a>
+			</div>
+			{% endif %}
 
 			<div class="accordion-header" id="pedidoHeading{{ p.id_pedido }}">
 				<button

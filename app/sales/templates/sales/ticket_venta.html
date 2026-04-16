@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Ticket {{ ticket.folio }}</title>
+		<title>Ticket {{ ticket.folio if ticket else ticket_folio }}</title>
 		<style>
 			:root {
 				--ink: #2f231d;
@@ -146,25 +146,38 @@
 		</style>
 	</head>
 	<body>
+		{% set detalle_items = venta.detalles if venta else pedido.detalles %}
+		{% set folio = ticket.folio if ticket else ticket_folio %}
+		{% set negocio = ticket.nombre_negocio if ticket else nombre_negocio %}
+		{% set fecha_ticket = ticket.fecha if ticket else ticket_fecha %}
+		{% set medio_pago_ticket = venta.tipo_pago if venta else medio_pago %}
+		{% set estado_ticket = venta.estado if venta else pedido.estado_pedido %}
 		<div class="ticket-wrap">
 			<article class="ticket">
 				<header class="header">
-					<div class="brand">{{ ticket.nombre_negocio }}</div>
+					<div class="brand">{{ negocio }}</div>
 					<div class="subtitle">Ticket de venta</div>
 				</header>
 
 				<section class="meta">
 					<div>
 						<strong>Folio:</strong>
-						{{ ticket.folio }}
+						{{ folio }}
 					</div>
+					{% if venta %}
 					<div>
 						<strong>Venta:</strong>
 						V-{{ '%03d'|format(venta.id_venta) }}
 					</div>
+					{% else %}
+					<div>
+						<strong>Pedido:</strong>
+						PED-{{ '%04d'|format(pedido.id_pedido) }}
+					</div>
+					{% endif %}
 					<div>
 						<strong>Fecha:</strong>
-						{{ ticket.fecha.strftime('%Y-%m-%d %H:%M') if ticket.fecha else '—' }}
+						{{ fecha_ticket.strftime('%Y-%m-%d %H:%M') if fecha_ticket else '—' }}
 					</div>
 					<div>
 						<strong>Cliente:</strong>
@@ -172,11 +185,11 @@
 					</div>
 					<div>
 						<strong>Pago:</strong>
-						{{ venta.tipo_pago }}
+						{{ medio_pago_ticket }}
 					</div>
 					<div>
 						<strong>Estado:</strong>
-						<span class="status">{{ venta.estado }}</span>
+						<span class="status">{{ estado_ticket }}</span>
 					</div>
 				</section>
 
@@ -190,7 +203,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for d in venta.detalles %}
+						{% for d in detalle_items %}
 						<tr>
 							<td>{{ d.producto.nombre if d.producto else 'Producto' }}</td>
 							<td class="num">{{ d.cantidad }}</td>
@@ -215,10 +228,10 @@
 			<button class="btn primary" type="button" onclick="window.print()">Imprimir</button>
 			<a
 				class="btn"
-				href="{{ url_for('sales.ver_ticket_venta', id_venta=venta.id_venta, download=1) }}">
+				href="{{ download_url or url_for('sales.ver_ticket_venta', id_venta=venta.id_venta, download=1) }}">
 				Descargar
 			</a>
-			<a class="btn" href="{{ url_for('sales.ventas', tab='historial') }}">Volver a ventas</a>
+			<a class="btn" href="{{ back_url or url_for('sales.ventas', tab='historial') }}">{{ back_label or 'Volver a ventas' }}</a>
 		</div>
 		{% endif %}
 	</body>
